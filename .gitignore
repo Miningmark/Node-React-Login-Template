@@ -2,3 +2,4 @@
 server/package.json
 
 node_modules/
+server/package-lock.json
