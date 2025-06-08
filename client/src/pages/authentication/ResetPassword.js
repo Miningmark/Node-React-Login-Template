@@ -1,34 +1,44 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "../components/ToastContext";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useToast } from "../../components/ToastContext";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-import "../components/CSS/login.css";
-
-function Register() {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+function ResetPassword() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [touched, setTouched] = useState({});
+  const [token, setToken] = useState(null);
 
-  const { addToast } = useToast();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
-  const isUsernameValid = username.trim().length >= 5 && username.trim().length <= 15;
+  useEffect(() => {
+    const tokenFromUrl = searchParams.get("token");
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+    }
+  }, [searchParams]);
 
   const isLengthValid = password.length >= 8;
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const passwordsMatch = password === repeatPassword;
 
-  const handleSubmitRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isLengthValid || !hasNumber || !hasSpecialChar) {
+    if (!token || token.length !== 32) {
+      addToast("Kein gültiger Token vorhanden", "danger");
+      return;
+    }
+
+    if (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSpecialChar) {
       addToast("Passwort erfüllt nicht die Anforderungen", "danger");
       return;
     }
@@ -38,19 +48,23 @@ function Register() {
       return;
     }
 
-    const res = await fetch("http://localhost:4000/api/v1/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, username, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:4000/api/v1/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.status === 201) {
-      addToast("Registrierung erfolgreich! Bitte einloggen.", "success");
-      navigate("/login");
-    } else {
-      addToast(data.message || "Registrierung fehlgeschlagen", "danger");
+      if (res.status === 200) {
+        addToast("Passwort erfolgreich geändert.", "success");
+        navigate("/login");
+      } else {
+        addToast(data.message || "Passwort konnte nicht geändert werden", "danger");
+      }
+    } catch (err) {
+      addToast("Serverfehler beim Zurücksetzen des Passworts", "danger");
     }
   };
 
@@ -68,47 +82,8 @@ function Register() {
         className="border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
         style={{ maxWidth: "400px" }}
       >
-        <h2 className="text-center mb-4">Registrieren</h2>
-        <Form onSubmit={handleSubmitRegister} noValidate>
-          <div className="form-floating mb-3">
-            <input
-              type="email"
-              className={`form-control ${touched.email && email.trim() === "" ? "is-invalid" : ""}`}
-              id="floatingEmail"
-              placeholder="E-Mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => setTouched({ ...touched, email: true })}
-              required
-            />
-            <label htmlFor="floatingEmail">E-Mail</label>
-          </div>
-
-          <div className="form-floating mb-3">
-            <input
-              type="text"
-              className={`form-control ${
-                touched.username && !isUsernameValid
-                  ? "is-invalid"
-                  : isUsernameValid
-                  ? "is-valid"
-                  : ""
-              }`}
-              id="floatingUsername"
-              placeholder="Benutzername"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onBlur={() => setTouched({ ...touched, username: true })}
-              required
-            />
-            <label htmlFor="floatingUsername">Benutzername</label>
-            {touched.username && !isUsernameValid && (
-              <div className="invalid-feedback">
-                Benutzername muss zwischen 5 und 15 Zeichen lang sein.
-              </div>
-            )}
-          </div>
-
+        <h2 className="text-center mb-4">Passwort zurücksetzen</h2>
+        <Form onSubmit={handleSubmit} noValidate>
           <div className="form-floating mb-3">
             <input
               type="password"
@@ -116,13 +91,13 @@ function Register() {
                 touched.password && !isLengthValid ? "is-invalid" : isLengthValid ? "is-valid" : ""
               }`}
               id="floatingPassword"
-              placeholder="Passwort"
+              placeholder="Neues Passwort"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => setTouched({ ...touched, password: true })}
               required
             />
-            <label htmlFor="floatingPassword">Passwort</label>
+            <label htmlFor="floatingPassword">Neues Passwort</label>
           </div>
 
           <ul className="mb-3 list-unstyled small">
@@ -130,6 +105,12 @@ function Register() {
               className={touched.password ? (isLengthValid ? "text-success" : "text-danger") : ""}
             >
               {isLengthValid ? "✅" : "❌"} Mindestens 8 Zeichen
+            </li>
+            <li className={touched.password ? (hasLowercase ? "text-success" : "text-danger") : ""}>
+              {hasLowercase ? "✅" : "❌"} Mindestens ein Kleinbuchstabe
+            </li>
+            <li className={touched.password ? (hasUppercase ? "text-success" : "text-danger") : ""}>
+              {hasUppercase ? "✅" : "❌"} Mindestens ein Großbuchstabe
             </li>
             <li className={touched.password ? (hasNumber ? "text-success" : "text-danger") : ""}>
               {hasNumber ? "✅" : "❌"} Mindestens eine Zahl
@@ -163,7 +144,7 @@ function Register() {
 
           <div className="d-flex justify-content-center">
             <Button variant="primary" type="submit">
-              Registrieren
+              Passwort ändern
             </Button>
           </div>
         </Form>
@@ -172,4 +153,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default ResetPassword;
