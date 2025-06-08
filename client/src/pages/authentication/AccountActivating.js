@@ -29,7 +29,7 @@ function AccountActivating() {
       hasActivated = true;
 
       try {
-        const res = await fetch("http://localhost:4000/api/v1/account-activating", {
+        const res = await fetch("http://localhost:4000/api/v1/account-activation", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
@@ -42,8 +42,16 @@ function AccountActivating() {
           setStatus("success");
           setTimeout(() => navigate("/login"), 2000);
         } else {
-          addToast(data.message || "Aktivierung fehlgeschlagen", "danger");
-          setStatus("error");
+          if (data.redirect) {
+            addToast(
+              data.message || "Aktivierung bereits abgelaufen, bitte erneut Registrieren.",
+              "danger"
+            );
+            setTimeout(() => navigate(data.redirect), 2000);
+          } else {
+            addToast(data.message || "Aktivierung fehlgeschlagen", "danger");
+            setStatus("error");
+          }
         }
       } catch (error) {
         addToast("Serverfehler beim Aktivieren des Accounts", "danger");
