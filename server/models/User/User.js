@@ -20,6 +20,16 @@ export default (sequelize, DataTypes) => {
             password: {
                 type: DataTypes.STRING,
                 allowNull: false
+            },
+            active: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            },
+            disabled: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
         },
         {
@@ -33,6 +43,10 @@ export default (sequelize, DataTypes) => {
             through: models.UserRole,
             foreignKey: "userId",
             otherKey: "roleId"
+        });
+
+        User.hasMany(models.UserToken, {
+            foreignKey: "userId"
         });
     };
 

@@ -1,23 +1,44 @@
 import "dotenv/config";
 import express from "express";
 
-import cors from "cors";
+//middlewares
 import helmet from "helmet";
+import credentials from "./middleware/credentials.js";
+import cors from "cors";
+import corsOptions from "./config/corsOptions.js";
+import cookieParser from "cookie-parser";
 
+//nodemailer
+import { sendMail } from "./mail/mailer.js";
+
+//sequelize and models
 import { sequelize, Models } from "./controllers/modelController.js";
 
-import loginRoute from "./routes/login/loginRoute.js";
+//routes
+import registerRoute from "./routes/register/registerRoute.js";
+import generateUUID from "./uuid/generateUUID.js";
 
-//Init Expressw
+//init express
 const app = express();
 
-//Middleware
-app.use(cors({ credentials: true, origin: true }));
+//appling middlewares
 app.use(helmet());
+app.use(credentials);
+app.use(cors(corsOptions));
 
-//Routes
-app.use("/api/" + process.env.API_VERSION, loginRoute);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
 
+//public routes
+app.use("/api/" + process.env.API_VERSION, registerRoute);
+
+//middleware to protect routes
+
+//protected routes
+//TODO:
+
+//connect and sync sequelize and start server listing
 (async () => {
     try {
         await sequelize.authenticate();
@@ -50,7 +71,7 @@ app.use("/api/" + process.env.API_VERSION, loginRoute);
                 ]);
 
                 await markus.addRoles([adminRole, modRole, userRole]);
-                await juli.addRole(modRole, userRole);
+                await juli.addRole([modRole, userRole]);
                 await christian.addRoles([userRole]);
 
                 const users = await Models.User.findAll({ include: Models.Role });
@@ -59,7 +80,22 @@ app.use("/api/" + process.env.API_VERSION, loginRoute);
                     user.Roles.forEach((role) => console.log(` - ${role.name}`));
                 });
 
-                await sequelize.close();
+                let markus2 = await Models.User.findOne({ where: { username: "markus" } });
+                markus2.active = true;
+
+                await markus2.save();
+
+                //TODO:
+
+                console.log(generateUUID());
+
+                /*for (let i = 0; i < 200; i++) {
+                    let uuidTest = uuidv4().replaceAll("-", "");
+                    console.log(uuidTest);
+                    console.log(uuidTest.length);
+                }*/
+
+                //sendMail("Juli051@gmx.net", "Test123456", "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam laborum, facilis sint ad minus odit blanditiis amet! Obcaecati, hic quos, pariatur totam, ipsa ducimus voluptatibus et doloribus dolorum amet aliquid!"));
             })();
         });
 })();
