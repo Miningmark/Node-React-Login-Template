@@ -40,7 +40,7 @@ export const ToastProvider = ({ children }) => {
           <Toast
             key={id}
             onClose={() => removeToast(id)}
-            delay={4000}
+            delay={5000}
             autohide
             className={`text-bg-${variant}`}
           >
