@@ -8,6 +8,7 @@ import NavBar from "./components/NavBar";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
 import ResetPassword from "./pages/ResetPassword";
+import AccountActivating from "./pages/AccountActivating";
 
 function AppWrapper() {
   return (
@@ -23,7 +24,7 @@ function AppWrapper() {
 
 function App() {
   const location = useLocation();
-  const publicPaths = ["/", "/login", "/register", "/reset-password"];
+  const publicPaths = ["/", "/login", "/register", "/reset-password", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/account-activation" element={<AccountActivating />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
