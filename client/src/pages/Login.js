@@ -1,6 +1,7 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../components/ToastContext";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -13,9 +14,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const { addToast } = useToast();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  //TODO:
   const handleSubmitLogin = async (e) => {
     e.preventDefault();
     const res = await fetch("http://localhost:4000/api/auth/login", {
@@ -24,12 +27,17 @@ function Login() {
       body: JSON.stringify({ name, password }),
     });
     const data = await res.json();
-    if (data.token) {
+    if (res.status === 200) {
       login(data.token);
       navigate("/dashboard");
+    } else {
+      setPassword("");
+      setName("");
+      addToast(data.message, "danger");
     }
   };
 
+  //TODO:
   const handleSubmitReset = async (e) => {
     e.preventDefault();
     const res = await fetch("http://localhost:4000/api/auth/passwordreset", {
@@ -37,7 +45,13 @@ function Login() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
     });
-    const data = await res.json();
+
+    if (res.status === 200) {
+      setIsFlipped(false);
+    } else {
+      const data = await res.json();
+      addToast(data.message, "danger");
+    }
   };
 
   return (
@@ -103,12 +117,7 @@ function Login() {
             style={{ maxWidth: "400px" }}
           >
             <h2 className="text-center mb-4">Passwort vergessen</h2>
-            <Form
-              onSubmit={(e) => {
-                handleSubmitReset(e);
-                setIsFlipped(false);
-              }}
-            >
+            <Form onSubmit={handleSubmitReset}>
               <div className="form-floating mb-3">
                 <input
                   className="form-control"
