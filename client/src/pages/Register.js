@@ -18,9 +18,13 @@ function Register() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isUsernameValid = username.trim().length >= 5 && username.trim().length <= 15;
 
   const isLengthValid = password.length >= 8;
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const passwordsMatch = password === repeatPassword;
@@ -28,7 +32,7 @@ function Register() {
   const handleSubmitRegister = async (e) => {
     e.preventDefault();
 
-    if (!isLengthValid || !hasNumber || !hasSpecialChar) {
+    if (!isLengthValid || !hasNumber || !hasSpecialChar || !hasLowercase || !hasUppercase) {
       addToast("Passwort erfüllt nicht die Anforderungen", "danger");
       return;
     }
@@ -73,7 +77,9 @@ function Register() {
           <div className="form-floating mb-3">
             <input
               type="email"
-              className={`form-control ${touched.email && email.trim() === "" ? "is-invalid" : ""}`}
+              className={`form-control ${
+                touched.email ? (isEmailValid ? "is-valid" : "is-invalid") : ""
+              }`}
               id="floatingEmail"
               placeholder="E-Mail"
               value={email}
@@ -130,6 +136,12 @@ function Register() {
               className={touched.password ? (isLengthValid ? "text-success" : "text-danger") : ""}
             >
               {isLengthValid ? "✅" : "❌"} Mindestens 8 Zeichen
+            </li>
+            <li className={touched.password ? (hasLowercase ? "text-success" : "text-danger") : ""}>
+              {hasLowercase ? "✅" : "❌"} Mindestens ein Kleinbuchstabe
+            </li>
+            <li className={touched.password ? (hasUppercase ? "text-success" : "text-danger") : ""}>
+              {hasUppercase ? "✅" : "❌"} Mindestens ein Großbuchstabe
             </li>
             <li className={touched.password ? (hasNumber ? "text-success" : "text-danger") : ""}>
               {hasNumber ? "✅" : "❌"} Mindestens eine Zahl
