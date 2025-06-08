@@ -8,17 +8,17 @@ export default (sequelize, DataTypes) => {
                 autoIncrement: true
             },
             username: {
-                type: DataTypes.STRING(25),
+                type: DataTypes.STRING,
                 allowNull: false,
                 unique: true
             },
             email: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.STRING,
                 allowNull: false,
                 unique: true
             },
             password: {
-                type: DataTypes.STRING(100),
+                type: DataTypes.STRING,
                 allowNull: false
             }
         },
@@ -27,6 +27,14 @@ export default (sequelize, DataTypes) => {
             timestamps: false
         }
     );
+
+    User.associate = (models) => {
+        User.belongsToMany(models.Role, {
+            through: models.UserRole,
+            foreignKey: "userId",
+            otherKey: "roleId"
+        });
+    };
 
     return User;
 };

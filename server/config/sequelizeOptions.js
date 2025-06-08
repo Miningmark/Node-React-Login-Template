@@ -13,4 +13,6 @@ export const database = {
         acquire: 10000,
         idle: 10000
     }
+    //Remove this comment to disable SQL Logs in Console
+    //logging: false
 };
