@@ -7,6 +7,7 @@ import Admin from "./pages/Admin";
 import NavBar from "./components/NavBar";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
+import ResetPassword from "./pages/ResetPassword";
 
 function AppWrapper() {
   return (
@@ -22,7 +23,7 @@ function AppWrapper() {
 
 function App() {
   const location = useLocation();
-  const publicPaths = ["/", "/login", "/register"];
+  const publicPaths = ["/", "/login", "/register", "/reset-password"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
