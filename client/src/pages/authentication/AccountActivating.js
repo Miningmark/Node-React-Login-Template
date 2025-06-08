@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useToast } from "../components/ToastContext";
+import { useToast } from "../../components/ToastContext";
 
 import "bootstrap/dist/css/bootstrap.min.css";
-
-import "../components/CSS/login.css";
 
 function AccountActivating() {
   const [status, setStatus] = useState("loading");

@@ -1,13 +1,13 @@
 import { useState, useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../components/ToastContext";
+import { useToast } from "../../components/ToastContext";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-import "../components/CSS/login.css";
+import "../../components/css/login.css";
 
 function Login() {
   const [name, setName] = useState("");
