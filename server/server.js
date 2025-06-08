@@ -74,20 +74,12 @@ app.use("/api/" + process.env.API_VERSION, registerRoute);
                 await juli.addRole([modRole, userRole]);
                 await christian.addRoles([userRole]);
 
-                const users = await Models.User.findAll({ include: Models.Role });
-                users.forEach((user) => {
-                    console.log(`\n${user.username} hat Rollen:`);
-                    user.Roles.forEach((role) => console.log(` - ${role.name}`));
-                });
-
-                let markus2 = await Models.User.findOne({ where: { username: "markus" } });
-                markus2.active = true;
-
-                await markus2.save();
+                markus.active = true;
+                await markus.save();
 
                 //TODO:
 
-                console.log(generateUUID());
+                //console.log(generateUUID());
 
                 /*for (let i = 0; i < 200; i++) {
                     let uuidTest = uuidv4().replaceAll("-", "");
