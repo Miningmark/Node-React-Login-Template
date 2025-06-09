@@ -32,8 +32,6 @@ await (async () => {
     let paths = [];
     paths = readFilesRecursively(baseModelFolder);
 
-    console.log(paths);
-
     await Promise.all(
         paths.map(async (file) => {
             const module = await import(pathToFileURL(file));
