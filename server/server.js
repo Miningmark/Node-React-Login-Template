@@ -8,15 +8,12 @@ import cors from "cors";
 import corsOptions from "./config/corsOptions.js";
 import cookieParser from "cookie-parser";
 
-//nodemailer
-import { sendMail } from "./mail/mailer.js";
-
 //sequelize and models
 import { sequelize, Models } from "./controllers/modelController.js";
 
 //routes
 import registerRoute from "./routes/register/registerRoute.js";
-import generateUUID from "./uuid/generateUUID.js";
+import loginRoute from "./routes/login/loginRoute.js";
 
 //init express
 const app = express();
@@ -32,6 +29,7 @@ app.use(cookieParser());
 
 //public routes
 app.use("/api/" + process.env.API_VERSION, registerRoute);
+app.use("/api/" + process.env.API_VERSION, loginRoute);
 
 //middleware to protect routes
 
@@ -74,7 +72,7 @@ app.use("/api/" + process.env.API_VERSION, registerRoute);
                 await juli.addRole([modRole, userRole]);
                 await christian.addRoles([userRole]);
 
-                markus.active = true;
+                markus.isActive = true;
                 await markus.save();
 
                 //TODO:

@@ -20,14 +20,15 @@ const register = async (req, res, next) => {
             return res.status(401).json({ message: "Eingaben entsprechen nicht den Anforderungen!" });
         }
 
-        const duplicate = await Models.User.findOne({
-            where: {
-                [Op.or]: [{ username }, { email }]
-            }
-        });
+        const duplicateUsername = await Models.User.findOne({ where: { username } });
+        const duplicateEmail = await Models.User.findOne({ where: { email } });
 
-        if (duplicate) {
-            return res.status(409).json({ message: "Nutzername oder Email bereits registriert!" });
+        if (duplicateUsername) {
+            return res.status(409).json({ message: "Nutzername bereits vergeben!", reason: "username" });
+        }
+
+        if (duplicateEmail) {
+            return res.status(409).json({ message: "Email bereits registriert!", reason: "email" });
         }
 
         //TODO: should do it with an transaction if Role could not beeing added
@@ -82,7 +83,7 @@ const accountActivation = async (req, res, next) => {
             return res.status(400).json({ message: "Token abgelaufen, bitte neu registrieren", redirect: "/register" });
         }
 
-        userToken.User.activated = true;
+        userToken.User.isActive = true;
         await userToken.User.save();
 
         await userToken.destroy();
