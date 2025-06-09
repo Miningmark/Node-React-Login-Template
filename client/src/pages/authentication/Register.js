@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
 import { axiosPublic } from "../../util/axios";
@@ -13,6 +13,11 @@ function Register() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [touched, setTouched] = useState({});
+
+  const emailRef = useRef(null);
+  const usernameRef = useRef(null);
+  const passwordRef = useRef(null);
+  const repeatRef = useRef(null);
 
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -31,13 +36,27 @@ function Register() {
   const handleSubmitRegister = async (e) => {
     e.preventDefault();
 
+    if (!isEmailValid) {
+      setTouched((prev) => ({ ...prev, email: true }));
+      emailRef.current?.focus();
+      return;
+    }
+
+    if (!isUsernameValid) {
+      setTouched((prev) => ({ ...prev, username: true }));
+      usernameRef.current?.focus();
+      return;
+    }
+
     if (!isLengthValid || !hasNumber || !hasSpecialChar || !hasLowercase || !hasUppercase) {
       addToast("Passwort erfüllt nicht die Anforderungen", "danger");
+      passwordRef.current?.focus();
       return;
     }
 
     if (!passwordsMatch) {
       addToast("Passwörter stimmen nicht überein", "danger");
+      repeatRef.current?.focus();
       return;
     }
 
@@ -48,6 +67,7 @@ function Register() {
       navigate("/login");
     } catch (error) {
       if (error.response?.reason === "email") {
+        emailRef.current?.focus();
         addToast(
           error.response?.data?.message ||
             "Registrierung fehlgeschlagen E-Mail bereits Registriert",
@@ -55,6 +75,7 @@ function Register() {
         );
         setEmail("");
       } else if (error.response?.reason === "username") {
+        usernameRef.current?.focus();
         addToast(
           error.response?.data?.message || "Registrierung fehlgeschlagen Name bereits Vergeben",
           "danger"
@@ -94,6 +115,7 @@ function Register() {
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => setTouched({ ...touched, email: true })}
               required
+              ref={emailRef}
             />
             <label htmlFor="floatingEmail">E-Mail</label>
           </div>
@@ -114,6 +136,7 @@ function Register() {
               onChange={(e) => setUsername(e.target.value)}
               onBlur={() => setTouched({ ...touched, username: true })}
               required
+              ref={usernameRef}
             />
             <label htmlFor="floatingUsername">Benutzername</label>
             {touched.username && !isUsernameValid && (
@@ -135,6 +158,7 @@ function Register() {
               onChange={(e) => setPassword(e.target.value)}
               onBlur={() => setTouched({ ...touched, password: true })}
               required
+              ref={passwordRef}
             />
             <label htmlFor="floatingPassword">Passwort</label>
           </div>
@@ -177,6 +201,7 @@ function Register() {
               onChange={(e) => setRepeatPassword(e.target.value)}
               onBlur={() => setTouched({ ...touched, repeat: true })}
               required
+              ref={repeatRef}
             />
             <label htmlFor="floatingRepeatPassword">Passwort wiederholen</label>
           </div>
