@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
+import { axiosPublic } from "../../util/axios";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -29,33 +30,26 @@ function AccountActivating() {
       hasActivated = true;
 
       try {
-        const res = await fetch("http://localhost:4000/api/v1/account-activation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
-        });
+        await axiosPublic.post("/account-activation", { token });
 
-        const data = await res.json();
-
-        if (res.ok) {
-          addToast("Account erfolgreich aktiviert", "success");
-          setStatus("success");
-          setTimeout(() => navigate("/login"), 2000);
-        } else {
-          if (data.redirect) {
-            addToast(
-              data.message || "Aktivierung bereits abgelaufen, bitte erneut Registrieren.",
-              "danger"
-            );
-            setTimeout(() => navigate(data.redirect), 2000);
-          } else {
-            addToast(data.message || "Aktivierung fehlgeschlagen", "danger");
-            setStatus("error");
-          }
-        }
+        addToast("Account erfolgreich aktiviert", "success");
+        setStatus("success");
+        setTimeout(() => navigate("/login"), 2000);
       } catch (error) {
-        addToast("Serverfehler beim Aktivieren des Accounts", "danger");
-        setStatus("error");
+        if (error.response?.data?.redirect) {
+          addToast(
+            error.response?.data?.message ||
+              "Aktivierung bereits abgelaufen, bitte erneut Registrieren.",
+            "danger"
+          );
+          setTimeout(() => navigate(error.response?.data?.redirect), 2000);
+        } else {
+          addToast(
+            error.response?.data?.message || "Serverfehler beim Aktivieren des Accounts",
+            "danger"
+          );
+          setStatus("error");
+        }
       }
     }
 

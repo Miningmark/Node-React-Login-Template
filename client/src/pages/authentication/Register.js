@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
+import { axiosPublic } from "../../util/axios";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -40,19 +41,28 @@ function Register() {
       return;
     }
 
-    const res = await fetch("http://localhost:4000/api/v1/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, username, password }),
-    });
+    try {
+      await axiosPublic.post("/register", { email, username, password });
 
-    const data = await res.json();
-
-    if (res.status === 201) {
       addToast("Registrierung erfolgreich! Bitte einloggen.", "success");
       navigate("/login");
-    } else {
-      addToast(data.message || "Registrierung fehlgeschlagen", "danger");
+    } catch (error) {
+      if (error.response?.reason === "email") {
+        addToast(
+          error.response?.data?.message ||
+            "Registrierung fehlgeschlagen E-Mail bereits Registriert",
+          "danger"
+        );
+        setEmail("");
+      } else if (error.response?.reason === "username") {
+        addToast(
+          error.response?.data?.message || "Registrierung fehlgeschlagen Name bereits Vergeben",
+          "danger"
+        );
+        setUsername("");
+      } else {
+        addToast(error.response?.data?.message || "Registrierung fehlgeschlagen", "danger");
+      }
     }
   };
 
