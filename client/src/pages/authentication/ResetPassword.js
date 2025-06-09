@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
+import { axiosPublic } from "../../util/axios";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -49,22 +50,18 @@ function ResetPassword() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/api/v1/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+      await axiosPublic.post("/reset-password", {
+        token,
+        password,
       });
 
-      const data = await res.json();
-
-      if (res.status === 200) {
-        addToast("Passwort erfolgreich geändert.", "success");
-        navigate("/login");
-      } else {
-        addToast(data.message || "Passwort konnte nicht geändert werden", "danger");
-      }
-    } catch (err) {
-      addToast("Serverfehler beim Zurücksetzen des Passworts", "danger");
+      addToast("Passwort erfolgreich geändert.", "success");
+      navigate("/login");
+    } catch (error) {
+      addToast(
+        error.response?.data?.message || "Serverfehler beim Zurücksetzen des Passworts",
+        "danger"
+      );
     }
   };
 
