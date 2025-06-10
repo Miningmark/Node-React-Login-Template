@@ -2,26 +2,31 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [token, setToken] = useState(localStorage.getItem("token"));
-    const [roles, setRoles] = useState([]);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem("accessToken"));
+  const [roles, setRoles] = useState([]);
 
-    useEffect(() => {
-        if (token) {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            setRoles(payload.roles || []);
-        }
-    }, [token]);
+  useEffect(() => {
+    if (accessToken) {
+      console.log("Token found:", accessToken);
+      const payload = JSON.parse(atob(accessToken.split(".")[1]));
+      setRoles(payload.roles || []);
+    }
+  }, [accessToken]);
 
-    const login = (newToken) => {
-        localStorage.setItem("token", newToken);
-        setToken(newToken);
-    };
+  const login = (newAccessToken) => {
+    sessionStorage.setItem("accessToken", newAccessToken);
+    setAccessToken(newAccessToken);
+  };
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        setToken(null);
-        setRoles([]);
-    };
+  const logout = () => {
+    sessionStorage.removeItem("accessToken");
+    setAccessToken(null);
+    setRoles([]);
+  };
 
-    return <AuthContext.Provider value={{ token, login, logout, roles }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ accessToken, login, logout, roles }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

@@ -27,7 +27,7 @@ function Login() {
         username: name,
         password,
       });
-      login(res.data.token);
+      login(res.data.accessToken);
       navigate("/dashboard");
     } catch (error) {
       setPassword("");
