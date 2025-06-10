@@ -24,12 +24,16 @@ function ResetPassword() {
     }
   }, [searchParams]);
 
-  const isLengthValid = password.length >= 8;
+  const isLengthValid = password.length >= 8 && password.length <= 24;
   const hasLowercase = /[a-z]/.test(password);
   const hasUppercase = /[A-Z]/.test(password);
+
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const passwordsMatch = password === repeatPassword;
+
+  const PASSWORD_REGEX =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +43,7 @@ function ResetPassword() {
       return;
     }
 
-    if (!isLengthValid || !hasLowercase || !hasUppercase || !hasNumber || !hasSpecialChar) {
+    if (!PASSWORD_REGEX.test(password)) {
       addToast("Passwort erfüllt nicht die Anforderungen", "danger");
       return;
     }
@@ -101,7 +105,7 @@ function ResetPassword() {
             <li
               className={touched.password ? (isLengthValid ? "text-success" : "text-danger") : ""}
             >
-              {isLengthValid ? "✅" : "❌"} Mindestens 8 Zeichen
+              {isLengthValid ? "✅" : "❌"} Mindestens 8 Zeichen max.24 Zeichen
             </li>
             <li className={touched.password ? (hasLowercase ? "text-success" : "text-danger") : ""}>
               {hasLowercase ? "✅" : "❌"} Mindestens ein Kleinbuchstabe
