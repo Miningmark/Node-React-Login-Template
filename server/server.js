@@ -12,8 +12,7 @@ import cookieParser from "cookie-parser";
 import { sequelize, Models } from "./controllers/modelController.js";
 
 //routes
-import registerRoute from "./routes/register/registerRoute.js";
-import loginRoute from "./routes/login/loginRoute.js";
+import accountRoute from "./routes/account/accountRoute.js";
 
 //init express
 const app = express();
@@ -28,8 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 //public routes
-app.use("/api/" + process.env.API_VERSION, registerRoute);
-app.use("/api/" + process.env.API_VERSION, loginRoute);
+app.use("/api/" + process.env.API_VERSION, accountRoute);
 
 //middleware to protect routes
 
