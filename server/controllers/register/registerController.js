@@ -42,7 +42,7 @@ const register = async (req, res, next) => {
         const expiresAt = new Date(Date.now() + parseInt(process.env.REGISTER_TOKEN_EXPIRE_AT) * 1000);
 
         await Models.UserToken.create({ userId: user.id, token, type: "registration", expiresAt });
-        sendMail(
+        /*sendMail(
             email,
             "Abschluss deiner Registrierung",
             "Unter dem nachfolgenden Link kannst du deine Registrierung auf " +
@@ -50,7 +50,7 @@ const register = async (req, res, next) => {
                 " abschließen: " +
                 process.env.FRONTEND_WEBADRESS_REGISTER_TOKEN +
                 token
-        );
+        );*/
 
         return res.status(201).json({ message: "Nutzer wurde erfolgreich registriert" });
     } catch (err) {
