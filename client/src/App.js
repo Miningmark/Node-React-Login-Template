@@ -24,7 +24,7 @@ function AppWrapper() {
 
 function App() {
   const location = useLocation();
-  const publicPaths = ["/", "/login", "/register", "/reset-password", "/account-activation"];
+  const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
   return (
@@ -34,7 +34,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/password-reset" element={<ResetPassword />} />
         <Route path="/account-activation" element={<AccountActivating />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<Admin />} />

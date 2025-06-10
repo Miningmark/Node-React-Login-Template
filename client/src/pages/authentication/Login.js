@@ -40,7 +40,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      await axiosPublic.post("/passwordreset", {
+      await axiosPublic.post("/request-password-reset", {
         username: name,
       });
       setIsFlipped(false);
@@ -122,7 +122,7 @@ function Login() {
                   type="text"
                   required
                 />
-                <label htmlFor="floatingName">E-Mail</label>
+                <label htmlFor="floatingName">Name</label>
               </div>
               <div className="d-flex justify-content-end mb-3">
                 <span
