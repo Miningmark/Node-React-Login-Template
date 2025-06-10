@@ -122,6 +122,7 @@ const register = async (req, res, next) => {
 
         return res.status(201).json({ message: "Benutzer wurde erfolgreich registriert" });
     } catch (err) {
+        console.log(err);
         return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
     }
 };
@@ -158,6 +159,7 @@ const accountActivation = async (req, res, next) => {
 
         return res.status(201).json({ message: "Benutzer erfolgreich freigeschaltet!" });
     } catch (err) {
+        console.log(err);
         return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
     }
 };
