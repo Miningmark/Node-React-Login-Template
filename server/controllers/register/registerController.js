@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import { Op } from "sequelize";
 import { Models } from "../modelController.js";
 import { sendMail } from "../../mail/mailer.js";
 import generateUUID from "../../uuid/generateUUID.js";
@@ -24,7 +23,7 @@ const register = async (req, res, next) => {
         const duplicateEmail = await Models.User.findOne({ where: { email } });
 
         if (duplicateUsername) {
-            return res.status(409).json({ message: "Nutzername bereits vergeben!", reason: "username" });
+            return res.status(409).json({ message: "Benutzername bereits vergeben!", reason: "username" });
         }
 
         if (duplicateEmail) {
@@ -42,17 +41,20 @@ const register = async (req, res, next) => {
         const expiresAt = new Date(Date.now() + parseInt(process.env.REGISTER_TOKEN_EXPIRE_AT) * 1000);
 
         await Models.UserToken.create({ userId: user.id, token, type: "registration", expiresAt });
-        /*sendMail(
+
+        sendMail(
             email,
             "Abschluss deiner Registrierung",
             "Unter dem nachfolgenden Link kannst du deine Registrierung auf " +
                 process.env.FRONTEND_WEBADRESS +
+                " bis " +
+                expiresAt +
                 " abschließen: " +
                 process.env.FRONTEND_WEBADRESS_REGISTER_TOKEN +
                 token
-        );*/
+        );
 
-        return res.status(201).json({ message: "Nutzer wurde erfolgreich registriert" });
+        return res.status(201).json({ message: "Benutzer wurde erfolgreich registriert" });
     } catch (err) {
         return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
     }
@@ -88,7 +90,7 @@ const accountActivation = async (req, res, next) => {
 
         await userToken.destroy();
 
-        return res.status(201).json({ message: "Nutzer erfolgreich freigeschaltet!" });
+        return res.status(201).json({ message: "Benutzer erfolgreich freigeschaltet!" });
     } catch (err) {
         return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
     }
