@@ -10,7 +10,7 @@ export default (req, res, next) => {
     const accessToken = authorizationHeader[1];
 
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) return res.sendStatus(403);
+        if (err) return res.status(401).json({ message: "AccessToken ungültig" });
         if (!req.body) {
             req.body = {};
         }
