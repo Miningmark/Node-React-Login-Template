@@ -75,7 +75,7 @@ const login = async (req, res, next) => {
             httpOnly: true,
             sameSite: "None",
             /*secure: true,*/ //TODO:
-            maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000
+            maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000
         });
 
         return res.status(200).json({ accessToken: accessToken });
@@ -286,6 +286,12 @@ const logout = async (req, res, next) => {
         if (userToken) {
             userToken.destroy();
         }
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "None"
+            /*secure: true,*/ //TODO:
+        });
 
         res.status(200).json({ message: "Nutzer erfolgreich abgemeldet" });
     } catch (err) {
