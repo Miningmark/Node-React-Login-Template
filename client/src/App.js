@@ -63,18 +63,14 @@ function App() {
           }
         />
 
-        <Route path="/userpage" element={<UserPage />} />
-
-        {/* 
         <Route
-          path="/user"
+          path="/userpage"
           element={
             <RequireAuth allowedRoles={["user", "admin"]}>
               <UserPage />
             </RequireAuth>
           }
         />
-        */}
 
         <Route path="/unauthorized" element={<Unauthorized />} />
 
