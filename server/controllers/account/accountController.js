@@ -287,11 +287,10 @@ const logout = async (req, res, next) => {
             userToken.destroy();
         }
 
-        res.cookie("refreshToken", "", {
+        res.clearCookie("refreshToken", {
             httpOnly: true,
-            sameSite: "None",
+            sameSite: "None"
             /*secure: true,*/ //TODO:
-            maxAge: 1
         });
 
         res.status(200).json({ message: "Nutzer erfolgreich abgemeldet" });
