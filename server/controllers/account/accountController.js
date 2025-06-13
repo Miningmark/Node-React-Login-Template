@@ -73,7 +73,7 @@ const login = async (req, res, next) => {
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            sameSite: "None",
+            sameSite: "Lax",
             /*secure: true,*/ //TODO:
             maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000
         });
