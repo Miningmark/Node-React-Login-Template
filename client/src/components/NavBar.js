@@ -3,17 +3,19 @@ import { AuthContext } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { axiosProtected } from "../util/axios";
+import { useNavigate } from "react-router-dom";
 
 function NavBar() {
   const { accessToken, username, logout, roles } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
 
+  const navigate = useNavigate();
+
   async function handleLogout() {
     try {
-      await axiosProtected.post("/logout", {
-        username: username,
-      });
+      await axiosProtected.post("/logout");
       await logout();
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
