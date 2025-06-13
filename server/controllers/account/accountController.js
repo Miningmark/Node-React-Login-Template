@@ -57,13 +57,25 @@ const login = async (req, res, next) => {
         );
 
         const expiresAt = new Date(Date.now() + parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000);
+
+        const userToken = await Models.UserToken.findOne({
+            where: {
+                token,
+                type: "refreshToken"
+            }
+        });
+
+        if (userToken) {
+            userToken.destroy();
+        }
+
         await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "refreshToken", expiresAt });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             sameSite: "None",
             /*secure: true,*/ //TODO:
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000
         });
 
         return res.status(200).json({ accessToken: accessToken });
@@ -108,7 +120,7 @@ const register = async (req, res, next) => {
 
         await Models.UserToken.create({ userId: user.id, token, type: "registration", expiresAt });
 
-        /*sendMail(
+        sendMail(
             email,
             "Abschluss deiner Registrierung",
             "Unter dem nachfolgenden Link kannst du deine Registrierung auf " +
@@ -118,7 +130,7 @@ const register = async (req, res, next) => {
                 " abschließen: " +
                 process.env.FRONTEND_WEBADRESS_REGISTER_TOKEN +
                 token
-        );*/
+        );
 
         return res.status(201).json({ message: "Benutzer wurde erfolgreich registriert" });
     } catch (err) {
@@ -164,7 +176,7 @@ const accountActivation = async (req, res, next) => {
     }
 };
 
-const passwordReset = async (req, res, next) => {
+const requestPasswordReset = async (req, res, next) => {
     try {
         const { username } = req.body;
 
@@ -181,19 +193,15 @@ const passwordReset = async (req, res, next) => {
             return res.status(401).json({ message: "Benutzer ist gesperrt, kein zurücksetzten des Passworts möglich" });
         }
 
-        if (!foundUser.isActive) {
-            return res.status(401).json({ message: "Benutzer ist noch nicht aktiviert, bitte zuerst die Email bestätigen" });
-        }
-
-        const existingToken = await Models.UserToken.findOne({
+        const userToken = await Models.UserToken.findOne({
             where: {
                 userId: foundUser.id,
                 type: "passwordReset"
             }
         });
 
-        if (existingToken) {
-            existingToken.destroy();
+        if (userToken) {
+            userToken.destroy();
         }
 
         const token = generateUUID();
@@ -214,11 +222,54 @@ const passwordReset = async (req, res, next) => {
                 token
         );
 
-        return res.status(200).json({ message: "Email zum Passwort ändern wurde versandt" });
+        const { doNotSendRespone } = req.body;
+        if (!doNotSendRespone) {
+            return res.status(200).json({ message: "Email zum Passwort ändern wurde versandt" });
+        }
     } catch (err) {
         console.log(err);
         return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
     }
 };
 
-export { login, register, accountActivation, passwordReset };
+const passwordReset = async (req, res, next) => {
+    try {
+        const { token, password } = req.body;
+
+        if (!token || !password) {
+            return res.status(401).json({ message: "Benutzername und Token erforderlich!" });
+        }
+
+        if (!PASSWORD_REGEX.test(password)) {
+            return res.status(401).json({ message: "Passwort entspricht nicht den Anforderungen" });
+        }
+
+        const userToken = await Models.UserToken.findOne({ where: { token: token, type: "passwordReset" }, include: Models.User });
+
+        if (!userToken) {
+            return res.status(401).json({ message: "Token nicht vorhanden" });
+        }
+
+        if (new Date(Date.now()) > userToken.expiresAt) {
+            req.body.doNotSendRespone = true;
+            req.body.username = userToken.User.username;
+            requestPasswordReset(req, res);
+
+            return res.status(400).json({ message: "Token bereits abgelaufen, neuer Token wurde an deine Email gesendet" });
+        }
+
+        const hashedPassword = await bcrypt.hash(userToken.User.password, 10);
+
+        userToken.User.password = hashedPassword;
+        userToken.User.save();
+
+        userToken.destroy();
+
+        return res.status(200).json({ message: "Neues Passwort erfolgreich gesetzt" });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    }
+};
+
+export { login, register, accountActivation, requestPasswordReset, passwordReset };

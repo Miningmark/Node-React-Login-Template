@@ -60,30 +60,19 @@ app.use("/api/" + process.env.API_VERSION, accountRoute);
                     Models.Role.create({ name: "Moderator" })
                 ]);
 
-                const [markus, juli, christian] = await Promise.all([
-                    Models.User.create({ username: "markus", email: "markus@example.com", password: "5178989489" }),
-                    Models.User.create({ username: "juli", email: "juli@example.com", password: "548948949" }),
-                    Models.User.create({ username: "christian", email: "christian@example.com", password: "561978489489" })
+                const [juli051, markus] = await Promise.all([
+                    Models.User.create({ username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) }),
+                    Models.User.create({ username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) })
                 ]);
 
+                await juli051.addRoles([adminRole, modRole, userRole]);
                 await markus.addRoles([adminRole, modRole, userRole]);
-                await juli.addRole([modRole, userRole]);
-                await christian.addRoles([userRole]);
 
+                juli051.isActive = true;
                 markus.isActive = true;
+
+                await juli051.save();
                 await markus.save();
-
-                //TODO:
-
-                //console.log(generateUUID());
-
-                /*for (let i = 0; i < 200; i++) {
-                    let uuidTest = uuidv4().replaceAll("-", "");
-                    console.log(uuidTest);
-                    console.log(uuidTest.length);
-                }*/
-
-                //sendMail("Juli051@gmx.net", "Test123456", "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam laborum, facilis sint ad minus odit blanditiis amet! Obcaecati, hic quos, pariatur totam, ipsa ducimus voluptatibus et doloribus dolorum amet aliquid!"));
             })();
         });
 })();

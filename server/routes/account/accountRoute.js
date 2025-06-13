@@ -6,6 +6,7 @@ import * as accountController from "../../controllers/account/accountController.
 router.post("/login", accountController.login);
 router.post("/register", accountController.register);
 router.post("/account-activation", accountController.accountActivation);
-router.post("/request-password-reset", accountController.passwordReset);
+router.post("/request-password-reset", accountController.requestPasswordReset);
+router.post("/password-reset", accountController.passwordReset);
 
 export default router;
