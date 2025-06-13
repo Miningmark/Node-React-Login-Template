@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
+import { ValidationError } from "../errors/errorClasses.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -13,25 +14,26 @@ const login = async (req, res, next) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
-            return res.status(400).json({ message: "Alle Eingaben erforderlich" });
+            //return res.status(400).json({ message: "Alle Eingaben erforderlich" });
         }
 
         const foundUser = await Models.User.findOne({ where: { username } });
         if (!foundUser) {
-            return res.status(401).json({ message: "Dieser Benutzer existiert nicht" });
+            throw new ValidationError("Dieser Benutzer exsistiert nicht");
+            //return res.status(401).json({ message: "Dieser Benutzer existiert nicht" });
         }
 
         if (foundUser.isDisabled) {
-            return res.status(401).json({ message: "Benutzer ist gesperrt" });
+            //return res.status(401).json({ message: "Benutzer ist gesperrt" });
         }
 
         if (!foundUser.isActive) {
-            return res.status(401).json({ message: "Benutzer ist noch nicht aktiviert" });
+            //return res.status(401).json({ message: "Benutzer ist noch nicht aktiviert" });
         }
 
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
         if (!isPasswordMatching) {
-            return res.status(401).json({ message: "Passwort nicht korrekt" });
+            //return res.status(401).json({ message: "Passwort nicht korrekt" });
         }
 
         const accessToken = jwt.sign(
@@ -71,6 +73,8 @@ const login = async (req, res, next) => {
 
         await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt });
 
+        reason.test = "TEST reason";
+
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             sameSite: "None",
@@ -79,9 +83,8 @@ const login = async (req, res, next) => {
         });
 
         return res.status(200).json({ accessToken: accessToken });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    } catch (error) {
+        next(error);
     }
 };
 
