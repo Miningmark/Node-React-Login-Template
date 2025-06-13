@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import bcrypt from "bcrypt";
 
 //middlewares
 import helmet from "helmet";
