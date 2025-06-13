@@ -11,6 +11,9 @@ export default (req, res, next) => {
 
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) return res.sendStatus(403);
+        if (!req.body) {
+            req.body = {};
+        }
         req.body.username = decoded.UserInfo.username;
         //TODO: add roles and other usefull data to the payload of the object at creation and read it here
         next();
