@@ -22,7 +22,7 @@ function Register() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(email.trim());
 
   const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(username.trim());
 
