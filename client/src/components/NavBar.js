@@ -2,10 +2,22 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { axiosProtected } from "../util/axios";
 
 function NavBar() {
-  const { token, logout, roles } = useContext(AuthContext);
+  const { accessToken, username, logout, roles } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
+
+  async function handleLogout() {
+    try {
+      await axiosProtected.post("/logout", {
+        username: username,
+      });
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
 
   return (
     <nav className={`navbar navbar-expand-lg bg-body-tertiary px-3`}>
@@ -16,8 +28,8 @@ function NavBar() {
         <button onClick={toggleTheme} className="btn btn-outline-secondary ms-auto">
           {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
         </button>
-        {token && (
-          <button className="btn btn-outline-danger ms-2" onClick={logout}>
+        {accessToken && (
+          <button className="btn btn-outline-danger ms-2" onClick={handleLogout}>
             Logout
           </button>
         )}
