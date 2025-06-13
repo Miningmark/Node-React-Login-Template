@@ -56,7 +56,7 @@ const login = async (req, res, next) => {
             { expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) }
         );
 
-        const expiresAt = new Date(Date.now() + parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000);
+        const expiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000);
 
         const userToken = await Models.UserToken.findOne({
             where: {
@@ -69,7 +69,7 @@ const login = async (req, res, next) => {
             userToken.destroy();
         }
 
-        await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "refreshToken", expiresAt });
+        await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -300,4 +300,45 @@ const logout = async (req, res, next) => {
     }
 };
 
-export { login, register, accountActivation, requestPasswordReset, passwordReset, logout };
+const refreshAccessToken = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: "Keinen Cookie für Erneuerung gefunden" });
+        }
+
+        const userToken = await Models.UserToken.findOne({ where: { token: refreshToken, type: "refreshToken" }, include: Models.User });
+        if (!userToken) {
+            res.clearCookie("refreshToken", {
+                httpOnly: true,
+                sameSite: "None"
+                /*secure: true,*/ //TODO:
+            });
+            return res.status(401).json({ message: "Token nicht vorhanden, bitte neu anmelden" });
+        }
+
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+            if (err || decoded.UserInfo.username !== userToken.User.username) {
+                return res.status(401).json({ message: "Token stimmt nicht mit Username überein" });
+            }
+
+            const accessToken = jwt.sign(
+                {
+                    UserInfo: {
+                        username: userToken.User.username
+                        //TODO: add additional information to paylpoad (roles, etc.)
+                    }
+                },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) }
+            );
+            return res.status(200).json({ accessToken: accessToken });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    }
+};
+
+export { login, register, accountActivation, requestPasswordReset, passwordReset, logout, refreshAccessToken };
