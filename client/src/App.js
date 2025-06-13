@@ -9,6 +9,7 @@ import NavBar from "./components/NavBar";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
 import ResetPassword from "./pages/authentication/ResetPassword";
+import NotFound from "./pages/NotFound";
 
 function AppWrapper() {
   return (
@@ -38,6 +39,9 @@ function App() {
         <Route path="/account-activation" element={<AccountActivating />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<Admin />} />
+
+        {/* Catch-all route for 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
