@@ -73,7 +73,7 @@ const login = async (req, res, next) => {
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            sameSite: "Lax",
+            sameSite: "None",
             /*secure: true,*/ //TODO:
             maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000
         });
@@ -208,9 +208,6 @@ const requestPasswordReset = async (req, res, next) => {
         const expiresAt = new Date(Date.now() + parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRE_AT) * 1000);
 
         await Models.UserToken.create({ userId: foundUser.id, token, type: "passwordReset", expiresAt });
-
-        foundUser.isActive = false;
-        await foundUser.save();
 
         sendMail(
             foundUser.email,
