@@ -10,14 +10,17 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
 import ResetPassword from "./pages/authentication/ResetPassword";
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 function AppWrapper() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ThemeProvider>
       </ToastProvider>
     </AuthProvider>
   );
