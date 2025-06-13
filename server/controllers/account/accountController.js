@@ -271,7 +271,7 @@ const passwordReset = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        const { username } = req.body;
+        const { username } = req;
 
         if (!username) {
             return res.status(400).json({ message: "Nutzername erforderlich" });

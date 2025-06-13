@@ -9,6 +9,7 @@ import corsOptions from "./config/corsOptions.js";
 import cookieParser from "cookie-parser";
 
 import verifyAccessToken from "./middleware/verifyAccessToken.js";
+import authorizePermission from "./middleware/authorizePermission.js";
 
 //sequelize and models
 import { sequelize } from "./controllers/modelController.js";
@@ -18,6 +19,8 @@ import publicAccountRoute from "./routes/account/publicAccountRoute.js";
 
 //protected Routes
 import protectedAccountRoute from "./routes/account/protectedAccountRoute.js";
+
+//seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
 
 //init express
@@ -40,6 +43,22 @@ app.use(verifyAccessToken);
 
 //protected routes
 app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
+
+app.get("/api/" + process.env.API_VERSION + "/viewDashboard", authorizePermission("view_dashboard"), (req, res, next) => {
+    res.status(200).json({ message: "viewDashboard" });
+});
+
+app.get("/api/" + process.env.API_VERSION + "/editUser", authorizePermission("edit_user"), (req, res, next) => {
+    res.status(200).json({ message: "editUser" });
+});
+
+app.get("/api/" + process.env.API_VERSION + "/deletePost", authorizePermission("delete_post"), (req, res, next) => {
+    res.status(200).json({ message: "deletePost" });
+});
+
+app.get("/api/" + process.env.API_VERSION + "/createPost", authorizePermission("create_post"), (req, res, next) => {
+    res.status(200).json({ message: "createPost" });
+});
 
 //connect and sync sequelize and start server listing
 (async () => {
