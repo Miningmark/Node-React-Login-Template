@@ -255,7 +255,7 @@ const passwordReset = async (req, res, next) => {
             return res.status(400).json({ message: "Token bereits abgelaufen, neuer Token wurde an deine Email gesendet" });
         }
 
-        const hashedPassword = await bcrypt.hash(userToken.User.password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         userToken.User.password = hashedPassword;
         userToken.User.save();
