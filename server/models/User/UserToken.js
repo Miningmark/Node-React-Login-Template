@@ -13,7 +13,8 @@ export default (sequelize, DataTypes) => {
             },
             type: {
                 type: DataTypes.ENUM("registration", "passwordReset", "refreshToken"),
-                allowNull: false
+                allowNull: false,
+                primaryKey: true
             },
             expiresAt: {
                 type: DataTypes.DATE,
