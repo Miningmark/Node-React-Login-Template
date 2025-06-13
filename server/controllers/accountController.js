@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
-import generateUUID from "../uuid/generateUUID.js";
+import generateUUID from "../utils/generateUUID.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

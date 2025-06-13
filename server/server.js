@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 
 import verifyAccessToken from "./middleware/verifyAccessToken.js";
 import authorizePermission from "./middleware/authorizePermission.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 //sequelize and models
 import { sequelize } from "./controllers/modelController.js";
@@ -59,6 +60,9 @@ app.get("/api/" + process.env.API_VERSION + "/deletePost", authorizePermission("
 app.get("/api/" + process.env.API_VERSION + "/createPost", authorizePermission("create_post"), (req, res, next) => {
     res.status(200).json({ message: "createPost" });
 });
+
+//global error handler for all routes
+app.use(errorHandler);
 
 //connect and sync sequelize and start server listing
 (async () => {
