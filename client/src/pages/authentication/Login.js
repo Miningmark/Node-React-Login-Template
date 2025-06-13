@@ -50,7 +50,7 @@ function Login() {
         username: name,
       });
       setIsFlipped(false);
-      addToast("Passwort reset erfolgreich abgeschickt", "danger");
+      addToast("Passwort reset erfolgreich abgeschickt", "success");
     } catch (error) {
       addToast(error.response?.data?.message, "danger");
     }
@@ -100,7 +100,18 @@ function Login() {
                 />
                 <label htmlFor="floatingPassword">Password</label>
               </div>
-              <div className="d-flex justify-content-end mb-3">
+              <div className="d-flex mb-3">
+                {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+                  <span
+                    role="button"
+                    className="text-primary text-decoration-underline me-auto"
+                    onClick={() => navigate("/register")}
+                  >
+                    Registrieren
+                  </span>
+                ) : (
+                  <div className="me-auto" />
+                )}
                 <span
                   role="button"
                   className="text-primary text-decoration-underline"
@@ -120,7 +131,11 @@ function Login() {
           {/* Rückseite - Passwort vergessen */}
           <div
             className="back border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
-            style={{ maxWidth: "400px" }}
+            style={{
+              maxWidth: "400px",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
           >
             <h2 className="text-center mb-4">Passwort vergessen</h2>
             <Form onSubmit={handleSubmitReset}>

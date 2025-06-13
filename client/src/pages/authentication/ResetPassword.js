@@ -81,7 +81,11 @@ function ResetPassword() {
     >
       <div
         className="border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
-        style={{ maxWidth: "400px" }}
+        style={{
+          maxWidth: "400px",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }}
       >
         <h2 className="text-center mb-4">Passwort zurücksetzen</h2>
         <Form onSubmit={handleSubmit} noValidate>

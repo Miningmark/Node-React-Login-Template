@@ -68,7 +68,12 @@ function AccountActivating() {
     >
       <div
         className="border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100 d-flex justify-content-center align-items-center"
-        style={{ maxWidth: "400px", minHeight: "150px" }} // Höhe anpassen je nach Bedarf
+        style={{
+          maxWidth: "400px",
+          minHeight: "150px",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }} // Höhe anpassen je nach Bedarf
       >
         {status === "loading" && <h4>Account wird aktiviert...</h4>}
         {status === "success" && <h4>Account wurde erfolgreich aktiviert! Weiterleitung...</h4>}
