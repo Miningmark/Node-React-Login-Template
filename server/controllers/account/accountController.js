@@ -5,7 +5,7 @@ import { sendMail } from "../../mail/mailer.js";
 import generateUUID from "../../uuid/generateUUID.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
-const EMAIL_REGEX = /^(?=^.{0,36}$)[\w-.]+@([\w-]+.)+[\w-]{2,4}$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 
 const login = async (req, res, next) => {
@@ -269,4 +269,29 @@ const passwordReset = async (req, res, next) => {
     }
 };
 
-export { login, register, accountActivation, requestPasswordReset, passwordReset };
+const logout = async (req, res, next) => {
+    try {
+        const { username } = req.body;
+
+        if (!username) {
+            return res.status(400).json({ message: "Nutzername erforderlich" });
+        }
+
+        const foundUser = await Models.User.findOne({ where: { username: username } });
+        if (!foundUser) {
+            return res.status(400).json({ message: "Kein Nutzer mit diesem Benutzername gefunden" });
+        }
+
+        const userToken = await Models.UserToken.findOne({ where: { userId: foundUser.id, type: "refreshToken" } });
+        if (userToken) {
+            userToken.destroy();
+        }
+
+        res.status(200).json({ message: "Nutzer erfolgreich abgemeldet" });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    }
+};
+
+export { login, register, accountActivation, requestPasswordReset, passwordReset, logout };

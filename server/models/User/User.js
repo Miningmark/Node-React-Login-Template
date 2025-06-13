@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
                 autoIncrement: true
             },
             username: {
-                type: DataTypes.STRING,
+                type: DataTypes.STRING(15),
                 allowNull: false,
                 unique: true
             },
@@ -18,7 +18,7 @@ export default (sequelize, DataTypes) => {
                 unique: true
             },
             password: {
-                type: DataTypes.STRING,
+                type: DataTypes.STRING(100),
                 allowNull: false
             },
             isActive: {

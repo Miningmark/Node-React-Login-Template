@@ -9,11 +9,16 @@ import cors from "cors";
 import corsOptions from "./config/corsOptions.js";
 import cookieParser from "cookie-parser";
 
+import verifyAccessToken from "./middleware/verifyAccessToken.js";
+
 //sequelize and models
 import { sequelize, Models } from "./controllers/modelController.js";
 
-//routes
-import accountRoute from "./routes/account/accountRoute.js";
+//public Routes
+import publicAccountRoute from "./routes/account/publicAccountRoute.js";
+
+//protected Routes
+import protectedAccountRoute from "./routes/account/protectedAccountRoute.js";
 
 //init express
 const app = express();
@@ -28,12 +33,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 //public routes
-app.use("/api/" + process.env.API_VERSION, accountRoute);
+app.use("/api/" + process.env.API_VERSION, publicAccountRoute);
 
 //middleware to protect routes
+app.use(verifyAccessToken);
 
 //protected routes
-//TODO:
+app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
 
 //connect and sync sequelize and start server listing
 (async () => {
