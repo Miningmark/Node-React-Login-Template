@@ -75,7 +75,7 @@ const login = async (req, res, next) => {
             httpOnly: true,
             sameSite: "None",
             /*secure: true,*/ //TODO:
-            maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000
+            maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000
         });
 
         return res.status(200).json({ accessToken: accessToken });
