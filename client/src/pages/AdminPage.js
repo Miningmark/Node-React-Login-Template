@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
-function Admin() {
+function AdminPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [roles, setRoles] = useState([]);
-  const { token, roles: userRoles } = useContext(AuthContext);
+  const { accessToken, roles: userRoles } = useContext(AuthContext);
 
   if (!userRoles.includes("admin")) return <p>Access denied</p>;
 
@@ -42,4 +42,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default AdminPage;
