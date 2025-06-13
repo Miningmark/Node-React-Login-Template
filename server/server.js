@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import bcrypt from "bcrypt";
 
 //middlewares
 import helmet from "helmet";
@@ -12,13 +11,14 @@ import cookieParser from "cookie-parser";
 import verifyAccessToken from "./middleware/verifyAccessToken.js";
 
 //sequelize and models
-import { sequelize, Models } from "./controllers/modelController.js";
+import { sequelize } from "./controllers/modelController.js";
 
 //public Routes
 import publicAccountRoute from "./routes/account/publicAccountRoute.js";
 
 //protected Routes
 import protectedAccountRoute from "./routes/account/protectedAccountRoute.js";
+import { seedDatabase } from "./seedDatabase.js";
 
 //init express
 const app = express();
@@ -60,26 +60,6 @@ app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
             });
 
             //TODO: remove later only for testing
-            (async () => {
-                const [adminRole, userRole, modRole] = await Promise.all([
-                    Models.Role.create({ name: "Admin" }),
-                    Models.Role.create({ name: "User" }),
-                    Models.Role.create({ name: "Moderator" })
-                ]);
-
-                const [juli051, markus] = await Promise.all([
-                    Models.User.create({ username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) }),
-                    Models.User.create({ username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) })
-                ]);
-
-                await juli051.addRoles([adminRole, modRole, userRole]);
-                await markus.addRoles([adminRole, modRole, userRole]);
-
-                juli051.isActive = true;
-                markus.isActive = true;
-
-                await juli051.save();
-                await markus.save();
-            })();
+            seedDatabase();
         });
 })();
