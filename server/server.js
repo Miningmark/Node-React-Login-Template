@@ -15,10 +15,10 @@ import authorizePermission from "./middleware/authorizePermission.js";
 import { sequelize } from "./controllers/modelController.js";
 
 //public Routes
-import publicAccountRoute from "./routes/account/publicAccountRoute.js";
+import publicAccountRoute from "./routes/publicAccountRoute.js";
 
 //protected Routes
-import protectedAccountRoute from "./routes/account/protectedAccountRoute.js";
+import protectedAccountRoute from "./routes/protectedAccountRoute.js";
 
 //seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
