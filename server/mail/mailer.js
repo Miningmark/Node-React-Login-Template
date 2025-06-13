@@ -1,8 +1,9 @@
 import "dotenv/config";
 import nodemailer from "nodemailer";
+import isDevMode from "../utils/env.js";
 
 export async function sendMail(to, subject, text) {
-    if (!process.env.BACKEND_DEV_MODE) {
+    if (!isDevMode()) {
         const transporter = nodemailer.createTransport({
             host: "mail.your-server.de",
             port: 587, // oder 465 für SSL

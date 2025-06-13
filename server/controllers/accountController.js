@@ -3,47 +3,11 @@ import jwt from "jsonwebtoken";
 import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
-import { ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
+import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
-
-const generateAccessToken = (username) => {
-    return jwt.sign(
-        {
-            UserInfo: {
-                username: username
-                //TODO: add additional information to paylpoad (roles, etc.)
-            }
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) }
-    );
-};
-
-const generateRefreshToken = (username) => {
-    return jwt.sign(
-        {
-            UserInfo: {
-                username: username
-                //TODO: add additional information to paylpoad (roles, etc.)
-            }
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) }
-    );
-};
-
-const findUserToken = async (userId, token, type) => {
-    return await Models.UserToken.findOne({
-        where: {
-            ...(userId && { userId: userId }),
-            ...(token && { token: token }),
-            type: type
-        }
-    });
-};
 
 const login = async (req, res, next) => {
     try {
@@ -60,8 +24,8 @@ const login = async (req, res, next) => {
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
         if (!isPasswordMatching) throw new UnauthorizedError("Passwort nicht korrekt");
 
-        const accessToken = generateAccessToken(foundUser.username);
-        const refreshToken = generateRefreshToken(foundUser.username);
+        const accessToken = generateJWT(foundUser.username, process.env.ACCESS_TOKEN_SECRET, parseInt(process.env.ACCESS_TOKEN_EXPIRATION));
+        const refreshToken = generateJWT(foundUser.username, process.env.REFRESH_TOKEN_SECRET, parseInt(process.env.REFRESH_TOKEN_EXPIRATION));
         const expiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000);
 
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken");
@@ -90,37 +54,28 @@ const register = async (req, res, next) => {
     try {
         const { username, password, email } = req.body;
 
-        if (!username || !password || !email) {
-            return res.status(400).json({ message: "Alle Eingaben erforderlich" });
-        }
+        if (!username || !password || !email) throw new ValidationError("Alle Eingaben erforderlich");
 
-        if (!USERNAME_REGEX.test(username) || !EMAIL_REGEX.test(email) || !PASSWORD_REGEX.test(password)) {
-            return res.status(401).json({ message: "Eingaben entsprechen nicht den Anforderungen!" });
-        }
+        if (!USERNAME_REGEX.test(username) || !EMAIL_REGEX.test(email) || !PASSWORD_REGEX.test(password))
+            throw new ValidationError("Eingaben entsprechen nicht den Anforderungen");
 
-        const duplicateUsername = await Models.User.findOne({ where: { username } });
-        const duplicateEmail = await Models.User.findOne({ where: { email } });
+        const duplicateUsername = await findUser(username, null);
+        const duplicateEmail = await findUser(null, email);
 
-        if (duplicateUsername) {
-            return res.status(409).json({ message: "Benutzername bereits vergeben!", reason: "username" });
-        }
+        if (duplicateUsername) throw new ConflictError("Benutzername bereits vergeben!", "username");
+        if (duplicateEmail) throw new ConflictError("Email bereits registriert!", "email");
 
-        if (duplicateEmail) {
-            return res.status(409).json({ message: "Email bereits registriert!", reason: "email" });
-        }
-
-        //TODO: should do it with an transaction if Role could not beeing added
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await Models.User.create({ username, email, password: hashedPassword });
+        const createdUser = await Models.User.create({ username, email, password: hashedPassword });
         const role = await Models.Role.findOne({ where: { name: "User" } });
-
-        await user.addRole(role);
 
         const token = generateUUID();
         const expiresAt = new Date(Date.now() + parseInt(process.env.REGISTER_TOKEN_EXPIRE_AT) * 1000);
 
-        await Models.UserToken.create({ userId: user.id, token, type: "registration", expiresAt });
+        await createdUser.addRole(role);
+        await Models.UserToken.create({ userId: createdUser.id, token, type: "registration", expiresAt });
 
+        //TODO: make it fancier
         sendMail(
             email,
             "Abschluss deiner Registrierung",
@@ -134,9 +89,8 @@ const register = async (req, res, next) => {
         );
 
         return res.status(201).json({ message: "Benutzer wurde erfolgreich registriert" });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    } catch (error) {
+        next(error);
     }
 };
 
@@ -340,6 +294,38 @@ const refreshAccessToken = async (req, res, next) => {
         console.log(err);
         return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
     }
+};
+
+const generateJWT = (username, secret, expiresIn) => {
+    return jwt.sign(
+        {
+            UserInfo: {
+                username: username
+                //TODO: add additional information to paylpoad (roles, etc.)
+            }
+        },
+        secret,
+        { expiresIn: expiresIn }
+    );
+};
+
+const findUser = async (username, email) => {
+    return await Models.User.findOne({
+        where: {
+            ...(username && { username: username }),
+            ...(email && { email: email })
+        }
+    });
+};
+
+const findUserToken = async (userId, token, type) => {
+    return await Models.UserToken.findOne({
+        where: {
+            ...(userId && { userId: userId }),
+            ...(token && { token: token }),
+            type: type
+        }
+    });
 };
 
 export { login, register, accountActivation, requestPasswordReset, passwordReset, logout, refreshAccessToken };

@@ -23,6 +23,7 @@ import protectedAccountRoute from "./routes/protectedAccountRoute.js";
 
 //seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
+import isDevMode from "./utils/env.js";
 
 //init express
 const app = express();
@@ -45,6 +46,7 @@ app.use(verifyAccessToken);
 //protected routes
 app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
 
+//TODO: TEMP Routes for testing roles
 app.get("/api/" + process.env.API_VERSION + "/viewDashboard", authorizePermission("view_dashboard"), (req, res, next) => {
     res.status(200).json({ message: "viewDashboard" });
 });
@@ -73,16 +75,11 @@ app.use(errorHandler);
         console.error("Unable to connect to the database:", error);
     }
 
-    sequelize
-        .sync({
-            force: true
-        })
-        .then(() => {
-            app.listen(process.env.SERVER_PORT, () => {
-                console.log("Database connected and server is running on port " + process.env.SERVER_PORT);
-            });
-
-            //TODO: remove later only for testing
-            seedDatabase();
+    sequelize.sync(isDevMode() ? { force: true } : {}).then(() => {
+        app.listen(process.env.SERVER_PORT, () => {
+            console.log("Database connected and server is running on port " + process.env.SERVER_PORT);
         });
+
+        if (isDevMode()) seedDatabase();
+    });
 })();
