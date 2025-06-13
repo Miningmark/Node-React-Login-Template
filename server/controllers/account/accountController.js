@@ -60,7 +60,7 @@ const login = async (req, res, next) => {
 
         const userToken = await Models.UserToken.findOne({
             where: {
-                token,
+                userId: foundUser.id,
                 type: "refreshToken"
             }
         });
