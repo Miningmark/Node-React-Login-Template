@@ -3,77 +3,75 @@ import jwt from "jsonwebtoken";
 import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
-import { ValidationError } from "../errors/errorClasses.js";
+import { ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 
+const generateAccessToken = (username) => {
+    return jwt.sign(
+        {
+            UserInfo: {
+                username: username
+                //TODO: add additional information to paylpoad (roles, etc.)
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) }
+    );
+};
+
+const generateRefreshToken = (username) => {
+    return jwt.sign(
+        {
+            UserInfo: {
+                username: username
+                //TODO: add additional information to paylpoad (roles, etc.)
+            }
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) }
+    );
+};
+
+const findUserToken = async (userId, token, type) => {
+    return await Models.UserToken.findOne({
+        where: {
+            ...(userId && { userId: userId }),
+            ...(token && { token: token }),
+            type: type
+        }
+    });
+};
+
 const login = async (req, res, next) => {
     try {
         const { username, password } = req.body;
 
-        if (!username || !password) {
-            //return res.status(400).json({ message: "Alle Eingaben erforderlich" });
-        }
+        if (!username || !password) throw new ValidationError("Benutzername und Passwort erforderlich");
 
         const foundUser = await Models.User.findOne({ where: { username } });
-        if (!foundUser) {
-            throw new ValidationError("Dieser Benutzer exsistiert nicht");
-            //return res.status(401).json({ message: "Dieser Benutzer existiert nicht" });
-        }
 
-        if (foundUser.isDisabled) {
-            //return res.status(401).json({ message: "Benutzer ist gesperrt" });
-        }
-
-        if (!foundUser.isActive) {
-            //return res.status(401).json({ message: "Benutzer ist noch nicht aktiviert" });
-        }
+        if (!foundUser) throw new ValidationError("Dieser Benutzer existiert nicht");
+        if (foundUser.isDisabled) throw new ForbiddenError("Dieser Benutzer ist gesperrt");
+        if (!foundUser.isActive) throw new ForbiddenError("Dieser Benutzer ist noch nicht aktiviert");
 
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
-        if (!isPasswordMatching) {
-            //return res.status(401).json({ message: "Passwort nicht korrekt" });
-        }
+        if (!isPasswordMatching) throw new UnauthorizedError("Passwort nicht korrekt");
 
-        const accessToken = jwt.sign(
-            {
-                UserInfo: {
-                    username: foundUser.username
-                    //TODO: add additional information to paylpoad (roles, etc.)
-                }
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) }
-        );
-
-        const refreshToken = jwt.sign(
-            {
-                UserInfo: {
-                    username: foundUser.username
-                    //TODO: add additional information to paylpoad (roles, etc.)
-                }
-            },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) }
-        );
-
+        const accessToken = generateAccessToken(foundUser.username);
+        const refreshToken = generateRefreshToken(foundUser.username);
         const expiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000);
 
-        const userToken = await Models.UserToken.findOne({
-            where: {
-                userId: foundUser.id,
-                type: "refreshToken"
-            }
-        });
+        const accessUserToken = await findUserToken(foundUser.id, null, "accessToken");
+        const refreshUserToken = await findUserToken(foundUser.id, null, "refreshToken");
 
-        if (userToken) {
-            userToken.destroy();
-        }
+        if (accessUserToken) accessUserToken.destroy();
+        if (refreshUserToken) refreshUserToken.destroy();
 
+        await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "accessToken", expiresAt });
         await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt });
-
-        reason.test = "TEST reason";
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
