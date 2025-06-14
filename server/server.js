@@ -57,7 +57,6 @@ app.get("/api/" + config.apiVersion + "/createPost", verifyAccessToken, authoriz
 
 //catching all routes and sending an 404 error back
 app.all("{*splat}", (req, res, next) => {
-    console.log("TESTING");
     next(new NotFoundError("Angeforderte Route nicht gefunden!"));
 });
 
