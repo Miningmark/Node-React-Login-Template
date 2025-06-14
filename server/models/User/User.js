@@ -42,11 +42,13 @@ export default (sequelize, DataTypes) => {
         User.belongsToMany(models.Role, {
             through: models.UserRole,
             foreignKey: "userId",
-            otherKey: "roleId"
+            otherKey: "roleId",
+            onDelete: "CASCADE"
         });
 
         User.hasMany(models.UserToken, {
-            foreignKey: "userId"
+            foreignKey: "userId",
+            onDelete: "CASCADE"
         });
     };
 

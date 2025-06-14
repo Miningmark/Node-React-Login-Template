@@ -1,4 +1,5 @@
 import "dotenv/config";
+import config from "./config.js";
 
 export const database = {
     database: process.env.DATABASE_DATABASE,
@@ -12,7 +13,6 @@ export const database = {
         min: 0,
         acquire: 10000,
         idle: 10000
-    }
-    //Remove this comment to disable SQL Logs in Console
-    //logging: false
+    },
+    ...(config.logDatabaseQuerries ? {} : { logging: false })
 };

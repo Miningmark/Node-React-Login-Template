@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import bcrypt from "bcrypt";
 
 //middlewares
 import helmet from "helmet";
@@ -10,15 +9,19 @@ import corsOptions from "./config/corsOptions.js";
 import cookieParser from "cookie-parser";
 
 import verifyAccessToken from "./middleware/verifyAccessToken.js";
+import authorizePermission from "./middleware/authorizePermission.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 //sequelize and models
-import { sequelize, Models } from "./controllers/modelController.js";
+import { sequelize } from "./controllers/modelController.js";
 
-//public Routes
-import publicAccountRoute from "./routes/account/publicAccountRoute.js";
+//Routes
+import accountRoute from "./routes/accountRoute.js";
 
-//protected Routes
-import protectedAccountRoute from "./routes/account/protectedAccountRoute.js";
+//seeding standard users into database
+import { seedDatabase } from "./seedDatabase.js";
+import config from "./config/config.js";
+import { NotFoundError } from "./errors/NotFoundError.js";
 
 //init express
 const app = express();
@@ -32,14 +35,33 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-//public routes
-app.use("/api/" + process.env.API_VERSION, publicAccountRoute);
+//routes
+app.use("/api/" + config.apiVersion, accountRoute);
 
-//middleware to protect routes
-app.use(verifyAccessToken);
+//TODO: TEMP Routes for testing roles
+app.get("/api/" + config.apiVersion + "/viewDashboard", verifyAccessToken, authorizePermission("view_dashboard"), (req, res, next) => {
+    res.status(200).json({ message: "viewDashboard" });
+});
 
-//protected routes
-app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
+app.get("/api/" + config.apiVersion + "/editUser", verifyAccessToken, authorizePermission("edit_user"), (req, res, next) => {
+    res.status(200).json({ message: "editUser" });
+});
+
+app.get("/api/" + config.apiVersion + "/deletePost", verifyAccessToken, authorizePermission("delete_post"), (req, res, next) => {
+    res.status(200).json({ message: "deletePost" });
+});
+
+app.get("/api/" + config.apiVersion + "/createPost", verifyAccessToken, authorizePermission("create_post"), (req, res, next) => {
+    res.status(200).json({ message: "createPost" });
+});
+
+//catching all routes and sending an 404 error back
+app.all("{*splat}", (req, res, next) => {
+    next(new NotFoundError("Angeforderte Route nicht gefunden!"));
+});
+
+//global error handler for all routes
+app.use(errorHandler);
 
 //connect and sync sequelize and start server listing
 (async () => {
@@ -50,36 +72,11 @@ app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
         console.error("Unable to connect to the database:", error);
     }
 
-    sequelize
-        .sync({
-            force: true
-        })
-        .then(() => {
-            app.listen(process.env.SERVER_PORT, () => {
-                console.log("Database connected and server is running on port " + process.env.SERVER_PORT);
-            });
-
-            //TODO: remove later only for testing
-            (async () => {
-                const [adminRole, userRole, modRole] = await Promise.all([
-                    Models.Role.create({ name: "Admin" }),
-                    Models.Role.create({ name: "User" }),
-                    Models.Role.create({ name: "Moderator" })
-                ]);
-
-                const [juli051, markus] = await Promise.all([
-                    Models.User.create({ username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) }),
-                    Models.User.create({ username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) })
-                ]);
-
-                await juli051.addRoles([adminRole, modRole, userRole]);
-                await markus.addRoles([adminRole, modRole, userRole]);
-
-                juli051.isActive = true;
-                markus.isActive = true;
-
-                await juli051.save();
-                await markus.save();
-            })();
+    sequelize.sync(config.deleteDatabaseOnStart ? { force: true } : {}).then(() => {
+        app.listen(config.backendPORT, () => {
+            console.log("Database connected and server is running on port " + config.backendPORT);
         });
+
+        if (config.seedDatabase) seedDatabase();
+    });
 })();

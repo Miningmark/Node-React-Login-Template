@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
-    const Role = sequelize.define(
-        "Role",
+    const Permission = sequelize.define(
+        "Permission",
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -14,25 +14,19 @@ export default (sequelize, DataTypes) => {
             }
         },
         {
-            tableName: "roles",
+            tableName: "permissions",
             timestamps: false
         }
     );
 
-    Role.associate = (models) => {
-        Role.belongsToMany(models.User, {
-            through: models.UserRole,
-            foreignKey: "roleId",
-            otherKey: "userId",
-            onDelete: "CASCADE"
-        });
-        Role.belongsToMany(models.Permission, {
+    Permission.associate = (models) => {
+        Permission.belongsToMany(models.Role, {
             through: models.RolePermission,
-            foreignKey: "roleId",
-            otherKey: "permissionId",
+            foreignKey: "permissionId",
+            otherKey: "roleId",
             onDelete: "CASCADE"
         });
     };
 
-    return Role;
+    return Permission;
 };
