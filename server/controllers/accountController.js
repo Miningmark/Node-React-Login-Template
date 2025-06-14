@@ -261,6 +261,89 @@ const refreshAccessToken = async (req, res, next) => {
     }
 };
 
+const changePassword = async (req, res, next) => {
+    try {
+        const { username } = req;
+        const { currentPassword, newPassword } = req.body;
+
+        if (!username || !currentPassword || !newPassword) throw new ValidationError("Alle Eingaben erforderlich");
+
+        const foundUser = await findUser(username);
+        if (!foundUser) throw new ValidationError("Benutzername nicht vorhanden");
+
+        const currentPasswordMatching = await bcrypt.compare(currentPassword, foundUser.password);
+        if (!currentPasswordMatching) throw new ValidationError("Altes Passwort stimmt nicht überein");
+
+        if (!PASSWORD_REGEX.test(newPassword)) throw new ValidationError("Neues Passwort entspricht nicht den Anforderungen");
+        const newPasswordHashed = await bcrypt.hash(newPassword, 10);
+
+        foundUser.password = newPasswordHashed;
+        foundUser.save();
+
+        const accessUserToken = await findUserToken(foundUser.id, null, "refreshToken", null);
+        const refreshUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
+
+        if (accessUserToken) accessUserToken.destroy();
+        if (refreshUserToken) refreshUserToken.destroy();
+
+        res.status(200).json({ message: "Passwort erfolgreich geändert bitte neu anmelden" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const changeEmail = async (req, res, next) => {
+    try {
+        const { username } = req;
+        const { newEmail } = req.body;
+
+        if (!username || !newEmail) throw new ValidationError("Alle Eingaben erforderlich");
+
+        const foundUser = await findUser(username, null);
+        if (!foundUser) throw new ValidationError("Benutzername nicht vorhanden");
+
+        if (foundUser.email.toLowerCase() === newEmail.toLowerCase()) throw new ConflictError("Die Email ist die selbe wie momentan verwendet");
+        if (!EMAIL_REGEX.test(newEmail)) throw new ValidationError("Neue Email entspricht keiner gültigen Email");
+
+        const foundUserNewEmail = await findUser(null, newEmail);
+        if (foundUserNewEmail && foundUserNewEmail.username !== foundUser.username) throw new ConflictError("Email bereits vergeben");
+
+        foundUser.email = newEmail;
+        foundUser.save();
+
+        res.status(200).json({ message: "Email erfolgreich geändert" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const changeUsername = async (req, res, next) => {
+    try {
+        const { username } = req;
+        const { newUsername } = req.body;
+
+        if (!username || !newUsername) throw new ValidationError("Alle Eingaben erforderlich");
+
+        const foundUser = await findUser(username, null);
+        if (!foundUser) throw new ValidationError("Benutzername nicht vorhanden");
+
+        if (foundUser.username.toLowerCase() === newUsername.toLowerCase())
+            throw new ConflictError("Die Benutzername ist der selbe wie momentan verwendet");
+
+        if (!USERNAME_REGEX.test(newUsername)) throw new ValidationError("Neuer Nutzername ist nicht gültig");
+
+        const foundUserNewUsername = await findUser(newUsername, null);
+        if (foundUserNewUsername && foundUserNewUsername.email !== foundUser.email) throw new ConflictError("Nutzername bereits vergeben");
+
+        foundUser.username = newUsername;
+        foundUser.save();
+
+        res.status(200).json({ message: "Nutzername erfolgreich geändert" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const generateJWT = (username, secret, expiresIn) => {
     return jwt.sign(
         {
@@ -294,4 +377,15 @@ const findUserToken = async (userId, token, type, includeUser) => {
     });
 };
 
-export { login, register, accountActivation, requestPasswordReset, passwordReset, logout, refreshAccessToken };
+export {
+    login,
+    register,
+    accountActivation,
+    requestPasswordReset,
+    passwordReset,
+    logout,
+    refreshAccessToken,
+    changePassword,
+    changeEmail,
+    changeUsername
+};

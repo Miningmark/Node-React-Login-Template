@@ -75,19 +75,11 @@ app.use(errorHandler);
         console.error("Unable to connect to the database:", error);
     }
 
-    sequelize
-        .sync(
-            isDevMode()
-                ? {
-                      /*force: true*/
-                  }
-                : {}
-        )
-        .then(() => {
-            app.listen(process.env.SERVER_PORT, () => {
-                console.log("Database connected and server is running on port " + process.env.SERVER_PORT);
-            });
-
-            //if (isDevMode()) seedDatabase();
+    sequelize.sync(isDevMode() ? { force: true } : {}).then(() => {
+        app.listen(process.env.SERVER_PORT, () => {
+            console.log("Database connected and server is running on port " + process.env.SERVER_PORT);
         });
+
+        if (isDevMode()) seedDatabase();
+    });
 })();
