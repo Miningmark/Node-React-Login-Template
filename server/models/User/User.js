@@ -50,6 +50,10 @@ export default (sequelize, DataTypes) => {
             foreignKey: "userId",
             onDelete: "CASCADE"
         });
+        User.hasMany(models.LastLogin, {
+            foreignKey: "userId",
+            as: "logins"
+        });
     };
 
     return User;
