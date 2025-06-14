@@ -39,8 +39,6 @@ function Login() {
 
       const res2 = await axiosProtected.get("/user-roles");
 
-      console.log("User roles:", res2.data);
-
       setUser(res2.data);
       addToast("Login erfolgreich", "success");
 

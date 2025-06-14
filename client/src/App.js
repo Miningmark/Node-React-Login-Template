@@ -65,7 +65,7 @@ function App() {
         <Route
           path="/userpage"
           element={
-            <RequireAuth allowedRoles={["user", "admin"]}>
+            <RequireAuth allowedRoles={["User"]}>
               <UserPage />
             </RequireAuth>
           }
