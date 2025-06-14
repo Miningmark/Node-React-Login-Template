@@ -344,6 +344,37 @@ const changeUsername = async (req, res, next) => {
     }
 };
 
+const userRoles = async (req, res, next) => {
+    try {
+        const { username } = req;
+
+        if (!username) throw new ValidationError("Nutzername erforderlich");
+
+        const foundUser = await Models.User.findOne({
+            where: { username: username },
+            include: { model: Models.Role, include: { model: Models.Permission } }
+        });
+
+        if (!foundUser) throw new ValidationError("Kein Nutzer in der Datenbank gefunden");
+
+        const jsonResult = {
+            username: foundUser.username,
+            roles: foundUser.Roles.map((role) => ({
+                id: role.id,
+                name: role.name,
+                permissions: role.Permissions.map((perm) => ({
+                    id: perm.id,
+                    name: perm.name
+                }))
+            }))
+        };
+
+        return res.status(200).json(jsonResult);
+    } catch (error) {
+        next(error);
+    }
+};
+
 const generateJWT = (username, secret, expiresIn) => {
     return jwt.sign(
         {
@@ -387,5 +418,6 @@ export {
     refreshAccessToken,
     changePassword,
     changeEmail,
-    changeUsername
+    changeUsername,
+    userRoles
 };

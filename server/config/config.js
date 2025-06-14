@@ -1,9 +1,9 @@
 export default {
-    deleteDatabaseOnStart: false,
+    deleteDatabaseOnStart: true,
     logDatabaseQuerries: true,
     logErrorsInsideConsole: true,
     sendEmails: false,
-    seedDatabase: false,
+    seedDatabase: true,
     isDevServer: true,
 
     isRegisterEnable: true,

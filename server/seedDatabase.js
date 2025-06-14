@@ -24,7 +24,7 @@ const seedDatabase = async () => {
         Models.User.create({ username: "testUser", email: "testUser@gmx.net", password: await bcrypt.hash("testUser", 10) })
     ]);
 
-    await juli051.addRoles([adminRole]);
+    await juli051.addRoles([adminRole, modRole, userRole]);
     await markus.addRoles([adminRole]);
 
     await testAdmin.addRoles([adminRole]);
