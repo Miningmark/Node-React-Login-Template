@@ -5,7 +5,6 @@ import * as accountController from "../controllers/accountController.js";
 import config from "../config/config.js";
 
 import verifyAccessToken from "../middleware/verifyAccessToken.js";
-import authorizePermission from "../middleware/authorizePermission.js";
 
 //public routes
 if (config.isRegisterEnable) {

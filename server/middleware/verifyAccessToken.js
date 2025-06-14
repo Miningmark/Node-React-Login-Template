@@ -6,6 +6,7 @@ import { ConflictError, UnauthorizedError } from "../errors/errorClasses.js";
 
 export default async (req, res, next) => {
     try {
+        console.log("VerifyAccessToken");
         const authorizationHeader = req?.headers?.authorization?.split(" ");
         if (!authorizationHeader || authorizationHeader[0].toLowerCase() !== "bearer") throw new ConflictError("Kein AccessToken vorhanden");
 
@@ -14,8 +15,8 @@ export default async (req, res, next) => {
         const accessUserToken = await Models.UserToken.findOne({ where: { token: accessToken, type: "accessToken" } });
         if (!accessUserToken) throw new UnauthorizedError("AccessToken ungültig");
 
-        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-            if (err) throw new UnauthorizedError("AccessToken ungültig");
+        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+            if (error) throw new UnauthorizedError("AccessToken ungültig");
 
             req.username = decoded.UserInfo.username;
             //TODO: add roles and other usefull data to the payload of the object at creation and read it here

@@ -42,7 +42,7 @@ const login = async (req, res, next) => {
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            sameSite: "None",
+            sameSite: "Lax",
             ...(config.isDevServer ? {} : { secure: true }),
             maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000
         });
@@ -206,7 +206,7 @@ const logout = async (req, res, next) => {
 
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            sameSite: "None",
+            sameSite: "Lax",
             ...(config.isDevServer ? {} : { secure: true })
         });
 
@@ -226,7 +226,7 @@ const refreshAccessToken = async (req, res, next) => {
         if (!refreshUserToken) {
             res.clearCookie("refreshToken", {
                 httpOnly: true,
-                sameSite: "None",
+                sameSite: "Lax",
                 ...(config.isDevServer ? {} : { secure: true })
             });
 

@@ -1,13 +1,13 @@
 export default {
-    deleteDatabaseOnStart: true,
+    deleteDatabaseOnStart: false,
     logDatabaseQuerries: true,
     logErrorsInsideConsole: true,
     sendEmails: false,
-    seedDatabase: true,
+    seedDatabase: false,
     isDevServer: true,
 
-    isRegisterEnable: false,
-    isUsernameChangeEnable: false,
+    isRegisterEnable: true,
+    isUsernameChangeEnable: true,
 
     backendPORT: 4000,
     apiVersion: "v1",
