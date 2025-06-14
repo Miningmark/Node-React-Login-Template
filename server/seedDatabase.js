@@ -9,7 +9,7 @@ const seedDatabase = async () => {
         { name: "create_post" }
     ]);
 
-    const [adminRole, userRole, modRole] = await Models.Role.bulkCreate([{ name: "Admin" }, { name: "Moderator" }, { name: "User" }]);
+    const [adminRole, modRole, userRole] = await Models.Role.bulkCreate([{ name: "Admin" }, { name: "Moderator" }, { name: "User" }]);
 
     await adminRole.setPermissions([viewDashboardPermission, editUserPermission, deletePostPermission, createPostPermission]);
     await modRole.setPermissions([viewDashboardPermission, deletePostPermission, createPostPermission]);
