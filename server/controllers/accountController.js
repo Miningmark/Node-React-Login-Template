@@ -358,7 +358,7 @@ const userRoles = async (req, res, next) => {
         if (!foundUser) throw new ValidationError("Kein Nutzer in der Datenbank gefunden");
 
         const jsonResult = {
-            username: foundUser.username,
+            username: foundUser.username.charAt(0).toUpperCase() + foundUser.username.slice(1),
             roles: foundUser.Roles.map((role) => ({
                 id: role.id,
                 name: role.name,
