@@ -3,6 +3,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
 import { axiosPublic } from "../../util/axios";
+import useAxiosProtected from "../../hook/useAxiosProtected";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -16,8 +17,9 @@ function Login() {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const { addToast } = useToast();
-  const { login } = useContext(AuthContext);
+  const { login, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const axiosProtected = useAxiosProtected();
 
   const handleSubmitLogin = async (e) => {
     e.preventDefault();
@@ -34,6 +36,14 @@ function Login() {
         }
       );
       login(res.data.accessToken, name);
+
+      const res2 = await axiosProtected.get("/user-roles");
+
+      console.log("User roles:", res2.data);
+
+      setUser(res2.data);
+      addToast("Login erfolgreich", "success");
+
       navigate("/dashboard");
     } catch (error) {
       setPassword("");

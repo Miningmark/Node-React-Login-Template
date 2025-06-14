@@ -84,6 +84,7 @@ const UserPage = () => {
 
       addToast("E-Mail-Adresse erfolgreich aktualisiert.", "success");
       setNewEmail("");
+      setTouched({ ...touched, email: false });
     } catch (error) {
       addToast(error.response?.data?.message || "E-Mail-Änderung fehlgeschlagen", "danger");
     }

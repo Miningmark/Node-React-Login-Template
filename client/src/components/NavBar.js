@@ -5,7 +5,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import useAxiosProtected from "../hook/useAxiosProtected";
 
 function NavBar() {
-  const { accessToken, username, logout } = useContext(AuthContext);
+  const { accessToken, user, logout } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ function NavBar() {
               >
                 <li>
                   <button className="dropdown-item" onClick={() => navigate("/userpage")}>
-                    {username}
+                    {user.username}
                   </button>
                 </li>
                 <li>

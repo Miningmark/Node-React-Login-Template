@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 
 const RequireAuth = ({ children, allowedRoles }) => {
-  const { accessToken, username, roles } = useContext(AuthContext);
+  const { accessToken, user } = useContext(AuthContext);
   const location = useLocation();
   const refreshAccessToken = useRefreshToken();
 
@@ -36,7 +36,9 @@ const RequireAuth = ({ children, allowedRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const hasRequiredRole = allowedRoles ? roles.some((role) => allowedRoles.includes(role)) : true;
+  const hasRequiredRole = allowedRoles
+    ? user?.roles?.some((role) => allowedRoles.includes(role.name) || role.name === "Admin")
+    : true;
 
   if (!hasRequiredRole) {
     return <Navigate to="/unauthorized" replace />;
