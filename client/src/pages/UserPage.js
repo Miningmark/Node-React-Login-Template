@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "../components/ToastContext";
-import { axiosProtected } from "../util/axios";
+import useAxiosProtected from "../hook/useAxiosProtected";
+import { Link, useNavigate } from "react-router-dom";
 
 const UserPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -10,6 +11,8 @@ const UserPage = () => {
   const [touched, setTouched] = useState({ password: false });
 
   const { addToast } = useToast();
+  const axiosProtected = useAxiosProtected();
+  const navigate = useNavigate();
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -61,6 +64,7 @@ const UserPage = () => {
       await axiosProtected.post("/change-password", { currentPassword, newPassword });
 
       addToast("Passwordänderung erfolgreich.", "success");
+      navigate("/login");
     } catch (error) {
       addToast(error.response?.data?.message || "Passwordänderung fehlgeschlagen", "danger");
     }
@@ -79,6 +83,7 @@ const UserPage = () => {
       await axiosProtected.post("/change-email", { newEmail });
 
       addToast("E-Mail-Adresse erfolgreich aktualisiert.", "success");
+      setNewEmail("");
     } catch (error) {
       addToast(error.response?.data?.message || "E-Mail-Änderung fehlgeschlagen", "danger");
     }
@@ -95,18 +100,11 @@ const UserPage = () => {
               <div className="form-floating mb-3">
                 <input
                   type="password"
-                  className={`form-control ${
-                    touched.password
-                      ? isLengthValid && hasLowercase && hasUppercase && hasNumber && hasSpecialChar
-                        ? "is-valid"
-                        : "is-invalid"
-                      : ""
-                  }`}
+                  className={`form-control `}
                   id="floatingCurrentPassword"
                   placeholder="Aktuelles Passwort"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  onBlur={() => setTouched({ ...touched, password: true })}
                   required
                   ref={passwordRef}
                 />
