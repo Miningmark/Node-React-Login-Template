@@ -15,15 +15,13 @@ import { errorHandler } from "./middleware/errorHandler.js";
 //sequelize and models
 import { sequelize } from "./controllers/modelController.js";
 
-//public Routes
-import publicAccountRoute from "./routes/publicAccountRoute.js";
-
-//protected Routes
-import protectedAccountRoute from "./routes/protectedAccountRoute.js";
+//Routes
+import accountRoute from "./routes/accountRoute.js";
 
 //seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
-import isDevMode from "./utils/env.js";
+import config from "./config/config.js";
+import { NotFoundError } from "./errors/NotFoundError.js";
 
 //init express
 const app = express();
@@ -37,30 +35,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-//public routes
-app.use("/api/" + process.env.API_VERSION, publicAccountRoute);
-
-//middleware to protect routes
-app.use(verifyAccessToken);
-
-//protected routes
-app.use("/api/" + process.env.API_VERSION, protectedAccountRoute);
+//routes
+app.use("/api/" + config.apiVersion, accountRoute);
 
 //TODO: TEMP Routes for testing roles
-app.get("/api/" + process.env.API_VERSION + "/viewDashboard", authorizePermission("view_dashboard"), (req, res, next) => {
+app.get("/api/" + config.apiVersion + "/viewDashboard", verifyAccessToken, authorizePermission("view_dashboard"), (req, res, next) => {
     res.status(200).json({ message: "viewDashboard" });
 });
 
-app.get("/api/" + process.env.API_VERSION + "/editUser", authorizePermission("edit_user"), (req, res, next) => {
+app.get("/api/" + config.apiVersion + "/editUser", verifyAccessToken, authorizePermission("edit_user"), (req, res, next) => {
     res.status(200).json({ message: "editUser" });
 });
 
-app.get("/api/" + process.env.API_VERSION + "/deletePost", authorizePermission("delete_post"), (req, res, next) => {
+app.get("/api/" + config.apiVersion + "/deletePost", verifyAccessToken, authorizePermission("delete_post"), (req, res, next) => {
     res.status(200).json({ message: "deletePost" });
 });
 
-app.get("/api/" + process.env.API_VERSION + "/createPost", authorizePermission("create_post"), (req, res, next) => {
+app.get("/api/" + config.apiVersion + "/createPost", verifyAccessToken, authorizePermission("create_post"), (req, res, next) => {
     res.status(200).json({ message: "createPost" });
+});
+
+//catching all routes and sending an 404 error back
+app.all("{*splat}", (req, res, next) => {
+    console.log("TESTING");
+    next(new NotFoundError("Angeforderte Route nicht gefunden!"));
 });
 
 //global error handler for all routes
@@ -75,11 +73,11 @@ app.use(errorHandler);
         console.error("Unable to connect to the database:", error);
     }
 
-    sequelize.sync(isDevMode() ? { force: true } : {}).then(() => {
-        app.listen(process.env.SERVER_PORT, () => {
-            console.log("Database connected and server is running on port " + process.env.SERVER_PORT);
+    sequelize.sync(config.deleteDatabaseOnStart ? { force: true } : {}).then(() => {
+        app.listen(config.backendPORT, () => {
+            console.log("Database connected and server is running on port " + config.backendPORT);
         });
 
-        if (isDevMode()) seedDatabase();
+        if (config.seedDatabase) seedDatabase();
     });
 })();

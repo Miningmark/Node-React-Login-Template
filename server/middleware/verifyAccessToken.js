@@ -19,7 +19,7 @@ export default async (req, res, next) => {
 
             req.username = decoded.UserInfo.username;
             //TODO: add roles and other usefull data to the payload of the object at creation and read it here
-            next();
+            return next();
         });
     } catch (error) {
         next(error);

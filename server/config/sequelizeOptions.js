@@ -1,5 +1,5 @@
 import "dotenv/config";
-import isDevMode from "../utils/env.js";
+import config from "./config.js";
 
 export const database = {
     database: process.env.DATABASE_DATABASE,
@@ -14,5 +14,5 @@ export const database = {
         acquire: 10000,
         idle: 10000
     },
-    ...(isDevMode() ? {} : { logging: false })
+    ...(config.logDatabaseQuerries ? {} : { logging: false })
 };

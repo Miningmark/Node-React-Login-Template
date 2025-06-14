@@ -4,7 +4,7 @@ import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
-import isDevMode from "../utils/env.js";
+import config from "../config/config.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -43,7 +43,7 @@ const login = async (req, res, next) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             sameSite: "None",
-            ...(!isDevMode() ? { secure: true } : {}),
+            ...(config.isDevServer ? {} : { secure: true }),
             maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000
         });
 
@@ -73,7 +73,7 @@ const register = async (req, res, next) => {
         const role = await Models.Role.findOne({ where: { name: "User" } });
 
         const token = generateUUID();
-        const expiresAt = new Date(Date.now() + parseInt(process.env.REGISTER_TOKEN_EXPIRE_AT) * 1000);
+        const expiresAt = new Date(Date.now() + config.accountActivationTokenExpiresIn * 1000);
 
         await createdUser.addRole(role);
         await Models.UserToken.create({ userId: createdUser.id, token, type: "registration", expiresAt });
@@ -82,12 +82,11 @@ const register = async (req, res, next) => {
         sendMail(
             email,
             "Abschluss deiner Registrierung",
-            "Unter dem nachfolgenden Link kannst du deine Registrierung auf " +
-                process.env.FRONTEND_WEBADRESS +
-                " bis " +
+            "Unter dem nachfolgenden Link kannst du deine Registrierung bis " +
                 expiresAt +
                 " abschließen: " +
-                process.env.FRONTEND_WEBADRESS_REGISTER_TOKEN +
+                config.frontendURL +
+                config.frontendURLAccountActivationToken +
                 token
         );
 
@@ -138,7 +137,7 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
         if (userToken) userToken.destroy();
 
         const token = generateUUID();
-        const expiresAt = new Date(Date.now() + parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRE_AT) * 1000);
+        const expiresAt = new Date(Date.now() + config.passwordResetTokenExpiresIn * 1000);
 
         await Models.UserToken.create({ userId: foundUser.id, token, type: "passwordReset", expiresAt });
 
@@ -149,7 +148,8 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
             "Unter dem nachfolgenden Link kannst du dein Passwort bis " +
                 expiresAt +
                 " zurück setzten: " +
-                process.env.FRONTEND_WEBADRESS_PASSWORD_RESET_TOKEN +
+                config.frontendURL +
+                config.frontendURLPasswordResetToken +
                 token
         );
 
@@ -207,7 +207,7 @@ const logout = async (req, res, next) => {
         res.clearCookie("refreshToken", {
             httpOnly: true,
             sameSite: "None",
-            ...(!isDevMode() ? { secure: true } : {})
+            ...(config.isDevServer ? {} : { secure: true })
         });
 
         res.status(200).json({ message: "Nutzer erfolgreich abgemeldet" });
@@ -227,7 +227,7 @@ const refreshAccessToken = async (req, res, next) => {
             res.clearCookie("refreshToken", {
                 httpOnly: true,
                 sameSite: "None",
-                ...(!isDevMode() ? { secure: true } : {})
+                ...(config.isDevServer ? {} : { secure: true })
             });
 
             throw new UnauthorizedError("Token nicht vorhanden, bitte neu anmelden");
