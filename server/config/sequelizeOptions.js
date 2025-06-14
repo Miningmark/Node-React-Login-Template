@@ -14,5 +14,5 @@ export const database = {
         acquire: 10000,
         idle: 10000
     },
-    ...(isDevMode() ? { logging: false } : {})
+    ...(isDevMode() ? {} : { logging: false })
 };

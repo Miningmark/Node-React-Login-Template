@@ -4,6 +4,7 @@ import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
+import isDevMode from "../utils/env.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -15,7 +16,7 @@ const login = async (req, res, next) => {
 
         if (!username || !password) throw new ValidationError("Benutzername und Passwort erforderlich");
 
-        const foundUser = await Models.User.findOne({ where: { username } });
+        const foundUser = await findUser(username);
 
         if (!foundUser) throw new ValidationError("Dieser Benutzer existiert nicht");
         if (foundUser.isDisabled) throw new ForbiddenError("Dieser Benutzer ist gesperrt");
@@ -24,23 +25,25 @@ const login = async (req, res, next) => {
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
         if (!isPasswordMatching) throw new UnauthorizedError("Passwort nicht korrekt");
 
-        const accessToken = generateJWT(foundUser.username, process.env.ACCESS_TOKEN_SECRET, parseInt(process.env.ACCESS_TOKEN_EXPIRATION));
-        const refreshToken = generateJWT(foundUser.username, process.env.REFRESH_TOKEN_SECRET, parseInt(process.env.REFRESH_TOKEN_EXPIRATION));
-        const expiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000);
-
-        const accessUserToken = await findUserToken(foundUser.id, null, "accessToken");
-        const refreshUserToken = await findUserToken(foundUser.id, null, "refreshToken");
+        const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
+        const refreshUserToken = await findUserToken(foundUser.id, null, "refreshToken", null);
 
         if (accessUserToken) accessUserToken.destroy();
         if (refreshUserToken) refreshUserToken.destroy();
 
-        await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "accessToken", expiresAt });
-        await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt });
+        const accessToken = generateJWT(foundUser.username, process.env.ACCESS_TOKEN_SECRET, parseInt(process.env.ACCESS_TOKEN_EXPIRATION));
+        const refreshToken = generateJWT(foundUser.username, process.env.REFRESH_TOKEN_SECRET, parseInt(process.env.REFRESH_TOKEN_EXPIRATION));
+
+        const accessTokenExpiresAt = new Date(Date.now() + parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000);
+        const refreshTokenExpiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000);
+
+        await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "accessToken", expiresAt: accessTokenExpiresAt });
+        await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt: refreshTokenExpiresAt });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             sameSite: "None",
-            /*secure: true,*/ //TODO:
+            ...(!isDevMode() ? { secure: true } : {}),
             maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000
         });
 
@@ -100,7 +103,7 @@ const accountActivation = async (req, res, next) => {
 
         if (!token) throw new ValidationError("Token nicht vorhanden");
 
-        const userToken = await findUserToken(null, token, "registration");
+        const userToken = await findUserToken(null, token, "registration", true);
         if (!userToken) throw new ValidationError("Token nicht vorhanden");
 
         if (new Date(Date.now()) > userToken.expiresAt) {
@@ -119,7 +122,7 @@ const accountActivation = async (req, res, next) => {
     }
 };
 
-const requestPasswordReset = async (req, res, next) => {
+const requestPasswordReset = async (req, res, next, sendResponse = true) => {
     try {
         const { username } = req.body;
 
@@ -150,9 +153,7 @@ const requestPasswordReset = async (req, res, next) => {
                 token
         );
 
-        //TODO:
-        const { doNotSendRespone } = req.body;
-        if (!doNotSendRespone) return res.status(200).json({ message: "Email zum Passwort ändern wurde versandt" });
+        if (sendResponse) return res.status(200).json({ message: "Email zum Passwort ändern wurde versandt" });
     } catch (error) {
         next(error);
     }
@@ -162,26 +163,17 @@ const passwordReset = async (req, res, next) => {
     try {
         const { token, password } = req.body;
 
-        if (!token || !password) {
-            return res.status(401).json({ message: "Benutzername und Token erforderlich!" });
-        }
+        if (!token || !password) throw new ValidationError("Passwort und Token erforderlich!");
+        if (!PASSWORD_REGEX.test(password)) throw new ValidationError("Passwort entspricht nicht den Anforderungen");
 
-        if (!PASSWORD_REGEX.test(password)) {
-            return res.status(401).json({ message: "Passwort entspricht nicht den Anforderungen" });
-        }
-
-        const userToken = await Models.UserToken.findOne({ where: { token: token, type: "passwordReset" }, include: Models.User });
-
-        if (!userToken) {
-            return res.status(401).json({ message: "Token nicht vorhanden" });
-        }
+        const userToken = await findUserToken(null, token, "passwordReset", true);
+        if (!userToken) throw new ValidationError("Token nicht vorhanden");
 
         if (new Date(Date.now()) > userToken.expiresAt) {
-            req.body.doNotSendRespone = true;
             req.body.username = userToken.User.username;
-            requestPasswordReset(req, res);
+            requestPasswordReset(req, res, next, false);
 
-            return res.status(400).json({ message: "Token bereits abgelaufen, neuer Token wurde an deine Email gesendet" });
+            throw new ValidationError("Token bereits abgelaufen, neuer Token wurde an deine Email gesendet");
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -191,10 +183,9 @@ const passwordReset = async (req, res, next) => {
 
         userToken.destroy();
 
-        return res.status(200).json({ message: "Neues Passwort erfolgreich gesetzt" });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+        return res.status(200).json({ message: "Neues Passwort erfolgreich gespeichert" });
+    } catch (error) {
+        next(error);
     }
 };
 
@@ -202,30 +193,26 @@ const logout = async (req, res, next) => {
     try {
         const { username } = req;
 
-        if (!username) {
-            return res.status(400).json({ message: "Nutzername erforderlich" });
-        }
+        if (!username) throw new ValidationError("Nutzername erforderlich");
 
-        const foundUser = await Models.User.findOne({ where: { username: username } });
-        if (!foundUser) {
-            return res.status(400).json({ message: "Kein Nutzer mit diesem Benutzername gefunden" });
-        }
+        const foundUser = await findUser(username, null);
+        if (!foundUser) throw new ValidationError("Kein Nutzer mit diesem Benutzername gefunden");
 
-        const userToken = await Models.UserToken.findOne({ where: { userId: foundUser.id, type: "refreshToken" } });
-        if (userToken) {
-            userToken.destroy();
-        }
+        const refreshUserToken = await findUserToken(foundUser.id, null, "refreshToken");
+        const accessUserToken = await findUserToken(foundUser.id, null, "accessToken");
+
+        if (refreshUserToken) refreshUserToken.destroy();
+        if (accessUserToken) accessUserToken.destroy();
 
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            sameSite: "None"
-            /*secure: true,*/ //TODO:
+            sameSite: "None",
+            ...(!isDevMode() ? { secure: true } : {})
         });
 
         res.status(200).json({ message: "Nutzer erfolgreich abgemeldet" });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    } catch (error) {
+        next(error);
     }
 };
 
@@ -233,40 +220,44 @@ const refreshAccessToken = async (req, res, next) => {
     try {
         const { refreshToken } = req.cookies;
 
-        if (!refreshToken) {
-            return res.status(401).json({ message: "Keinen Cookie für Erneuerung gefunden" });
-        }
+        if (!refreshToken) throw new ValidationError("Keinen Cookie für Erneuerung gefunden");
 
-        const userToken = await Models.UserToken.findOne({ where: { token: refreshToken, type: "refreshToken" }, include: Models.User });
-        if (!userToken) {
+        const refreshUserToken = await findUserToken(null, refreshToken, "refreshToken", true);
+        if (!refreshUserToken) {
             res.clearCookie("refreshToken", {
                 httpOnly: true,
-                sameSite: "None"
-                /*secure: true,*/ //TODO:
+                sameSite: "None",
+                ...(!isDevMode() ? { secure: true } : {})
             });
-            return res.status(401).json({ message: "Token nicht vorhanden, bitte neu anmelden" });
+
+            throw new UnauthorizedError("Token nicht vorhanden, bitte neu anmelden");
         }
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-            if (err || decoded.UserInfo.username !== userToken.User.username) {
-                return res.status(401).json({ message: "Token stimmt nicht mit Username überein" });
+        const accessUserToken = await findUserToken(refreshUserToken.User.id, null, "accessToken", null);
+        if (accessUserToken) accessUserToken.destroy();
+
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+            if (err || decoded.UserInfo.username !== refreshUserToken.User.username) {
+                throw new ValidationError("Token stimmt nicht mit Username überein");
             }
 
-            const accessToken = jwt.sign(
-                {
-                    UserInfo: {
-                        username: userToken.User.username
-                        //TODO: add additional information to paylpoad (roles, etc.)
-                    }
-                },
+            const accessToken = generateJWT(
+                refreshUserToken.User.username,
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRATION) }
+                parseInt(process.env.ACCESS_TOKEN_EXPIRATION)
             );
+            const accessTokenExpiresAt = new Date(Date.now() + parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000);
+
+            await Models.UserToken.create({
+                userId: refreshUserToken.User.id,
+                token: accessToken,
+                type: "accessToken",
+                expiresAt: accessTokenExpiresAt
+            });
             return res.status(200).json({ accessToken: accessToken });
         });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    } catch (error) {
+        next(error);
     }
 };
 
@@ -292,13 +283,14 @@ const findUser = async (username, email) => {
     });
 };
 
-const findUserToken = async (userId, token, type) => {
+const findUserToken = async (userId, token, type, includeUser) => {
     return await Models.UserToken.findOne({
         where: {
             ...(userId && { userId: userId }),
             ...(token && { token: token }),
             type: type
-        }
+        },
+        ...(includeUser && { include: Models.User })
     });
 };
 
