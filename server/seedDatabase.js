@@ -25,7 +25,7 @@ const seedDatabase = async () => {
     ]);
 
     await juli051.addRoles([adminRole, modRole, userRole]);
-    await markus.addRoles([adminRole]);
+    await markus.addRoles([adminRole, modRole, userRole]);
 
     await testAdmin.addRoles([adminRole]);
     await testMod.addRoles([modRole]);
