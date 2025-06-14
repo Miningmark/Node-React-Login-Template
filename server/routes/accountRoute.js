@@ -20,11 +20,11 @@ router.get("/refresh-access-token", accountController.refreshAccessToken);
 
 //protected routes
 if (config.isRegisterEnable) {
-    router.post("/changeUsername", verifyAccessToken, accountController.changeUsername);
+    router.post("/change-username", verifyAccessToken, accountController.changeUsername);
 }
 
 router.post("/logout", verifyAccessToken, accountController.logout);
-router.post("/changePassword", verifyAccessToken, accountController.changePassword);
-router.post("/changeEmail", verifyAccessToken, accountController.changeEmail);
+router.post("/change-password", verifyAccessToken, accountController.changePassword);
+router.post("/change-email", verifyAccessToken, accountController.changeEmail);
 
 export default router;
