@@ -98,25 +98,14 @@ const accountActivation = async (req, res, next) => {
     try {
         const { token } = req.body;
 
-        if (!token) {
-            return res.status(400).json({ message: "Token nicht vorhanden" });
-        }
+        if (!token) throw new ValidationError("Token nicht vorhanden");
 
-        const userToken = await Models.UserToken.findOne({
-            where: {
-                token,
-                type: "registration"
-            },
-            include: Models.User
-        });
-
-        if (!userToken) {
-            return res.status(400).json({ message: "Token nicht vorhanden" });
-        }
+        const userToken = await findUserToken(null, token, "registration");
+        if (!userToken) throw new ValidationError("Token nicht vorhanden");
 
         if (new Date(Date.now()) > userToken.expiresAt) {
             await userToken.User.destroy();
-            return res.status(400).json({ message: "Token abgelaufen, bitte neu registrieren", redirect: "/register" });
+            throw new ValidationError("Token abgelaufen, bitte neu registrieren", "/register");
         }
 
         userToken.User.isActive = true;
@@ -125,9 +114,8 @@ const accountActivation = async (req, res, next) => {
         await userToken.destroy();
 
         return res.status(201).json({ message: "Benutzer erfolgreich freigeschaltet!" });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+    } catch (error) {
+        next(error);
     }
 };
 
@@ -135,35 +123,23 @@ const requestPasswordReset = async (req, res, next) => {
     try {
         const { username } = req.body;
 
-        if (!username) {
-            return res.status(400).json({ message: "Benutzername erforderlich" });
-        }
+        if (!username) throw new ValidationError("Benutzername erforderlich");
 
-        const foundUser = await Models.User.findOne({ where: { username: username } });
-        if (!foundUser) {
-            return res.status(401).json({ message: "Es existiert kein Benutzer mit dieser Nutzername" });
-        }
+        const foundUser = await findUser(username, null);
 
-        if (foundUser.isDisabled) {
-            return res.status(401).json({ message: "Benutzer ist gesperrt, kein zurücksetzten des Passworts möglich" });
-        }
+        if (!foundUser) throw new ValidationError("Es existiert kein Benutzer mit dieser Nutzername");
+        if (foundUser.isDisabled) throw new UnauthorizedError("Benutzer ist gesperrt, kein zurücksetzten des Passworts möglich");
 
-        const userToken = await Models.UserToken.findOne({
-            where: {
-                userId: foundUser.id,
-                type: "passwordReset"
-            }
-        });
+        const userToken = await findUserToken(foundUser.id, null, "passwordReset");
 
-        if (userToken) {
-            userToken.destroy();
-        }
+        if (userToken) userToken.destroy();
 
         const token = generateUUID();
         const expiresAt = new Date(Date.now() + parseInt(process.env.PASSWORD_RESET_TOKEN_EXPIRE_AT) * 1000);
 
         await Models.UserToken.create({ userId: foundUser.id, token, type: "passwordReset", expiresAt });
 
+        //TODO: make it prettier
         sendMail(
             foundUser.email,
             "Passwort vergessen ?",
@@ -174,13 +150,11 @@ const requestPasswordReset = async (req, res, next) => {
                 token
         );
 
+        //TODO:
         const { doNotSendRespone } = req.body;
-        if (!doNotSendRespone) {
-            return res.status(200).json({ message: "Email zum Passwort ändern wurde versandt" });
-        }
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Interner Serverfehler, bitte Admin kontaktieren" });
+        if (!doNotSendRespone) return res.status(200).json({ message: "Email zum Passwort ändern wurde versandt" });
+    } catch (error) {
+        next(error);
     }
 };
 
