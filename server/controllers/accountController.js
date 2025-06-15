@@ -5,6 +5,7 @@ import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 import config from "../config/config.js";
+import ipLookup from "../utils/ipChecker.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -49,7 +50,7 @@ const login = async (req, res, next) => {
 
         const jsonResult = {};
         jsonResult.accessToken = accessToken;
-        jsonResult.username = username;
+        jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
         jsonResult.roles = await getJSONRoles(username);
         jsonResult.config = getJSONConfig();
 
@@ -366,7 +367,7 @@ const getUsername = async (req, res, next) => {
         if (!username) throw new ValidationError("Nutzername erforderlich");
 
         const jsonResult = {};
-        jsonResult.username = username;
+        jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -383,6 +384,20 @@ const getConfig = async (req, res, next) => {
         jsonResult.config = getJSONConfig();
 
         return res.status(200).json(jsonResult);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const testIP = async (req, res, next) => {
+    try {
+        console.log(req.ip);
+        console.log(await ipLookup(req.ip));
+
+        const jsonResult = {};
+        jsonResult.config = getJSONConfig();
+
+        return res.sendStatus(200);
     } catch (error) {
         next(error);
     }
@@ -460,5 +475,6 @@ export {
     changeUsername,
     getUserRoles,
     getUsername,
-    getConfig
+    getConfig,
+    testIP
 };
