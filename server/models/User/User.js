@@ -52,7 +52,7 @@ export default (sequelize, DataTypes) => {
         });
         User.hasMany(models.LastLogin, {
             foreignKey: "userId",
-            as: "logins"
+            onDelete: "CASCADE"
         });
     };
 

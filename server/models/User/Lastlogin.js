@@ -11,26 +11,31 @@ export default (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 primaryKey: true
             },
-            ipAdress: {
-                type: DataTypes.STRING(15),
+            ipv4Adress: {
+                type: DataTypes.STRING,
                 allowNull: false
             },
             userAgent: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.STRING,
                 allowNull: false
             },
             country: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.STRING,
                 allowNull: false
             },
-            region: {
-                type: DataTypes.STRING(50),
+            regionName: {
+                type: DataTypes.STRING,
                 allowNull: false
             },
             loginAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: DataTypes.NOW
+            },
+            successfully: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
         },
         {
@@ -42,7 +47,6 @@ export default (sequelize, DataTypes) => {
     LastLogin.associate = (models) => {
         LastLogin.belongsTo(models.User, {
             foreignKey: "userId",
-            as: "user",
             onDelete: "CASCADE"
         });
     };

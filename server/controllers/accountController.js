@@ -9,6 +9,7 @@ import config from "../config/config.js";
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
+const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
 
 const login = async (req, res, next) => {
     try {
@@ -23,8 +24,10 @@ const login = async (req, res, next) => {
         if (!foundUser.isActive) throw new ForbiddenError("Dieser Benutzer ist noch nicht aktiviert");
 
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
-        if (!isPasswordMatching) throw new UnauthorizedError("Passwort nicht korrekt");
-
+        if (!isPasswordMatching) {
+            await addLastLogin(req, foundUser.id, false);
+            throw new UnauthorizedError("Passwort nicht korrekt");
+        }
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
         const refreshUserToken = await findUserToken(foundUser.id, null, "refreshToken", null);
 
@@ -49,9 +52,11 @@ const login = async (req, res, next) => {
 
         const jsonResult = {};
         jsonResult.accessToken = accessToken;
-        jsonResult.username = username;
+        jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
         jsonResult.roles = await getJSONRoles(username);
         jsonResult.config = getJSONConfig();
+
+        await addLastLogin(req, foundUser.id, true);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -366,7 +371,7 @@ const getUsername = async (req, res, next) => {
         if (!username) throw new ValidationError("Nutzername erforderlich");
 
         const jsonResult = {};
-        jsonResult.username = username;
+        jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -386,6 +391,56 @@ const getConfig = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+const getLastLogins = async (req, res, next) => {
+    try {
+        const { username } = req;
+
+        if (!username) throw new ValidationError("Nutzername erforderlich");
+
+        const foundUser = await Models.User.findOne({
+            where: { username: username },
+            include: [{ model: Models.LastLogin, limit: 5, order: [["loginAt", "DESC"]] }]
+        });
+
+        const resultJson = foundUser.LastLogins.map((lastLogin) => ({
+            ipv4Adress: lastLogin.ipv4Adress,
+            userAgent: lastLogin.userAgent,
+            country: lastLogin.country,
+            regionName: lastLogin.regionName,
+            loginAt: lastLogin.loginAt,
+            successfully: lastLogin.successfully
+        }));
+
+        return res.status(200).json(resultJson);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const addLastLogin = async (req, userId, successfully) => {
+    const ipv4Adress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip;
+    const userAgent = req.headers["user-agent"];
+
+    const jsonResult = {};
+    let isValid = true;
+
+    if (!ipv4Adress || !IPV4_REGEX.test(ipv4Adress)) isValid = false;
+    const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
+    const ipLookupData = await ipLookupResponse.json();
+
+    if (!userId) throw new ValidationError("UserId nicht verhanden");
+
+    jsonResult.userId = userId;
+    jsonResult.ipv4Adress = isValid ? ipv4Adress : "Ungültig: " + ipv4Adress;
+    jsonResult.userAgent = userAgent ? userAgent : "Nicht vorhanden";
+    jsonResult.country = ipLookupData.status === "success" ? ipLookupData.country : "IP Lookup nicht erfolgreich";
+    jsonResult.regionName = ipLookupData.status === "success" ? ipLookupData.regionName : "IP Lookup nicht erfolgreich";
+    jsonResult.loginAt = new Date(Date.now());
+    jsonResult.successfully = successfully;
+
+    await Models.LastLogin.create(jsonResult);
 };
 
 const getJSONRoles = async (username) => {
@@ -460,5 +515,6 @@ export {
     changeUsername,
     getUserRoles,
     getUsername,
-    getConfig
+    getConfig,
+    getLastLogins
 };

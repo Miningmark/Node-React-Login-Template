@@ -29,5 +29,6 @@ router.post("/change-email", verifyAccessToken, accountController.changeEmail);
 router.get("/user-roles", verifyAccessToken, accountController.getUserRoles);
 router.get("/username", verifyAccessToken, accountController.getUsername);
 router.get("/config", verifyAccessToken, accountController.getConfig);
+router.get("/last-logins", verifyAccessToken, accountController.getLastLogins);
 
 export default router;
