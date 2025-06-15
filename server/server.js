@@ -1,3 +1,4 @@
+import config from "./config/config.js";
 import express from "express";
 
 //middlewares
@@ -7,9 +8,8 @@ import cors from "cors";
 import corsOptions from "./config/corsOptions.js";
 import cookieParser from "cookie-parser";
 
-import verifyAccessToken from "./middleware/verifyAccessToken.js";
-import authorizePermission from "./middleware/authorizePermission.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { NotFoundError } from "./errors/NotFoundError.js";
 
 //sequelize and models
 import { sequelize } from "./controllers/modelController.js";
@@ -19,9 +19,6 @@ import accountRoute from "./routes/accountRoute.js";
 
 //seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
-
-import config from "./config/config.js";
-import { NotFoundError } from "./errors/NotFoundError.js";
 
 //init express
 const app = express();
@@ -37,23 +34,6 @@ app.use(cookieParser());
 
 //routes
 app.use("/api/" + config.apiVersion, accountRoute);
-
-//TODO: TEMP Routes for testing roles
-app.get("/api/" + config.apiVersion + "/viewDashboard", verifyAccessToken, authorizePermission("view_dashboard"), (req, res, next) => {
-    res.status(200).json({ message: "viewDashboard" });
-});
-
-app.get("/api/" + config.apiVersion + "/editUser", verifyAccessToken, authorizePermission("edit_user"), (req, res, next) => {
-    res.status(200).json({ message: "editUser" });
-});
-
-app.get("/api/" + config.apiVersion + "/deletePost", verifyAccessToken, authorizePermission("delete_post"), (req, res, next) => {
-    res.status(200).json({ message: "deletePost" });
-});
-
-app.get("/api/" + config.apiVersion + "/createPost", verifyAccessToken, authorizePermission("create_post"), (req, res, next) => {
-    res.status(200).json({ message: "createPost" });
-});
 
 //catching all routes and sending an 404 error back
 app.all("{*splat}", (req, res, next) => {

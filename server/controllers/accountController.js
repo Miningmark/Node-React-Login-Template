@@ -47,7 +47,13 @@ const login = async (req, res, next) => {
             maxAge: config.refreshTokenExpiration * 1000
         });
 
-        return res.status(200).json({ accessToken: accessToken });
+        const jsonResult = {};
+        jsonResult.accessToken = accessToken;
+        jsonResult.username = username;
+        jsonResult.roles = await getJSONRoles(username);
+        jsonResult.config = getJSONConfig();
+
+        return res.status(200).json(jsonResult);
     } catch (error) {
         next(error);
     }
@@ -340,35 +346,72 @@ const changeUsername = async (req, res, next) => {
     }
 };
 
-const userRoles = async (req, res, next) => {
+const getUserRoles = async (req, res, next) => {
     try {
         const { username } = req;
-
         if (!username) throw new ValidationError("Nutzername erforderlich");
 
-        const foundUser = await Models.User.findOne({
-            where: { username: username },
-            include: { model: Models.Role, include: { model: Models.Permission } }
-        });
-
-        if (!foundUser) throw new ValidationError("Kein Nutzer in der Datenbank gefunden");
-
-        const jsonResult = {
-            username: foundUser.username.charAt(0).toUpperCase() + foundUser.username.slice(1),
-            roles: foundUser.Roles.map((role) => ({
-                id: role.id,
-                name: role.name,
-                permissions: role.Permissions.map((perm) => ({
-                    id: perm.id,
-                    name: perm.name
-                }))
-            }))
-        };
+        const jsonResult = {};
+        jsonResult.roles = await getJSONRoles(username);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
         next(error);
     }
+};
+
+const getUsername = async (req, res, next) => {
+    try {
+        const { username } = req;
+        if (!username) throw new ValidationError("Nutzername erforderlich");
+
+        const jsonResult = {};
+        jsonResult.username = username;
+
+        return res.status(200).json(jsonResult);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getConfig = async (req, res, next) => {
+    try {
+        const { username } = req;
+        if (!username) throw new ValidationError("Nutzername erforderlich");
+
+        const jsonResult = {};
+        jsonResult.config = getJSONConfig();
+
+        return res.status(200).json(jsonResult);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getJSONRoles = async (username) => {
+    const foundUser = await Models.User.findOne({
+        where: { username: username },
+        include: { model: Models.Role, include: { model: Models.Permission } }
+    });
+
+    if (!foundUser) throw new ValidationError("Kein Nutzer in der Datenbank gefunden");
+
+    return foundUser.Roles.map((role) => ({
+        id: role.id,
+        name: role.name,
+        permissions: role.Permissions.map((perm) => ({
+            id: perm.id,
+            name: perm.name
+        }))
+    }));
+};
+
+const getJSONConfig = () => {
+    return {
+        isRegisterEnable: config.isRegisterEnable,
+        isUsernameChangeEnable: config.isUsernameChangeEnable,
+        serverVersion: config.serverVersion
+    };
 };
 
 const generateJWT = (username, secret, expiresIn) => {
@@ -415,5 +458,7 @@ export {
     changePassword,
     changeEmail,
     changeUsername,
-    userRoles
+    getUserRoles,
+    getUsername,
+    getConfig
 };
