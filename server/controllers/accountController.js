@@ -434,7 +434,7 @@ const addLastLogin = async (req, userId, successfully) => {
 
     jsonResult.userId = userId;
     jsonResult.ipv4Adress = isValid ? ipv4Adress : "Ungültig: " + ipv4Adress;
-    jsonResult.userAgent = userAgent ? userAgent : null;
+    jsonResult.userAgent = userAgent ? userAgent : "Nicht vorhanden";
     jsonResult.country = ipLookupData.status === "success" ? ipLookupData.country : "IP Lookup nicht erfolgreich";
     jsonResult.regionName = ipLookupData.status === "success" ? ipLookupData.regionName : "IP Lookup nicht erfolgreich";
     jsonResult.loginAt = new Date(Date.now());

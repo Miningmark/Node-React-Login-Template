@@ -17,15 +17,15 @@ export default (sequelize, DataTypes) => {
             },
             userAgent: {
                 type: DataTypes.STRING,
-                allowNull: true
+                allowNull: false
             },
             country: {
                 type: DataTypes.STRING,
-                allowNull: true
+                allowNull: false
             },
             regionName: {
                 type: DataTypes.STRING,
-                allowNull: true
+                allowNull: false
             },
             loginAt: {
                 type: DataTypes.DATE,
