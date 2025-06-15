@@ -8,15 +8,18 @@ const UserPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const [newUsername, setNewUsername] = useState("");
   const [touched, setTouched] = useState({ password: false });
 
   const { addToast } = useToast();
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
-  const emailRef = useRef(null);
+  const currentPasswordRef = useRef(null);
   const passwordRef = useRef(null);
   const repeatRef = useRef(null);
+  const emailRef = useRef(null);
+  const usernameRef = useRef(null);
 
   // Passwortregeln
   const isLengthValid = newPassword.length >= 8 && newPassword.length <= 24;
@@ -25,12 +28,14 @@ const UserPage = () => {
   const hasNumber = /[0-9]/.test(newPassword);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
   const passwordsMatch = newPassword === confirmPassword;
-
   const PASSWORD_REGEX =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 
   //E-Mail regeln
   const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(newEmail.trim());
+
+  //Benutzername regeln
+  const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(newUsername.trim());
 
   const recentLogins = [
     { date: "2025-06-13 14:23", ip: "192.168.1.1", location: "Berlin, DE" },
@@ -90,136 +95,192 @@ const UserPage = () => {
     }
   }
 
+  async function handleUpdateUsername(e) {
+    e.preventDefault();
+
+    if (!isUsernameValid) {
+      addToast("Ungültiger Benutzername", "danger");
+      usernameRef.current?.focus();
+      return;
+    }
+    try {
+      await axiosProtected.post("/change-username", { newUsername });
+
+      addToast("Benutzername erfolgreich aktualisiert.", "success");
+      setNewUsername("");
+      setTouched({ ...touched, username: false });
+    } catch (error) {
+      addToast(error.response?.data?.message || "Benutzername-Änderung fehlgeschlagen", "danger");
+    }
+  }
+
   return (
     <div className="container mt-4">
+      <h2>Benutzereinstellungen</h2>
       <div className="row g-4">
         {/* Passwort ändern */}
         <div className="col-12 col-md-6">
           <div className="card h-100">
             <div className="card-header fw-bold">Passwort ändern</div>
             <div className="card-body">
-              <div className="form-floating mb-3">
-                <input
-                  type="password"
-                  className={`form-control `}
-                  id="floatingCurrentPassword"
-                  placeholder="Aktuelles Passwort"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                  ref={passwordRef}
-                />
-                <label htmlFor="floatingCurrentPassword">Aktuelles Passwort</label>
-              </div>
-              <div className="form-floating mb-3">
-                <input
-                  type="password"
-                  className={`form-control ${
-                    touched.password
-                      ? isLengthValid && hasLowercase && hasUppercase && hasNumber && hasSpecialChar
+              <form onSubmit={handleUpdatePassword}>
+                <div className="form-floating mb-3">
+                  <input
+                    type="password"
+                    className={`form-control `}
+                    id="floatingCurrentPassword"
+                    placeholder="Aktuelles Passwort"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    ref={currentPasswordRef}
+                  />
+                  <label htmlFor="floatingCurrentPassword">Aktuelles Passwort</label>
+                </div>
+                <div className="form-floating mb-3">
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      touched.password
+                        ? isLengthValid &&
+                          hasLowercase &&
+                          hasUppercase &&
+                          hasNumber &&
+                          hasSpecialChar
+                          ? "is-valid"
+                          : "is-invalid"
+                        : ""
+                    }`}
+                    id="floatingNewPassword"
+                    placeholder="Neues Passwort"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    onBlur={() => setTouched({ ...touched, password: true })}
+                    required
+                    ref={passwordRef}
+                  />
+                  <label htmlFor="floatingNewPassword">Neues Passwort</label>
+                </div>
+                <ul className="mb-3 list-unstyled small">
+                  <li
+                    className={
+                      touched.password ? (isLengthValid ? "text-success" : "text-danger") : ""
+                    }
+                  >
+                    {isLengthValid ? "✅" : "❌"} Mindestens 8 Zeichen, max. 24 Zeichen
+                  </li>
+                  <li
+                    className={
+                      touched.password ? (hasLowercase ? "text-success" : "text-danger") : ""
+                    }
+                  >
+                    {hasLowercase ? "✅" : "❌"} Mindestens ein Kleinbuchstabe
+                  </li>
+                  <li
+                    className={
+                      touched.password ? (hasUppercase ? "text-success" : "text-danger") : ""
+                    }
+                  >
+                    {hasUppercase ? "✅" : "❌"} Mindestens ein Großbuchstabe
+                  </li>
+                  <li
+                    className={touched.password ? (hasNumber ? "text-success" : "text-danger") : ""}
+                  >
+                    {hasNumber ? "✅" : "❌"} Mindestens eine Zahl
+                  </li>
+                  <li
+                    className={
+                      touched.password ? (hasSpecialChar ? "text-success" : "text-danger") : ""
+                    }
+                  >
+                    {hasSpecialChar ? "✅" : "❌"} Mindestens ein Sonderzeichen
+                  </li>
+                </ul>
+                <div className="form-floating mb-3">
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      touched.repeat && !passwordsMatch
+                        ? "is-invalid"
+                        : passwordsMatch && confirmPassword !== ""
                         ? "is-valid"
-                        : "is-invalid"
-                      : ""
-                  }`}
-                  id="floatingNewPassword"
-                  placeholder="Neues Passwort"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  onBlur={() => setTouched({ ...touched, password: true })}
-                  required
-                  ref={passwordRef}
-                />
-                <label htmlFor="floatingNewPassword">Neues Passwort</label>
-              </div>
-              <ul className="mb-3 list-unstyled small">
-                <li
-                  className={
-                    touched.password ? (isLengthValid ? "text-success" : "text-danger") : ""
-                  }
-                >
-                  {isLengthValid ? "✅" : "❌"} Mindestens 8 Zeichen, max. 24 Zeichen
-                </li>
-                <li
-                  className={
-                    touched.password ? (hasLowercase ? "text-success" : "text-danger") : ""
-                  }
-                >
-                  {hasLowercase ? "✅" : "❌"} Mindestens ein Kleinbuchstabe
-                </li>
-                <li
-                  className={
-                    touched.password ? (hasUppercase ? "text-success" : "text-danger") : ""
-                  }
-                >
-                  {hasUppercase ? "✅" : "❌"} Mindestens ein Großbuchstabe
-                </li>
-                <li
-                  className={touched.password ? (hasNumber ? "text-success" : "text-danger") : ""}
-                >
-                  {hasNumber ? "✅" : "❌"} Mindestens eine Zahl
-                </li>
-                <li
-                  className={
-                    touched.password ? (hasSpecialChar ? "text-success" : "text-danger") : ""
-                  }
-                >
-                  {hasSpecialChar ? "✅" : "❌"} Mindestens ein Sonderzeichen
-                </li>
-              </ul>
-              <div className="form-floating mb-3">
-                <input
-                  type="password"
-                  className={`form-control ${
-                    touched.repeat && !passwordsMatch
-                      ? "is-invalid"
-                      : passwordsMatch && confirmPassword !== ""
-                      ? "is-valid"
-                      : ""
-                  }`}
-                  id="floatingConfirmPassword"
-                  placeholder="Passwort wiederholen"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onBlur={() => setTouched({ ...touched, repeat: true })}
-                  required
-                  ref={repeatRef}
-                />
-                <label htmlFor="floatingConfirmPassword">Passwort wiederholen</label>
-                {touched.repeat && !passwordsMatch && (
-                  <div className="invalid-feedback">Passwörter stimmen nicht überein.</div>
-                )}
-              </div>
-              <button className="btn btn-primary w-100" onClick={handleUpdatePassword}>
-                Passwort aktualisieren
-              </button>
+                        : ""
+                    }`}
+                    id="floatingConfirmPassword"
+                    placeholder="Passwort wiederholen"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onBlur={() => setTouched({ ...touched, repeat: true })}
+                    required
+                    ref={repeatRef}
+                  />
+                  <label htmlFor="floatingConfirmPassword">Passwort wiederholen</label>
+                  {touched.repeat && !passwordsMatch && (
+                    <div className="invalid-feedback">Passwörter stimmen nicht überein.</div>
+                  )}
+                </div>
+                <button className="btn btn-primary w-100" type="submit">
+                  Passwort aktualisieren
+                </button>
+              </form>
             </div>
           </div>
         </div>
 
-        {/* E-Mail ändern */}
         <div className="col-12 col-md-6">
-          <div className="card h-100">
+          {/* E-Mail ändern */}
+          <div className="card">
             <div className="card-header fw-bold">E-Mail-Adresse ändern</div>
             <div className="card-body">
-              <div className="form-floating mb-3">
-                <input
-                  type="email"
-                  className={`form-control ${
-                    touched.email ? (isEmailValid ? "is-valid" : "is-invalid") : ""
-                  }`}
-                  id="floatingNewEmail"
-                  placeholder="E-Mail"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  onBlur={() => setTouched({ ...touched, email: true })}
-                  required
-                  ref={emailRef}
-                />
-                <label htmlFor="floatingNewEmail">E-Mail</label>
-              </div>
-              <button className="btn btn-primary w-100" onClick={handleUpdateEmail}>
-                E-Mail aktualisieren
-              </button>
+              <form onSubmit={handleUpdateEmail}>
+                <div className="form-floating mb-3">
+                  <input
+                    type="email"
+                    className={`form-control ${
+                      touched.email ? (isEmailValid ? "is-valid" : "is-invalid") : ""
+                    }`}
+                    id="floatingNewEmail"
+                    placeholder="E-Mail"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    onBlur={() => setTouched({ ...touched, email: true })}
+                    required
+                    ref={emailRef}
+                  />
+                  <label htmlFor="floatingNewEmail">E-Mail</label>
+                </div>
+                <button className="btn btn-primary w-100" type="submit">
+                  E-Mail aktualisieren
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Benutzername ändern */}
+          <div className="card  mt-4">
+            <div className="card-header fw-bold">Benutzername ändern</div>
+            <div className="card-body">
+              <form onSubmit={handleUpdateUsername}>
+                <div className="form-floating mb-3">
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      touched.username ? (isUsernameValid ? "is-valid" : "is-invalid") : ""
+                    }`}
+                    id="floatingNewUsername"
+                    placeholder="Benutzername"
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    onBlur={() => setTouched({ ...touched, username: true })}
+                    required
+                    ref={usernameRef}
+                  />
+                  <label htmlFor="floatingNewUsername">Benutzername</label>
+                </div>
+                <button className="btn btn-primary w-100" type="submit">
+                  Benutzername aktualisieren
+                </button>
+              </form>
             </div>
           </div>
         </div>

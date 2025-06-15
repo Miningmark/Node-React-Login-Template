@@ -101,12 +101,12 @@ function Login() {
                 <input
                   className="form-control"
                   id="floatingPassword"
-                  placeholder="Password"
+                  placeholder="Passwort"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <label htmlFor="floatingPassword">Password</label>
+                <label htmlFor="floatingPassword">Passwort</label>
               </div>
               <div className="d-flex mb-3">
                 {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
