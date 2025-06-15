@@ -22,7 +22,6 @@ export default {
     frontendURLPasswordResetToken: process.env.frontendURLPasswordResetToken,
     passwordResetTokenExpiresIn: Number(process.env.passwordResetTokenExpiresIn),
 
-    frontendURLAccountReactivation: process.env.frontendURLAccountReactivation,
     frontendURLPasswordForgotten: process.env.frontendURLPasswordForgotten,
 
     allowedOrigins: JSON.parse(process.env.allowedOrigins),
@@ -42,5 +41,5 @@ export default {
     refreshTokenSecret: process.env.refreshTokenSecret,
     refreshTokenExpiration: Number(process.env.refreshTokenExpiration),
 
-    serverVersion: "0.0.7"
+    serverVersion: "0.0.8"
 };

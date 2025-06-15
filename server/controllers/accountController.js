@@ -6,6 +6,7 @@ import generateUUID from "../utils/generateUUID.js";
 import formatDate from "../utils/formatDate.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 import config from "../config/config.js";
+import { Op } from "sequelize";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -173,23 +174,28 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
     }
 };
 
-const passwordReset = async (req, res, next) => {
+const passwordResetAndReactivation = async (req, res, next) => {
     try {
         const { token, password } = req.body;
 
         if (!token || !password) throw new ValidationError("Passwort und Token erforderlich!");
         if (!PASSWORD_REGEX.test(password)) throw new ValidationError("Passwort entspricht nicht den Anforderungen");
 
-        const userToken = await findUserToken(null, token, "passwordReset", true);
+        const userToken = await Models.UserToken.findOne({
+            where: { token: token, type: { [Op.or]: ["passwordReset", "accountReactivation"] } },
+            include: Models.User
+        });
+
         if (!userToken) throw new ValidationError("Token nicht vorhanden");
 
-        if (new Date(Date.now()) > userToken.expiresAt) {
-            req.body.username = userToken.User.username;
-            requestPasswordReset(req, res, next, false);
+        if (userToken.expiresAt !== null) {
+            if (new Date(Date.now()) > userToken.expiresAt) {
+                req.body.username = userToken.User.username;
+                requestPasswordReset(req, res, next, false);
 
-            throw new ValidationError("Token bereits abgelaufen, neuer Token wurde an deine Email gesendet");
+                throw new ValidationError("Token bereits abgelaufen, neuer Token wurde an deine Email gesendet");
+            }
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
         userToken.User.password = hashedPassword;
@@ -481,14 +487,14 @@ const checkLastLogins = async (username) => {
             "Account Sperrung",
             "Aus Sicherheitsgründen wurde dein Account nach mehreren fehlgeschlagenen Login-Versuchen vorübergehend deaktiviert. \nDu kannst ihn über den folgenden Link wieder aktivieren: " +
                 config.frontendURL +
-                config.frontendURLAccountReactivation +
+                config.frontendURLPasswordResetToken +
                 token
         );
 
         foundUser.isActive = false;
         await foundUser.save();
 
-        await Models.UserToken.create({ userId: foundUser.id, toke: token, type: "accountReactivation", expiresAt: null });
+        await Models.UserToken.create({ userId: foundUser.id, token: token, type: "accountReactivation", expiresAt: null });
     }
 };
 
@@ -580,7 +586,7 @@ export {
     register,
     accountActivation,
     requestPasswordReset,
-    passwordReset,
+    passwordResetAndReactivation,
     logout,
     refreshAccessToken,
     changePassword,

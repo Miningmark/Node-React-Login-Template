@@ -13,7 +13,7 @@ if (config.isRegisterEnable) {
 }
 router.post("/login", accountController.login);
 router.post("/request-password-reset", accountController.requestPasswordReset);
-router.post("/password-reset", accountController.passwordReset);
+router.post("/password-reset", accountController.passwordResetAndReactivation);
 
 router.get("/refresh-access-token", accountController.refreshAccessToken);
 router.get("/config", accountController.getConfig);
