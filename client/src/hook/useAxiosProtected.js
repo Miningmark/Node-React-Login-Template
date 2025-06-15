@@ -10,7 +10,6 @@ const useAxiosProtected = () => {
   useEffect(() => {
     const requestIntercept = axiosProtected.interceptors.request.use(
       (config) => {
-        console.log("Axios request interceptor triggered");
         if (!config.headers["Authorization"]) {
           config.headers["Authorization"] = `Bearer ${accessToken}`;
         }
