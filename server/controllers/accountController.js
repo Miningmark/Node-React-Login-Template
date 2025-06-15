@@ -5,7 +5,6 @@ import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 import config from "../config/config.js";
-import ipLookup from "../utils/ipChecker.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
