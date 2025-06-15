@@ -19,7 +19,7 @@ const UserPage = () => {
   const [loadingLogins, setLoadingLogins] = useState(true);
 
   const { addToast } = useToast();
-  const { config, setAccessToken } = useContext(AuthContext);
+  const { config, setAccessToken, setUsername } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
@@ -129,8 +129,8 @@ const UserPage = () => {
       await axiosProtected.post("/change-username", { newUsername });
 
       addToast("Benutzername erfolgreich aktualisiert.", "success");
-      setNewUsername("");
-      setTouched({ ...touched, username: false });
+      setAccessToken("");
+      navigate("/login");
     } catch (error) {
       addToast(error.response?.data?.message || "Benutzername-Änderung fehlgeschlagen", "danger");
     } finally {
