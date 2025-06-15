@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 
 const RequireAuth = ({ children, allowedRoles }) => {
-  const { accessToken, user } = useContext(AuthContext);
+  const { accessToken, roles } = useContext(AuthContext);
   const location = useLocation();
   const refreshAccessToken = useRefreshToken();
 
@@ -37,7 +37,7 @@ const RequireAuth = ({ children, allowedRoles }) => {
   }
 
   const hasRequiredRole = allowedRoles
-    ? user?.roles?.some((role) => allowedRoles.includes(role.name) || role.name === "Admin")
+    ? roles?.some((role) => allowedRoles.includes(role.name) || role.name === "Admin")
     : true;
 
   if (!hasRequiredRole) {

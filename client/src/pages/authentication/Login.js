@@ -17,7 +17,7 @@ function Login() {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const { addToast } = useToast();
-  const { login, setUser } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const axiosProtected = useAxiosProtected();
 
@@ -35,13 +35,12 @@ function Login() {
           withCredentials: true,
         }
       );
-      login(res.data.accessToken, name);
-
-      const res2 = await axiosProtected.get("/user-roles");
-
-      setUser(res2.data);
+      console.log("AccessToken:", res.data.accessToken);
+      console.log("Username:", res.data.username);
+      console.log("Roles:", res.data.roles);
+      console.log("Config:", res.data.config);
+      login(res.data.accessToken, res.data.username, res.data.roles, res.data.config);
       addToast("Login erfolgreich", "success");
-
       navigate("/dashboard");
     } catch (error) {
       setPassword("");
