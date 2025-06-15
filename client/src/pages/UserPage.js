@@ -63,10 +63,10 @@ const UserPage = () => {
     try {
       await axiosProtected.post("/change-password", { currentPassword, newPassword });
 
-      addToast("Passwordänderung erfolgreich.", "success");
+      addToast("Passwort änderung erfolgreich.", "success");
       navigate("/login");
     } catch (error) {
-      addToast(error.response?.data?.message || "Passwordänderung fehlgeschlagen", "danger");
+      addToast(error.response?.data?.message || "Passwort änderung fehlgeschlagen", "danger");
     }
   }
 

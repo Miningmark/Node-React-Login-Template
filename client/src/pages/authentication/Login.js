@@ -39,8 +39,6 @@ function Login() {
 
       const res2 = await axiosProtected.get("/user-roles");
 
-      console.log("User roles:", res2.data);
-
       setUser(res2.data);
       addToast("Login erfolgreich", "success");
 
@@ -178,6 +176,18 @@ function Login() {
             </Form>
           </div>
         </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "20px",
+          color: "white",
+          fontWeight: "bold",
+          textShadow: "1px 1px 2px black",
+        }}
+      >
+        ABCDE
       </div>
     </div>
   );
