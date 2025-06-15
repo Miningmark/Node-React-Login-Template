@@ -402,7 +402,7 @@ const addLastLogin = async (headers, userId, successfully) => {
     console.log(`http://ip-api.com/json/${ipv4Adress}`);
     const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
     console.log(ipLookupResponse);
-    const ipLookupData = ipLookupResponse.json();
+    const ipLookupData = await ipLookupResponse.json();
     console.log(ipLookupData);
 
     if (!userId) throw new ValidationError("UserId nicht verhanden");
