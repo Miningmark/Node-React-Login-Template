@@ -3,7 +3,6 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
 import { axiosPublic } from "../../util/axios";
-import useAxiosProtected from "../../hook/useAxiosProtected";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -19,7 +18,6 @@ function Login() {
   const { addToast } = useToast();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const axiosProtected = useAxiosProtected();
 
   const handleSubmitLogin = async (e) => {
     e.preventDefault();

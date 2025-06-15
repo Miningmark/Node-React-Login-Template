@@ -8,20 +8,35 @@ export const AuthProvider = ({ children }) => {
   const [roles, setRoles] = useState({});
   const [config, setConfig] = useState({});
 
-  const login = (newAccessToken, username, roles, config) => {
+  function login(newAccessToken, username, roles, config) {
     setAccessToken(newAccessToken);
     setUsername(username);
     setRoles(roles);
     setConfig(config);
-  };
+  }
 
-  const logout = () => {
+  function logout() {
     setAccessToken(null);
     setUsername(null);
-  };
+    setRoles(null);
+    setConfig(null);
+  }
 
   return (
-    <AuthContext.Provider value={{ accessToken, username, roles, config, setRoles, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        username,
+        roles,
+        config,
+        setAccessToken,
+        setUsername,
+        setRoles,
+        setConfig,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

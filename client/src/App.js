@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import RequireAuth from "./components/RequireAuth";
+import PublicRoute from "./components/PublicRoute";
 
 function AppWrapper() {
   return (
@@ -37,13 +38,53 @@ function App() {
     <>
       {!hideNavBar && <NavBar />}
       <Routes>
-        <Route path="/" element={<Login />} />
-        {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
-          <Route path="/register" element={<Register />} />
-        ) : null}
-        <Route path="/login" element={<Login />} />
-        <Route path="/password-reset" element={<ResetPassword />} />
-        <Route path="/account-activation" element={<AccountActivating />} />
+        {/* Öffentlich, aber geschützt wenn bereits eingeloggt */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/password-reset"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/account-activation"
+          element={
+            <PublicRoute>
+              <AccountActivating />
+            </PublicRoute>
+          }
+        />
+
+        {/* Nur anzeigen, wenn Registrierung aktiv ist */}
+        {process.env.REACT_APP_REGISTER_ACTIVE === "true" && (
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
+        )}
+
+        {/* Authentifizierte Routen */}
         <Route
           path="/dashboard"
           element={
