@@ -469,7 +469,7 @@ const checkLastLogins = async (username) => {
         include: [{ model: Models.LastLogin, limit: 5, order: [["loginAt", "DESC"]] }]
     });
 
-    foundUser.LastLogins.foreach((lastLogin) => {
+    foundUser.LastLogins.forEach((lastLogin) => {
         if (!lastLogin.successfully) countUnsuccessfullyLogins++;
     });
 
