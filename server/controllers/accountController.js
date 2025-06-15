@@ -29,6 +29,7 @@ const login = async (req, res, next) => {
         if (!isPasswordMatching) {
             await addLastLogin(req, foundUser.id, false);
             await checkLastLogins(foundUser.username);
+            await checkChangedLocationAndRegion(foundUser.username);
             throw new UnauthorizedError("Passwort nicht korrekt");
         }
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
@@ -199,6 +200,7 @@ const passwordResetAndReactivation = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         userToken.User.password = hashedPassword;
+        if (userToken.type === "accountReactivation") userToken.User.isActive = true;
         userToken.User.save();
 
         userToken.destroy();
