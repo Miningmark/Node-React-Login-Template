@@ -1,0 +1,76 @@
+# Update to match your values: branch_name, app_name, SSH key name on GitHub from previous step if changed, server ip, username, port, and server Node pathname (using 'which pm2' on server to get path)
+
+name: Deploy Node-React-Login-Template App (React + Node.js)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check Node.js version
+        run: node -v
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to Server
+        env:
+          HOST: ${{ secrets.HOST_IP }}
+          USERNAME: ${{ secrets.USERNAME }}
+          TARGET_DIR: ${{ secrets.TARGET_DIR }}
+          FRONTEND_NAME: client
+          BACKEND_NAME: server
+          FRONTEND_PORT: ${{ secrets.PORT_FRONTEND }}
+          BACKEND_PORT: ${{ secrets.PORT_BACKEND }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$HOST << EOF
+            export PATH=/root/.nvm/versions/node/v20.15.0/bin:$PATH #'which pm2' command on terminal will give the right path
+            
+            cd $TARGET_DIR
+            git pull origin ${GITHUB_REF#refs/heads/}
+
+            # Frontend: React build
+            cd client
+            npm install
+            npm run build
+
+            # Serve frontend using pm2 & serve
+            if pm2 list | grep -q $FRONTEND_NAME; then
+              echo "Restarting frontend: $FRONTEND_NAME"
+              pm2 restart $FRONTEND_NAME
+            else
+              echo "Starting frontend: $FRONTEND_NAME"
+              pm2 start npx --name $FRONTEND_NAME -- serve -s build -l $FRONTEND_PORT
+            fi
+
+            # Backend: Node.js server
+            cd ../server
+            npm install
+
+            if pm2 list | grep -q $BACKEND_NAME; then
+              echo "Restarting backend: $BACKEND_NAME"
+              pm2 restart $BACKEND_NAME
+            else
+              echo "Starting backend: $BACKEND_NAME"
+              pm2 start index.js --name $BACKEND_NAME -- --port $BACKEND_PORT
+            fi
+
+            pm2 save
+          EOF
+
+
+
