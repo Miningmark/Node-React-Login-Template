@@ -27,7 +27,7 @@ const login = async (req, res, next) => {
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
         if (!isPasswordMatching) {
             await addLastLogin(req, foundUser.id, false);
-            await checkLastLogins();
+            await checkLastLogins(foundUser.username);
             throw new UnauthorizedError("Passwort nicht korrekt");
         }
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
@@ -295,6 +295,12 @@ const changePassword = async (req, res, next) => {
 
         if (accessUserToken) accessUserToken.destroy();
         if (refreshUserToken) refreshUserToken.destroy();
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "Lax",
+            ...(config.isDevServer ? {} : { secure: true })
+        });
 
         res.status(200).json({ message: "Passwort erfolgreich geändert bitte neu anmelden" });
     } catch (error) {
