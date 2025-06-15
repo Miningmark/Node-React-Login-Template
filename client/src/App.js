@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminPage from "./pages/AdminPage";
 import UserPage from "./pages/UserPage";
 import NavBar from "./components/NavBar";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
 import ResetPassword from "./pages/authentication/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -14,6 +14,7 @@ import Unauthorized from "./pages/Unauthorized";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import RequireAuth from "./components/RequireAuth";
 import PublicRoute from "./components/PublicRoute";
+import React, { useContext } from "react";
 
 function AppWrapper() {
   return (
@@ -33,6 +34,8 @@ function App() {
   const location = useLocation();
   const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
+
+  const { config } = useContext(AuthContext);
 
   return (
     <>
@@ -73,7 +76,7 @@ function App() {
         />
 
         {/* Nur anzeigen, wenn Registrierung aktiv ist */}
-        {process.env.REACT_APP_REGISTER_ACTIVE === "true" && (
+        {config.isRegisterEnable && (
           <Route
             path="/register"
             element={

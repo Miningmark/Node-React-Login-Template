@@ -1,7 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { useToast } from "../components/ToastContext";
 import useAxiosProtected from "../hook/useAxiosProtected";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { convertToLocalTime } from "../util/timeConverting";
+import { AuthContext } from "../contexts/AuthContext";
 
 const UserPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -10,8 +12,14 @@ const UserPage = () => {
   const [newEmail, setNewEmail] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [touched, setTouched] = useState({ password: false });
+  const [logins, setLogins] = useState([]);
+  const [loadingPassword, setLoadingPassword] = useState(false);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [loadingUsername, setLoadingUsername] = useState(false);
+  const [loadingLogins, setLoadingLogins] = useState(true);
 
   const { addToast } = useToast();
+  const { config } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
@@ -37,13 +45,20 @@ const UserPage = () => {
   //Benutzername regeln
   const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(newUsername.trim());
 
-  const recentLogins = [
-    { date: "2025-06-13 14:23", ip: "192.168.1.1", location: "Berlin, DE" },
-    { date: "2025-06-12 09:47", ip: "192.168.1.2", location: "Munich, DE" },
-    { date: "2025-06-11 18:11", ip: "192.168.1.3", location: "Hamburg, DE" },
-    { date: "2025-06-10 21:33", ip: "192.168.1.4", location: "Cologne, DE" },
-    { date: "2025-06-09 07:59", ip: "192.168.1.5", location: "Frankfurt, DE" },
-  ];
+  useEffect(() => {
+    const fetchLogins = async () => {
+      try {
+        const response = await axiosProtected.get("/last-logins");
+        setLogins(response.data);
+      } catch (error) {
+        addToast("Fehler beim Laden der letzten Logins", "danger");
+      } finally {
+        setLoadingLogins(false);
+      }
+    };
+
+    fetchLogins();
+  }, [axiosProtected, addToast]);
 
   async function handleUpdatePassword(e) {
     e.preventDefault();
@@ -65,6 +80,7 @@ const UserPage = () => {
       repeatRef.current?.focus();
       return;
     }
+    setLoadingPassword(true);
     try {
       await axiosProtected.post("/change-password", { currentPassword, newPassword });
 
@@ -72,6 +88,8 @@ const UserPage = () => {
       navigate("/login");
     } catch (error) {
       addToast(error.response?.data?.message || "Passwort änderung fehlgeschlagen", "danger");
+    } finally {
+      setLoadingPassword(false);
     }
   }
 
@@ -83,7 +101,7 @@ const UserPage = () => {
       emailRef.current?.focus();
       return;
     }
-
+    setLoadingEmail(true);
     try {
       await axiosProtected.post("/change-email", { newEmail });
 
@@ -92,6 +110,8 @@ const UserPage = () => {
       setTouched({ ...touched, email: false });
     } catch (error) {
       addToast(error.response?.data?.message || "E-Mail-Änderung fehlgeschlagen", "danger");
+    } finally {
+      setLoadingEmail(false);
     }
   }
 
@@ -103,6 +123,7 @@ const UserPage = () => {
       usernameRef.current?.focus();
       return;
     }
+    setLoadingUsername(true);
     try {
       await axiosProtected.post("/change-username", { newUsername });
 
@@ -111,6 +132,8 @@ const UserPage = () => {
       setTouched({ ...touched, username: false });
     } catch (error) {
       addToast(error.response?.data?.message || "Benutzername-Änderung fehlgeschlagen", "danger");
+    } finally {
+      setLoadingUsername(false);
     }
   }
 
@@ -155,7 +178,9 @@ const UserPage = () => {
                     placeholder="Neues Passwort"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    onBlur={() => setTouched({ ...touched, password: true })}
+                    onBlur={(e) =>
+                      setTouched({ ...touched, password: e.target.value === "" ? false : true })
+                    }
                     required
                     ref={passwordRef}
                   />
@@ -210,7 +235,9 @@ const UserPage = () => {
                     placeholder="Passwort wiederholen"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    onBlur={() => setTouched({ ...touched, repeat: true })}
+                    onBlur={(e) =>
+                      setTouched({ ...touched, repeat: e.target.value === "" ? false : true })
+                    }
                     required
                     ref={repeatRef}
                   />
@@ -219,8 +246,16 @@ const UserPage = () => {
                     <div className="invalid-feedback">Passwörter stimmen nicht überein.</div>
                   )}
                 </div>
-                <button className="btn btn-primary w-100" type="submit">
-                  Passwort aktualisieren
+                <button className="btn btn-primary w-100" type="submit" disabled={loadingPassword}>
+                  {loadingPassword ? (
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  ) : (
+                    "Passwort aktualisieren"
+                  )}
                 </button>
               </form>
             </div>
@@ -243,73 +278,100 @@ const UserPage = () => {
                     placeholder="E-Mail"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    onBlur={() => setTouched({ ...touched, email: true })}
+                    onBlur={(e) =>
+                      setTouched({ ...touched, email: e.target.value === "" ? false : true })
+                    }
                     required
                     ref={emailRef}
                   />
                   <label htmlFor="floatingNewEmail">E-Mail</label>
                 </div>
-                <button className="btn btn-primary w-100" type="submit">
-                  E-Mail aktualisieren
+                <button className="btn btn-primary w-100" type="submit" disabled={loadingEmail}>
+                  {loadingEmail ? (
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  ) : (
+                    "E-Mail aktualisieren"
+                  )}
                 </button>
               </form>
             </div>
           </div>
 
           {/* Benutzername ändern */}
-          <div className="card  mt-4">
-            <div className="card-header fw-bold">Benutzername ändern</div>
-            <div className="card-body">
-              <form onSubmit={handleUpdateUsername}>
-                <div className="form-floating mb-3">
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      touched.username ? (isUsernameValid ? "is-valid" : "is-invalid") : ""
-                    }`}
-                    id="floatingNewUsername"
-                    placeholder="Benutzername"
-                    value={newUsername}
-                    onChange={(e) => setNewUsername(e.target.value)}
-                    onBlur={() => setTouched({ ...touched, username: true })}
-                    required
-                    ref={usernameRef}
-                  />
-                  <label htmlFor="floatingNewUsername">Benutzername</label>
-                </div>
-                <button className="btn btn-primary w-100" type="submit">
-                  Benutzername aktualisieren
-                </button>
-              </form>
+          {config.isUsernameChangeEnable ? (
+            <div className="card  mt-4">
+              <div className="card-header fw-bold">Benutzername ändern</div>
+              <div className="card-body">
+                <form onSubmit={handleUpdateUsername}>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        touched.username ? (isUsernameValid ? "is-valid" : "is-invalid") : ""
+                      }`}
+                      id="floatingNewUsername"
+                      placeholder="Benutzername"
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      onBlur={(e) =>
+                        setTouched({ ...touched, username: e.target.value === "" ? false : true })
+                      }
+                      required
+                      ref={usernameRef}
+                    />
+                    <label htmlFor="floatingNewUsername">Benutzername</label>
+                  </div>
+                  <button
+                    className="btn btn-primary w-100"
+                    type="submit"
+                    disabled={loadingUsername}
+                  >
+                    {loadingUsername ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      "Benutzername aktualisieren"
+                    )}
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
 
         {/* Letzte Logins */}
         <div className="col-12">
           <div className="card">
             <div className="card-header fw-bold">Letzte Logins</div>
-            <div className="card-body p-0">
-              <div className="table-responsive">
-                <table className="table table-striped mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Datum/Uhrzeit</th>
-                      <th>IP-Adresse</th>
-                      <th>Ort</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentLogins.map((login, index) => (
-                      <tr key={index}>
-                        <td>{login.date}</td>
-                        <td>{login.ip}</td>
-                        <td>{login.location}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <div className="card-body">
+              {loadingLogins ? (
+                <div className="d-flex justify-content-center py-3">
+                  <div className="spinner-border text-primary" role="status" aria-hidden="true" />
+                </div>
+              ) : logins.length > 0 ? (
+                <ul className="list-group">
+                  {logins.map((entry, idx) => (
+                    <li key={idx} className="list-group-item d-flex justify-content-between">
+                      <span>{convertToLocalTime(entry.loginAt)}</span>
+                      <span>{entry.ipv4Adress}</span>
+                      <span>
+                        {entry.regionName === "IP Lookup nicht erfolgreich"
+                          ? entry.regionName
+                          : `${entry.regionName}/${entry.country}`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted">Keine Login-Daten verfügbar.</p>
+              )}
             </div>
           </div>
         </div>

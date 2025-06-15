@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 import useAxiosProtected from "../hook/useAxiosProtected";
+import { axiosPublic } from "../../util/axios";
 
 export default function PublicRoute({ children }) {
   const { accessToken, setAccessToken, setUsername, setRoles, setConfig } = useContext(AuthContext);
@@ -20,7 +21,7 @@ export default function PublicRoute({ children }) {
       await setUsername(() => res1?.data?.username);
       const res2 = await axiosProtected.get("/user-roles");
       await setRoles(() => res2?.data?.roles);
-      const res3 = await axiosProtected.get("/config");
+      const res3 = await axiosPublic.get("/config");
       await setConfig(() => res3?.data?.config);
     } catch (error) {}
   }
