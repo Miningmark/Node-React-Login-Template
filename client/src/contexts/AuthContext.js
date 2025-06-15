@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
     setAccessToken(null);
     setUsername(null);
     setRoles(null);
-    setConfig(null);
   }
 
   return (
