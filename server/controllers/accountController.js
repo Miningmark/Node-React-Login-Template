@@ -462,7 +462,7 @@ const checkChangedLocationAndRegion = async (username) => {
 };
 
 const checkLastLogins = async (username) => {
-    let countUnsuccessfullyLogins;
+    let countUnsuccessfullyLogins = 0;
 
     const foundUser = await Models.User.findOne({
         where: { username: username },
