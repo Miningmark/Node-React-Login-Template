@@ -16,6 +16,7 @@ router.post("/request-password-reset", accountController.requestPasswordReset);
 router.post("/password-reset", accountController.passwordReset);
 
 router.get("/refresh-access-token", accountController.refreshAccessToken);
+router.get("/config", accountController.getConfig);
 
 //protected routes
 if (config.isRegisterEnable) {
@@ -28,7 +29,6 @@ router.post("/change-email", verifyAccessToken, accountController.changeEmail);
 
 router.get("/user-roles", verifyAccessToken, accountController.getUserRoles);
 router.get("/username", verifyAccessToken, accountController.getUsername);
-router.get("/config", verifyAccessToken, accountController.getConfig);
 router.get("/last-logins", verifyAccessToken, accountController.getLastLogins);
 
 export default router;
