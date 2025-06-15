@@ -384,9 +384,6 @@ const getUsername = async (req, res, next) => {
 
 const getConfig = async (req, res, next) => {
     try {
-        const { username } = req;
-        if (!username) throw new ValidationError("Nutzername erforderlich");
-
         const jsonResult = {};
         jsonResult.config = getJSONConfig();
 
