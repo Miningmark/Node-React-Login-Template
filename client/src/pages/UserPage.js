@@ -8,6 +8,7 @@ const UserPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const [newUsername, setNewUsername] = useState("");
   const [touched, setTouched] = useState({ password: false });
 
   const { addToast } = useToast();
@@ -17,6 +18,7 @@ const UserPage = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const repeatRef = useRef(null);
+  const usernameRef = useRef(null);
 
   // Passwortregeln
   const isLengthValid = newPassword.length >= 8 && newPassword.length <= 24;
@@ -25,12 +27,14 @@ const UserPage = () => {
   const hasNumber = /[0-9]/.test(newPassword);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
   const passwordsMatch = newPassword === confirmPassword;
-
   const PASSWORD_REGEX =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 
   //E-Mail regeln
   const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(newEmail.trim());
+
+  //Benutzername regeln
+  const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(newUsername.trim());
 
   const recentLogins = [
     { date: "2025-06-13 14:23", ip: "192.168.1.1", location: "Berlin, DE" },
@@ -87,6 +91,25 @@ const UserPage = () => {
       setTouched({ ...touched, email: false });
     } catch (error) {
       addToast(error.response?.data?.message || "E-Mail-Änderung fehlgeschlagen", "danger");
+    }
+  }
+
+  async function handleUpdateUsername(e) {
+    e.preventDefault();
+
+    if (!isUsernameValid) {
+      addToast("Ungültiger Benutzername", "danger");
+      usernameRef.current?.focus();
+      return;
+    }
+    try {
+      await axiosProtected.post("/change-username", { newUsername });
+
+      addToast("Benutzername erfolgreich aktualisiert.", "success");
+      setNewUsername("");
+      setTouched({ ...touched, username: false });
+    } catch (error) {
+      addToast(error.response?.data?.message || "Benutzername-Änderung fehlgeschlagen", "danger");
     }
   }
 
@@ -219,6 +242,34 @@ const UserPage = () => {
               </div>
               <button className="btn btn-primary w-100" onClick={handleUpdateEmail}>
                 E-Mail aktualisieren
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Benutzername ändern */}
+        <div className="col-12 col-md-6">
+          <div className="card h-100">
+            <div className="card-header fw-bold">Benutzername ändern</div>
+            <div className="card-body">
+              <div className="form-floating mb-3">
+                <input
+                  type="text"
+                  className={`form-control ${
+                    touched.username ? (isUsernameValid ? "is-valid" : "is-invalid") : ""
+                  }`}
+                  id="floatingNewUsername"
+                  placeholder="E-Mail"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  onBlur={() => setTouched({ ...touched, username: true })}
+                  required
+                  ref={usernameRef}
+                />
+                <label htmlFor="floatingNewUsername">E-Mail</label>
+              </div>
+              <button className="btn btn-primary w-100" onClick={handleUpdateUsername}>
+                Benutzername aktualisieren
               </button>
             </div>
           </div>
