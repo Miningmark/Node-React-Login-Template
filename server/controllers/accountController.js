@@ -163,7 +163,7 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
             "Passwort vergessen?",
             "Unter dem nachstehenden Link hast du bis zum " +
                 formatDate(expiresAt) +
-                "die Möglichkeit, dein Passwort zurückzusetzen: " +
+                " die Möglichkeit, dein Passwort zurückzusetzen: " +
                 config.frontendURL +
                 config.frontendURLPasswordResetToken +
                 token
