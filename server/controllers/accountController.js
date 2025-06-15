@@ -296,6 +296,12 @@ const changePassword = async (req, res, next) => {
         if (accessUserToken) accessUserToken.destroy();
         if (refreshUserToken) refreshUserToken.destroy();
 
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "Lax",
+            ...(config.isDevServer ? {} : { secure: true })
+        });
+
         res.status(200).json({ message: "Passwort erfolgreich geändert bitte neu anmelden" });
     } catch (error) {
         next(error);
