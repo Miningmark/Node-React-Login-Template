@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     setConfig(config);
   }
 
-  function logout() {
+  async function logout() {
     setAccessToken(null);
     setUsername(null);
     setRoles(null);

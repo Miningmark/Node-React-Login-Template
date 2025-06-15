@@ -58,7 +58,7 @@ const UserPage = () => {
     };
 
     fetchLogins();
-  }, [axiosProtected, addToast]);
+  }, []);
 
   async function handleUpdatePassword(e) {
     e.preventDefault();
