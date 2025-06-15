@@ -390,15 +390,20 @@ const getConfig = async (req, res, next) => {
 };
 
 const addLastLogin = async (headers, userId, successfully) => {
-    const ipv4Adress = headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"];
+    console.log(headers);
+    const ipv4Adress = headers["x-forwarded-for"] || headers["x-real-ip"] || headers["remote-addr"];
+    console.log(ipv4Adress);
     const userAgent = headers["user-agent"];
 
     const jsonResult = {};
     const isValid = true;
 
     if (!ipv4Adress || !IPV4_REGEX.test(ipv4Adress)) isValid = false;
+    console.log(`http://ip-api.com/json/${ipv4Adress}`);
     const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
+    console.log(ipLookupResponse);
     const ipLookupData = ipLookupResponse.json();
+    console.log(ipLookupData);
 
     if (!userId) throw new ValidationError("UserId nicht verhanden");
 
