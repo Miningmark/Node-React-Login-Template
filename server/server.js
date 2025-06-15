@@ -1,4 +1,3 @@
-import "dotenv/config";
 import express from "express";
 
 //middlewares
@@ -20,6 +19,7 @@ import accountRoute from "./routes/accountRoute.js";
 
 //seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
+
 import config from "./config/config.js";
 import { NotFoundError } from "./errors/NotFoundError.js";
 
@@ -74,7 +74,7 @@ app.use(errorHandler);
 
     sequelize.sync(config.deleteDatabaseOnStart ? { force: true } : {}).then(() => {
         app.listen(config.backendPORT, () => {
-            console.log("Database connected and server is running on port " + config.backendPORT);
+            console.log("Database connected and server is running on port " + config.backendPORT + " with Version: " + config.serverVersion);
         });
 
         if (config.seedDatabase) seedDatabase();

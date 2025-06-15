@@ -1,17 +1,16 @@
-import "dotenv/config";
 import Sequelize from "sequelize";
 
 import fs from "fs";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 
-import { database } from "../config/sequelizeOptions.js";
+import { defaultDatabase } from "../config/sequelizeOptions.js";
 
 const models = {};
 const filename = fileURLToPath(import.meta.url);
 const baseModelFolder = path.join(path.dirname(filename), "..", "models/");
 
-const sequelize = new Sequelize(database);
+const sequelize = new Sequelize(defaultDatabase);
 const basename = path.basename(filename);
 
 function readFilesRecursively(dir) {
@@ -19,12 +18,11 @@ function readFilesRecursively(dir) {
 
     fs.readdirSync(dir, { withFileTypes: true }).filter((file) => {
         if (file.isFile() && file.name.indexOf(".") !== 0 && file.name.slice(-3) === ".js") {
-            filepaths.push(dir + file.name);
+            filepaths.push(path.join(dir, file.name));
         } else {
-            filepaths = filepaths.concat(readFilesRecursively(dir + file.name + "\\"));
+            filepaths = filepaths.concat(readFilesRecursively(path.join(dir, file.name)));
         }
     });
-
     return filepaths;
 }
 

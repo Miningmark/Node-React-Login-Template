@@ -31,11 +31,11 @@ const login = async (req, res, next) => {
         if (accessUserToken) accessUserToken.destroy();
         if (refreshUserToken) refreshUserToken.destroy();
 
-        const accessToken = generateJWT(foundUser.username, process.env.ACCESS_TOKEN_SECRET, parseInt(process.env.ACCESS_TOKEN_EXPIRATION));
-        const refreshToken = generateJWT(foundUser.username, process.env.REFRESH_TOKEN_SECRET, parseInt(process.env.REFRESH_TOKEN_EXPIRATION));
+        const accessToken = generateJWT(foundUser.username, config.accessTokenSecret, config.accessTokenExpiration);
+        const refreshToken = generateJWT(foundUser.username, config.refreshTokenSecret, config.refreshTokenExpiration);
 
-        const accessTokenExpiresAt = new Date(Date.now() + parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000);
-        const refreshTokenExpiresAt = new Date(Date.now() + parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000);
+        const accessTokenExpiresAt = new Date(Date.now() + config.accessTokenExpiration * 1000);
+        const refreshTokenExpiresAt = new Date(Date.now() + config.refreshTokenExpiration * 1000);
 
         await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "accessToken", expiresAt: accessTokenExpiresAt });
         await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt: refreshTokenExpiresAt });
@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
             httpOnly: true,
             sameSite: "Lax",
             ...(config.isDevServer ? {} : { secure: true }),
-            maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRATION) * 1000
+            maxAge: config.refreshTokenExpiration * 1000
         });
 
         return res.status(200).json({ accessToken: accessToken });
@@ -236,17 +236,13 @@ const refreshAccessToken = async (req, res, next) => {
         const accessUserToken = await findUserToken(refreshUserToken.User.id, null, "accessToken", null);
         if (accessUserToken) accessUserToken.destroy();
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+        jwt.verify(refreshToken, config.refreshTokenSecret, async (err, decoded) => {
             if (err || decoded.UserInfo.username !== refreshUserToken.User.username) {
                 throw new ValidationError("Token stimmt nicht mit Username überein");
             }
 
-            const accessToken = generateJWT(
-                refreshUserToken.User.username,
-                process.env.ACCESS_TOKEN_SECRET,
-                parseInt(process.env.ACCESS_TOKEN_EXPIRATION)
-            );
-            const accessTokenExpiresAt = new Date(Date.now() + parseInt(process.env.ACCESS_TOKEN_EXPIRATION) * 1000);
+            const accessToken = generateJWT(refreshUserToken.User.username, config.accessTokenSecret, config.accessTokenExpiration);
+            const accessTokenExpiresAt = new Date(Date.now() + config.accessTokenExpiration * 1000);
 
             await Models.UserToken.create({
                 userId: refreshUserToken.User.id,

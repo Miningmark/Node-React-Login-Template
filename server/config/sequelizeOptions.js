@@ -1,12 +1,11 @@
-import "dotenv/config";
 import config from "./config.js";
 
-export const database = {
-    database: process.env.DATABASE_DATABASE,
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    host: process.env.DATABASE_HOST,
-    port: process.env.DATABASE_PORT,
+export const defaultDatabase = {
+    database: config.defaultDatabaseName,
+    username: config.defaultDatabaseUsername,
+    password: config.defaultDatabasePassword,
+    host: config.defaultDatabaseHost,
+    port: config.defaultDatabasePort,
     dialect: "mysql",
     pool: {
         max: 5,

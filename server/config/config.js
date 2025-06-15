@@ -1,22 +1,43 @@
+import "dotenv/config";
+
 export default {
-    deleteDatabaseOnStart: true,
-    logDatabaseQuerries: true,
-    logErrorsInsideConsole: true,
-    sendEmails: false,
-    seedDatabase: true,
-    isDevServer: true,
+    deleteDatabaseOnStart: process.env.deleteDatabaseOnStart === "true",
+    logDatabaseQuerries: process.env.logDatabaseQuerries === "true",
+    logErrorsInsideConsole: process.env.logErrorsInsideConsole === "true",
+    sendEmails: process.env.sendEmails === "true",
+    seedDatabase: process.env.seedDatabase === "true",
+    isDevServer: process.env.isDevServer === "true",
 
-    isRegisterEnable: true,
-    isUsernameChangeEnable: true,
+    isRegisterEnable: process.env.isRegisterEnable === "true",
+    isUsernameChangeEnable: process.env.isUsernameChangeEnable === "true",
 
-    backendPORT: 4000,
-    apiVersion: "v1",
+    backendPORT: Number(process.env.backendPORT),
+    apiVersion: process.env.apiVersion,
 
-    frontendURL: "http://localhost:3000/",
+    frontendURL: process.env.frontendURL,
 
-    frontendURLAccountActivationToken: "account-activation?token=",
-    accountActivationTokenExpiresIn: 3600, //seconds
+    frontendURLAccountActivationToken: process.env.frontendURLAccountActivationToken,
+    accountActivationTokenExpiresIn: Number(process.env.accountActivationTokenExpiresIn),
 
-    frontendURLPasswordResetToken: "password-reset?token=",
-    passwordResetTokenExpiresIn: 3600 //seconds
+    frontendURLPasswordResetToken: process.env.frontendURLPasswordResetToken,
+    passwordResetTokenExpiresIn: Number(process.env.passwordResetTokenExpiresIn),
+
+    allowedOrigins: JSON.parse(process.env.allowedOrigins),
+
+    defaultDatabaseHost: process.env.defaultDatabaseHost,
+    defaultDatabasePort: Number(process.env.defaultDatabasePort),
+    defaultDatabaseUsername: process.env.defaultDatabaseUsername,
+    defaultDatabasePassword: process.env.defaultDatabasePassword,
+    defaultDatabaseName: process.env.defaultDatabaseName,
+
+    emailUser: process.env.emailUser,
+    emailPassword: process.env.emailPassword,
+
+    accessTokenSecret: process.env.accessTokenSecret,
+    accessTokenExpiration: Number(process.env.accessTokenExpiration),
+
+    refreshTokenSecret: process.env.refreshTokenSecret,
+    refreshTokenExpiration: Number(process.env.refreshTokenExpiration),
+
+    serverVersion: "0.0.1"
 };

@@ -1,4 +1,3 @@
-import "dotenv/config";
 import nodemailer from "nodemailer";
 import config from "../config/config.js";
 
@@ -9,14 +8,14 @@ export async function sendMail(to, subject, text) {
             port: 587, // oder 465 für SSL
             secure: false, // true für 465, false für andere Ports
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASSWORD
+                user: config.emailUser,
+                pass: config.emailPassword
             }
         });
 
         try {
             await transporter.sendMail({
-                from: process.env.EMAIL_USER,
+                from: config.emailUser,
                 to: to,
                 subject: subject,
                 text: text

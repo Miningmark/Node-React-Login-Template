@@ -1,12 +1,10 @@
-import "dotenv/config";
-
 import jwt from "jsonwebtoken";
 import { Models } from "../controllers/modelController.js";
 import { ForbiddenError, ValidationError } from "../errors/errorClasses.js";
+import config from "../config/config.js";
 
 export default async (req, res, next) => {
     try {
-        console.log("VerifyAccessToken");
         const authorizationHeader = req?.headers?.authorization?.split(" ");
         if (!authorizationHeader || authorizationHeader[0].toLowerCase() !== "bearer") throw new ValidationError("Kein AccessToken vorhanden");
 
@@ -15,7 +13,7 @@ export default async (req, res, next) => {
         const accessUserToken = await Models.UserToken.findOne({ where: { token: accessToken, type: "accessToken" } });
         if (!accessUserToken) throw new ForbiddenError("AccessToken ungültig");
 
-        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+        jwt.verify(accessToken, config.accessTokenSecret, (error, decoded) => {
             if (error) throw new ForbiddenError("AccessToken ungültig");
 
             req.username = decoded.UserInfo.username;
