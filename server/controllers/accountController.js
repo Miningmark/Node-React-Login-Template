@@ -27,7 +27,7 @@ const login = async (req, res, next) => {
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
         if (!isPasswordMatching) {
             await addLastLogin(req, foundUser.id, false);
-            await checkLastLogins();
+            await checkLastLogins(foundUser.username);
             throw new UnauthorizedError("Passwort nicht korrekt");
         }
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
