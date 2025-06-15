@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 import useAxiosProtected from "../hook/useAxiosProtected";
-import { axiosPublic } from "../../util/axios";
+import { axiosPublic } from "../util/axios";
 
 export default function PublicRoute({ children }) {
   const { accessToken, setAccessToken, setUsername, setRoles, setConfig } = useContext(AuthContext);
