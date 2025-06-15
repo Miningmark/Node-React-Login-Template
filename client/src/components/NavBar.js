@@ -24,7 +24,9 @@ function NavBar() {
     try {
       await axiosProtected.post("/logout");
       await logout();
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 200);
     } catch (error) {
       console.error("Logout failed:", error);
     }
