@@ -21,11 +21,12 @@ const login = async (req, res, next) => {
 
         if (!foundUser) throw new ValidationError("Dieser Benutzer existiert nicht");
         if (foundUser.isDisabled) throw new ForbiddenError("Dieser Benutzer ist gesperrt");
-        if (!foundUser.isActive) throw new ForbiddenError("Dieser Benutzer ist noch nicht aktiviert");
+        if (!foundUser.isActive) throw new ForbiddenError("Dieser Benutzer ist noch nicht aktiviert oder wurde vorübergehend deaktiviert");
 
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
         if (!isPasswordMatching) {
             await addLastLogin(req, foundUser.id, false);
+            await checkLastLogins();
             throw new UnauthorizedError("Passwort nicht korrekt");
         }
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
@@ -57,6 +58,7 @@ const login = async (req, res, next) => {
         jsonResult.config = getJSONConfig();
 
         await addLastLogin(req, foundUser.id, true);
+        await checkChangedLocationAndRegion(foundUser.username);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -93,9 +95,9 @@ const register = async (req, res, next) => {
         sendMail(
             email,
             "Abschluss deiner Registrierung",
-            "Unter dem nachfolgenden Link kannst du deine Registrierung bis " +
+            "Unter dem nachstehenden Link hast du bis zum " +
                 expiresAt +
-                " abschließen: " +
+                " die Möglichkeit, deine Registrierung abzuschließen: " +
                 config.frontendURL +
                 config.frontendURLAccountActivationToken +
                 token
@@ -155,10 +157,10 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
         //TODO: make it prettier
         sendMail(
             foundUser.email,
-            "Passwort vergessen ?",
-            "Unter dem nachfolgenden Link kannst du dein Passwort bis " +
+            "Passwort vergessen?",
+            "Unter dem nachstehenden Link hast du bis zum " +
                 expiresAt +
-                " zurück setzten: " +
+                "die Möglichkeit, dein Passwort zurückzusetzen: " +
                 config.frontendURL +
                 config.frontendURLPasswordResetToken +
                 token
@@ -415,6 +417,76 @@ const getLastLogins = async (req, res, next) => {
         return res.status(200).json(resultJson);
     } catch (error) {
         next(error);
+    }
+};
+
+const checkChangedLocationAndRegion = async (username) => {
+    let countUnsuccessfullyLogins;
+
+    const foundUser = await Models.User.findOne({
+        where: { username: username },
+        include: [{ model: Models.LastLogin, limit: 2, order: [["loginAt", "DESC"]] }]
+    });
+
+    if (foundUser.LastLogins.length !== 2) return;
+
+    const recentLogin = foundUser.LastLogins[0];
+    const lastLogin = foundUser.LastLogins[1];
+
+    if (recentLogin.country !== lastLogin.country || recentLogin.region !== lastLogin.region) {
+        sendMail(
+            foundUser.email,
+            "Verdächtiger Login-Versuch auf deinem Account",
+            "Wir haben einen Login-Versuch auf deinem Account festgestellt, der von einem ungewöhnlichen Standort aus erfolgt ist.\n" +
+                "Details des Logins:\n" +
+                "Datum & Uhrzeit: " +
+                recentLogin.loginAt +
+                "\n" +
+                "IP-Adresse: " +
+                recentLogin.ipv4Adress +
+                "\n" +
+                "Land: " +
+                recentLogin.country +
+                "\n" +
+                "Region: " +
+                recentLogin.region +
+                "\n" +
+                "Wenn du diesen Login nicht selbst durchgeführt hast, empfehlen wir dir dringend, dein Passwort sofort zu ändern und verdächtige Aktivitäten zu überprüfen.\n" +
+                "Du kannst dein Passwort über folgenden Link ändern:" +
+                config.frontendURL +
+                config.frontendURLPasswordForgotten
+        );
+    }
+};
+
+const checkLastLogins = async (username) => {
+    let countUnsuccessfullyLogins;
+
+    const foundUser = await Models.User.findOne({
+        where: { username: username },
+        include: [{ model: Models.LastLogin, limit: 5, order: [["loginAt", "DESC"]] }]
+    });
+
+    foundUser.LastLogins.foreach((lastLogin) => {
+        if (!lastLogin.successfully) countUnsuccessfullyLogins++;
+    });
+
+    if (countUnsuccessfullyLogins === 5) {
+        const token = generateUUID();
+        //TODO: make it fancier
+        sendMail(
+            foundUser.email,
+            "Account Sperrung",
+            "Aus Sicherheitsgründen wurde dein Account nach mehreren fehlgeschlagenen Login-Versuchen vorübergehend deaktiviert. \nDu kannst ihn über den folgenden Link wieder aktivieren: " +
+                config.frontendURL +
+                config.frontendURLAccountReactivation +
+                token
+        );
+
+        foundUser.isActive = false;
+        await foundUser.save();
+
+        await Models.UserToken.create({ userId: foundUser.id, toke: token, type: "accountReactivation", expiresAt: null });
     }
 };
 
