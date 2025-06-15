@@ -177,6 +177,18 @@ function Login() {
           </div>
         </div>
       </div>
+      <div
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "20px",
+          color: "white",
+          fontWeight: "bold",
+          textShadow: "1px 1px 2px black",
+        }}
+      >
+        ABCD
+      </div>
     </div>
   );
 }
