@@ -24,8 +24,10 @@ const login = async (req, res, next) => {
         if (!foundUser.isActive) throw new ForbiddenError("Dieser Benutzer ist noch nicht aktiviert");
 
         const isPasswordMatching = await bcrypt.compare(password, foundUser.password);
-        if (!isPasswordMatching) throw new UnauthorizedError("Passwort nicht korrekt");
-
+        if (!isPasswordMatching) {
+            await addLastLogin(req, foundUser.id, false);
+            throw new UnauthorizedError("Passwort nicht korrekt");
+        }
         const accessUserToken = await findUserToken(foundUser.id, null, "accessToken", null);
         const refreshUserToken = await findUserToken(foundUser.id, null, "refreshToken", null);
 
@@ -53,6 +55,8 @@ const login = async (req, res, next) => {
         jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
         jsonResult.roles = await getJSONRoles(username);
         jsonResult.config = getJSONConfig();
+
+        await addLastLogin(req, foundUser.id, true);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -389,21 +393,42 @@ const getConfig = async (req, res, next) => {
     }
 };
 
-const addLastLogin = async (headers, userId, successfully) => {
-    console.log(headers);
-    const ipv4Adress = headers["x-forwarded-for"] || headers["x-real-ip"] || headers["remote-addr"];
-    console.log(ipv4Adress);
-    const userAgent = headers["user-agent"];
+const getLastLogins = async (req, res, next) => {
+    try {
+        const { username } = req;
+
+        if (!username) throw new ValidationError("Nutzername erforderlich");
+
+        const foundUser = await Models.User.findOne({
+            where: { username: username },
+            include: [{ model: Models.LastLogin, limit: 5, order: [["loginAt", "DESC"]] }]
+        });
+
+        const resultJson = foundUser.LastLogins.map((lastLogin) => ({
+            ipv4Adress: lastLogin.ipv4Adress,
+            userAgent: lastLogin.userAgent,
+            country: lastLogin.country,
+            regionName: lastLogin.regionName,
+            loginAt: lastLogin.loginAt,
+            successfully: lastLogin.successfully
+        }));
+
+        return res.status(200).json(resultJson);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const addLastLogin = async (req, userId, successfully) => {
+    const ipv4Adress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip;
+    const userAgent = req.headers["user-agent"];
 
     const jsonResult = {};
-    const isValid = true;
+    let isValid = true;
 
     if (!ipv4Adress || !IPV4_REGEX.test(ipv4Adress)) isValid = false;
-    console.log(`http://ip-api.com/json/${ipv4Adress}`);
     const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
-    console.log(ipLookupResponse);
     const ipLookupData = await ipLookupResponse.json();
-    console.log(ipLookupData);
 
     if (!userId) throw new ValidationError("UserId nicht verhanden");
 
@@ -415,15 +440,7 @@ const addLastLogin = async (headers, userId, successfully) => {
     jsonResult.loginAt = new Date(Date.now());
     jsonResult.successfully = successfully;
 
-    console.log(jsonResult);
-};
-
-const testIP = async (req, res, next) => {
-    try {
-        addLastLogin(req.headers, 1, true);
-    } catch (error) {
-        next(error);
-    }
+    await Models.LastLogin.create(jsonResult);
 };
 
 const getJSONRoles = async (username) => {
@@ -499,5 +516,5 @@ export {
     getUserRoles,
     getUsername,
     getConfig,
-    testIP
+    getLastLogins
 };

@@ -12,19 +12,19 @@ export default (sequelize, DataTypes) => {
                 primaryKey: true
             },
             ipv4Adress: {
-                type: DataTypes.STRING(15),
+                type: DataTypes.STRING,
                 allowNull: false
             },
             userAgent: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.STRING,
                 allowNull: true
             },
             country: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.STRING,
                 allowNull: true
             },
             regionName: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.STRING,
                 allowNull: true
             },
             loginAt: {
@@ -47,7 +47,6 @@ export default (sequelize, DataTypes) => {
     LastLogin.associate = (models) => {
         LastLogin.belongsTo(models.User, {
             foreignKey: "userId",
-            as: "user",
             onDelete: "CASCADE"
         });
     };
