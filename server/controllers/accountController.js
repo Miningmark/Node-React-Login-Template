@@ -10,6 +10,7 @@ import ipLookup from "../utils/ipChecker.js";
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
+const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
 
 const login = async (req, res, next) => {
     try {
@@ -389,16 +390,33 @@ const getConfig = async (req, res, next) => {
     }
 };
 
+const addLastLogin = async (headers, userId, successfully) => {
+    const ipv4Adress = headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"];
+    const userAgent = headers["user-agent"];
+
+    const jsonResult = {};
+    const isValid = true;
+
+    if (!ipv4Adress || !IPV4_REGEX.test(ipv4Adress)) isValid = false;
+    const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
+    const ipLookupData = ipLookupResponse.json();
+
+    if (!userId) throw new ValidationError("UserId nicht verhanden");
+
+    jsonResult.userId = userId;
+    jsonResult.ipv4Adress = isValid ? ipv4Adress : "Ungültig: " + ipv4Adress;
+    jsonResult.userAgent = userAgent ? userAgent : null;
+    jsonResult.country = ipLookupData.status === "success" ? ipLookupData.country : "IP Lookup nicht erfolgreich";
+    jsonResult.regionName = ipLookupData.status === "success" ? ipLookupData.regionName : "IP Lookup nicht erfolgreich";
+    jsonResult.loginAt = new Date(Date.now());
+    jsonResult.successfully = successfully;
+
+    console.log(jsonResult);
+};
+
 const testIP = async (req, res, next) => {
     try {
-        const userIp = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"];
-        console.log(userIp);
-        console.log(await ipLookup(userIp));
-
-        const jsonResult = {};
-        jsonResult.config = getJSONConfig();
-
-        return res.sendStatus(200);
+        addLastLogin(req.headers, 1, true);
     } catch (error) {
         next(error);
     }

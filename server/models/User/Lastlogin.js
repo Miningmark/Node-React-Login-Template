@@ -11,26 +11,31 @@ export default (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 primaryKey: true
             },
-            ipAdress: {
+            ipv4Adress: {
                 type: DataTypes.STRING(15),
                 allowNull: false
             },
             userAgent: {
                 type: DataTypes.STRING(50),
-                allowNull: false
+                allowNull: true
             },
             country: {
                 type: DataTypes.STRING(50),
-                allowNull: false
+                allowNull: true
             },
-            region: {
+            regionName: {
                 type: DataTypes.STRING(50),
-                allowNull: false
+                allowNull: true
             },
             loginAt: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: DataTypes.NOW
+            },
+            successfully: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
         },
         {
