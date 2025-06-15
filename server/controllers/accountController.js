@@ -406,7 +406,6 @@ const getLastLogins = async (req, res, next) => {
 
         const resultJson = foundUser.LastLogins.map((lastLogin) => ({
             ipv4Adress: lastLogin.ipv4Adress,
-            userAgent: lastLogin.userAgent,
             country: lastLogin.country,
             regionName: lastLogin.regionName,
             loginAt: lastLogin.loginAt,
