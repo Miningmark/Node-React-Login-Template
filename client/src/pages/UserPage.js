@@ -19,7 +19,7 @@ const UserPage = () => {
   const [loadingLogins, setLoadingLogins] = useState(true);
 
   const { addToast } = useToast();
-  const { config } = useContext(AuthContext);
+  const { config, setAccessToken } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
@@ -85,6 +85,7 @@ const UserPage = () => {
       await axiosProtected.post("/change-password", { currentPassword, newPassword });
 
       addToast("Passwort änderung erfolgreich.", "success");
+      setAccessToken("");
       navigate("/login");
     } catch (error) {
       addToast(error.response?.data?.message || "Passwort änderung fehlgeschlagen", "danger");
