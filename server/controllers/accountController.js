@@ -392,7 +392,8 @@ const getConfig = async (req, res, next) => {
 const testIP = async (req, res, next) => {
     try {
         console.log(req.ip);
-        console.log(await ipLookup(req.ip));
+        console.log(req.headers);
+        //console.log(await ipLookup(req.ip));
 
         const jsonResult = {};
         jsonResult.config = getJSONConfig();
