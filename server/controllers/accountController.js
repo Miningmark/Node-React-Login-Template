@@ -391,9 +391,9 @@ const getConfig = async (req, res, next) => {
 
 const testIP = async (req, res, next) => {
     try {
-        console.log(req.ip);
-        console.log(req.headers);
-        //console.log(await ipLookup(req.ip));
+        const userIp = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"];
+        console.log(userIp);
+        console.log(await ipLookup(userIp));
 
         const jsonResult = {};
         jsonResult.config = getJSONConfig();
