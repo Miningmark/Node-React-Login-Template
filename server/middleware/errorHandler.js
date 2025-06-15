@@ -4,7 +4,7 @@ import config from "../config/config.js";
 export const errorHandler = (error, req, res, next) => {
     //TODO: logging inside database
 
-    if (config.logErrorsInsideConsole) console.error(error);
+    if (config.logErrorsInsideConsole) console.error(error.stack);
 
     if (error instanceof AppError) {
         return res
