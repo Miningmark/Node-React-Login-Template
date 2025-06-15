@@ -32,7 +32,7 @@ function Login() {
       }
     }
     fetchConfig();
-  }, [setConfig, addToast]);
+  }, [setConfig]);
 
   useEffect(() => {
     const key = searchParams.get("key");
