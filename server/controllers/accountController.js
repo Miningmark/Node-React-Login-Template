@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { Models } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
+import formatDate from "../utils/formatDate.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 import config from "../config/config.js";
 
@@ -96,7 +97,7 @@ const register = async (req, res, next) => {
             email,
             "Abschluss deiner Registrierung",
             "Unter dem nachstehenden Link hast du bis zum " +
-                expiresAt +
+                formatDate(expiresAt) +
                 " die Möglichkeit, deine Registrierung abzuschließen: " +
                 config.frontendURL +
                 config.frontendURLAccountActivationToken +
@@ -159,7 +160,7 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
             foundUser.email,
             "Passwort vergessen?",
             "Unter dem nachstehenden Link hast du bis zum " +
-                expiresAt +
+                formatDate(expiresAt) +
                 "die Möglichkeit, dein Passwort zurückzusetzen: " +
                 config.frontendURL +
                 config.frontendURLPasswordResetToken +
@@ -438,7 +439,7 @@ const checkChangedLocationAndRegion = async (username) => {
             "Wir haben einen Login-Versuch auf deinem Account festgestellt, der von einem ungewöhnlichen Standort aus erfolgt ist.\n" +
                 "Details des Logins:\n" +
                 "• Datum & Uhrzeit: " +
-                recentLogin.loginAt +
+                formatDate(recentLogin.loginAt) +
                 "\n" +
                 "• IP-Adresse: " +
                 recentLogin.ipv4Adress +
