@@ -36,7 +36,7 @@ const defaultUsers = [
 const UserManagement =()=>{
     const [users,setUsers] = useState(defaultUsers);
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortColumn, setSortColumn] = useState(null);
+    const [sortColumn, setSortColumn] = useState("username");
     const [sortOrder, setSortOrder] = useState("asc");
 
     /* 
@@ -85,7 +85,7 @@ const UserManagement =()=>{
 
   function handleSort(columnId) {
     if (columnId === sortColumn) {
-      setSortOrder(sortDirection === "asc" ? "desc" : "asc");
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortColumn(columnId);
       setSortOrder("asc");
