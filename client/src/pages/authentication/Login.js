@@ -74,7 +74,7 @@ function Login() {
 
     try {
       await axiosPublic.post("/request-password-reset", {
-        username: name,
+        usernameOrEmail: name,
       });
       setIsFlipped(false);
       addToast("Passwort reset erfolgreich abgeschickt", "success");
@@ -171,13 +171,13 @@ function Login() {
                   <input
                     className="form-control"
                     id="floatingName"
-                    placeholder="Name"
+                    placeholder="Name/E-Mail"
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
-                  <label htmlFor="floatingName">Name</label>
+                  <label htmlFor="floatingName">Name/E-Mail</label>
                 </div>
                 <div className="d-flex justify-content-end mb-3">
                   <span

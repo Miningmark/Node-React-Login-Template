@@ -357,19 +357,30 @@ const UserPage = () => {
                   <div className="spinner-border text-primary" role="status" aria-hidden="true" />
                 </div>
               ) : logins.length > 0 ? (
-                <ul className="list-group">
-                  {logins.map((entry, idx) => (
-                    <li key={idx} className="list-group-item d-flex justify-content-between">
-                      <span>{convertToLocalTime(entry.loginAt)}</span>
-                      <span>{entry.ipv4Adress}</span>
-                      <span>
-                        {entry.regionName === "IP Lookup nicht erfolgreich"
-                          ? entry.regionName
-                          : `${entry.regionName}/${entry.country}`}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="table-responsive">
+                  <table className="table table-striped table-bordered align-middle">
+                    <thead className="table-light">
+                      <tr>
+                        <th scope="col">Zeitpunkt</th>
+                        <th scope="col">IPv4-Adresse</th>
+                        <th scope="col">Region / Land</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logins.map((entry, idx) => (
+                        <tr key={idx}>
+                          <td>{convertToLocalTime(entry.loginAt)}</td>
+                          <td>{entry.ipv4Adress}</td>
+                          <td>
+                            {entry.regionName === "IP Lookup nicht erfolgreich"
+                              ? entry.regionName
+                              : `${entry.regionName} / ${entry.country}`}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <p className="text-muted">Keine Login-Daten verfügbar.</p>
               )}
