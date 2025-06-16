@@ -15,6 +15,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import RequireAuth from "./components/RequireAuth";
 import PublicRoute from "./components/PublicRoute";
 import React, { useContext } from "react";
+import UserManagement from "./pages/UserManagement";
 
 function AppWrapper() {
   return (
@@ -102,6 +103,15 @@ function App() {
           element={
             <RequireAuth allowedRoles={["admin"]}>
               <AdminPage />
+            </RequireAuth>
+          }
+        />
+
+         <Route
+          path="/usermanagement"
+          element={
+            <RequireAuth allowedRoles={["admin"]}>
+              <UserManagement />
             </RequireAuth>
           }
         />
