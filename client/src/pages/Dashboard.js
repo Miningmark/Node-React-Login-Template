@@ -9,6 +9,10 @@ function Dashboard() {
       <button onClick={() => navigate("/admin")} className="btn btn-primary">
         Admin Page
       </button>
+
+      <button onClick={() => navigate("/usermanagement")} className="btn btn-primary">
+        User-Management
+      </button>
     </div>
   );
 }
