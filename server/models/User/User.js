@@ -39,13 +39,6 @@ export default (sequelize, DataTypes) => {
     );
 
     User.associate = (models) => {
-        User.belongsToMany(models.Role, {
-            through: models.UserRole,
-            foreignKey: "userId",
-            otherKey: "roleId",
-            onDelete: "CASCADE"
-        });
-
         User.hasMany(models.UserToken, {
             foreignKey: "userId",
             onDelete: "CASCADE"
