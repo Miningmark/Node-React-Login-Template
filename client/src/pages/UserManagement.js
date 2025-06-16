@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { convertToLocalTime } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
 import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
+import sortingAlgorithm from "../util/sortingAlgorithm";
+
 
 const defaultUsers = [
     { id: 1, username: "MaxMustermann", email: "max@example.com", active: true, blocked: false },
@@ -37,6 +39,7 @@ const UserManagement =()=>{
     const [sortColumn, setSortColumn] = useState(null);
     const [sortOrder, setSortOrder] = useState("asc");
 
+    /* 
      // Filter users based on search term
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,6 +58,39 @@ const UserManagement =()=>{
             return 0;
         });
     };
+    */
+
+    const filteredUsers = useMemo(() => {
+    if (!users) return [];
+
+    const searchLower = search.toLowerCase();
+
+    const filtered = search
+      ? users.filter((item) =>
+          Object.values(item).some((value) => {
+            if (typeof value === "string") {
+              return value.toLowerCase().includes(searchLower);
+            }
+            if (typeof value === "number") {
+              return value.toString().includes(search);
+            }
+
+            return false;
+          })
+        )
+      : users;
+
+    return sortingAlgorithm(filtered, sortColumn, sortOrder);
+  }, [users, searchTerm, sortColumn, sortOrder]);
+
+  function handleSort(columnId) {
+    if (columnId === sortColumn) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(columnId);
+      setSortDirection("asc");
+    }
+  }
 
 
 
@@ -73,10 +109,10 @@ const UserManagement =()=>{
                     <Table striped bordered hover>
                         <thead>
                             <tr>
-                                <th onClick={() => sortUsers("username")}>Username 🔽</th>
-                                <th onClick={() => sortUsers("email")}>Email 🔽</th>
-                                <th onClick={() => sortUsers("active")}>Active 🔽</th>
-                                <th onClick={() => sortUsers("blocked")}>Blocked 🔽</th>
+                                <th onClick={() => handleSort("username")}>Username 🔽</th>
+                                <th onClick={() => handleSort("email")}>Email 🔽</th>
+                                <th onClick={() => handleSort("active")}>Active 🔽</th>
+                                <th onClick={() => handleSort("blocked")}>Blocked 🔽</th>
                             </tr>
                         </thead>
                         <tbody>
