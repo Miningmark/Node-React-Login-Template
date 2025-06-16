@@ -85,10 +85,10 @@ const UserManagement =()=>{
 
   function handleSort(columnId) {
     if (columnId === sortColumn) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      setSortOrder(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortColumn(columnId);
-      setSortDirection("asc");
+      setSortOrder("asc");
     }
   }
 
