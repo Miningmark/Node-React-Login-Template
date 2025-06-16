@@ -47,6 +47,13 @@ export default (sequelize, DataTypes) => {
             foreignKey: "userId",
             onDelete: "CASCADE"
         });
+
+        User.belongsToMany(models.Permission, {
+            through: models.UserPermission,
+            foreignKey: "userId",
+            otherKey: "permissionId",
+            onDelete: "CASCADE"
+        });
     };
 
     return User;
