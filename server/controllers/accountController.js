@@ -139,13 +139,13 @@ const accountActivation = async (req, res, next) => {
 
 const requestPasswordReset = async (req, res, next, sendResponse = true) => {
     try {
-        const { username } = req.body;
+        const { usernameOrEmail } = req.body;
 
-        if (!username) throw new ValidationError("Benutzername erforderlich");
+        if (!usernameOrEmail) throw new ValidationError("Benutzername/Email erforderlich");
 
-        const foundUser = await findUser(username, null);
+        const foundUser = await Models.User.findOne({ where: { [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }] } });
 
-        if (!foundUser) throw new ValidationError("Es existiert kein Benutzer mit dieser Nutzername");
+        if (!foundUser) throw new ValidationError("Es existiert kein Benutzer mit dieser Nutzernamen oder Email");
         if (foundUser.isDisabled) throw new UnauthorizedError("Benutzer ist gesperrt, kein zurücksetzten des Passworts möglich");
 
         const userToken = await findUserToken(foundUser.id, null, "passwordReset");
