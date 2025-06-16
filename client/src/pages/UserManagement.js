@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext,useMemo } from "react";
 import { useToast } from "../components/ToastContext";
 import useAxiosProtected from "../hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
@@ -91,8 +91,6 @@ const UserManagement =()=>{
       setSortOrder("asc");
     }
   }
-
-
 
     return(
     <>
