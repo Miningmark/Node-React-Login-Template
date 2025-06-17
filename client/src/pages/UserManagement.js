@@ -4,7 +4,7 @@ import useAxiosProtected from "../hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
 import { convertToLocalTime } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
-import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
+import { Table, InputGroup, FormControl, Tabs, Tab, Container,Modal, Button  } from "react-bootstrap";
 import sortingAlgorithm from "../util/sortingAlgorithm";
 
 
@@ -31,6 +31,25 @@ const defaultUsers = [
     { id: 20, username: "TestUser", email: "test@example.com", active: false, blocked: true },
 ];
 
+const UserDetailsModal = ({ show, handleClose, user }) => {
+  return (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>{user?.username}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p><strong>Email:</strong> {user?.email}</p>
+        <p><strong>Active:</strong> {user?.active ? "✔️ Ja" : "❌ Nein"}</p>
+        <p><strong>Blocked:</strong> {user?.blocked ? "✔️ Ja" : "❌ Nein"}</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>Schließen</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+
 
 
 const UserManagement =()=>{
@@ -38,6 +57,9 @@ const UserManagement =()=>{
     const [searchTerm, setSearchTerm] = useState("");
     const [sortColumn, setSortColumn] = useState("username");
     const [sortOrder, setSortOrder] = useState("asc");
+    const [selectedUser, setSelectedUser] = useState(null);
+const [showModal, setShowModal] = useState(false);
+
 
     /* 
      // Filter users based on search term
@@ -92,6 +114,12 @@ const UserManagement =()=>{
     }
   }
 
+  const handleUserClick = (user) => {
+  setSelectedUser(user);
+  setShowModal(true);
+};
+
+
     return(
     <>
         <Container className="mt-4">
@@ -108,7 +136,7 @@ const UserManagement =()=>{
                         <thead>
                             <tr>
                                 <th onClick={() => handleSort("username")}>Username 🔽</th>
-                                <th onClick={() => handleSort("email")}>Email 🔽</th>
+                                <th className="d-none d-sm-table-cell" onClick={() => handleSort("email")}>Email 🔽</th>
                                 <th onClick={() => handleSort("active")}>Active 🔽</th>
                                 <th onClick={() => handleSort("blocked")}>Blocked 🔽</th>
                             </tr>
@@ -116,8 +144,10 @@ const UserManagement =()=>{
                         <tbody>
                             {filteredUsers.map(user => (
                                 <tr key={user.id}>
-                                    <td>{user.username}</td>
-                                    <td>{user.email}</td>
+                                    <td style={{ cursor: "pointer", color: "blue" }} onClick={() => handleUserClick(user)}>
+                                        {user.username}
+                                    </td>
+                                    <td className="d-none d-sm-table-cell">{user.email}</td>
                                     <td>{user.active ? "✔️" : "❌"}</td>
                                     <td>{user.blocked ? "✔️" : "❌"}</td>
                                 </tr>
@@ -133,6 +163,11 @@ const UserManagement =()=>{
                 </Tab>
             </Tabs>
         </Container>
+
+        {selectedUser && (
+            <UserDetailsModal show={showModal} handleClose={() => setShowModal(false)} user={selectedUser} />
+        )}
+
 
     </>)
 };
