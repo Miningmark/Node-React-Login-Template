@@ -107,6 +107,29 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
                             <label htmlFor="floatingEmail">E-Mail</label>
                         </div>
 
+                        <div className="form-check mb-3">
+                            <input 
+                                type="checkbox" 
+                                className="form-check-input" 
+                                id="activeCheckbox" 
+                                checked={editedUser.active} 
+                                onChange={() => setEditedUser({ ...editedUser, active: !editedUser.active })} 
+                            />
+                            <label className="form-check-label" htmlFor="activeCheckbox">Aktiv</label>
+                        </div>
+
+                        <div className="form-check mb-3">
+                            <input 
+                                type="checkbox" 
+                                className="form-check-input" 
+                                id="blockedCheckbox" 
+                                checked={editedUser.blocked} 
+                                onChange={() => setEditedUser({ ...editedUser, blocked: !editedUser.blocked })} 
+                            />
+                            <label className="form-check-label" htmlFor="blockedCheckbox">Gesperrt</label>
+                        </div>
+
+
                         <p><strong>Berechtigungen:</strong></p>
                         {allPermissions.map((perm) => (
                             <div key={perm} className="mb-2">
@@ -230,9 +253,9 @@ const handleUpdateUser = (updatedUser) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredUsers.map(user => (
+                            {filteredUsers.map((user) => (
                                 <tr key={user.id}>
-                                    <td style={{ cursor: "pointer", fontWeight:"bold" }} onClick={() => handleUserClick(user)}>
+                                    <td style={{ cursor: "pointer", fontWeight:"bold" }} onClick={() => handleUserClick(user.id)}>
                                         {user.username}
                                     </td>
                                     <td className="d-none d-sm-table-cell">{user.email}</td>
@@ -253,7 +276,7 @@ const handleUpdateUser = (updatedUser) => {
         </Container>
 
         {selectedUser && (
-            <UserDetailsModal show={showModal} handleClose={() => setShowModal(false)} user={selectedUser} updateUser={handleUpdateUser}/>
+            <UserDetailsModal show={showModal} handleClose={() => setShowModal(false)} user={users.find((user)=> selectedUser === user.id)} updateUser={handleUpdateUser}/>
         )}
 
 
