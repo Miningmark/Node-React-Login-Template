@@ -60,8 +60,14 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
         setEditMode(false);
     };
 
+    const closeModal = () => {
+        setEditMode(false);
+        setEditedUser(null);
+        handleClose();
+    }
+
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={closeModal}>
             <Modal.Header closeButton>
                 <Modal.Title>{editMode ? "Bearbeitungsmodus" : user?.username || "User"}</Modal.Title>
             </Modal.Header>
@@ -80,7 +86,7 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
                                 value={editedUser.username}
                                 onChange={handleChange}
                                 onBlur={() => setTouched({ ...touched, username: true })}
-                                name="Username"
+                                name="username"
                             />
                             <label htmlFor="floatingUsername">Username</label>
                         </div>
@@ -130,10 +136,11 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
             <Modal.Footer>
                 {editMode ? (
                     <Button variant="success" onClick={handleSave}>Speichern</Button>
+                     <Button variant="secondary" onClick={() => setEditMode(false)}>Abbrechen</Button>
                 ) : (
                     <Button variant="primary" onClick={() => setEditMode(true)}>Bearbeitungsmodus</Button>
+                     <Button variant="secondary" onClick={closeModal}>Schließen</Button>
                 )}
-                <Button variant="secondary" onClick={handleClose}>Schließen</Button>
             </Modal.Footer>
         </Modal>
     );
