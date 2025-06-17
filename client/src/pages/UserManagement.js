@@ -35,9 +35,10 @@ const UserDetailsModal = ({ show, handleClose, user }) => {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>{user?.username}</Modal.Title>
+        <Modal.Title>User</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <p><strong>Username:</strong> {user?.username}</p>
         <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Active:</strong> {user?.active ? "✔️ Ja" : "❌ Nein"}</p>
         <p><strong>Blocked:</strong> {user?.blocked ? "✔️ Ja" : "❌ Nein"}</p>
@@ -133,7 +134,13 @@ const [showModal, setShowModal] = useState(false);
                         />
                     </InputGroup>
                     <Table striped bordered hover>
-                        <thead>
+                        <thead {
+                            position: sticky;
+                            top: "60px";
+                            background-color: white;
+                            z-index: 100;
+                        }>
+
                             <tr>
                                 <th onClick={() => handleSort("username")}>Username 🔽</th>
                                 <th className="d-none d-sm-table-cell" onClick={() => handleSort("email")}>Email 🔽</th>
@@ -144,12 +151,12 @@ const [showModal, setShowModal] = useState(false);
                         <tbody>
                             {filteredUsers.map(user => (
                                 <tr key={user.id}>
-                                    <td style={{ cursor: "pointer", color: "blue" }} onClick={() => handleUserClick(user)}>
+                                    <td style={{ cursor: "pointer", fontWeight:"bold" }} onClick={() => handleUserClick(user)}>
                                         {user.username}
                                     </td>
                                     <td className="d-none d-sm-table-cell">{user.email}</td>
-                                    <td>{user.active ? "✔️" : "❌"}</td>
-                                    <td>{user.blocked ? "✔️" : "❌"}</td>
+                                    <td className="text-center">{user.active ? "✅" : "❌"}</td>
+                                    <td className="text-center">{user.blocked ? "✅" : "❌"}</td>
                                 </tr>
                             ))}
                         </tbody>
