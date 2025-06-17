@@ -9,39 +9,49 @@ import sortingAlgorithm from "../util/sortingAlgorithm";
 
 
 const defaultUsers = [
-    { id: 1, username: "MaxMustermann", email: "max@example.com", active: true, blocked: false },
-    { id: 2, username: "ErikaMustermann", email: "erika@example.com", active: true, blocked: false },
-    { id: 3, username: "TechGuru", email: "techguru@example.com", active: false, blocked: true },
-    { id: 4, username: "CodeMaster", email: "code@example.com", active: true, blocked: false },
-    { id: 5, username: "JohnDoe", email: "john@example.com", active: false, blocked: true },
-    { id: 6, username: "JaneDoe", email: "jane@example.com", active: true, blocked: false },
-    { id: 7, username: "SuperAdmin", email: "admin@example.com", active: true, blocked: false },
-    { id: 8, username: "User123", email: "user123@example.com", active: false, blocked: true },
-    { id: 9, username: "HappyCoder", email: "happycoder@example.com", active: true, blocked: false },
-    { id: 10, username: "ReactFan", email: "reactfan@example.com", active: true, blocked: false },
-    { id: 11, username: "BootstrapUser", email: "bootstrap@example.com", active: true, blocked: false },
-    { id: 12, username: "DebugMaster", email: "debug@example.com", active: false, blocked: true },
-    { id: 13, username: "Fixer", email: "fixer@example.com", active: true, blocked: false },
-    { id: 14, username: "CSSWizard", email: "css@example.com", active: false, blocked: true },
-    { id: 15, username: "JSNinja", email: "jsninja@example.com", active: true, blocked: false },
-    { id: 16, username: "BackendBoss", email: "backend@example.com", active: false, blocked: true },
-    { id: 17, username: "FrontendFan", email: "frontend@example.com", active: true, blocked: false },
-    { id: 18, username: "DatabaseDude", email: "database@example.com", active: true, blocked: false },
-    { id: 19, username: "SecurityExpert", email: "security@example.com", active: true, blocked: false },
-    { id: 20, username: "TestUser", email: "test@example.com", active: false, blocked: true },
+    { id: 1, username: "MaxMustermann", email: "max@example.com", active: true, blocked: false, permission: ["admin", "user"] },
+    { id: 2, username: "ErikaMustermann", email: "erika@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 3, username: "TechGuru", email: "techguru@example.com", active: false, blocked: true, permission: ["test"] },
+    { id: 4, username: "CodeMaster", email: "code@example.com", active: true, blocked: false, permission: ["admin", "user"] },
+    { id: 5, username: "JohnDoe", email: "john@example.com", active: false, blocked: true, permission: ["test"] },
+    { id: 6, username: "JaneDoe", email: "jane@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 7, username: "SuperAdmin", email: "admin@example.com", active: true, blocked: false, permission: ["admin"] },
+    { id: 8, username: "User123", email: "user123@example.com", active: false, blocked: true, permission: ["test"] },
+    { id: 9, username: "HappyCoder", email: "happycoder@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 10, username: "ReactFan", email: "reactfan@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 11, username: "BootstrapUser", email: "bootstrap@example.com", active: true, blocked: false, permission: ["admin", "user"] },
+    { id: 12, username: "DebugMaster", email: "debug@example.com", active: false, blocked: true, permission: ["test"] },
+    { id: 13, username: "Fixer", email: "fixer@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 14, username: "CSSWizard", email: "css@example.com", active: false, blocked: true, permission: ["test"] },
+    { id: 15, username: "JSNinja", email: "jsninja@example.com", active: true, blocked: false, permission: ["admin", "user"] },
+    { id: 16, username: "BackendBoss", email: "backend@example.com", active: false, blocked: true, permission: ["test"] },
+    { id: 17, username: "FrontendFan", email: "frontend@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 18, username: "DatabaseDude", email: "database@example.com", active: true, blocked: false, permission: ["admin"] },
+    { id: 19, username: "SecurityExpert", email: "security@example.com", active: true, blocked: false, permission: ["admin", "user"] },
+    { id: 20, username: "TestUser", email: "test@example.com", active: false, blocked: true, permission: ["test"] },
 ];
 
 const UserDetailsModal = ({ show, handleClose, user }) => {
+    if(!user) return null;
+
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>User</Modal.Title>
+        <Modal.Title>{user?.username || "User"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p><strong>Username:</strong> {user?.username}</p>
         <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Active:</strong> {user?.active ? "✔️ Ja" : "❌ Nein"}</p>
         <p><strong>Blocked:</strong> {user?.blocked ? "✔️ Ja" : "❌ Nein"}</p>
+        <p><strong>Permissions</strong></p>
+        <ul>
+            {user?.permissions?.length > 0 ? (
+                user.permissions.map((permission, index) => <li key={index}>{permission}</li>)
+            ) : (
+                <li>Keine Berechtigungen</li>
+            )}
+        </ul>
+
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>Schließen</Button>
@@ -59,29 +69,7 @@ const UserManagement =()=>{
     const [sortColumn, setSortColumn] = useState("username");
     const [sortOrder, setSortOrder] = useState("asc");
     const [selectedUser, setSelectedUser] = useState(null);
-const [showModal, setShowModal] = useState(false);
-
-
-    /* 
-     // Filter users based on search term
-    const filteredUsers = users.filter(user =>
-        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Sort users
-    const sortUsers = (column) => {
-        const newOrder = sortOrder === "asc" ? "desc" : "asc";
-        setSortOrder(newOrder);
-        setSortColumn(column);
-
-        filteredUsers.sort((a, b) => {
-            if (a[column] < b[column]) return newOrder === "asc" ? -1 : 1;
-            if (a[column] > b[column]) return newOrder === "asc" ? 1 : -1;
-            return 0;
-        });
-    };
-    */
+    const [showModal, setShowModal] = useState(false);
 
     const filteredUsers = useMemo(() => {
     if (!users) return [];
