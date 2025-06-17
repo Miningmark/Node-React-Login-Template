@@ -4,7 +4,7 @@ import useAxiosProtected from "../hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
 import { convertToLocalTime } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
-import { Table, InputGroup, FormControl, Tabs, Tab, Container,Modal, Button  } from "react-bootstrap";
+import { Table, InputGroup, FormControl, Tabs, Tab, Container,Modal, Button, InputGroup, FormControl  } from "react-bootstrap";
 import sortingAlgorithm from "../util/sortingAlgorithm";
 
 
@@ -31,11 +31,13 @@ const defaultUsers = [
     { id: 20, username: "TestUser", email: "test@example.com", active: false, blocked: true, permissions: ["test"] },
 ];
 
-const allPermissions = ["admin", "user","tester","kanban","finanzen"];
+const allPermissions = ["admin", "user","test","kanban","finanzen"];
 
 const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
     const [editMode, setEditMode] = useState(false);
     const [editedUser, setEditedUser] = useState(user);
+    const [touched, setTouched] = useState({ email: false });
+
 
     if (!user) return null;
 
@@ -66,22 +68,40 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
             <Modal.Body>
                 {editMode ? (
                     <>
-                        <InputGroup className="mb-2">
-                            <FormControl
-                                name="username"
-                                value={editedUser.username}
+                        
+                           <div className="form-floating mb-3">
+                            <input
+                                type="text"
+                                className={`form-control ${
+                                    touched.username ? "is-valid" : ""
+                                }`}
+                                id="floatingUsername"
+                                placeholder="Username"
+                                value={editedUser.Username}
                                 onChange={handleChange}
+                                onBlur={() => setTouched({ ...touched, Username: true })}
+                                name="Username"
                             />
-                        </InputGroup>
-                        <InputGroup className="mb-2">
-                            <FormControl
-                                name="email"
+                            <label htmlFor="floatingUsername">Username</label>
+                        </div>
+
+                        <div className="form-floating mb-3">
+                            <input
                                 type="email"
+                                className={`form-control ${
+                                    touched.email ? "is-valid" : ""
+                                }`}
+                                id="floatingEmail"
+                                placeholder="E-Mail"
                                 value={editedUser.email}
                                 onChange={handleChange}
+                                onBlur={() => setTouched({ ...touched, email: true })}
+                                name="email"
                             />
-                        </InputGroup>
-                        <p><strong>Permissions:</strong></p>
+                            <label htmlFor="floatingEmail">E-Mail</label>
+                        </div>
+
+                        <p><strong>Berechtigungen:</strong></p>
                         {allPermissions.map((perm) => (
                             <div key={perm} className="mb-2">
                                 <input
@@ -96,7 +116,7 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
                 ) : (
                     <>
                         <p><strong>Email:</strong> {user?.email}</p>
-                        <p><strong>Permissions:</strong></p>
+                        <p><strong>Berechtigungen:</strong></p>
                         <ul>
                             {user?.permissions?.length > 0 ? (
                                 user.permissions.map((permission, index) => <li key={index}>{permission}</li>)
@@ -118,6 +138,7 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
         </Modal>
     );
 };
+
 
 
 
