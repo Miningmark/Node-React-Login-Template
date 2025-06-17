@@ -12,11 +12,11 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { NotFoundError } from "./errors/NotFoundError.js";
 
 //sequelize and models
-import { sequelize } from "./controllers/modelController.js";
+import { Models, sequelize } from "./controllers/modelController.js";
 
 //Routes
 import accountRoute from "./routes/accountRoute.js";
-import newPermissionRoute from "./routes/newPermissionRoute.js";
+import ticketRoute from "./routes/ticketRoute.js";
 
 //seeding standard users into database
 import { seedDatabase } from "./seedDatabase.js";
@@ -39,18 +39,21 @@ app.use(cookieParser());
         await sequelize.authenticate();
         await sequelize.sync(config.deleteDatabaseOnStart ? { force: true } : {});
 
-        if (config.seedDatabase) await seedDatabase();
-
         //normal routes
         app.use("/api/" + config.apiVersion, accountRoute);
 
         //smartRouter routes
-        app.use("/api/v1", await newPermissionRoute());
+        app.use("/api/" + config.apiVersion, await ticketRoute());
+
+        if (config.seedDatabase) await seedDatabase();
 
         //catching all routes and sending an 404 error back
         app.all("{*splat}", (req, res, next) => {
             next(new NotFoundError("Angeforderte Route nicht gefunden!"));
         });
+
+        //global error handler for all routes
+        app.use(errorHandler);
 
         app.listen(config.backendPORT, () => {
             console.log("Database connected and server is running on port " + config.backendPORT + " with Version: " + config.serverVersion);
@@ -59,6 +62,3 @@ app.use(cookieParser());
         console.error(error);
     }
 })();
-
-//global error handler for all routes
-app.use(errorHandler);

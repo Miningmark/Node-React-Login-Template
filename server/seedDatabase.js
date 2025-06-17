@@ -18,6 +18,43 @@ const seedDatabase = async () => {
     testMod.isActive = true;
     testUser.isActive = true;
 
+    const readTickets = await Models.Permission.create({
+        name: "readTickets",
+        description: "Es können sämtliche Tickets angesehen"
+    }); //Routes: getTicket, getAllTickets
+    const createAndModifyTickets = await Models.Permission.create({
+        name: "createAndModifyTickets",
+        description: "Es können neue Tickets erstellt und bearbeitet werden"
+    }); //Routes: createTicket, updateTicket
+    const removeTickets = await Models.Permission.create({
+        name: "removeTickets",
+        description: "Es können Tickets gelöscht werden"
+    }); //Routes: removeTicket, removeTickets
+
+    const getTicketRoute = await Models.Route.findOne({ where: { method: "get", path: "/getTicket" } });
+    const getAllTicketsRoute = await Models.Route.findOne({ where: { method: "get", path: "/getAllTickets" } });
+    const createTicketRoute = await Models.Route.findOne({ where: { method: "post", path: "/createTicket" } });
+    const updateTicketRoute = await Models.Route.findOne({ where: { method: "post", path: "/updateTicket" } });
+    const removeTicketRoute = await Models.Route.findOne({ where: { method: "post", path: "/removeTicket" } });
+    const removeTicketsRoute = await Models.Route.findOne({ where: { method: "post", path: "/removeTickets" } });
+
+    await getTicketRoute.setPermission(readTickets);
+    await getAllTicketsRoute.setPermission(readTickets);
+
+    await createTicketRoute.setPermission(createAndModifyTickets);
+    await updateTicketRoute.setPermission(createAndModifyTickets);
+
+    await removeTicketRoute.setPermission(removeTickets);
+    await removeTicketsRoute.setPermission(removeTickets);
+
+    juli051.addPermissions([readTickets, createAndModifyTickets, removeTickets]);
+    markus.addPermissions([readTickets, createAndModifyTickets, removeTickets]);
+    testAdmin.addPermissions([readTickets, createAndModifyTickets, removeTickets]);
+
+    testMod.addPermissions([readTickets, createAndModifyTickets]);
+
+    testUser.addPermissions([readTickets]);
+
     await juli051.save();
     await markus.save();
 

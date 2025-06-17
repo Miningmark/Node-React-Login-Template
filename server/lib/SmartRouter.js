@@ -1,6 +1,7 @@
 import express from "express";
 
 import { Models } from "../controllers/modelController.js";
+import verifyPermission from "../middleware/verifyPermission.js";
 
 class SmartRouter {
     constructor() {
@@ -8,23 +9,27 @@ class SmartRouter {
         this.routes = [];
     }
 
-    async register(method, path, handler, description = "", middlewares = []) {
+    async register(method, path, description, ...args) {
         await Models.Route.findOrCreate({
-            where: { method, path },
-            defaults: { description }
+            where: { method: method, path: path },
+            defaults: { description: description }
         });
 
-        //const middleware = createPermissionMiddleware(method, path, this.models);
-        this.router[method](path, middlewares, /*middleware,*/ handler);
+        const handler = args.pop();
+        const middlewares = args;
+
+        const permissionMiddleware = verifyPermission(method, path);
+
+        this.router[method](path, ...middlewares, permissionMiddleware, handler);
         this.routes.push({ method, path, description });
     }
 
-    get(path, handler, description, middlewares = []) {
-        this.register("get", path, handler, description, middlewares);
+    get(path, description, ...args) {
+        this.register("get", path, description, ...args);
     }
 
-    post(path, handler, description = "", middlewares = []) {
-        this.register("post", path, handler, description, middlewares);
+    post(path, description, ...args) {
+        this.register("post", path, description, ...args);
     }
 
     getExpressRouter() {
