@@ -609,7 +609,7 @@ export {
     changeEmail,
     changeUsername,
     getUsername,
-    getRoutesForUser,
+    getUserRoutes,
     getConfig,
     getLastLogins
 };
