@@ -57,7 +57,6 @@ const login = async (req, res, next) => {
         const jsonResult = {};
         jsonResult.accessToken = accessToken;
         jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
-        jsonResult.roles = await getJSONRoles(username);
         jsonResult.config = getJSONConfig();
 
         await addLastLogin(req, foundUser.id, true);
@@ -86,12 +85,10 @@ const register = async (req, res, next) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const createdUser = await Models.User.create({ username, email, password: hashedPassword });
-        const role = await Models.Role.findOne({ where: { name: "User" } });
 
         const token = generateUUID();
         const expiresAt = new Date(Date.now() + config.accountActivationTokenExpiresIn * 1000);
 
-        await createdUser.addRole(role);
         await Models.UserToken.create({ userId: createdUser.id, token, type: "registration", expiresAt });
 
         //TODO: make it fancier
@@ -380,20 +377,6 @@ const changeUsername = async (req, res, next) => {
     }
 };
 
-const getUserRoles = async (req, res, next) => {
-    try {
-        const { username } = req;
-        if (!username) throw new ValidationError("Nutzername erforderlich");
-
-        const jsonResult = {};
-        jsonResult.roles = await getJSONRoles(username);
-
-        return res.status(200).json(jsonResult);
-    } catch (error) {
-        next(error);
-    }
-};
-
 const getUsername = async (req, res, next) => {
     try {
         const { username } = req;
@@ -536,24 +519,6 @@ const addLastLogin = async (req, userId, successfully) => {
     await Models.LastLogin.create(jsonResult);
 };
 
-const getJSONRoles = async (username) => {
-    const foundUser = await Models.User.findOne({
-        where: { username: username },
-        include: { model: Models.Role, include: { model: Models.Permission } }
-    });
-
-    if (!foundUser) throw new ValidationError("Kein Nutzer in der Datenbank gefunden");
-
-    return foundUser.Roles.map((role) => ({
-        id: role.id,
-        name: role.name,
-        permissions: role.Permissions.map((perm) => ({
-            id: perm.id,
-            name: perm.name
-        }))
-    }));
-};
-
 const getJSONConfig = () => {
     return {
         isRegisterEnable: config.isRegisterEnable,
@@ -606,7 +571,6 @@ export {
     changePassword,
     changeEmail,
     changeUsername,
-    getUserRoles,
     getUsername,
     getConfig,
     getLastLogins

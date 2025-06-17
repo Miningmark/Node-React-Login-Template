@@ -1,21 +1,21 @@
 export default (sequelize, DataTypes) => {
-    const UserRole = sequelize.define(
-        "UserRole",
+    const UserPermission = sequelize.define(
+        "UserPermission",
         {
             userId: {
                 type: DataTypes.INTEGER,
                 primaryKey: true
             },
-            roleId: {
+            permissionId: {
                 type: DataTypes.INTEGER,
                 primaryKey: true
             }
         },
         {
-            tableName: "user_roles",
+            tableName: "user-permissions",
             timestamps: false
         }
     );
 
-    return UserRole;
+    return UserPermission;
 };
