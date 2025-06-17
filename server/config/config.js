@@ -41,5 +41,5 @@ export default {
     refreshTokenSecret: process.env.refreshTokenSecret,
     refreshTokenExpiration: Number(process.env.refreshTokenExpiration),
 
-    serverVersion: "0.0.13alpha"
+    serverVersion: "0.0.13"
 };

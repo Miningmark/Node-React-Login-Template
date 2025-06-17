@@ -392,6 +392,20 @@ const getUsername = async (req, res, next) => {
     }
 };
 
+const getUserRoutes = async (req, res, next) => {
+    try {
+        const { username } = req;
+        if (!username) throw new ValidationError("Nutzername erforderlich");
+
+        const jsonResult = {};
+        jsonResult.routes = await getRoutesForUser(username);
+
+        return res.status(200).json(jsonResult);
+    } catch (error) {
+        next(error);
+    }
+};
+
 const getConfig = async (req, res, next) => {
     try {
         const jsonResult = {};
@@ -595,6 +609,7 @@ export {
     changeEmail,
     changeUsername,
     getUsername,
+    getRoutesForUser,
     getConfig,
     getLastLogins
 };
