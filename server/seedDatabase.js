@@ -20,40 +20,29 @@ const seedDatabase = async () => {
 
     const readTickets = await Models.Permission.create({
         name: "readTickets",
-        description: "Es können sämtliche Tickets angesehen"
-    }); //Routes: getTicket, getAllTickets
-    const createAndModifyTickets = await Models.Permission.create({
-        name: "createAndModifyTickets",
-        description: "Es können neue Tickets erstellt und bearbeitet werden"
-    }); //Routes: createTicket, updateTicket
-    const removeTickets = await Models.Permission.create({
-        name: "removeTickets",
-        description: "Es können Tickets gelöscht werden"
-    }); //Routes: removeTicket, removeTickets
+        description: "Es können sämtliche Tickets angesehen werden"
+    });
+    const createAndEditAndRemoveTickets = await Models.Permission.create({
+        name: "editAndRemoveTickets",
+        description: "Es können neue Tickets erstellt und bearbeitet und entfernt werden"
+    });
 
-    const getTicketRoute = await Models.Route.findOne({ where: { method: "get", path: "/getTicket" } });
-    const getAllTicketsRoute = await Models.Route.findOne({ where: { method: "get", path: "/getAllTickets" } });
-    const createTicketRoute = await Models.Route.findOne({ where: { method: "post", path: "/createTicket" } });
-    const updateTicketRoute = await Models.Route.findOne({ where: { method: "post", path: "/updateTicket" } });
-    const removeTicketRoute = await Models.Route.findOne({ where: { method: "post", path: "/removeTicket" } });
-    const removeTicketsRoute = await Models.Route.findOne({ where: { method: "post", path: "/removeTickets" } });
+    const getTicketRouteGroup = await Models.RouteGroup.findOne({ where: { name: "getTicket" } });
+    const editTicketRouteGroup = await Models.RouteGroup.findOne({ where: { name: "editTicket" } });
+    const removeTicketRouteGroup = await Models.RouteGroup.findOne({ where: { name: "removeTicket" } });
 
-    await getTicketRoute.setPermission(readTickets);
-    await getAllTicketsRoute.setPermission(readTickets);
+    await readTickets.addRouteGroup(getTicketRouteGroup);
 
-    await createTicketRoute.setPermission(createAndModifyTickets);
-    await updateTicketRoute.setPermission(createAndModifyTickets);
+    await createAndEditAndRemoveTickets.addRouteGroup(editTicketRouteGroup);
+    await createAndEditAndRemoveTickets.addRouteGroup(removeTicketRouteGroup);
 
-    await removeTicketRoute.setPermission(removeTickets);
-    await removeTicketsRoute.setPermission(removeTickets);
+    await juli051.addPermissions([readTickets, createAndEditAndRemoveTickets]);
+    await markus.addPermissions([readTickets, createAndEditAndRemoveTickets]);
+    await testAdmin.addPermissions([readTickets, createAndEditAndRemoveTickets]);
 
-    juli051.addPermissions([readTickets, createAndModifyTickets, removeTickets]);
-    markus.addPermissions([readTickets, createAndModifyTickets, removeTickets]);
-    testAdmin.addPermissions([readTickets, createAndModifyTickets, removeTickets]);
+    await testMod.addPermissions([readTickets]);
 
-    testMod.addPermissions([readTickets, createAndModifyTickets]);
-
-    testUser.addPermissions([readTickets]);
+    await testUser.addPermissions([readTickets]);
 
     await juli051.save();
     await markus.save();

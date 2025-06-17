@@ -6,14 +6,14 @@ import verifyAccessToken from "../middleware/verifyAccessToken.js";
 export default async () => {
     const smartRouter = new SmartRouter();
 
-    smartRouter.get("/getTicket", 'ich bin eine Beschreibung "getTicket"', verifyAccessToken, ticketController.getTicket);
-    smartRouter.get("/getAllTickets", 'ich bin eine Beschreibung "getAllTickets"', verifyAccessToken, ticketController.getAllTickets);
+    smartRouter.get("/getTicket", "getTicket", "getTicket Description", verifyAccessToken, ticketController.getTicket);
+    smartRouter.get("/getAllTickets", "getTicket", "getTicket Description", verifyAccessToken, ticketController.getAllTickets);
 
-    smartRouter.post("/createTicket", 'ich bin eine Beschreibung "createTicket"', verifyAccessToken, ticketController.createTicket);
-    smartRouter.post("/updateTicket", 'ich bin eine Beschreibung "updateTicket"', verifyAccessToken, ticketController.updateTicket);
+    smartRouter.post("/createTicket", "editTicket", "editTicket Description", verifyAccessToken, ticketController.createTicket);
+    smartRouter.post("/updateTicket", "editTicket", "editTicket Description", verifyAccessToken, ticketController.updateTicket);
 
-    smartRouter.post("/removeTicket", 'ich bin eine Beschreibung "removeTicket"', verifyAccessToken, ticketController.removeTicket);
-    smartRouter.post("/removeTickets", 'ich bin eine Beschreibung "removeTickets"', verifyAccessToken, ticketController.removeTickets);
+    smartRouter.post("/removeTicket", "removeTicket", "removeTicket Description", verifyAccessToken, ticketController.removeTicket);
+    smartRouter.post("/removeTickets", "removeTicket", "removeTicket Description", verifyAccessToken, ticketController.removeTickets);
 
     return smartRouter.getExpressRouter();
 };

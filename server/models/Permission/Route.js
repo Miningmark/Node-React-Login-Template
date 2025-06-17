@@ -7,19 +7,15 @@ export default (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true
             },
-            permissionId: {
+            routeGroupId: {
                 type: DataTypes.INTEGER,
-                allowNull: true
+                allowNull: false
             },
             method: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
             path: {
-                type: DataTypes.STRING,
-                allowNull: false
-            },
-            description: {
                 type: DataTypes.STRING,
                 allowNull: false
             }
@@ -31,8 +27,8 @@ export default (sequelize, DataTypes) => {
     );
 
     Route.associate = (models) => {
-        Route.belongsTo(models.Permission, {
-            foreignKey: "permissionId",
+        Route.belongsTo(models.RouteGroup, {
+            foreignKey: "routeGroupId",
             onDelete: "CASCADE"
         });
     };

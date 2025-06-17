@@ -254,7 +254,7 @@ const refreshAccessToken = async (req, res, next) => {
         }
 
         const accessUserToken = await findUserToken(refreshUserToken.User.id, null, "accessToken", null);
-        if (accessUserToken) accessUserToken.destroy();
+        if (accessUserToken) await accessUserToken.destroy();
 
         jwt.verify(refreshToken, config.refreshTokenSecret, async (err, decoded) => {
             if (err || decoded.UserInfo.username !== refreshUserToken.User.username) {

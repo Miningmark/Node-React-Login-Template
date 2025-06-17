@@ -1,15 +1,20 @@
 export default (sequelize, DataTypes) => {
-    const Permission = sequelize.define(
-        "Permission",
+    const RouteGroup = sequelize.define(
+        "RouteGroup",
         {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
+            permissionId: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
             name: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
+                unique: true
             },
             description: {
                 type: DataTypes.STRING,
@@ -17,24 +22,21 @@ export default (sequelize, DataTypes) => {
             }
         },
         {
-            tableName: "permissions",
+            tableName: "route-groups",
             timestamps: false
         }
     );
 
-    Permission.associate = (models) => {
-        Permission.hasMany(models.RouteGroup, {
-            foreignKey: "permissionId",
+    RouteGroup.associate = (models) => {
+        RouteGroup.hasMany(models.Route, {
+            foreignKey: "routeGroupId",
             onDelete: "CASCADE"
         });
 
-        Permission.belongsToMany(models.User, {
-            through: models.UserPermission,
+        RouteGroup.belongsTo(models.Permission, {
             foreignKey: "permissionId",
-            otherKey: "userId",
             onDelete: "CASCADE"
         });
     };
-
-    return Permission;
+    return RouteGroup;
 };
