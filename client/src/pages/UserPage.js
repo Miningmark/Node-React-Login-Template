@@ -19,7 +19,7 @@ const UserPage = () => {
   const [loadingLogins, setLoadingLogins] = useState(true);
 
   const { addToast } = useToast();
-  const { config, setAccessToken, setUsername } = useContext(AuthContext);
+  const { setAccessToken, setUsername } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
@@ -46,18 +46,30 @@ const UserPage = () => {
   const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(newUsername.trim());
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchLogins = async () => {
       try {
-        const response = await axiosProtected.get("/last-logins");
+        const response = await axiosProtected.get("/last-logins", {
+          signal: controller.signal,
+        });
         setLogins(response.data);
       } catch (error) {
-        addToast("Fehler beim Laden der letzten Logins", "danger");
+        if (error.name === "CanceledError") {
+          console.log("Login-Fetch abgebrochen");
+        } else {
+          addToast("Fehler beim Laden der letzten Logins", "danger");
+        }
       } finally {
         setLoadingLogins(false);
       }
     };
 
     fetchLogins();
+
+    return () => {
+      controller.abort(); // Cleanup beim Unmount
+    };
   }, []);
 
   async function handleUpdatePassword(e) {
@@ -303,7 +315,7 @@ const UserPage = () => {
           </div>
 
           {/* Benutzername ändern */}
-          {config.isUsernameChangeEnable ? (
+          {process.env.REACT_APP_CHANGE_USERNAME_ACTIVE ? (
             <div className="card  mt-4">
               <div className="card-header fw-bold">Benutzername ändern</div>
               <div className="card-body">

@@ -44,8 +44,18 @@ const login = async (req, res, next) => {
         const accessTokenExpiresAt = new Date(Date.now() + config.accessTokenExpiration * 1000);
         const refreshTokenExpiresAt = new Date(Date.now() + config.refreshTokenExpiration * 1000);
 
-        await Models.UserToken.create({ userId: foundUser.id, token: accessToken, type: "accessToken", expiresAt: accessTokenExpiresAt });
-        await Models.UserToken.create({ userId: foundUser.id, token: refreshToken, type: "refreshToken", expiresAt: refreshTokenExpiresAt });
+        await Models.UserToken.create({
+            userId: foundUser.id,
+            token: accessToken,
+            type: "accessToken",
+            expiresAt: accessTokenExpiresAt
+        });
+        await Models.UserToken.create({
+            userId: foundUser.id,
+            token: refreshToken,
+            type: "refreshToken",
+            expiresAt: refreshTokenExpiresAt
+        });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -90,7 +100,12 @@ const register = async (req, res, next) => {
         const token = generateUUID();
         const expiresAt = new Date(Date.now() + config.accountActivationTokenExpiresIn * 1000);
 
-        await Models.UserToken.create({ userId: createdUser.id, token, type: "registration", expiresAt });
+        await Models.UserToken.create({
+            userId: createdUser.id,
+            token,
+            type: "registration",
+            expiresAt
+        });
 
         //TODO: make it fancier
         sendMail(
@@ -141,7 +156,9 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
 
         if (!usernameOrEmail) throw new ValidationError("Benutzername/Email erforderlich");
 
-        const foundUser = await Models.User.findOne({ where: { [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }] } });
+        const foundUser = await Models.User.findOne({
+            where: { [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }] }
+        });
 
         if (!foundUser) throw new ValidationError("Es existiert kein Benutzer mit dieser Nutzernamen oder Email");
         if (foundUser.isDisabled) throw new UnauthorizedError("Benutzer ist gesperrt, kein zurücksetzten des Passworts möglich");
@@ -153,7 +170,12 @@ const requestPasswordReset = async (req, res, next, sendResponse = true) => {
         const token = generateUUID();
         const expiresAt = new Date(Date.now() + config.passwordResetTokenExpiresIn * 1000);
 
-        await Models.UserToken.create({ userId: foundUser.id, token, type: "passwordReset", expiresAt });
+        await Models.UserToken.create({
+            userId: foundUser.id,
+            token,
+            type: "passwordReset",
+            expiresAt
+        });
 
         //TODO: make it prettier
         sendMail(
@@ -528,7 +550,12 @@ const checkLastLogins = async (username) => {
         foundUser.isActive = false;
         await foundUser.save();
 
-        await Models.UserToken.create({ userId: foundUser.id, token: token, type: "accountReactivation", expiresAt: null });
+        await Models.UserToken.create({
+            userId: foundUser.id,
+            token: token,
+            type: "accountReactivation",
+            expiresAt: null
+        });
     }
 };
 

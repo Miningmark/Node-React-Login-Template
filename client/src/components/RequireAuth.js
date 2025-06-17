@@ -3,44 +3,48 @@ import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 
-const RequireAuth = ({ children, allowedRoles }) => {
-  const { accessToken, roles } = useContext(AuthContext);
+const RequireAuth = ({ children, allowedRoutes }) => {
+  const { accessToken, routes } = useContext(AuthContext);
   const location = useLocation();
   const refreshAccessToken = useRefreshToken();
 
   const [isLoading, setIsLoading] = useState(!accessToken);
-  const [authReady, setAuthReady] = useState(!!accessToken);
 
-  useEffect(() => {
-    const verifyRefreshToken = async () => {
-      try {
-        await refreshAccessToken();
-        setAuthReady(true);
-      } catch (err) {
-        setAuthReady(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  async function loadAccessToken() {
+    try {
+      await refreshAccessToken();
 
-    if (!accessToken) {
-      verifyRefreshToken();
+      throw new Error("No access token received");
+    } catch (error) {
+      console.error("Error refreshing access token:", error);
+      throw error;
     }
-  }, [accessToken, refreshAccessToken]);
+  }
+
+  if (!accessToken) {
+    loadAccessToken()
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }
 
   if (isLoading) {
     return <div>Loading...</div>; // or a spinner
   }
 
-  if (!authReady) {
+  if (!accessToken) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const hasRequiredRole = allowedRoles
-    ? roles?.some((role) => allowedRoles.includes(role.name) || role.name === "Admin")
-    : true;
+  const hasRequiredRoutes = allowedRoutes
+    ? routes?.some((route) => allowedRoutes.includes(route) || route.name === "/admin")
+    : false;
 
-  if (!hasRequiredRole) {
+  console.log("Allowed Routes:", allowedRoutes);
+  if (!hasRequiredRoutes && allowedRoutes.length > 0) {
     return <Navigate to="/unauthorized" replace />;
   }
 

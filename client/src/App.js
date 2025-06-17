@@ -14,8 +14,9 @@ import Unauthorized from "./pages/Unauthorized";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import RequireAuth from "./components/RequireAuth";
 import PublicRoute from "./components/PublicRoute";
-import React, { useContext } from "react";
+import { useContext, useEffect } from "react";
 import UserManagement from "./pages/UserManagement";
+import useAxiosProtected from "./hook/useAxiosProtected";
 
 function AppWrapper() {
   return (
@@ -36,7 +37,43 @@ function App() {
   const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
-  const { config } = useContext(AuthContext);
+  const { setUsername, setRoutes, username } = useContext(AuthContext);
+  const axiosProtected = useAxiosProtected();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let isMounted = true;
+
+    const fetchUser = async () => {
+      try {
+        const [userRes, routesRes] = await Promise.all([
+          axiosProtected.get("/username", { signal }),
+          axiosProtected.get("/user-routes", { signal }),
+        ]);
+
+        if (isMounted) {
+          if (userRes.data?.username) setUsername(userRes.data.username);
+          if (routesRes.data?.routes) setRoutes(routesRes.data.routes);
+        }
+      } catch (err) {
+        if (err.name === "CanceledError") {
+          console.log("Anfrage abgebrochen");
+        } else {
+          console.warn("Kein gültiger Login gefunden.");
+        }
+      }
+    };
+
+    if (!username) {
+      fetchUser();
+    }
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [username]);
 
   return (
     <>
@@ -77,7 +114,7 @@ function App() {
         />
 
         {/* Nur anzeigen, wenn Registrierung aktiv ist */}
-        {config.isRegisterEnable && (
+        {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
           <Route
             path="/register"
             element={
@@ -86,13 +123,13 @@ function App() {
               </PublicRoute>
             }
           />
-        )}
+        ) : null}
 
         {/* Authentifizierte Routen */}
         <Route
           path="/dashboard"
           element={
-            <RequireAuth>
+            <RequireAuth allowedRoutes={[]}>
               <Dashboard />
             </RequireAuth>
           }
@@ -101,16 +138,16 @@ function App() {
         <Route
           path="/admin"
           element={
-            <RequireAuth allowedRoles={["admin"]}>
+            <RequireAuth allowedRoutes={["admin"]}>
               <AdminPage />
             </RequireAuth>
           }
         />
 
-         <Route
+        <Route
           path="/usermanagement"
           element={
-            <RequireAuth allowedRoles={["admin"]}>
+            <RequireAuth allowedRoutes={["admin"]}>
               <UserManagement />
             </RequireAuth>
           }
@@ -119,7 +156,7 @@ function App() {
         <Route
           path="/userpage"
           element={
-            <RequireAuth allowedRoles={["User"]}>
+            <RequireAuth allowedRoutes={[]}>
               <UserPage />
             </RequireAuth>
           }
