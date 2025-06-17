@@ -57,7 +57,8 @@ const login = async (req, res, next) => {
         const jsonResult = {};
         jsonResult.accessToken = accessToken;
         jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
-        jsonResult.config = getJSONConfig();
+        jsonResult.routes = await getRoutesForUser(username);
+        //TODO: enable if frontend works jsonResult.config = getJSONConfig();
 
         await addLastLogin(req, foundUser.id, true);
         await checkChangedLocationAndRegion(foundUser.username);
@@ -425,6 +426,28 @@ const getLastLogins = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+const getRoutesForUser = async (username) => {
+    const routeArray = [];
+
+    const userWithPermissions = await Models.User.findOne({
+        where: { username: username },
+        include: {
+            model: Models.Permission,
+            include: {
+                model: Models.Route
+            }
+        }
+    });
+
+    userWithPermissions.Permissions.flatMap((permission) => {
+        permission.Routes.map((route) => {
+            routeArray.push(route.path);
+        });
+    });
+
+    return routeArray;
 };
 
 const checkChangedLocationAndRegion = async (username) => {
