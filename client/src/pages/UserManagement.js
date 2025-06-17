@@ -4,7 +4,7 @@ import useAxiosProtected from "../hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
 import { convertToLocalTime } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
-import { Table, InputGroup, FormControl, Tabs, Tab, Container,Modal, Button, InputGroup, FormControl  } from "react-bootstrap";
+import { Table, InputGroup, FormControl, Tabs, Tab, Container,Modal, Button  } from "react-bootstrap";
 import sortingAlgorithm from "../util/sortingAlgorithm";
 
 
@@ -18,12 +18,12 @@ const defaultUsers = [
     { id: 7, username: "SuperAdmin", email: "admin@example.com", active: true, blocked: false, permissions: ["admin"] },
     { id: 8, username: "User123", email: "user123@example.com", active: false, blocked: true, permissions: ["test"] },
     { id: 9, username: "HappyCoder", email: "happycoder@example.com", active: true, blocked: false, permissions: ["user"] },
-    { id: 10, username: "ReactFan", email: "reactfan@example.com", active: true, blocked: false, permission: ["user"] },
+    { id: 10, username: "ReactFan", email: "reactfan@example.com", active: true, blocked: false, permissions: ["user"] },
     { id: 11, username: "BootstrapUser", email: "bootstrap@example.com", active: true, blocked: false, permissions: ["admin", "user"] },
     { id: 12, username: "DebugMaster", email: "debug@example.com", active: false, blocked: true, permissions: ["test"] },
     { id: 13, username: "Fixer", email: "fixer@example.com", active: true, blocked: false, permissions: ["user"] },
     { id: 14, username: "CSSWizard", email: "css@example.com", active: false, blocked: true, permissions: ["test"] },
-    { id: 15, username: "JSNinja", email: "jsninja@example.com", active: true, blocked: false, permission: ["admin", "user"] },
+    { id: 15, username: "JSNinja", email: "jsninja@example.com", active: true, blocked: false, permissions: ["admin", "user"] },
     { id: 16, username: "BackendBoss", email: "backend@example.com", active: false, blocked: true, permissions: ["test"] },
     { id: 17, username: "FrontendFan", email: "frontend@example.com", active: true, blocked: false, permissions: ["user"] },
     { id: 18, username: "DatabaseDude", email: "database@example.com", active: true, blocked: false, permissions: ["admin"] },
@@ -77,9 +77,9 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
                                 }`}
                                 id="floatingUsername"
                                 placeholder="Username"
-                                value={editedUser.Username}
+                                value={editedUser.username}
                                 onChange={handleChange}
-                                onBlur={() => setTouched({ ...touched, Username: true })}
+                                onBlur={() => setTouched({ ...touched, username: true })}
                                 name="Username"
                             />
                             <label htmlFor="floatingUsername">Username</label>
