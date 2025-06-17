@@ -121,34 +121,6 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
 
 
 
-  return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{user?.username || "User"}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Active:</strong> {user?.active ? "✔️ Ja" : "❌ Nein"}</p>
-        <p><strong>Blocked:</strong> {user?.blocked ? "✔️ Ja" : "❌ Nein"}</p>
-        <p><strong>Permissions</strong></p>
-        <ul>
-            {user?.permissions?.length > 0 ? (
-                user.permissions.map((permission, index) => <li key={index}>{permission}</li>)
-            ) : (
-                <li>Keine Berechtigungen</li>
-            )}
-        </ul>
-
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Schließen</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-
-
 
 const UserManagement =()=>{
     const [users,setUsers] = useState(defaultUsers);
@@ -193,6 +165,14 @@ const UserManagement =()=>{
   const handleUserClick = (user) => {
   setSelectedUser(user);
   setShowModal(true);
+};
+
+const handleUpdateUser = (updatedUser) => {
+    setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+            user.id === updatedUser.id ? updatedUser : user
+        )
+    );
 };
 
 
@@ -241,7 +221,7 @@ const UserManagement =()=>{
         </Container>
 
         {selectedUser && (
-            <UserDetailsModal show={showModal} handleClose={() => setShowModal(false)} user={selectedUser} />
+            <UserDetailsModal show={showModal} handleClose={() => setShowModal(false)} user={selectedUser} updateUser={handleUpdateUser}/>
         )}
 
 
