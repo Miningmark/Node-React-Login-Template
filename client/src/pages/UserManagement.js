@@ -135,11 +135,15 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser }) => {
             </Modal.Body>
             <Modal.Footer>
                 {editMode ? (
+                    <>
                     <Button variant="success" onClick={handleSave}>Speichern</Button>
                      <Button variant="secondary" onClick={() => setEditMode(false)}>Abbrechen</Button>
+                     </>
                 ) : (
+                    <>
                     <Button variant="primary" onClick={() => setEditMode(true)}>Bearbeitungsmodus</Button>
                      <Button variant="secondary" onClick={closeModal}>Schließen</Button>
+                     </>
                 )}
             </Modal.Footer>
         </Modal>
