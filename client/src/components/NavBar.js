@@ -96,7 +96,7 @@ function NavBar() {
               >
                 <li>
                   <button className="dropdown-item" onClick={() => navigate("/userpage")}>
-                    {username}
+                    {username ? username : "Benutzer"}
                   </button>
                 </li>
                 <li>

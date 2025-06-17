@@ -1,24 +1,22 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [username, setUsername] = useState(null);
-  const [roles, setRoles] = useState({});
-  const [config, setConfig] = useState({});
+  const [routes, setRoutes] = useState(null);
 
-  function login(newAccessToken, username, roles, config) {
+  function login(newAccessToken, username, routes) {
     setAccessToken(newAccessToken);
     setUsername(username);
-    setRoles(roles);
-    setConfig(config);
+    setRoutes(routes);
   }
 
   async function logout() {
     setAccessToken(null);
     setUsername(null);
-    setRoles(null);
+    setRoutes(null);
   }
 
   return (
@@ -26,12 +24,10 @@ export const AuthProvider = ({ children }) => {
       value={{
         accessToken,
         username,
-        roles,
-        config,
+        routes,
         setAccessToken,
         setUsername,
-        setRoles,
-        setConfig,
+        setRoutes,
         login,
         logout,
       }}

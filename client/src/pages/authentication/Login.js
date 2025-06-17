@@ -14,25 +14,11 @@ function Login() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
-  const [loadingConfig, setLoadingConfig] = useState(true);
 
   const { addToast } = useToast();
-  const { login, setConfig } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    async function fetchConfig() {
-      try {
-        const res = await axiosPublic.get("/config");
-        setConfig(res?.data?.config);
-        setLoadingConfig(false);
-      } catch (error) {
-        addToast("Fehler beim Laden der Konfiguration", "danger");
-      }
-    }
-    fetchConfig();
-  }, [setConfig]);
 
   useEffect(() => {
     const key = searchParams.get("key");
@@ -57,9 +43,8 @@ function Login() {
       );
       console.log("AccessToken:", res.data.accessToken);
       console.log("Username:", res.data.username);
-      console.log("Roles:", res.data.roles);
-      console.log("Config:", res.data.config);
-      login(res.data.accessToken, res.data.username, res.data.roles, res.data.config);
+      console.log("Routes:", res.data.routes);
+      login(res.data.accessToken, res.data.username, res.data.routes);
       addToast("Login erfolgreich", "success");
       navigate("/dashboard");
     } catch (error) {
@@ -93,111 +78,109 @@ function Login() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {!loadingConfig ? (
-        <div className={`flip-container ${isFlipped ? "flipped" : ""}`}>
-          <div className="flipper">
-            {/* Vorderseite - Login */}
-            <div
-              className="front border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
-              style={{
-                maxWidth: "400px",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-              }}
-            >
-              <h2 className="text-center mb-4">Login</h2>
-              <Form onSubmit={handleSubmitLogin}>
-                <div className="form-floating mb-3">
-                  <input
-                    className="form-control"
-                    id="floatingInput"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <label htmlFor="floatingInput">Name</label>
-                </div>
-                <div className="form-floating mb-3">
-                  <input
-                    className="form-control"
-                    id="floatingPassword"
-                    placeholder="Passwort"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <label htmlFor="floatingPassword">Passwort</label>
-                </div>
-                <div className="d-flex mb-3">
-                  {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
-                    <span
-                      role="button"
-                      className="text-primary text-decoration-underline me-auto"
-                      onClick={() => navigate("/register")}
-                    >
-                      Registrieren
-                    </span>
-                  ) : (
-                    <div className="me-auto" />
-                  )}
+      <div className={`flip-container ${isFlipped ? "flipped" : ""}`}>
+        <div className="flipper">
+          {/* Vorderseite - Login */}
+          <div
+            className="front border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
+            style={{
+              maxWidth: "400px",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            <h2 className="text-center mb-4">Login</h2>
+            <Form onSubmit={handleSubmitLogin}>
+              <div className="form-floating mb-3">
+                <input
+                  className="form-control"
+                  id="floatingInput"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <label htmlFor="floatingInput">Name</label>
+              </div>
+              <div className="form-floating mb-3">
+                <input
+                  className="form-control"
+                  id="floatingPassword"
+                  placeholder="Passwort"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <label htmlFor="floatingPassword">Passwort</label>
+              </div>
+              <div className="d-flex mb-3">
+                {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
                   <span
                     role="button"
-                    className="text-primary text-decoration-underline"
-                    onClick={() => setIsFlipped(true)}
+                    className="text-primary text-decoration-underline me-auto"
+                    onClick={() => navigate("/register")}
                   >
-                    Passwort vergessen
+                    Registrieren
                   </span>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <Button variant="primary" type="submit">
-                    Login
-                  </Button>
-                </div>
-              </Form>
-            </div>
+                ) : (
+                  <div className="me-auto" />
+                )}
+                <span
+                  role="button"
+                  className="text-primary text-decoration-underline"
+                  onClick={() => setIsFlipped(true)}
+                >
+                  Passwort vergessen
+                </span>
+              </div>
+              <div className="d-flex justify-content-center">
+                <Button variant="primary" type="submit">
+                  Login
+                </Button>
+              </div>
+            </Form>
+          </div>
 
-            {/* Rückseite - Passwort vergessen */}
-            <div
-              className="back border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
-              style={{
-                maxWidth: "400px",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-              }}
-            >
-              <h2 className="text-center mb-4">Passwort vergessen</h2>
-              <Form onSubmit={handleSubmitReset}>
-                <div className="form-floating mb-3">
-                  <input
-                    className="form-control"
-                    id="floatingName"
-                    placeholder="Name/E-Mail"
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <label htmlFor="floatingName">Name/E-Mail</label>
-                </div>
-                <div className="d-flex justify-content-end mb-3">
-                  <span
-                    role="button"
-                    className="text-primary text-decoration-underline"
-                    onClick={() => setIsFlipped(false)}
-                  >
-                    Zurück zum Login
-                  </span>
-                </div>
-                <div className="d-flex justify-content-center">
-                  <Button variant="primary" type="submit">
-                    Link senden
-                  </Button>
-                </div>
-              </Form>
-            </div>
+          {/* Rückseite - Passwort vergessen */}
+          <div
+            className="back border p-4 rounded shadow bg-body-tertiary bg-opacity-50 w-100"
+            style={{
+              maxWidth: "400px",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            <h2 className="text-center mb-4">Passwort vergessen</h2>
+            <Form onSubmit={handleSubmitReset}>
+              <div className="form-floating mb-3">
+                <input
+                  className="form-control"
+                  id="floatingName"
+                  placeholder="Name/E-Mail"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <label htmlFor="floatingName">Name/E-Mail</label>
+              </div>
+              <div className="d-flex justify-content-end mb-3">
+                <span
+                  role="button"
+                  className="text-primary text-decoration-underline"
+                  onClick={() => setIsFlipped(false)}
+                >
+                  Zurück zum Login
+                </span>
+              </div>
+              <div className="d-flex justify-content-center">
+                <Button variant="primary" type="submit">
+                  Link senden
+                </Button>
+              </div>
+            </Form>
           </div>
         </div>
-      ) : null}
+      </div>
 
       <div
         style={{
