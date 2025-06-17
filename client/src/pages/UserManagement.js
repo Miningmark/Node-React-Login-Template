@@ -134,13 +134,7 @@ const [showModal, setShowModal] = useState(false);
                         />
                     </InputGroup>
                     <Table striped bordered hover>
-                        <thead {
-                            position: sticky;
-                            top: "60px";
-                            background-color: white;
-                            z-index: 100;
-                        }>
-
+                        <thead>
                             <tr>
                                 <th onClick={() => handleSort("username")}>Username 🔽</th>
                                 <th className="d-none d-sm-table-cell" onClick={() => handleSort("email")}>Email 🔽</th>
