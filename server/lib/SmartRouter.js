@@ -17,17 +17,15 @@ class SmartRouter {
         for (const entry of this.queueEntries) {
             const { method, path, groupName, groupDescription, args } = entry;
 
-            const [routeGroup] = await Models.RouteGroup.findOrCreate({
+            await Models.RouteGroup.findOrCreate({
                 where: { name: groupName },
                 defaults: { description: groupDescription }
             });
 
-            await Models.Route.findOrCreate({ where: { method: method, path: path }, defaults: { routeGroupId: routeGroup.id } });
-
             const handler = args.pop();
             const middlewares = args;
 
-            const permissionMiddleware = verifyPermission(method, path);
+            const permissionMiddleware = verifyPermission(groupName);
 
             this.router[method](path, ...middlewares, permissionMiddleware, handler);
         }

@@ -6,7 +6,7 @@ import verifyAccessToken from "../middleware/verifyAccessToken.js";
 export default async () => {
     const smartRouter = new SmartRouter();
 
-    smartRouter.get("/getAllUsers", "userManagementRead", "Hat das Recht alle Userdaten zu sehen", verifyAccessToken, userManagementController.getAllUsers);
+    smartRouter.get("/getUsers{/:limit-:offset}", "userManagementRead", "Hat das Recht alle Userdaten zu sehen", verifyAccessToken, userManagementController.getUsers);
 
     return smartRouter.getExpressRouter();
 };

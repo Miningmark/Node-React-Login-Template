@@ -28,11 +28,6 @@ export default (sequelize, DataTypes) => {
     );
 
     RouteGroup.associate = (models) => {
-        RouteGroup.hasMany(models.Route, {
-            foreignKey: "routeGroupId",
-            onDelete: "CASCADE"
-        });
-
         RouteGroup.belongsTo(models.Permission, {
             foreignKey: "permissionId",
             onDelete: "CASCADE"

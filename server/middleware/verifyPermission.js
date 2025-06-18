@@ -2,18 +2,20 @@ import { Op } from "sequelize";
 import { Models } from "../controllers/modelController.js";
 import { UnauthorizedError } from "../errors/errorClasses.js";
 
-export default (method, path) => {
+export default (groupName) => {
     return async (req, res, next) => {
         try {
             const { username } = req;
             if (!username) throw new UnauthorizedError("Keine Berechtigung diese Route aufzurufen");
 
-            const route = await Models.Route.findOne({
-                where: { path: path, method: method, permissionId: { [Op.ne]: null } },
+            const route = await Models.RouteGroup.findOne({
+                where: { name: groupName, permissionId: { [Op.ne]: null } },
                 include: {
                     model: Models.Permission,
+                    required: true,
                     include: {
                         model: Models.User,
+                        required: true,
                         where: { username: username }
                     }
                 }

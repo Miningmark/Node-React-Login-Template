@@ -49,8 +49,6 @@ app.use(cookieParser());
         app.use("/api/" + config.apiVersion + "/userManagement", await userManagementRoute());
         app.use("/api/" + config.apiVersion, await ticketRoute());
 
-        //TODO: remove routes which are not present any longer
-
         //seeding Database
         if (config.seedDatabase) await seedDatabase();
 

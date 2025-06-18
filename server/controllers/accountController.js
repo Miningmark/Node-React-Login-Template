@@ -570,14 +570,6 @@ const addLastLogin = async (req, userId, successfully) => {
     await Models.LastLogin.create(jsonResult);
 };
 
-const getJSONConfig = () => {
-    return {
-        isRegisterEnable: config.isRegisterEnable,
-        isUsernameChangeEnable: config.isUsernameChangeEnable,
-        serverVersion: config.serverVersion
-    };
-};
-
 const generateJWT = (username, secret, expiresIn) => {
     return jwt.sign(
         {
