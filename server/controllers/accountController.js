@@ -67,7 +67,7 @@ const login = async (req, res, next) => {
         const jsonResult = {};
         jsonResult.accessToken = accessToken;
         jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
-        jsonResult.routeGroups = await getRoutesForUser(username);
+        jsonResult.routeGroups = await getRouteGroupsForUser(username);
         //TODO: enable if frontend works jsonResult.config = getJSONConfig();
 
         await addLastLogin(req, foundUser.id, true);
@@ -414,13 +414,13 @@ const getUsername = async (req, res, next) => {
     }
 };
 
-const getUserRoutes = async (req, res, next) => {
+const getUserRouteGroup = async (req, res, next) => {
     try {
         const { username } = req;
         if (!username) throw new ValidationError("Nutzername erforderlich");
 
         const jsonResult = {};
-        jsonResult.routes = await getRoutesForUser(username);
+        jsonResult.routeGroups = await getRouteGroupsForUser(username);
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -464,7 +464,7 @@ const getLastLogins = async (req, res, next) => {
     }
 };
 
-const getRoutesForUser = async (username) => {
+const getRouteGroupsForUser = async (username) => {
     const routeGroupsArray = [];
 
     const userWithPermissions = await Models.User.findOne({
@@ -636,7 +636,7 @@ export {
     changeEmail,
     changeUsername,
     getUsername,
-    getUserRoutes,
+    getUserRouteGroup,
     getConfig,
     getLastLogins
 };
