@@ -85,8 +85,7 @@ const register = async (req, res, next) => {
 
         if (!username || !password || !email) throw new ValidationError("Alle Eingaben erforderlich");
 
-        if (!USERNAME_REGEX.test(username) || !EMAIL_REGEX.test(email) || !PASSWORD_REGEX.test(password))
-            throw new ValidationError("Eingaben entsprechen nicht den Anforderungen");
+        if (!USERNAME_REGEX.test(username) || !EMAIL_REGEX.test(email) || !PASSWORD_REGEX.test(password)) throw new ValidationError("Eingaben entsprechen nicht den Anforderungen");
 
         const duplicateUsername = await findUser(username, null);
         const duplicateEmail = await findUser(null, email);
@@ -371,8 +370,7 @@ const changeUsername = async (req, res, next) => {
         const foundUser = await findUser(username, null);
         if (!foundUser) throw new ValidationError("Benutzername nicht vorhanden");
 
-        if (foundUser.username.toLowerCase() === newUsername.toLowerCase())
-            throw new ConflictError("Die Benutzername ist der selbe wie momentan verwendet");
+        if (foundUser.username.toLowerCase() === newUsername.toLowerCase()) throw new ConflictError("Die Benutzername ist der selbe wie momentan verwendet");
 
         if (!USERNAME_REGEX.test(newUsername)) throw new ValidationError("Neuer Nutzername ist nicht gültig");
 
@@ -414,24 +412,13 @@ const getUsername = async (req, res, next) => {
     }
 };
 
-const getUserRouteGroup = async (req, res, next) => {
+const getRouteGroup = async (req, res, next) => {
     try {
         const { username } = req;
         if (!username) throw new ValidationError("Nutzername erforderlich");
 
         const jsonResult = {};
         jsonResult.routeGroups = await getRouteGroupsForUser(username);
-
-        return res.status(200).json(jsonResult);
-    } catch (error) {
-        next(error);
-    }
-};
-
-const getConfig = async (req, res, next) => {
-    try {
-        const jsonResult = {};
-        jsonResult.config = getJSONConfig();
 
         return res.status(200).json(jsonResult);
     } catch (error) {
@@ -636,7 +623,6 @@ export {
     changeEmail,
     changeUsername,
     getUsername,
-    getUserRouteGroup,
-    getConfig,
+    getRouteGroup,
     getLastLogins
 };

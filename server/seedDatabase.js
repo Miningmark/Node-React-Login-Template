@@ -36,8 +36,17 @@ const seedDatabase = async () => {
     await createAndEditAndRemoveTickets.addRouteGroup(editTicketRouteGroup);
     await createAndEditAndRemoveTickets.addRouteGroup(removeTicketRouteGroup);
 
-    await juli051.addPermissions([readTickets, createAndEditAndRemoveTickets]);
-    await markus.addPermissions([readTickets, createAndEditAndRemoveTickets]);
+    const userManagementRead = await Models.RouteGroup.findOne({ where: { name: "userManagementRead" } });
+
+    const userManagement = await Models.Permission.create({
+        name: "userManagement",
+        description: "Es können User gesehen, bearbeitet und gelöscht werden"
+    });
+
+    userManagement.addRouteGroup(userManagementRead);
+
+    await juli051.addPermissions([readTickets, createAndEditAndRemoveTickets, userManagement]);
+    await markus.addPermissions([readTickets, createAndEditAndRemoveTickets, userManagement]);
     await testAdmin.addPermissions([readTickets, createAndEditAndRemoveTickets]);
 
     await testMod.addPermissions([readTickets]);

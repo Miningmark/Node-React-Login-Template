@@ -12,10 +12,13 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { NotFoundError } from "./errors/NotFoundError.js";
 
 //sequelize and models
-import { Models, sequelize } from "./controllers/modelController.js";
+import { sequelize } from "./controllers/modelController.js";
 
 //Routes
 import accountRoute from "./routes/accountRoute.js";
+
+//SmartRouter Routes
+import userManagementRoute from "./routes/userManagementRoute.js";
 import ticketRoute from "./routes/ticketRoute.js";
 
 //seeding standard users into database
@@ -40,9 +43,10 @@ app.use(cookieParser());
         await sequelize.sync(config.deleteDatabaseOnStart ? { force: true } : {});
 
         //normal routes
-        app.use("/api/" + config.apiVersion, accountRoute);
+        app.use("/api/" + config.apiVersion + "/user", accountRoute);
 
-        //smartRouter routes
+        //SmartRouter routes
+        app.use("/api/" + config.apiVersion + "/userManagement", await userManagementRoute());
         app.use("/api/" + config.apiVersion, await ticketRoute());
 
         //TODO: remove routes which are not present any longer
