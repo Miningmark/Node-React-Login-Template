@@ -56,10 +56,10 @@ function App() {
           axiosProtected.get("/user/getRouteGroups", { signal }),
         ]);
 
-        if (!isMounted) {
+        if (isMounted) {
           console.log("User data fetched successfully:");
           if (userRes.data?.username) setUsername(userRes.data.username);
-          if (routesRes.data?.rrouteGroups) setRouteGroups(routesRes.data.routeGroups);
+          if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
@@ -152,7 +152,7 @@ function App() {
         <Route
           path="/usermanagement"
           element={
-            <RequireAuth allowedRouteGroups={["admin"]}>
+            <RequireAuth allowedRouteGroups={["userManagementRead"]}>
               <UserManagement />
             </RequireAuth>
           }

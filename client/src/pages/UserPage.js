@@ -19,7 +19,7 @@ const UserPage = () => {
   const [loadingLogins, setLoadingLogins] = useState(true);
 
   const { addToast } = useToast();
-  const { setAccessToken, setUsername } = useContext(AuthContext);
+  const { setAccessToken } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
