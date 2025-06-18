@@ -7,6 +7,9 @@ export default async () => {
     const smartRouter = new SmartRouter();
 
     smartRouter.get("/getUsers{/:limit-:offset}", "userManagementRead", "Hat das Recht alle Userdaten zu sehen", verifyAccessToken, userManagementController.getUsers);
+    smartRouter.get("/getAllPermissions", "userManagementWrite", "Hat das Recht alle Userdaten zu sehen und zu bearbeiten", verifyAccessToken, userManagementController.getAllPermissions);
+
+    smartRouter.post("/updateUser", "userManagementWrite", "Hat das Recht alle Userdaten zu sehen und zu bearbeiten", verifyAccessToken, userManagementController.updateUsers);
 
     return smartRouter.getExpressRouter();
 };

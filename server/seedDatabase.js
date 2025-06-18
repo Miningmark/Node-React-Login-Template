@@ -37,6 +37,7 @@ const seedDatabase = async () => {
     await createAndEditAndRemoveTickets.addRouteGroup(removeTicketRouteGroup);
 
     const userManagementRead = await Models.RouteGroup.findOne({ where: { name: "userManagementRead" } });
+    const userManagementWrite = await Models.RouteGroup.findOne({ where: { name: "userManagementWrite" } });
 
     const userManagement = await Models.Permission.create({
         name: "userManagement",
@@ -44,6 +45,7 @@ const seedDatabase = async () => {
     });
 
     userManagement.addRouteGroup(userManagementRead);
+    userManagement.addRouteGroup(userManagementWrite);
 
     await juli051.addPermissions([readTickets, createAndEditAndRemoveTickets, userManagement]);
     await markus.addPermissions([readTickets, createAndEditAndRemoveTickets, userManagement]);
