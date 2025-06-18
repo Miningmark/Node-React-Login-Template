@@ -1,12 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Models } from "./modelController.js";
+import { Models, sequelize } from "./modelController.js";
 import { sendMail } from "../mail/mailer.js";
 import generateUUID from "../utils/generateUUID.js";
 import formatDate from "../utils/formatDate.js";
 import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from "../errors/errorClasses.js";
 import config from "../config/config.js";
 import { Op } from "sequelize";
+import { generateUserToken, validateEmail, validatePassword, validateUsername } from "../utils/accountUtils.js";
+import { sendRegistrationEmail } from "../mail/accountMails.js";
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -15,11 +17,11 @@ const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{
 
 const login = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { username, password } = req.body || {};
 
-        if (!username || !password) throw new ValidationError("Benutzername und Passwort erforderlich");
+        if (username === undefined || password === undefined) throw new ValidationError("Benutzername und Passwort erforderlich");
 
-        const foundUser = await findUser(username);
+        const foundUser = await Models.User.findOne({ where: { username: username } });
 
         if (!foundUser) throw new ValidationError("Dieser Benutzer existiert nicht");
         if (foundUser.isDisabled) throw new ForbiddenError("Dieser Benutzer ist gesperrt");
@@ -68,7 +70,6 @@ const login = async (req, res, next) => {
         jsonResult.accessToken = accessToken;
         jsonResult.username = username.charAt(0).toUpperCase() + username.slice(1);
         jsonResult.routeGroups = await getRouteGroupsForUser(username);
-        //TODO: enable if frontend works jsonResult.config = getJSONConfig();
 
         await addLastLogin(req, foundUser.id, true);
         await checkChangedLocationAndRegion(foundUser.username);
@@ -79,50 +80,30 @@ const login = async (req, res, next) => {
     }
 };
 
-const register = async (req, res, next) => {
+export async function register(req, res, next) {
+    const transaction = await sequelize.transaction();
     try {
-        const { username, password, email } = req.body;
+        const { username, password, email } = req.body || {};
 
-        if (!username || !password || !email) throw new ValidationError("Alle Eingaben erforderlich");
+        if (username === undefined || password === undefined || email === undefined) throw new ValidationError("Alle Eingaben erforderlich");
 
-        if (!USERNAME_REGEX.test(username) || !EMAIL_REGEX.test(email) || !PASSWORD_REGEX.test(password)) throw new ValidationError("Eingaben entsprechen nicht den Anforderungen");
-
-        const duplicateUsername = await findUser(username, null);
-        const duplicateEmail = await findUser(null, email);
-
-        if (duplicateUsername) throw new ConflictError("Benutzername bereits vergeben!", "username");
-        if (duplicateEmail) throw new ConflictError("Email bereits registriert!", "email");
+        await validateUsername(username);
+        await validateEmail(email);
+        await validatePassword(password);
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const createdUser = await Models.User.create({ username, email, password: hashedPassword });
+        const user = await Models.User.create({ username, email, password: hashedPassword });
 
-        const token = generateUUID();
-        const expiresAt = new Date(Date.now() + config.accountActivationTokenExpiresIn * 1000);
+        await generateUserToken(transaction, user.id, "registration", config.accountActivationTokenExpiresIn);
+        await sendRegistrationEmail();
 
-        await Models.UserToken.create({
-            userId: createdUser.id,
-            token,
-            type: "registration",
-            expiresAt
-        });
-
-        //TODO: make it fancier
-        sendMail(
-            email,
-            "Abschluss deiner Registrierung",
-            "Unter dem nachstehenden Link hast du bis zum " +
-                formatDate(expiresAt) +
-                " die Möglichkeit, deine Registrierung abzuschließen: " +
-                config.frontendURL +
-                config.frontendURLAccountActivationToken +
-                token
-        );
-
+        await transaction.commit();
         return res.status(201).json({ message: "Benutzer wurde erfolgreich registriert" });
     } catch (error) {
+        await transaction.rollback();
         next(error);
     }
-};
+}
 
 const accountActivation = async (req, res, next) => {
     try {
@@ -605,7 +586,6 @@ const findUserToken = async (userId, token, type, includeUser) => {
 
 export {
     login,
-    register,
     accountActivation,
     requestPasswordReset,
     passwordResetAndReactivation,

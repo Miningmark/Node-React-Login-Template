@@ -1,12 +1,10 @@
-import { ConflictError, ValidationError } from "../errors/errorClasses.js";
+import { ValidationError } from "../errors/errorClasses.js";
+import { validateEmail, validateUsername } from "../utils/accountUtils.js";
 import { Models, sequelize } from "./modelController.js";
 
-const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-const getUsers = async (req, res, next) => {
+export async function getUsers(req, res, next) {
     try {
-        const { offset, limit } = req.params;
+        const { offset, limit } = req.params || {};
 
         const users = await Models.User.findAll({
             include: {
@@ -14,6 +12,10 @@ const getUsers = async (req, res, next) => {
             },
             ...(limit || offset ? { limit: Number(limit), offset: Number(offset) } : {})
         });
+
+        if (users === null) {
+            return res.status(200).json({ Users: {} });
+        }
 
         const jsonResult = {
             Users: users.map((user) => {
@@ -35,11 +37,15 @@ const getUsers = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+}
 
-const getAllPermissions = async (req, res, next) => {
+export async function getAllPermissions(req, res, next) {
     try {
         const permissions = await Models.Permission.findAll();
+
+        if (permissions === null) {
+            return res.status(200).json({ Permissions: {} });
+        }
 
         const jsonResult = {
             Permissions: permissions.map((permission) => {
@@ -55,9 +61,9 @@ const getAllPermissions = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+}
 
-const updateUsers = async (req, res, next) => {
+export async function updateUsers(req, res, next) {
     const transaction = await sequelize.transaction();
     try {
         const { id, username, email, isActive, isDisabled } = req.body || {};
@@ -65,23 +71,24 @@ const updateUsers = async (req, res, next) => {
         if (id === undefined) throw new ValidationError("Die ID des zu bearbeitenden Benutzers muss mitgegeben werden");
 
         const user = await Models.User.findOne({ where: { id: id } }, { transaction: transaction });
-        if (user === undefined) throw new ValidationError("Es existiert kein Benutzer mit dieser ID");
+        if (user === null) throw new ValidationError("Es existiert kein Benutzer mit dieser ID");
 
         if (username === undefined && email === undefined && isActive === undefined && isDisabled === undefined) throw new ValidationError("Es muss mindestens ein Wert geändert werden");
 
         if (username) {
-            if (!USERNAME_REGEX.test(username)) throw new ValidationError("Benutzername entsprechen nicht den Anforderungen");
-            const duplicateUsername = await Models.User.findOne({ where: { username: username } }, { transaction: transaction });
+            validateUsername(username);
 
-            if (duplicateUsername) throw new ConflictError("Benutzername bereits vergeben!");
+            const refreshUserToken = await Models.UserToken.findOne({ where: { userId: user.id, type: "refreshToken" } }, { transaction: transaction });
+            const accessUserToken = await Models.UserToken.findOne({ where: { userId: user.id, type: "accessToken" } }, { transaction: transaction });
+
+            if (refreshUserToken !== null) await refreshUserToken.destroy();
+            if (accessUserToken !== null) await accessUserToken.destroy();
+
             user.username = username;
         }
 
         if (email) {
-            if (!EMAIL_REGEX.test(email)) throw new ValidationError("Email entspricht nicht den Anforderungen");
-            const duplicateEmail = await Models.User.findOne({ where: { email: email } }, { transaction: transaction });
-
-            if (duplicateEmail) throw new ConflictError("Email bereits vergeben!");
+            validateEmail(email);
             user.email = email;
         }
 
@@ -103,6 +110,4 @@ const updateUsers = async (req, res, next) => {
         await transaction.rollback();
         next(error);
     }
-};
-
-export { getUsers, getAllPermissions, updateUsers };
+}
