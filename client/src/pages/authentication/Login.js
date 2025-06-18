@@ -32,7 +32,7 @@ function Login() {
 
     try {
       const res = await axiosPublic.post(
-        "/login",
+        "/user/login",
         {
           username: name,
           password,
@@ -43,8 +43,8 @@ function Login() {
       );
       console.log("AccessToken:", res.data.accessToken);
       console.log("Username:", res.data.username);
-      console.log("Routes:", res.data.routes);
-      login(res.data.accessToken, res.data.username, res.data.routes);
+      console.log("RouteGroups:", res.data.routeGroups);
+      login(res.data.accessToken, res.data.username, res.data.routeGroups);
       addToast("Login erfolgreich", "success");
       navigate("/dashboard");
     } catch (error) {
@@ -58,7 +58,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      await axiosPublic.post("/request-password-reset", {
+      await axiosPublic.post("/user/requestPasswordReset", {
         usernameOrEmail: name,
       });
       setIsFlipped(false);

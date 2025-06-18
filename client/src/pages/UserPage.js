@@ -50,7 +50,7 @@ const UserPage = () => {
 
     const fetchLogins = async () => {
       try {
-        const response = await axiosProtected.get("/last-logins", {
+        const response = await axiosProtected.get("/user/lastLogins", {
           signal: controller.signal,
         });
         setLogins(response.data);
@@ -94,7 +94,7 @@ const UserPage = () => {
     }
     setLoadingPassword(true);
     try {
-      await axiosProtected.post("/change-password", { currentPassword, newPassword });
+      await axiosProtected.post("/user/changePassword", { currentPassword, newPassword });
 
       addToast("Passwort änderung erfolgreich.", "success");
       setAccessToken("");
@@ -116,7 +116,7 @@ const UserPage = () => {
     }
     setLoadingEmail(true);
     try {
-      await axiosProtected.post("/change-email", { newEmail });
+      await axiosProtected.post("/user/changeEmail", { newEmail });
 
       addToast("E-Mail-Adresse erfolgreich aktualisiert.", "success");
       setNewEmail("");
@@ -138,7 +138,7 @@ const UserPage = () => {
     }
     setLoadingUsername(true);
     try {
-      await axiosProtected.post("/change-username", { newUsername });
+      await axiosProtected.post("/user/changeUsername", { newUsername });
 
       addToast("Benutzername erfolgreich aktualisiert.", "success");
       setAccessToken("");

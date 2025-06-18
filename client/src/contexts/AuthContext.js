@@ -5,18 +5,18 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [username, setUsername] = useState(null);
-  const [routes, setRoutes] = useState(null);
+  const [routeGroups, setRouteGroups] = useState(null);
 
-  function login(newAccessToken, username, routes) {
+  function login(newAccessToken, username, routeGroups) {
     setAccessToken(newAccessToken);
     setUsername(username);
-    setRoutes(routes);
+    setRouteGroups(routeGroups);
   }
 
   async function logout() {
     setAccessToken(null);
     setUsername(null);
-    setRoutes(null);
+    setRouteGroups(null);
   }
 
   return (
@@ -24,10 +24,10 @@ export const AuthProvider = ({ children }) => {
       value={{
         accessToken,
         username,
-        routes,
+        routeGroups,
         setAccessToken,
         setUsername,
-        setRoutes,
+        setRouteGroups,
         login,
         logout,
       }}

@@ -18,15 +18,6 @@ export default function PublicRoute({ children }) {
         return;
       }
       await setAccessToken(() => res?.data?.accessToken);
-      /* 
-      const res1 = await axiosProtected.get("/username");
-      await setUsername(() => res1?.data?.username);
-      const res2 = await axiosProtected.get("/user-routes");
-      await setRoutes(() => res2?.data?.routes);
-      console.log("AccessToken loaded:", res?.data?.accessToken);
-      console.log("Username loaded:", res1?.data?.username);
-      console.log("Routes loaded:", res2?.data?.routes);
-      */
     } catch (error) {}
   }
 
