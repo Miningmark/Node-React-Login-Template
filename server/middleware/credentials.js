@@ -1,4 +1,4 @@
-import config from "./config.js";
+import config from "../config/config.js";
 
 export default (req, res, next) => {
     const origin = req.headers.origin;

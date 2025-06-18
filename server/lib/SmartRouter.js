@@ -22,7 +22,7 @@ class SmartRouter {
                 defaults: { description: groupDescription }
             });
 
-            await Models.Route.create({ method: method, path: path, routeGroupId: routeGroup.id });
+            await Models.Route.findOrCreate({ where: { method: method, path: path }, defaults: { routeGroupId: routeGroup.id } });
 
             const handler = args.pop();
             const middlewares = args;

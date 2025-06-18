@@ -45,6 +45,9 @@ app.use(cookieParser());
         //smartRouter routes
         app.use("/api/" + config.apiVersion, await ticketRoute());
 
+        //TODO: remove routes which are not present any longer
+
+        //seeding Database
         if (config.seedDatabase) await seedDatabase();
 
         //catching all routes and sending an 404 error back
