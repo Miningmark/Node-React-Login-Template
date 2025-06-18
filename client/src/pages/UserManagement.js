@@ -84,6 +84,7 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions 
         await axiosProtected.post("/userManagement/updateUser", payload);
       }
 
+      addToast("User erfolgreich Bearbeitet", "success");
       updateUser(editedUser);
       setEditMode(false);
     } catch (error) {
