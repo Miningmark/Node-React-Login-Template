@@ -183,7 +183,7 @@ const passwordResetAndReactivation = async (req, res, next) => {
         if (!PASSWORD_REGEX.test(password)) throw new ValidationError("Passwort entspricht nicht den Anforderungen");
 
         const userToken = await Models.UserToken.findOne({
-            where: { token: token, type: { [Op.or]: ["passwordReset", "accountReactivation"] } },
+            where: { token: token, type: { [Op.or]: ["passwordReset", "accountReactivation", "registrationByAdmin"] } },
             include: Models.User
         });
 
@@ -191,6 +191,10 @@ const passwordResetAndReactivation = async (req, res, next) => {
 
         if (userToken.expiresAt !== null) {
             if (new Date(Date.now()) > userToken.expiresAt) {
+                if (userToken.type === "registrationByAdmin") {
+                    throw new UnauthorizedError("Zeit zum Registrierung abschließen leider abgelaufen bitte selbst registrieren oder einen Admin darum bitten");
+                }
+
                 req.body.username = userToken.User.username;
                 requestPasswordReset(req, res, next, false);
 
@@ -200,7 +204,7 @@ const passwordResetAndReactivation = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         userToken.User.password = hashedPassword;
-        if (userToken.type === "accountReactivation") userToken.User.isActive = true;
+        if (userToken.type === "accountReactivation" || userToken.type === "registrationByAdmin") userToken.User.isActive = true;
         userToken.User.save();
 
         userToken.destroy();
