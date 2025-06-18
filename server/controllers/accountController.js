@@ -412,7 +412,7 @@ const getUsername = async (req, res, next) => {
     }
 };
 
-const getRouteGroup = async (req, res, next) => {
+const getRouteGroups = async (req, res, next) => {
     try {
         const { username } = req;
         if (!username) throw new ValidationError("Nutzername erforderlich");
@@ -615,6 +615,6 @@ export {
     changeEmail,
     changeUsername,
     getUsername,
-    getRouteGroup,
+    getRouteGroups,
     getLastLogins
 };

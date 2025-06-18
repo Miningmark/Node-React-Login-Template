@@ -26,7 +26,7 @@ router.post("/logout", verifyAccessToken, accountController.logout);
 router.post("/changePassword", verifyAccessToken, accountController.changePassword);
 router.post("/changeEmail", verifyAccessToken, accountController.changeEmail);
 
-router.get("/getRouteGroups", verifyAccessToken, accountController.getRouteGroup);
+router.get("/getRouteGroups", verifyAccessToken, accountController.getRouteGroups);
 router.get("/getUsername", verifyAccessToken, accountController.getUsername);
 router.get("/getLastLogins", verifyAccessToken, accountController.getLastLogins);
 
