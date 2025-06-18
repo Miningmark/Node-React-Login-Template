@@ -41,7 +41,7 @@ const seedDatabase = async () => {
 
     const userManagement = await Models.Permission.create({
         name: "userManagement",
-        description: "Es können User gesehen, bearbeitet und gelöscht werden"
+        description: "Es können User gesehen, bearbeitet werden"
     });
 
     userManagement.addRouteGroup(userManagementRead);

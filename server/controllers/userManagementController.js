@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { ValidationError } from "../errors/errorClasses.js";
 import { validateEmail, validateUsername } from "../utils/accountUtils.js";
 import { Models, sequelize } from "./modelController.js";
@@ -93,19 +94,19 @@ export async function updateUser(req, res, next) {
         }
 
         if (isActive) {
-            if (typeof isActive !== "boolean") throw new ValidationError("isActive darf nur vom type boolean sein");
+            if (typeof isActive !== "boolean") throw new ValidationError("Falscher Typ für isActive");
             user.isActive = isActive;
         }
 
         if (isDisabled) {
-            if (typeof isDisabled !== "boolean") throw new ValidationError("isDisabled darf nur vom type boolean sein");
+            if (typeof isDisabled !== "boolean") throw new ValidationError("Falscher Typ für isDisabled");
             user.isDisabled = isDisabled;
         }
 
         await user.save({ transaction: transaction });
         await transaction.commit();
 
-        return res.status(200).json({ message: "Nutzer erfolgreich bearbeitet" });
+        return res.status(200).json({ message: "Benutzer erfolgreich bearbeitet" });
     } catch (error) {
         await transaction.rollback();
         next(error);
@@ -114,50 +115,19 @@ export async function updateUser(req, res, next) {
 export async function updatePermissions(req, res, next) {
     const transaction = await sequelize.transaction();
     try {
-        const { userId, permissions } = req.body || {};
+        const { userId, permissionIds } = req.body || {};
 
         if (userId === undefined) throw new ValidationError("Die ID des zu bearbeitenden Benutzers muss mitgegeben werden");
-        if (permissions === undefined) throw new ValidationError("Die Permissions des zu bearbeitenden Benutzers muss mitgegeben werden");
+        if (permissionIds === undefined) throw new ValidationError("Die Rechte des zu bearbeitenden Benutzers muss mitgegeben werden");
 
-        console.log(typeof permissions);
-        /*if (id === undefined) throw new ValidationError("Die ID des zu bearbeitenden Benutzers muss mitgegeben werden");
+        if (!Array.isArray(permissionIds)) throw new ValidationError("Falscher Typ für Rechte");
 
-        const user = await Models.User.findOne({ where: { id: id } }, { transaction: transaction });
-        if (user === null) throw new ValidationError("Es existiert kein Benutzer mit dieser ID");
+        const user = await Models.User.findOne({ where: { id: userId } }, { transaction: transaction });
 
-        if (username === undefined && email === undefined && isActive === undefined && isDisabled === undefined) throw new ValidationError("Es muss mindestens ein Wert geändert werden");
+        const newPermissions = await Models.Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
+        await user.setPermissions(newPermissions);
 
-        if (username) {
-            validateUsername(username);
-
-            const refreshUserToken = await Models.UserToken.findOne({ where: { userId: user.id, type: "refreshToken" } }, { transaction: transaction });
-            const accessUserToken = await Models.UserToken.findOne({ where: { userId: user.id, type: "accessToken" } }, { transaction: transaction });
-
-            if (refreshUserToken !== null) await refreshUserToken.destroy();
-            if (accessUserToken !== null) await accessUserToken.destroy();
-
-            user.username = username;
-        }
-
-        if (email) {
-            validateEmail(email);
-            user.email = email;
-        }
-
-        if (isActive) {
-            if (typeof isActive !== "boolean") throw new ValidationError("isActive darf nur vom type boolean sein");
-            user.isActive = isActive;
-        }
-
-        if (isDisabled) {
-            if (typeof isDisabled !== "boolean") throw new ValidationError("isDisabled darf nur vom type boolean sein");
-            user.isDisabled = isDisabled;
-        }
-
-        await user.save({ transaction: transaction });
-        await transaction.commit();*/
-
-        return res.status(200).json({ message: "Permissions erfolgreich bearbeitet" });
+        return res.status(200).json({ message: "Rechten erfolgreich bearbeitet" });
     } catch (error) {
         await transaction.rollback();
         next(error);
