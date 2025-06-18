@@ -24,6 +24,9 @@ export default {
 
     frontendURLPasswordForgotten: process.env.frontendURLPasswordForgotten,
 
+    passwordAccountCreatedByAdmin: process.env.passwordAccountCreatedByAdmin,
+    accountCreatedByAdminExpiresIn: process.env.accountCreatedByAdminExpiresIn,
+
     allowedOrigins: JSON.parse(process.env.allowedOrigins),
 
     defaultDatabaseHost: process.env.defaultDatabaseHost,
@@ -41,5 +44,5 @@ export default {
     refreshTokenSecret: process.env.refreshTokenSecret,
     refreshTokenExpiration: Number(process.env.refreshTokenExpiration),
 
-    serverVersion: "0.0.17"
+    serverVersion: "0.0.18"
 };

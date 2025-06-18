@@ -34,4 +34,5 @@ export async function generateUserToken(transaction, userId, type, expiresIn) {
         },
         { transaction: transaction }
     );
+    return token;
 }

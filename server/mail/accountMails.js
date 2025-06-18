@@ -1,6 +1,6 @@
 import { sendMail } from "./mailer.js";
 
-export async function sendRegistrationEmail() {
+export async function sendRegistrationEmail(email, token) {
     sendMail(
         email,
         "Abschluss deiner Registrierung",

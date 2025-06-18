@@ -92,10 +92,10 @@ export async function register(req, res, next) {
         await validatePassword(password);
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await Models.User.create({ username, email, password: hashedPassword });
+        const user = await Models.User.create({ username: username, email: email, password: hashedPassword });
 
-        await generateUserToken(transaction, user.id, "registration", config.accountActivationTokenExpiresIn);
-        await sendRegistrationEmail();
+        const token = await generateUserToken(transaction, user.id, "registration", config.accountActivationTokenExpiresIn);
+        await sendRegistrationEmail(user.email, token);
 
         await transaction.commit();
         return res.status(201).json({ message: "Benutzer wurde erfolgreich registriert" });
