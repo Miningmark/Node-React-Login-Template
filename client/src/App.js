@@ -52,8 +52,8 @@ function App() {
       console.log("Fetching user data...");
       try {
         const [userRes, routesRes] = await Promise.all([
-          axiosProtected.get("/user/username", { signal }),
-          axiosProtected.get("/user/userRouteGroups", { signal }),
+          axiosProtected.get("/user/getUsername", { signal }),
+          axiosProtected.get("/user/getRouteGroups", { signal }),
         ]);
 
         if (!isMounted) {

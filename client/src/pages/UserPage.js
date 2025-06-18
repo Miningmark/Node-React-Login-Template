@@ -50,7 +50,7 @@ const UserPage = () => {
 
     const fetchLogins = async () => {
       try {
-        const response = await axiosProtected.get("/user/lastLogins", {
+        const response = await axiosProtected.get("/user/getLastLogins", {
           signal: controller.signal,
         });
         setLogins(response.data);
