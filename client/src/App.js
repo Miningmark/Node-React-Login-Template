@@ -37,8 +37,11 @@ function App() {
   const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
-  const { setUsername, setRoutes, username } = useContext(AuthContext);
+  const { setUsername, setRouteGroups, username } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
+
+  console.log("Username:", username);
+  console.log("RouteGroups:", useContext(AuthContext).routeGroups);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -46,15 +49,17 @@ function App() {
     let isMounted = true;
 
     const fetchUser = async () => {
+      console.log("Fetching user data...");
       try {
         const [userRes, routesRes] = await Promise.all([
-          axiosProtected.get("/username", { signal }),
-          axiosProtected.get("/user-routes", { signal }),
+          axiosProtected.get("/user/getUsername", { signal }),
+          axiosProtected.get("/user/getRouteGroups", { signal }),
         ]);
 
-        if (isMounted) {
+        if (!isMounted) {
+          console.log("User data fetched successfully:");
           if (userRes.data?.username) setUsername(userRes.data.username);
-          if (routesRes.data?.routes) setRoutes(routesRes.data.routes);
+          if (routesRes.data?.rrouteGroups) setRouteGroups(routesRes.data.routeGroups);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
@@ -129,7 +134,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <RequireAuth allowedRoutes={[]}>
+            <RequireAuth allowedRouteGroups={[]}>
               <Dashboard />
             </RequireAuth>
           }
@@ -138,7 +143,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <RequireAuth allowedRoutes={["admin"]}>
+            <RequireAuth allowedRouteGroups={["admin"]}>
               <AdminPage />
             </RequireAuth>
           }
@@ -147,7 +152,7 @@ function App() {
         <Route
           path="/usermanagement"
           element={
-            <RequireAuth allowedRoutes={["admin"]}>
+            <RequireAuth allowedRouteGroups={["admin"]}>
               <UserManagement />
             </RequireAuth>
           }
@@ -156,7 +161,7 @@ function App() {
         <Route
           path="/userpage"
           element={
-            <RequireAuth allowedRoutes={[]}>
+            <RequireAuth allowedRouteGroups={[]}>
               <UserPage />
             </RequireAuth>
           }

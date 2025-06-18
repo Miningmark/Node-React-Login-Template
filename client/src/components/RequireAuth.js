@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 
-const RequireAuth = ({ children, allowedRoutes }) => {
+const RequireAuth = ({ children, allowedRouteGroups }) => {
   const { accessToken, routes } = useContext(AuthContext);
   const location = useLocation();
   const refreshAccessToken = useRefreshToken();
@@ -39,12 +39,12 @@ const RequireAuth = ({ children, allowedRoutes }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const hasRequiredRoutes = allowedRoutes
-    ? routes?.some((route) => allowedRoutes.includes(route) || route.name === "/admin")
+  const hasRequiredRouteGroups = allowedRouteGroups
+    ? routes?.some((route) => allowedRouteGroups.includes(route) || route.name === "/admin")
     : false;
 
-  console.log("Allowed Routes:", allowedRoutes);
-  if (!hasRequiredRoutes && allowedRoutes.length > 0) {
+  console.log("Allowed RouteGroups:", allowedRouteGroups);
+  if (!hasRequiredRouteGroups && allowedRouteGroups.length > 0) {
     return <Navigate to="/unauthorized" replace />;
   }
 

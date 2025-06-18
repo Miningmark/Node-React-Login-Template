@@ -22,7 +22,7 @@ function NavBar() {
 
   async function handleLogout() {
     try {
-      await axiosProtected.post("/logout");
+      await axiosProtected.post("/user/logout");
       await logout();
       setTimeout(() => {
         navigate("/login");

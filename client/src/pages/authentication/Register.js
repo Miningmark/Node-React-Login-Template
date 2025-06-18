@@ -65,7 +65,7 @@ function Register() {
     }
 
     try {
-      await axiosPublic.post("/register", { email, username, password });
+      await axiosPublic.post("/user/register", { email, username, password });
 
       addToast("Registrierung erfolgreich! E-Mail Adresse Bestätigen.", "success");
       navigate("/login");

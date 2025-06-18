@@ -54,7 +54,7 @@ function ResetPassword() {
     }
 
     try {
-      await axiosPublic.post("/password-reset", {
+      await axiosPublic.post("/user/passwordReset", {
         token,
         password,
       });
