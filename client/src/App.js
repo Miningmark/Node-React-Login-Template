@@ -5,7 +5,7 @@ import AccountActivating from "./pages/authentication/AccountActivating";
 import Dashboard from "./pages/Dashboard";
 import AdminPage from "./pages/AdminPage";
 import UserPage from "./pages/UserPage";
-import NavBar from "./components/NavBar";
+import NavBar from "./components/menu/NavBar";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
 import ResetPassword from "./pages/authentication/ResetPassword";
