@@ -1,16 +1,44 @@
 import { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { ThemeContext } from "../contexts/ThemeContext";
-import useAxiosProtected from "../hook/useAxiosProtected";
+import { ThemeContext } from "contexts/ThemeContext";
+import useAxiosProtected from "hook/useAxiosProtected";
+import "./navBar.css";
 
 function NavBar() {
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const { accessToken, username, logout } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (window.innerWidth < 768) {
+        // Nur Mobile
+        if (currentScrollY > lastScrollY + 10) {
+          // Runterscrollen
+          setShowNavbar(false);
+        } else if (currentScrollY < lastScrollY - 5) {
+          // Hochscrollen
+          setShowNavbar(true);
+        }
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -33,7 +61,11 @@ function NavBar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary px-3 sticky-top">
+    <nav
+      className={`navbar navbar-expand-lg bg-body-tertiary px-3 sticky-top navbar-mobile-hide-show ${
+        showNavbar ? "navbar-visible" : "navbar-hidden"
+      }`}
+    >
       <div className="container-fluid">
         <Link className="navbar-brand" to="/dashboard">
           App
