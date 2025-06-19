@@ -45,6 +45,7 @@ app.use(cookieParser());
         app.use(errorHandler);
 
         app.listen(config.backendPORT, async () => {
+            console.log("Datenbank verbunden und Server läuft auf Port " + config.backendPORT + " mit Version: " + config.serverVersion);
             await serverLogger("INFO", "Datenbank verbunden und Server läuft auf Port " + config.backendPORT + " mit Version: " + config.serverVersion, {
                 source: "startup"
             });
