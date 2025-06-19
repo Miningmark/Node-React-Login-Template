@@ -39,6 +39,21 @@ const RequireAuth = ({ children, allowedRouteGroups }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  console.log("RouteGroups:", routeGroups);
+  if (!routeGroups) {
+    return (
+      <div className="d-flex flex-column justify-content-center align-items-center vh-100">
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "4rem", height: "4rem" }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
   const hasRequiredRouteGroups = allowedRouteGroups
     ? routeGroups?.some((routeGroup) => allowedRouteGroups.includes(routeGroup))
     : false;

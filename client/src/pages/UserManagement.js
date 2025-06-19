@@ -31,7 +31,6 @@ const UserManagement = () => {
         const response = await axiosProtected.get("/userManagement/getUsers", {
           signal: controller.signal,
         });
-        console.log("User-Fetch erfolgreich", response.data.users);
         setUsers(response.data.users);
       } catch (error) {
         if (error.name === "CanceledError") {
@@ -49,7 +48,6 @@ const UserManagement = () => {
         const response = await axiosProtected.get("/userManagement/getAllPermissions", {
           signal: controller.signal,
         });
-        console.log("Permissions-Fetch erfolgreich", response.data.permissions);
         setAllPermissions(response.data.permissions);
       } catch (error) {
         if (error.name === "CanceledError") {
