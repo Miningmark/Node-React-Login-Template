@@ -21,6 +21,6 @@ router.post("/logout", verifyAccessToken, accountController.logout);
 router.post("/changePassword", verifyAccessToken, accountController.changePassword);
 router.post("/changeEmail", verifyAccessToken, accountController.changeEmail);
 router.post("/requestPasswordReset", accountController.requestPasswordReset);
-router.post("/passwordReset", accountController.passwordResetOrReactivation); //TODO: rename function in frontend
+router.post("/passwordResetOrReactivation", accountController.passwordResetOrReactivation);
 
 export default router;
