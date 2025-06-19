@@ -15,7 +15,7 @@ import { NotFoundError } from "./errors/NotFoundError.js";
 import { serverLogger } from "./utils/ServerLog/serverLogger.js";
 
 import accountRoute from "./routes/Account/accountRoute.js";
-import userManagementRoute from "./routes/userManagement/userManagementRoute.js";
+import userManagementRoute from "./routes/UserManagement/userManagementRoute.js";
 
 const app = express();
 
