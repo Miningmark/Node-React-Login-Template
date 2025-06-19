@@ -39,7 +39,7 @@ export default (sequelize, DataTypes) => {
             }
         },
         {
-            tableName: "last_login",
+            tableName: "last_logins",
             timestamps: false
         }
     );

@@ -6,15 +6,15 @@ export default (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 primaryKey: true
             },
-            token: {
-                type: DataTypes.STRING,
-                unique: true,
-                allowNull: false
-            },
             type: {
-                type: DataTypes.ENUM("registration", "passwordReset", "refreshToken", "accessToken", "accountReactivation", "registrationByAdmin"),
+                type: DataTypes.ENUM("refreshToken", "accessToken", "userRegistration", "adminRegistration", "passwordReset", "accountReactivation"),
                 allowNull: false,
                 primaryKey: true
+            },
+            token: {
+                type: DataTypes.TEXT,
+                unique: true,
+                allowNull: false
             },
             expiresAt: {
                 type: DataTypes.DATE,

@@ -1,7 +1,7 @@
-import { sendMail } from "./mailer.js";
+import { sendMail } from "../mailer.js";
 
 export async function sendUserCreatedEmail(email, token) {
-    sendMail(
+    await sendMail(
         email,
         "Dein neuer Account - Passwort festlegen",
         "Für dich wurde ein Benutzerkonto eingerichtet.\n" +

@@ -1,66 +1,50 @@
 import bcrypt from "bcrypt";
-import { Models } from "./controllers/modelController.js";
+import { Models, sequelize } from "./controllers/modelController.js";
+import { serverLogger } from "./utils/ServerLog/serverLogger.js";
 
-const seedDatabase = async () => {
-    const [juli051, markus, testAdmin, testMod, testUser] = await Promise.all([
-        Models.User.create({ username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) }),
-        Models.User.create({ username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) }),
+export async function seedDatabase() {
+    const transaction = await sequelize.transaction();
+    try {
+        const juli051 = await Models.User.create(
+            { username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) },
+            { transaction: transaction }
+        );
+        const markus = await Models.User.create(
+            { username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) },
+            { transaction: transaction }
+        );
 
-        Models.User.create({ username: "testAdmin", email: "testAdmin@gmx.net", password: await bcrypt.hash("testAdmin", 10) }),
-        Models.User.create({ username: "testMod", email: "testMod@gmx.net", password: await bcrypt.hash("testMod", 10) }),
-        Models.User.create({ username: "testUser", email: "testUser@gmx.net", password: await bcrypt.hash("testUser", 10) })
-    ]);
+        juli051.isActive = true;
+        markus.isActive = true;
 
-    juli051.isActive = true;
-    markus.isActive = true;
+        const userManagementRead = await Models.RouteGroup.findOne({ where: { name: "userManagementRead" } }, { transaction: transaction });
+        const userManagementWrite = await Models.RouteGroup.findOne({ where: { name: "userManagementWrite" } }, { transaction: transaction });
+        const userManagementCreate = await Models.RouteGroup.findOne({ where: { name: "userManagementCreate" } }, { transaction: transaction });
 
-    testAdmin.isActive = true;
-    testMod.isActive = true;
-    testUser.isActive = true;
+        const userManagement = await Models.Permission.create(
+            {
+                name: "userManagement",
+                description: "Es können User gesehen, bearbeitet werden"
+            },
+            { transaction: transaction }
+        );
 
-    const readTickets = await Models.Permission.create({
-        name: "readTickets",
-        description: "Es können sämtliche Tickets angesehen werden"
-    });
-    const createAndEditAndRemoveTickets = await Models.Permission.create({
-        name: "editAndRemoveTickets",
-        description: "Es können neue Tickets erstellt und bearbeitet und entfernt werden"
-    });
+        await userManagement.addRouteGroup(userManagementRead, { transaction: transaction });
+        await userManagement.addRouteGroup(userManagementWrite, { transaction: transaction });
+        await userManagement.addRouteGroup(userManagementCreate, { transaction: transaction });
 
-    const getTicketRouteGroup = await Models.RouteGroup.findOne({ where: { name: "getTicket" } });
-    const editTicketRouteGroup = await Models.RouteGroup.findOne({ where: { name: "editTicket" } });
-    const removeTicketRouteGroup = await Models.RouteGroup.findOne({ where: { name: "removeTicket" } });
+        await juli051.addPermissions([userManagement], { transaction: transaction });
+        await markus.addPermissions([userManagement], { transaction: transaction });
 
-    await readTickets.addRouteGroup(getTicketRouteGroup);
+        await juli051.save({ transaction: transaction });
+        await markus.save({ transaction: transaction });
 
-    await createAndEditAndRemoveTickets.addRouteGroup(editTicketRouteGroup);
-    await createAndEditAndRemoveTickets.addRouteGroup(removeTicketRouteGroup);
-
-    const userManagementRead = await Models.RouteGroup.findOne({ where: { name: "userManagementRead" } });
-    const userManagementWrite = await Models.RouteGroup.findOne({ where: { name: "userManagementWrite" } });
-
-    const userManagement = await Models.Permission.create({
-        name: "userManagement",
-        description: "Es können User gesehen, bearbeitet werden"
-    });
-
-    userManagement.addRouteGroup(userManagementRead);
-    userManagement.addRouteGroup(userManagementWrite);
-
-    await juli051.addPermissions([readTickets, createAndEditAndRemoveTickets, userManagement]);
-    await markus.addPermissions([readTickets, createAndEditAndRemoveTickets, userManagement]);
-    await testAdmin.addPermissions([readTickets, createAndEditAndRemoveTickets]);
-
-    await testMod.addPermissions([readTickets]);
-
-    await testUser.addPermissions([readTickets]);
-
-    await juli051.save();
-    await markus.save();
-
-    await testAdmin.save();
-    await testMod.save();
-    await testUser.save();
-};
-
-export { seedDatabase };
+        await transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        await serverLogger("CRITICAL", "Datenbank füllen hat nicht funktioniert, es wird ohne Standardwerte fortgefahren", {
+            source: "seeding",
+            error: error
+        });
+    }
+}
