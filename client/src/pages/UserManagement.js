@@ -124,47 +124,149 @@ const UserManagement = () => {
         <h2>User-Management</h2>
         <div>
           <Tabs defaultActiveKey="user" id="user-management-tabs">
-            <Tab eventKey="user" title="Benutzer" className="border p-3 p mb-4">
+            <Tab
+              eventKey="user"
+              title="Benutzer"
+              className="border p-3 mb-4"
+              style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
+            >
               {!loadingUsers && users.length > 0 ? (
                 <>
-                  <InputGroup className="mb-3">
-                    <FormControl
-                      placeholder="Suche nach Username oder Email"
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </InputGroup>
-                  <Table striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th onClick={() => handleSort("username")}>Username 🔽</th>
-                        <th className="d-none d-sm-table-cell" onClick={() => handleSort("email")}>
-                          Email 🔽
-                        </th>
-                        <th onClick={() => handleSort("isActive")}>Active 🔽</th>
-                        <th onClick={() => handleSort("isDisabled")}>Blocked 🔽</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredUsers.map((user) => (
-                        <tr key={user.id}>
-                          <td
-                            style={{
-                              cursor: "pointer",
-                              fontWeight: "bold",
-                            }}
-                            onClick={() => {
-                              handleUserClick(user.id);
-                            }}
+                  <div className="d-flex gap-2 mb-3">
+                    <InputGroup className="flex-grow-1">
+                      <FormControl
+                        placeholder="Suche Benutzer oder Email"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </InputGroup>
+                    {routeGroups?.includes("userManagementCreate") && (
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={() => {
+                          setShowCreateModal(true);
+                          setCreateUser(true);
+                        }}
+                      >
+                        Neuer Benutzer
+                      </button>
+                    )}
+                  </div>
+
+                  <div
+                    className="border"
+                    style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
+                  >
+                    <Table striped bordered hover className="mb-0">
+                      <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+                        <tr>
+                          <th onClick={() => handleSort("username")}>Username 🔽</th>
+                          <th
+                            className="d-none d-sm-table-cell"
+                            onClick={() => handleSort("email")}
                           >
-                            {user.username}
-                          </td>
-                          <td className="d-none d-sm-table-cell">{user.email}</td>
-                          <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                          <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                            Email 🔽
+                          </th>
+                          <th onClick={() => handleSort("isActive")}>Active 🔽</th>
+                          <th onClick={() => handleSort("isDisabled")}>Blocked 🔽</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                      </thead>
+                      <tbody>
+                        {filteredUsers.map((user) => (
+                          <tr key={user.id}>
+                            <td
+                              style={{
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                              }}
+                              onClick={() => {
+                                handleUserClick(user.id);
+                              }}
+                            >
+                              {user.username}
+                            </td>
+                            <td className="d-none d-sm-table-cell">{user.email}</td>
+                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
+                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                          </tr>
+                        ))}
+                        {/* //TODO: LÖSCHEN */}
+                        {filteredUsers.map((user) => (
+                          <tr key={user.id}>
+                            <td
+                              style={{
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                              }}
+                              onClick={() => {
+                                handleUserClick(user.id);
+                              }}
+                            >
+                              {user.username}
+                            </td>
+                            <td className="d-none d-sm-table-cell">{user.email}</td>
+                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
+                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                          </tr>
+                        ))}
+                        {filteredUsers.map((user) => (
+                          <tr key={user.id}>
+                            <td
+                              style={{
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                              }}
+                              onClick={() => {
+                                handleUserClick(user.id);
+                              }}
+                            >
+                              {user.username}
+                            </td>
+                            <td className="d-none d-sm-table-cell">{user.email}</td>
+                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
+                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                          </tr>
+                        ))}
+                        {filteredUsers.map((user) => (
+                          <tr key={user.id}>
+                            <td
+                              style={{
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                              }}
+                              onClick={() => {
+                                handleUserClick(user.id);
+                              }}
+                            >
+                              {user.username}
+                            </td>
+                            <td className="d-none d-sm-table-cell">{user.email}</td>
+                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
+                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                          </tr>
+                        ))}
+                        {filteredUsers.map((user) => (
+                          <tr key={user.id}>
+                            <td
+                              style={{
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                              }}
+                              onClick={() => {
+                                handleUserClick(user.id);
+                              }}
+                            >
+                              {user.username}
+                            </td>
+                            <td className="d-none d-sm-table-cell">{user.email}</td>
+                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
+                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                          </tr>
+                        ))}
+                        {/* //TODO: LÖSCHEN */}
+                      </tbody>
+                    </Table>
+                  </div>
                 </>
               ) : (
                 <Table striped bordered hover>

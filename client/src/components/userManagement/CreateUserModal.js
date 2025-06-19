@@ -1,6 +1,5 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import { AuthContext } from "contexts/AuthContext";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 
@@ -15,7 +14,6 @@ const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) =
   const [touched, setTouched] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
-  const { routeGroups } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
 
@@ -47,7 +45,7 @@ const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) =
         permissionIds: newUser.permissions.map((p) => p.id),
       };
 
-      const response = await axiosProtected.post("/userManagement/createUser", payload);
+      const response = await axiosProtected.post("/userManagement/addUser", payload);
       addToast("User erfolgreich erstellt", "success");
 
       if (onUserCreated) onUserCreated(response.data);
