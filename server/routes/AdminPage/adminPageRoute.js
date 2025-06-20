@@ -6,16 +6,20 @@ import verifyAccessToken from "../../middleware/verifyAccessToken.js";
 export default async () => {
     const smartRouter = new SmartRouter();
 
-    smartRouter.get("/getServerLog{/:limit-:offset}", "adminPageServerLogRead", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getServerLog);
-    smartRouter.get("/getFilteredServerLog{/:limit-:offset}", "adminPageServerLogRead", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilteredServerLog);
-    smartRouter.get("/getFilterOptionsServerLog", "adminPageServerLogRead", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilterOptionsServerLog);
+    const adminPageServerLogReadDescription = "Hat das Recht den Serverlog zu sehen";
+    const adminPagePermissionsReadDescription = "Hat das Recht die Permissions mit den RouteGroups zu sehen";
+    const adminPagePermissionsWriteDescription = "Hat das Recht die Permissions mit den RouteGroups zu sehen und zu bearbeiten";
 
-    smartRouter.get("/getAllPermissionsWithRouteGroups", "adminPagePermissionsRead", "Hat das Recht die Permissions mit den RouteGroups zu sehen", verifyAccessToken, adminPageController.getAllPermissionsWithRouteGroups);
-    smartRouter.get("/getAllRouteGroups", "adminPagePermissionsWrite", "Hat das Recht die Permissions mit den RouteGroups zu sehen und zu bearbeiten", verifyAccessToken, adminPageController.getAllRouteGroups);
+    smartRouter.get("/getServerLog{/:limit-:offset}", "adminPageServerLogRead", adminPageServerLogReadDescription, verifyAccessToken, adminPageController.getServerLog);
+    smartRouter.get("/getFilteredServerLog{/:limit-:offset}", "adminPageServerLogRead", adminPageServerLogReadDescription, verifyAccessToken, adminPageController.getFilteredServerLog);
+    smartRouter.get("/getFilterOptionsServerLog", "adminPageServerLogRead", adminPageServerLogReadDescription, verifyAccessToken, adminPageController.getFilterOptionsServerLog);
 
-    smartRouter.post("/createPermission", "adminPagePermissionsWrite", "Hat das Recht die Permissions mit den RouteGroups zu sehen und zu bearbeiten", verifyAccessToken, adminPageController.createPermission);
-    smartRouter.post("/updatePermission", "adminPagePermissionsWrite", "Hat das Recht die Permissions mit den RouteGroups zu sehen und zu bearbeiten", verifyAccessToken, adminPageController.updatePermission);
-    smartRouter.post("/deletePermission", "adminPagePermissionsWrite", "Hat das Recht die Permissions mit den RouteGroups zu sehen und zu bearbeiten", verifyAccessToken, adminPageController.deletePermission);
+    smartRouter.get("/getAllPermissionsWithRouteGroups", "adminPagePermissionsRead", adminPagePermissionsReadDescription, verifyAccessToken, adminPageController.getAllPermissionsWithRouteGroups);
+    smartRouter.get("/getAllRouteGroups", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.getAllRouteGroups);
+
+    smartRouter.post("/createPermission", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.createPermission);
+    smartRouter.post("/updatePermission", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.updatePermission);
+    smartRouter.post("/deletePermission", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.deletePermission);
 
     return smartRouter.getExpressRouter();
 };

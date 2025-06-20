@@ -6,13 +6,17 @@ import verifyAccessToken from "../../middleware/verifyAccessToken.js";
 export default async () => {
     const smartRouter = new SmartRouter();
 
-    smartRouter.get("/getUsers{/:limit-:offset}", "userManagementRead", "Hat das Recht alle Userdaten zu sehen", verifyAccessToken, userManagementController.getUsers);
-    smartRouter.get("/getAllPermissions", "userManagementWrite", "Hat das Recht alle Userdaten zu sehen und zu bearbeiten", verifyAccessToken, userManagementController.getAllPermissions);
+    const userManagementReadDescription = "Hat das Recht alle Userdaten zu sehen";
+    const userManagementWriteDescription = "Hat das Recht alle Userdaten zu sehen und zu bearbeiten";
+    const userManagementCreateDescription = "Hat das Recht alle Userdaten zu sehen, zu bearbeiten und zu erstellen";
 
-    smartRouter.post("/addUser", "userManagementCreate", "Hat das Recht alle Userdaten zu sehen, zu bearbeiten und zu erstellen", verifyAccessToken, userManagementController.addUser);
+    smartRouter.get("/getUsers{/:limit-:offset}", "userManagementRead", userManagementReadDescription, verifyAccessToken, userManagementController.getUsers);
 
-    smartRouter.post("/updateUser", "userManagementWrite", "Hat das Recht alle Benutzerdaten zu sehen und zu bearbeiten", verifyAccessToken, userManagementController.updateUser);
-    smartRouter.post("/updatePermissions", "userManagementWrite", "Hat das Recht alle Benutzerdaten zu sehen und zu bearbeiten", verifyAccessToken, userManagementController.updatePermissions);
+    smartRouter.get("/getAllPermissions", "userManagementWrite", userManagementWriteDescription, verifyAccessToken, userManagementController.getAllPermissions);
+    smartRouter.post("/updateUser", "userManagementWrite", userManagementWriteDescription, verifyAccessToken, userManagementController.updateUser);
+    smartRouter.post("/updatePermissions", "userManagementWrite", userManagementWriteDescription, verifyAccessToken, userManagementController.updatePermissions);
+
+    smartRouter.post("/addUser", "userManagementCreate", userManagementCreateDescription, verifyAccessToken, userManagementController.addUser);
 
     return smartRouter.getExpressRouter();
 };

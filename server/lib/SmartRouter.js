@@ -23,6 +23,9 @@ class SmartRouter {
             });
 
             if (!isRouteGroupCreated) {
+                if (routeGroup.description !== groupDescription) {
+                    routeGroup.description = groupDescription;
+                }
                 routeGroup.updatedAt = new Date(Date.now());
                 routeGroup.save();
             }

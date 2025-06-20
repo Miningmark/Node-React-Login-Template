@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 
 import { sequelize } from "./controllers/modelController.js";
 import { seedDatabase } from "./seedDatabase.js";
+import { removeRouteGroups } from "./utils/utils.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import { NotFoundError } from "./errors/NotFoundError.js";
@@ -18,7 +19,6 @@ import accountRoute from "./routes/Account/accountRoute.js";
 
 import userManagementRoute from "./routes/UserManagement/userManagementRoute.js";
 import adminPageRoute from "./routes/AdminPage/adminPageRoute.js";
-import { removeRouteGroups } from "./utils/utils.js";
 
 const app = express();
 
