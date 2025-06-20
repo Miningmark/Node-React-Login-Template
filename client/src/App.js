@@ -37,13 +37,14 @@ function App() {
   const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
-  const { setUsername, setRouteGroups, username } = useContext(AuthContext);
+  const { setUsername, setRouteGroups, username, accessToken } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
 
   console.log("Username:", username);
   console.log("RouteGroups:", useContext(AuthContext).routeGroups);
 
   useEffect(() => {
+    if (!accessToken) return;
     const controller = new AbortController();
     const signal = controller.signal;
     let isMounted = true;
@@ -78,7 +79,7 @@ function App() {
       isMounted = false;
       controller.abort();
     };
-  }, [username]);
+  }, [accessToken]);
 
   return (
     <>

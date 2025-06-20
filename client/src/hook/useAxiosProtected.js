@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "./useRefreshToken";
 
 const useAxiosProtected = () => {
-  const { accessToken, login } = useContext(AuthContext); // login wird als setAccessToken genutzt
+  const { accessToken, login, setAccessToken } = useContext(AuthContext); // login wird als setAccessToken genutzt
   const refreshAccessToken = useRefreshToken();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const useAxiosProtected = () => {
         if (error?.response?.status === 403 && !prevRequest?.sent) {
           prevRequest.sent = true;
           const response = await refreshAccessToken();
-          login(response.data.accessToken);
+          setAccessToken(response.data.accessToken);
           prevRequest.headers["Authorization"] = `Bearer ${response.data.accessToken}`;
           return axiosProtected(prevRequest);
         }
@@ -37,7 +37,7 @@ const useAxiosProtected = () => {
       axiosProtected.interceptors.request.eject(requestIntercept);
       axiosProtected.interceptors.response.eject(responseIntercept);
     };
-  }, [accessToken, refreshAccessToken, login]);
+  }, [accessToken, refreshAccessToken, setAccessToken]);
 
   return axiosProtected;
 };
