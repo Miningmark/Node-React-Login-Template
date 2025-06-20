@@ -24,6 +24,8 @@ function AdminPage() {
   const [selectedServerLog, setSelectedServerLog] = useState(null);
 
   console.log("serverLog:", serverLog);
+  console.log("serverlogOffset:", serverlogOffset);
+  console.log("serverLogMaxEntries:", serverLogMaxEntries);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -39,7 +41,7 @@ function AdminPage() {
         setServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
       }
       setServerlogOffset((prevOffset) => prevOffset + 50);
-      setServerLogMaxEntries(response?.data?.maxEntries || null);
+      setServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
     } catch (error) {
       if (error.name === "CanceledError") {
         console.log("Server-Log-Fetch abgebrochen");
