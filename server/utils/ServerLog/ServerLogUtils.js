@@ -47,3 +47,25 @@ export function buildServerLogWhereClause(userIds, levels, ipv4Address, timestam
 
     return where;
 }
+
+export function buildJSONResponse(foundLogs) {
+    return foundLogs.map((log) => {
+        return {
+            id: log.id,
+            level: log.level,
+            message: log.message,
+            userId: log.UserId,
+            url: log.url,
+            method: log.method,
+            status: log.status,
+            ipv4Address: log.ipv4Address,
+            userAgent: log.userAgent,
+            requestBody: log.requestBody,
+            requestHeaders: log.requestHeaders,
+            response: log.response,
+            source: log.source,
+            errorStack: log.errorStack,
+            timestamp: log.timestamp
+        };
+    });
+}
