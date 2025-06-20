@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "./useRefreshToken";
 
 const useAxiosProtected = () => {
-  const { accessToken, login, setAccessToken } = useContext(AuthContext); // login wird als setAccessToken genutzt
+  const { accessToken, setAccessToken } = useContext(AuthContext);
   const refreshAccessToken = useRefreshToken();
 
   useEffect(() => {
