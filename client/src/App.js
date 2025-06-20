@@ -78,7 +78,7 @@ function App() {
       isMounted = false;
       controller.abort();
     };
-  }, [username]);
+  }, []);
 
   return (
     <>
