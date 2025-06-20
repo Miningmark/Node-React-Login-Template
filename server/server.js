@@ -15,7 +15,9 @@ import { NotFoundError } from "./errors/NotFoundError.js";
 import { serverLogger } from "./utils/ServerLog/serverLogger.js";
 
 import accountRoute from "./routes/Account/accountRoute.js";
+
 import userManagementRoute from "./routes/UserManagement/userManagementRoute.js";
+import adminPageRoute from "./routes/AdminPage/adminPageRoute.js";
 
 const app = express();
 
@@ -35,6 +37,7 @@ app.use(cookieParser());
         app.use("/api/" + config.apiVersion + "/user", accountRoute);
 
         app.use("/api/" + config.apiVersion + "/userManagement", await userManagementRoute());
+        app.use("/api/" + config.apiVersion + "/adminPage", await adminPageRoute());
 
         if (config.seedDatabase) await seedDatabase();
 

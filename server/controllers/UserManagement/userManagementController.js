@@ -10,8 +10,10 @@ import { sendUserCreatedEmail } from "../../mail/UserManagement/userManagementMa
 export async function getUsers(req, res, next) {
     try {
         const { userId } = req;
-        const { offset, limit } = req.params || {};
-        let jsonResponse = { message: "Alle Benutzer zurück gegeben", users: {} };
+        const { limit, offset } = req.params || {};
+        let jsonResponse = { message: "Alle angeforderten Benutzer zurück gegeben", users: {} };
+
+        //TODO: check limit and offset
 
         const users = await Models.User.findAll({
             include: {

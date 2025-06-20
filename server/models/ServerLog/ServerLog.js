@@ -40,15 +40,15 @@ export default (sequelize, DataTypes) => {
                 allowNull: true
             },
             requestBody: {
-                type: DataTypes.JSON,
+                type: DataTypes.JSON, //JSON
                 allowNull: true
             },
             requestHeaders: {
-                type: DataTypes.JSON,
+                type: DataTypes.JSON, //JSON
                 allowNull: true
             },
             response: {
-                type: DataTypes.JSON,
+                type: DataTypes.JSON, //JSON
                 allowNull: true
             },
             source: {
