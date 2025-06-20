@@ -5,14 +5,8 @@ import { serverLogger } from "./utils/ServerLog/serverLogger.js";
 export async function seedDatabase() {
     const transaction = await sequelize.transaction();
     try {
-        const juli051 = await Models.User.create(
-            { username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) },
-            { transaction: transaction }
-        );
-        const markus = await Models.User.create(
-            { username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) },
-            { transaction: transaction }
-        );
+        const juli051 = await Models.User.create({ username: "juli051", email: "Juli051@gmx.net", password: await bcrypt.hash("Admin123!", 10) }, { transaction: transaction });
+        const markus = await Models.User.create({ username: "markus", email: "markus.sibbe@t-online.de", password: await bcrypt.hash("Admin123!", 10) }, { transaction: transaction });
 
         juli051.isActive = true;
         markus.isActive = true;
@@ -21,7 +15,9 @@ export async function seedDatabase() {
         const userManagementWrite = await Models.RouteGroup.findOne({ where: { name: "userManagementWrite" } }, { transaction: transaction });
         const userManagementCreate = await Models.RouteGroup.findOne({ where: { name: "userManagementCreate" } }, { transaction: transaction });
 
-        const adminPageServerLog = await Models.RouteGroup.findOne({ where: { name: "adminPageServerLog" } }, { transaction: transaction });
+        const adminPageServerLogRead = await Models.RouteGroup.findOne({ where: { name: "adminPageServerLogRead" } }, { transaction: transaction });
+        const adminPagePermissionsRead = await Models.RouteGroup.findOne({ where: { name: "adminPagePermissionsRead" } }, { transaction: transaction });
+        const adminPagePermissionsWrite = await Models.RouteGroup.findOne({ where: { name: "adminPagePermissionsWrite" } }, { transaction: transaction });
 
         const userManagement = await Models.Permission.create(
             {
@@ -34,7 +30,7 @@ export async function seedDatabase() {
         const adminPage = await Models.Permission.create(
             {
                 name: "adminPage",
-                description: "Es kann der Serverlog gesehen und Rechte erstellt und bearbeitet werden"
+                description: "Es kann der Serverlog gesehen und kann Rechte erstellt und bearbeitet werden"
             },
             { transaction: transaction }
         );
@@ -43,7 +39,9 @@ export async function seedDatabase() {
         await userManagement.addRouteGroup(userManagementWrite, { transaction: transaction });
         await userManagement.addRouteGroup(userManagementCreate, { transaction: transaction });
 
-        await adminPage.addRouteGroup(adminPageServerLog, { transaction: transaction });
+        await adminPage.addRouteGroup(adminPageServerLogRead, { transaction: transaction });
+        await adminPage.addRouteGroup(adminPagePermissionsRead, { transaction: transaction });
+        await adminPage.addRouteGroup(adminPagePermissionsWrite, { transaction: transaction });
 
         await juli051.addPermissions([userManagement, adminPage], { transaction: transaction });
         await markus.addPermissions([userManagement, adminPage], { transaction: transaction });
