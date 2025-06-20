@@ -32,6 +32,7 @@ function AdminPage() {
   const fetchServerLog = async () => {
     try {
       const response = await axiosProtected.get(`/adminPage/getServerLog/50-${serverlogOffset}`);
+      console.log("Server-Log-Fetch erfolgreich:", response?.data);
       if (!serverLog) {
         setServerLog(response.data.serverLogs);
       } else {
