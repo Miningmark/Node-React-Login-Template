@@ -1,0 +1,16 @@
+@media (min-width: 768px) {
+  .page-wrapper {
+    height: calc(100vh - 86px);
+    overflow: hidden;
+  }
+
+  .tab-contend {
+    height: calc(100vh - 170px);
+    overflow-y: auto;
+  }
+
+  .table-wrapper {
+    height: calc(100vh - 290px);
+    overflow-y: auto;
+  }
+}

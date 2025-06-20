@@ -7,7 +7,7 @@ const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) =
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
-    isActive: true,
+    isActive: false,
     isDisabled: false,
     permissions: [],
   });
@@ -100,30 +100,6 @@ const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) =
             name="email"
           />
           <label htmlFor="floatingEmail">E-Mail</label>
-        </div>
-        <div className="form-check mb-3">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="activeCheckbox"
-            checked={newUser.isActive}
-            onChange={() => setNewUser((prev) => ({ ...prev, isActive: !prev.isActive }))}
-          />
-          <label className="form-check-label" htmlFor="activeCheckbox">
-            Aktiv
-          </label>
-        </div>
-        <div className="form-check mb-3">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="blockedCheckbox"
-            checked={newUser.isDisabled}
-            onChange={() => setNewUser((prev) => ({ ...prev, isDisabled: !prev.isDisabled }))}
-          />
-          <label className="form-check-label" htmlFor="blockedCheckbox">
-            Gesperrt
-          </label>
         </div>
         <p>
           <strong>Berechtigungen:</strong>

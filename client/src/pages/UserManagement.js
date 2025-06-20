@@ -6,6 +6,8 @@ import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-boot
 import sortingAlgorithm from "util/sortingAlgorithm";
 import UserDetailsModal from "components/userManagement/UserDetailsModal";
 import CreateUserModal from "components/userManagement/CreateUserModal";
+import TableLoadingAnimation from "components/TableLoadingAnimation";
+import "components/userManagement/userManagement.css";
 
 const UserManagement = () => {
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -118,17 +120,17 @@ const UserManagement = () => {
 
   return (
     <>
-      <Container className="mt-4">
+      <Container className="page-wrapper mt-4">
         <h2>User-Management</h2>
         <div>
           <Tabs defaultActiveKey="user" id="user-management-tabs">
             <Tab
               eventKey="user"
               title="Benutzer"
-              className="border p-3 mb-4"
+              className="tab-contend border p-3 mb-4"
               style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
             >
-              {!loadingUsers && users.length > 0 ? (
+              {!loadingUsers && users?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
                     <InputGroup className="flex-grow-1">
@@ -152,7 +154,7 @@ const UserManagement = () => {
                   </div>
 
                   <div
-                    className="border"
+                    className="table-wrapper border"
                     style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
                   >
                     <Table striped bordered hover className="mb-0">
@@ -267,39 +269,16 @@ const UserManagement = () => {
                   </div>
                 </>
               ) : (
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Username</th>
-                      <th className="d-none d-sm-table-cell">Email</th>
-                      <th>Active</th>
-                      <th>Blocked</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Array.from({ length: 5 }).map((_, idx) => (
-                      <tr key={idx} className="placeholder-glow">
-                        <td>
-                          <span className="placeholder col-6"></span>
-                        </td>
-                        <td className="d-none d-sm-table-cell">
-                          <span className="placeholder col-8"></span>
-                        </td>
-                        <td className="text-center">
-                          <span className="placeholder col-3"></span>
-                        </td>
-                        <td className="text-center">
-                          <span className="placeholder col-3"></span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                <TableLoadingAnimation />
               )}
             </Tab>
-            <Tab eventKey="allPermissions" title="Alle Rechte" className="border p-3 p mb-4">
+            <Tab
+              eventKey="allPermissions"
+              title="Alle Rechte"
+              className="tab-contend border p-3 p mb-4"
+            >
               <h2>Alle Berechtigungen</h2>
-              {!loadingUsers && allPermissions.length > 0 ? (
+              {!loadingUsers && allPermissions?.length > 0 ? (
                 <Table striped bordered hover>
                   <thead>
                     <tr>
@@ -317,7 +296,7 @@ const UserManagement = () => {
                   </tbody>
                 </Table>
               ) : (
-                <p>Keine Berechtigungen gefunden.</p>
+                <TableLoadingAnimation />
               )}
             </Tab>
           </Tabs>
