@@ -144,7 +144,9 @@ function App() {
         <Route
           path="/admin"
           element={
-            <RequireAuth allowedRouteGroups={[]}>
+            <RequireAuth
+              allowedRouteGroups={["adminPageServerLogRead", "adminPagePermissionsRead"]}
+            >
               <AdminPage />
             </RequireAuth>
           }
