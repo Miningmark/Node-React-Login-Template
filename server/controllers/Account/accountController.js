@@ -270,13 +270,13 @@ export async function refreshAccessToken(req, res, next) {
         req.userId = refreshUserToken.User.id;
 
         const accessUserToken = await Models.UserToken.findOne({ where: { userId: refreshUserToken.User.id, type: "accessToken" } }, { transaction: transaction });
-        if (accessUserToken !== null) await accessUserToken.destroy();
+        if (accessUserToken !== null) await accessUserToken.destroy({ transaction: transaction });
 
         const routeGroups = await accountUtils.findRouteGroups(refreshUserToken.User.id);
 
         jwt.verify(refreshToken, config.refreshTokenSecret, async (err, decoded) => {
             if (err || decoded.UserInfo.id !== refreshUserToken.User.id) {
-                await refreshUserToken.destroy();
+                await refreshUserToken.destroy({ transaction: transaction });
                 throw new ValidationError("Token stimmt nicht mit Benutzer id überein");
             }
 

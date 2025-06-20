@@ -1,4 +1,4 @@
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Models } from "../controllers/modelController.js";
 import { ForbiddenError, ValidationError } from "../errors/errorClasses.js";
 import config from "../config/config.js";
@@ -11,7 +11,7 @@ export default async (req, res, next) => {
         const accessToken = authorizationHeader[1];
 
         const accessUserToken = await Models.UserToken.findOne({ where: { token: accessToken, type: "accessToken" } });
-        if (!accessUserToken) throw new ForbiddenError("Ungültiger Token");
+        if (accessUserToken === null) throw new ForbiddenError("Kein Token vorhanden");
 
         jwt.verify(accessToken, config.accessTokenSecret, (error, decoded) => {
             if (error) throw new ForbiddenError("Ungültiger Token");

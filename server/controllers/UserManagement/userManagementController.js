@@ -1,9 +1,11 @@
 import config from "../../config/config.js";
+import bcrypt from "bcrypt";
 import { Op } from "sequelize";
 import { ValidationError } from "../../errors/errorClasses.js";
-import { validateEmail, validateUsername } from "../../utils/Account/accountUtils.js";
+import { generateUserToken, validateEmail, validateUsername } from "../../utils/Account/accountUtils.js";
 import { Models, sequelize } from "../modelController.js";
 import { serverLoggerForRoutes } from "../../utils/ServerLog/serverLogger.js";
+import { sendUserCreatedEmail } from "../../mail/UserManagement/userManagementMails.js";
 
 export async function getUsers(req, res, next) {
     try {
@@ -162,19 +164,24 @@ export async function addUser(req, res, next) {
     const transaction = await sequelize.transaction();
     try {
         const { userId } = req;
-        const { username, email } = req.body || {};
+        const { username, email, permissionIds } = req.body || {};
         let jsonResponse = { message: "Benutzer wurde erfolgreich registriert" };
 
-        if (username === undefined || email === undefined) throw new ValidationError("Benutzername und Email erforderlich");
+        if (username === undefined || email === undefined || permissionIds === undefined) throw new ValidationError("Alle Eingaben erforderlich");
 
         await validateUsername(username);
         await validateEmail(email);
 
+        if (!Array.isArray(permissionIds)) throw new ValidationError("Falscher Typ für Rechte");
+        const newPermissions = await Models.Permission.findAll({ where: { id: { [Op.in]: permissionIds } } }, { transaction: transaction });
+
         const hashedPassword = await bcrypt.hash(config.passwordAccountCreatedByAdmin, 10);
+
         const user = await Models.User.create({ username: username, email: email, password: hashedPassword });
+        await user.setPermissions(newPermissions, { transaction: transaction });
 
         const token = await generateUserToken(transaction, user.id, "adminRegistration", config.accountCreatedByAdminExpiresIn);
-        await sendRegistrationEmail(user.email, token);
+        await sendUserCreatedEmail(user.email, token, config.accountCreatedByAdminExpiresIn);
 
         await transaction.commit();
 
