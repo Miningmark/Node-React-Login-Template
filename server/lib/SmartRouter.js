@@ -17,10 +17,15 @@ class SmartRouter {
         for (const entry of this.queueEntries) {
             const { method, path, groupName, groupDescription, args } = entry;
 
-            await Models.RouteGroup.findOrCreate({
+            const [routeGroup, isRouteGroupCreated] = await Models.RouteGroup.findOrCreate({
                 where: { name: groupName },
                 defaults: { description: groupDescription }
             });
+
+            if (!isRouteGroupCreated) {
+                routeGroup.updatedAt = new Date(Date.now());
+                routeGroup.save();
+            }
 
             const handler = args.pop();
             const middlewares = args;

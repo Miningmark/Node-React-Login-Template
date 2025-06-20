@@ -18,6 +18,7 @@ import accountRoute from "./routes/Account/accountRoute.js";
 
 import userManagementRoute from "./routes/UserManagement/userManagementRoute.js";
 import adminPageRoute from "./routes/AdminPage/adminPageRoute.js";
+import { removeRouteGroups } from "./utils/utils.js";
 
 const app = express();
 
@@ -40,6 +41,8 @@ app.use(cookieParser());
         app.use("/api/" + config.apiVersion + "/adminPage", await adminPageRoute());
 
         if (config.seedDatabase) await seedDatabase();
+
+        await removeRouteGroups();
 
         app.all("{*splat}", (req, res, next) => {
             next(new NotFoundError("Angeforderte Route nicht gefunden!"));
