@@ -10,7 +10,7 @@ export async function errorHandler(error, req, res, next) {
         userId: req.userId,
         url: req.originalUrl,
         method: req.method,
-        ipv4Adress: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip,
+        ipv4Address: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip,
         userAgent: req.headers["user-agent"],
         requestBody: req.body,
         requestHeaders: req.headers,

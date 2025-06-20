@@ -31,7 +31,7 @@ export default (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: true
             },
-            ipv4Adress: {
+            ipv4Address: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
@@ -40,15 +40,15 @@ export default (sequelize, DataTypes) => {
                 allowNull: true
             },
             requestBody: {
-                type: DataTypes.JSON, //JSON
+                type: DataTypes.JSON,
                 allowNull: true
             },
             requestHeaders: {
-                type: DataTypes.JSON, //JSON
+                type: DataTypes.JSON,
                 allowNull: true
             },
             response: {
-                type: DataTypes.JSON, //JSON
+                type: DataTypes.JSON,
                 allowNull: true
             },
             source: {

@@ -11,7 +11,7 @@ export default (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 primaryKey: true
             },
-            ipv4Adress: {
+            ipv4Address: {
                 type: DataTypes.STRING,
                 allowNull: false
             },

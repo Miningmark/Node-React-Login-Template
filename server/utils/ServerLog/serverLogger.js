@@ -3,7 +3,7 @@ import { Models } from "../../controllers/modelController.js";
 
 export async function serverLogger(level, message, options = {}) {
     try {
-        const { userId, url, method, status, ipv4Adress, userAgent, requestBody, requestHeaders, response, source, error } = options;
+        const { userId, url, method, status, ipv4Address, userAgent, requestBody, requestHeaders, response, source, error } = options;
 
         if (requestBody !== undefined) {
             let { password, newPassword, currentPassword, email, newEmail, usernameOrEmail } = requestBody;
@@ -24,7 +24,7 @@ export async function serverLogger(level, message, options = {}) {
             url: url,
             method: method,
             status: status,
-            ipv4Adress: ipv4Adress,
+            ipv4Address: ipv4Address,
             userAgent: userAgent,
             requestBody: requestBody,
             requestHeaders: requestHeaders,
@@ -44,7 +44,7 @@ export async function serverLoggerForRoutes(req, level, message, userId, status,
         url: req.originalUrl,
         method: req.method,
         status: status,
-        ipv4Adress: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip,
+        ipv4Address: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip,
         userAgent: req.headers["user-agent"],
         requestBody: req.body,
         requestHeaders: req.headers,

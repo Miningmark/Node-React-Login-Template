@@ -253,10 +253,7 @@ export async function refreshAccessToken(req, res, next) {
 
         if (refreshToken === undefined) throw new ValidationError("Keinen Cookie für Erneuerung gefunden");
 
-        const refreshUserToken = await Models.UserToken.findOne(
-            { where: { token: refreshToken, type: "refreshToken" }, include: { model: Models.User } },
-            { transaction: transaction }
-        );
+        const refreshUserToken = await Models.UserToken.findOne({ where: { token: refreshToken, type: "refreshToken" }, include: { model: Models.User } }, { transaction: transaction });
 
         if (refreshUserToken === null) {
             res.clearCookie("refreshToken", {
@@ -281,18 +278,9 @@ export async function refreshAccessToken(req, res, next) {
             }
 
             const newAccessTokenExpiresAt = new Date(Date.now() + config.accessTokenExpiration * 1000);
-            const newAccessToken = accountUtils.generateJWT(
-                decoded.UserInfo.id,
-                decoded.UserInfo.username,
-                routeGroups,
-                config.accessTokenSecret,
-                config.accessTokenExpiration
-            );
+            const newAccessToken = accountUtils.generateJWT(decoded.UserInfo.id, decoded.UserInfo.username, routeGroups, config.accessTokenSecret, config.accessTokenExpiration);
 
-            await Models.UserToken.create(
-                { userId: decoded.UserInfo.id, token: newAccessToken, type: "accessToken", expiresAt: newAccessTokenExpiresAt },
-                { transaction: transaction }
-            );
+            await Models.UserToken.create({ userId: decoded.UserInfo.id, token: newAccessToken, type: "accessToken", expiresAt: newAccessTokenExpiresAt }, { transaction: transaction });
             jsonResponse.accessToken = newAccessToken;
 
             await transaction.commit();
@@ -444,7 +432,7 @@ export async function getLastLogins(req, res, next) {
         const foundUser = await Models.User.findOne({ where: { id: userId }, include: { model: Models.LastLogin, limit: 5, order: [["loginAt", "DESC"]] } });
 
         jsonResponse.lastLogins = foundUser.LastLogins.map((lastLogin) => ({
-            ipv4Adress: lastLogin.ipv4Adress,
+            ipv4Address: lastLogin.ipv4Address,
             country: lastLogin.country,
             regionName: lastLogin.regionName,
             loginAt: lastLogin.loginAt,

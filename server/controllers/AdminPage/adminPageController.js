@@ -1,5 +1,7 @@
 import { Models } from "../modelController.js";
 import { serverLoggerForRoutes } from "../../utils/ServerLog/serverLogger.js";
+import { Op, where } from "sequelize";
+import { buildServerLogWhereClause } from "../../utils/ServerLog/ServerLogUtils.js";
 
 export async function getServerLog(req, res, next) {
     try {
@@ -23,7 +25,7 @@ export async function getServerLog(req, res, next) {
                 url: log.url,
                 method: log.method,
                 status: log.status,
-                ipv4Adress: log.ipv4Adress,
+                ipv4Address: log.ipv4Address,
                 userAgent: log.userAgent,
                 requestBody: log.requestBody,
                 requestHeaders: log.requestHeaders,
@@ -41,6 +43,65 @@ export async function getServerLog(req, res, next) {
     }
 }
 
+export async function getFilteredServerLog(req, res, next) {
+    try {
+        const { userId } = req;
+        const { userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString } = req.body || {};
+        const { limit, offset } = req.params || {};
+        let jsonResponse = { message: "Alle angeforderten Serverlogs zurück gegeben", serverLogs: {} };
+
+        /*const logs = await Models.ServerLog.findAll({ ...(limit || offset ? { limit: Number(limit), offset: Number(offset) } : {}), order: [["id", "ASC"]] });
+
+        if (logs === null) {
+            await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse.message, "adminPageController", null);
+            return res.status(200).json(jsonResponse);
+        }*/
+
+        const whereClause = buildServerLogWhereClause(userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString);
+        const results = await Models.ServerLog.findAll({
+            where: whereClause,
+            limit: Number(limit),
+            offset: Number(offset),
+            order: [["id", "DESC"]]
+        });
+
+        /*const results = await Models.ServerLog.findAll({
+            where: userIds.includes(null) ? { [Op.or]: [{ userId: { [Op.in]: userIds } }, { userId: null }] } : { userId: { [Op.in]: userIds } },
+
+            limit: Number(limit),
+            offset: Number(offset),
+            order: [["id", "DESC"]]
+        });*/
+
+        /*
+                [Op.or]: [{ userId: { [Op.in]: userIds } }, ...(userIds.includes(null) ? { userId: null } : {})] /*,
+                [Op.or]: [{ message: { [Op.like]: `%${search}%` } }, { url: { [Op.like]: `%${search}%` } }, { method: { [Op.like]: `%${search}%` } }]*/
+        /*jsonResponse.serverLogs = logs.map((log) => {
+            return {
+                id: log.id,
+                level: log.level,
+                message: log.message,
+                userId: log.UserId,
+                url: log.url,
+                method: log.method,
+                status: log.status,
+                ipv4Address: log.ipv4Address,
+                userAgent: log.userAgent,
+                requestBody: log.requestBody,
+                requestHeaders: log.requestHeaders,
+                response: log.response,
+                source: log.source,
+                errorStack: log.errorStack,
+                timestamp: log.timestamp
+            };
+        });*/
+
+        //await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse.message, "userManagementController", null);
+        return res.status(200).json(results);
+    } catch (error) {
+        next(error);
+    }
+}
 /*
         const { userId } = req;
         const { search } = req.params || {};
@@ -67,7 +128,7 @@ export async function getServerLog(req, res, next) {
             message,
             url,
             method,
-            ipv4Adress,
+            ipv4Address,
             userAgent,
             source,
             errorStack,
@@ -82,7 +143,7 @@ export async function getServerLog(req, res, next) {
                 ]
             },
             where: Sequelize.literal(
-                `MATCH (message,url,method,ipv4Adress,userAgent,source,errorStack,requestBody,requestHeaders,response) AGAINST (${sequelize.escape(
+                `MATCH (message,url,method,ipv4Address,userAgent,source,errorStack,requestBody,requestHeaders,response) AGAINST (${sequelize.escape(
                     searchTerm
                 )} IN NATURAL LANGUAGE MODE)`
             ),

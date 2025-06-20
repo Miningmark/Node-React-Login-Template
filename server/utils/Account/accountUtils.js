@@ -78,7 +78,7 @@ export async function findRouteGroups(userId) {
 }
 
 export async function addLastLogin(req, userId, successfully) {
-    const ipv4Adress = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip;
+    const ipv4Address = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.headers["remote-addr"] || req.ip;
     const userAgent = req.headers["user-agent"];
 
     let jsonLastLogin = {};
@@ -88,13 +88,13 @@ export async function addLastLogin(req, userId, successfully) {
     jsonLastLogin.loginAt = new Date(Date.now());
     jsonLastLogin.successfully = successfully;
 
-    if (!ipv4Adress || !IPV4_REGEX.test(ipv4Adress)) {
-        jsonLastLogin.ipv4Adress = "Ungültig: " + ipv4Adress;
+    if (!ipv4Address || !IPV4_REGEX.test(ipv4Address)) {
+        jsonLastLogin.ipv4Address = "Ungültig: " + ipv4Address;
         jsonLastLogin.country = "Ungültige IP Adresse";
         jsonLastLogin.regionName = "Ungültige IP Adresse";
     } else {
-        jsonLastLogin.ipv4Adress = ipv4Adress;
-        const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
+        jsonLastLogin.ipv4Address = ipv4Address;
+        const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Address}`);
         const ipLookupData = await ipLookupResponse.json();
 
         if (ipLookupData?.status === "success") {

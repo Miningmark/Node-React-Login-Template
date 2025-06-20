@@ -36,7 +36,7 @@ export async function sendSuspiciousLogin(email, recentLogin) {
             formatDate(recentLogin.loginAt) +
             "\n" +
             "• IP-Adresse: " +
-            recentLogin.ipv4Adress +
+            recentLogin.ipv4Address +
             "\n" +
             "• Land: " +
             recentLogin.country +

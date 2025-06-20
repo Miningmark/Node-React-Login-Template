@@ -7,6 +7,7 @@ export default async () => {
     const smartRouter = new SmartRouter();
 
     smartRouter.get("/getServerLog{/:limit-:offset}", "adminPageServerLog", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getServerLog);
+    smartRouter.get("/getFilteredServerLog{/:limit-:offset}", "adminPageServerLog", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilteredServerLog);
 
     return smartRouter.getExpressRouter();
 };
