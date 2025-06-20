@@ -7,10 +7,10 @@ export async function getServerLog(req, res, next) {
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Serverlogs zurück gegeben", serverLogs: {} };
 
-        const logs = await Models.ServerLog.findAll({ ...(limit || offset ? { limit: Number(limit), offset: Number(offset) } : {}) });
+        const logs = await Models.ServerLog.findAll({ ...(limit || offset ? { limit: Number(limit), offset: Number(offset) } : {}), order: [["id", "ASC"]] });
 
         if (logs === null) {
-            await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "adminPageController", null);
+            await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse.message, "adminPageController", null);
             return res.status(200).json(jsonResponse);
         }
 
@@ -34,7 +34,7 @@ export async function getServerLog(req, res, next) {
             };
         });
 
-        await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "userManagementController", null);
+        await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse.message, "userManagementController", null);
         return res.status(200).json(jsonResponse);
     } catch (error) {
         next(error);
