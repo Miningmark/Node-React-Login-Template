@@ -13,7 +13,8 @@ export async function getUsers(req, res, next) {
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Benutzer zurück gegeben", users: {} };
 
-        //TODO: check limit and offset
+        if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
+        if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
 
         const users = await Models.User.findAll({
             include: {
@@ -87,8 +88,7 @@ export async function updateUser(req, res, next) {
         const user = await Models.User.findOne({ where: { id: id } }, { transaction: transaction });
         if (user === null) throw new ValidationError("Es existiert kein Benutzer mit dieser ID");
 
-        if (username === undefined && email === undefined && isActive === undefined && isDisabled === undefined && permissionIds === undefined)
-            throw new ValidationError("Es muss mindestens ein Wert geändert werden");
+        if (username === undefined && email === undefined && isActive === undefined && isDisabled === undefined && permissionIds === undefined) throw new ValidationError("Es muss mindestens ein Wert geändert werden");
 
         if (username !== undefined) {
             await validateUsername(username);

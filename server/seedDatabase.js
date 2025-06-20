@@ -30,7 +30,7 @@ export async function seedDatabase() {
         const adminPage = await Models.Permission.create(
             {
                 name: "adminPage",
-                description: "Es kann der Serverlog gesehen und kann Rechte erstellt und bearbeitet werden"
+                description: "Es kann der Serverlog gesehen und Rechte gesehen und bearbeitet werden"
             },
             { transaction: transaction }
         );

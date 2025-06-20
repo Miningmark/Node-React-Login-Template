@@ -9,7 +9,8 @@ export default (sequelize, DataTypes) => {
             },
             name: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
+                unique: true
             },
             description: {
                 type: DataTypes.STRING,
@@ -24,8 +25,7 @@ export default (sequelize, DataTypes) => {
 
     Permission.associate = (models) => {
         Permission.hasMany(models.RouteGroup, {
-            foreignKey: "permissionId",
-            onDelete: "CASCADE"
+            foreignKey: "permissionId"
         });
 
         Permission.belongsToMany(models.User, {

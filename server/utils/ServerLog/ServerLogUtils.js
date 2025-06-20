@@ -54,7 +54,7 @@ export function buildJSONResponse(foundLogs) {
             id: log.id,
             level: log.level,
             message: log.message,
-            userId: log.UserId,
+            userId: log.userId,
             url: log.url,
             method: log.method,
             status: log.status,
