@@ -1,28 +1,19 @@
-import { useState, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
-import { AuthContext } from "contexts/AuthContext";
-import { useToast } from "components/ToastContext";
-import useAxiosProtected from "hook/useAxiosProtected";
 
 const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
-  const { routeGroups } = useContext(AuthContext);
-  const axiosProtected = useAxiosProtected();
-  const { addToast } = useToast();
-
   if (!serverLogEntry) return null;
 
-  const handleDelete = async () => {
+  const renderJsonIfPossible = (value) => {
     try {
-      await axiosProtected.delete(`/adminPage/deleteServerLog/${serverLogEntry.id}`);
-      addToast("Serverlog-Eintrag erfolgreich gelöscht", "success");
-      handleClose();
-    } catch (error) {
-      addToast("Fehler beim Löschen des Serverlog-Eintrags", "danger");
+      const parsed = JSON.parse(value);
+      return <pre className="bg-light p-2 rounded border">{JSON.stringify(parsed, null, 2)}</pre>;
+    } catch {
+      return <pre className="bg-light p-2 rounded border">{value}</pre>;
     }
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
         <Modal.Title>Serverlog-Eintrag Details</Modal.Title>
       </Modal.Header>
@@ -34,24 +25,70 @@ const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
           <strong>Timestamp:</strong> {new Date(serverLogEntry.timestamp).toLocaleString()}
         </p>
         <p>
-          <strong>Route:</strong> {serverLogEntry.route}
+          <strong>Level:</strong> {serverLogEntry.level}
+        </p>
+        <p>
+          <strong>Source:</strong> {serverLogEntry.source}
         </p>
         <p>
           <strong>Message:</strong> {serverLogEntry.message}
         </p>
         <p>
-          <strong>User:</strong> {serverLogEntry.user ? serverLogEntry.user.username : "System"}
+          <strong>Method:</strong> {serverLogEntry.method || "—"}
         </p>
+        <p>
+          <strong>URL:</strong> {serverLogEntry.url || "—"}
+        </p>
+        <p>
+          <strong>Status:</strong> {serverLogEntry.status ?? "—"}
+        </p>
+        <p>
+          <strong>IPv4 Address:</strong> {serverLogEntry.ipv4Address || "—"}
+        </p>
+        <p>
+          <strong>User Agent:</strong> {serverLogEntry.userAgent || "—"}
+        </p>
+
+        {serverLogEntry.requestHeaders && (
+          <>
+            <p>
+              <strong>Request Headers:</strong>
+            </p>
+            {renderJsonIfPossible(serverLogEntry.requestHeaders)}
+          </>
+        )}
+
+        {serverLogEntry.requestBody && (
+          <>
+            <p>
+              <strong>Request Body:</strong>
+            </p>
+            {renderJsonIfPossible(serverLogEntry.requestBody)}
+          </>
+        )}
+
+        {serverLogEntry.response && (
+          <>
+            <p>
+              <strong>Response:</strong>
+            </p>
+            {renderJsonIfPossible(serverLogEntry.response)}
+          </>
+        )}
+
+        {serverLogEntry.errorStack && (
+          <>
+            <p>
+              <strong>Error Stack:</strong>
+            </p>
+            <pre className="bg-light p-2 rounded border">{serverLogEntry.errorStack}</pre>
+          </>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Schließen
         </Button>
-        {routeGroups.includes("admin") && (
-          <Button variant="danger" onClick={handleDelete}>
-            Löschen
-          </Button>
-        )}
       </Modal.Footer>
     </Modal>
   );
