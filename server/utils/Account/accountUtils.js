@@ -93,6 +93,7 @@ export async function addLastLogin(req, userId, successfully) {
         jsonLastLogin.country = "Ungültige IP Adresse";
         jsonLastLogin.regionName = "Ungültige IP Adresse";
     } else {
+        jsonLastLogin.ipv4Adress = ipv4Adress;
         const ipLookupResponse = await fetch(`http://ip-api.com/json/${ipv4Adress}`);
         const ipLookupData = await ipLookupResponse.json();
 
