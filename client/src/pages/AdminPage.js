@@ -52,7 +52,7 @@ function AdminPage() {
 
   return (
     <>
-      <Container className="mt-4">
+      <Container className="page-wrapper mt-4">
         <h2>AdminPage</h2>
 
         <div>
@@ -83,7 +83,7 @@ function AdminPage() {
 
                   <div
                     className="border"
-                    style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
+                    style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
                   >
                     <Table striped bordered hover className="mb-0">
                       <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
