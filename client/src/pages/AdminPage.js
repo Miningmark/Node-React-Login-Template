@@ -4,8 +4,6 @@ import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
 import sortingAlgorithm from "util/sortingAlgorithm";
-import UserDetailsModal from "components/userManagement/UserDetailsModal";
-import CreateUserModal from "components/userManagement/CreateUserModal";
 
 function AdminPage() {
 const [serverLog,setServerLog]=useState(null);
@@ -33,12 +31,12 @@ const [laodingServerLog,setLoadingServerLog]=useState(true);
                 setServerLog(response.data.users);
               } catch (error) {
                 if (error.name === "CanceledError") {
-                  console.log("User-Fetch abgebrochen");
+                  console.log("Server-Log-Fetch abgebrochen");
                 } else {
-                  addToast("Fehler beim Laden der Userliste", "danger");
+                  addToast("Fehler beim Laden des ServerLogs", "danger");
                 }
               } finally {
-                setLoadingUsers(false);
+                setLoadingServerLog(false);
               }
             };
              fetchServerLog();
