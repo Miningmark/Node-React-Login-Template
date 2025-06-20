@@ -6,9 +6,12 @@ import verifyAccessToken from "../../middleware/verifyAccessToken.js";
 export default async () => {
     const smartRouter = new SmartRouter();
 
-    smartRouter.get("/getServerLog{/:limit-:offset}", "adminPageServerLog", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getServerLog);
-    smartRouter.get("/getFilteredServerLog{/:limit-:offset}", "adminPageServerLog", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilteredServerLog);
-    smartRouter.get("/getFilterOptionsServerLog", "adminPageServerLog", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilterOptionsServerLog);
+    smartRouter.get("/getServerLog{/:limit-:offset}", "adminPageServerLogRead", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getServerLog);
+    smartRouter.get("/getFilteredServerLog{/:limit-:offset}", "adminPageServerLogRead", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilteredServerLog);
+    smartRouter.get("/getFilterOptionsServerLog", "adminPageServerLogRead", "Hat das Recht den Serverlog zu sehen", verifyAccessToken, adminPageController.getFilterOptionsServerLog);
+
+    smartRouter.get("/getAllPermissionsWithRouteGroups", "adminPagePermissionsRead", "Hat das Recht die Permissions mit den RouteGroups zu sehen", verifyAccessToken, adminPageController.getAllPermissionsWithRouteGroups);
+    smartRouter.get("/getAllRouteGroups", "adminPagePermissionsWrite", "Hat das Recht die Permissions mit den RouteGroups zu sehen", verifyAccessToken, adminPageController.getAllRouteGroups);
 
     return smartRouter.getExpressRouter();
 };

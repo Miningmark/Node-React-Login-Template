@@ -18,6 +18,7 @@ export async function getServerLog(req, res, next) {
             return res.status(200).json(jsonResponse);
         }
 
+        jsonResponse.serverLogCount = await Models.ServerLog.count();
         jsonResponse.serverLogs = buildJSONResponse(logResults);
 
         let jsonResponseServerLogger = {};
@@ -53,6 +54,7 @@ export async function getFilteredServerLog(req, res, next) {
             return res.status(200).json(jsonResponse);
         }
 
+        jsonResponse.serverLogCount = await Models.ServerLog.count({ where: whereClause });
         jsonResponse.serverLogs = buildJSONResponse(logResults);
 
         let jsonResponseServerLogger = {};
@@ -83,6 +85,30 @@ export async function getFilterOptionsServerLog(req, res, next) {
         }
 
         jsonResponse.filterOptions.levels = Models.ServerLog.rawAttributes.level.values;
+
+        await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "adminPageController", null);
+        return res.status(200).json(jsonResponse);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getAllPermissionsWithRouteGroups(req, res, next) {
+    try {
+        const { userId } = req;
+        let jsonResponse = { message: "Alle Filter Optionen zurück gegeben", filterOptions: { users: [] } };
+
+        await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "adminPageController", null);
+        return res.status(200).json(jsonResponse);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getAllRouteGroups(req, res, next) {
+    try {
+        const { userId } = req;
+        let jsonResponse = { message: "Alle Filter Optionen zurück gegeben", filterOptions: { users: [] } };
 
         await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "adminPageController", null);
         return res.status(200).json(jsonResponse);
