@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 
 import { sequelize } from "./controllers/modelController.js";
 import { seedDatabase } from "./seedDatabase.js";
-import { removeRouteGroups } from "./utils/utils.js";
+import { generateSuperAdmin, removeRouteGroups } from "./utils/utils.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import { NotFoundError } from "./errors/NotFoundError.js";
@@ -40,9 +40,10 @@ app.use(cookieParser());
         app.use("/api/" + config.apiVersion + "/userManagement", await userManagementRoute());
         app.use("/api/" + config.apiVersion + "/adminPage", await adminPageRoute());
 
-        if (config.seedDatabase) await seedDatabase();
-
         await removeRouteGroups();
+        await generateSuperAdmin();
+
+        if (config.seedDatabase) await seedDatabase();
 
         app.all("{*splat}", (req, res, next) => {
             next(new NotFoundError("Angeforderte Route nicht gefunden!"));
@@ -50,9 +51,9 @@ app.use(cookieParser());
 
         app.use(errorHandler);
 
-        app.listen(config.backendPORT, async () => {
-            console.log("Datenbank verbunden und Server läuft auf Port " + config.backendPORT + " mit Version: " + config.serverVersion);
-            await serverLogger("INFO", "Datenbank verbunden und Server läuft auf Port " + config.backendPORT + " mit Version: " + config.serverVersion, {
+        app.listen(config.backendPort, async () => {
+            console.log("Datenbank verbunden und Server läuft auf Port " + config.backendPort + " mit Version: " + config.serverVersion);
+            await serverLogger("INFO", "Datenbank verbunden und Server läuft auf Port " + config.backendPort + " mit Version: " + config.serverVersion, {
                 source: "startup"
             });
         });

@@ -11,8 +11,10 @@ export default {
     isRegisterEnable: process.env.isRegisterEnable === "true",
     isUsernameChangeEnable: process.env.isUsernameChangeEnable === "true",
 
-    backendPORT: Number(process.env.backendPORT),
+    backendPort: Number(process.env.backendPort),
     apiVersion: process.env.apiVersion,
+
+    superAdminPassword: process.env.superAdminPassword,
 
     frontendURL: process.env.frontendURL,
 
@@ -44,5 +46,5 @@ export default {
     refreshTokenSecret: process.env.refreshTokenSecret,
     refreshTokenExpiration: Number(process.env.refreshTokenExpiration),
 
-    serverVersion: "0.0.26"
+    serverVersion: "0.0.27"
 };
