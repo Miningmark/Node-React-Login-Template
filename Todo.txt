@@ -23,3 +23,9 @@ Backend:
 
     Renaming:
         rename folder structure to backend instead of server and client to frontend for a more clear naming
+
+    Unit Testing:
+        should add unit testing to the project
+
+    Typescript:
+        make a branch to port project to typescript for easier validation and maintaining of code 

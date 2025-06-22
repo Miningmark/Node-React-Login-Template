@@ -15,6 +15,8 @@ export async function validateEmail(email) {
 export async function validateUsername(username) {
     if (!USERNAME_REGEX.test(username)) throw new ValidationError("Benutzername entspricht nicht den Anforderungen");
 
+    if (username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ConflictError("Benutzername kann nicht SuperAdmin sein!");
+
     const duplicateUsername = await Models.User.findOne({ where: { username: username } });
     if (duplicateUsername) throw new ConflictError("Benutzername bereits vergeben!");
 }
