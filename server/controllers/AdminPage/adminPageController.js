@@ -10,9 +10,10 @@ export async function getServerLog(req, res, next) {
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Serverlogs zurück gegeben", serverLogs: {} };
 
-        if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
-        if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
-
+        if (limit !== undefined && offset !== undefined) {
+            if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
+            if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
+        }
         const logResults = await Models.ServerLog.findAll({ ...(limit || offset ? { limit: Number(limit), offset: Number(offset) } : {}), order: [["id", "DESC"]] });
 
         if (logResults !== null) {
@@ -38,8 +39,10 @@ export async function getFilteredServerLog(req, res, next) {
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Serverlogs zurück gegeben", serverLogs: {} };
 
-        if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
-        if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
+        if (limit !== undefined && offset !== undefined) {
+            if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
+            if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
+        }
 
         const whereClause = buildServerLogWhereClause(userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString);
         const logResults = await Models.ServerLog.findAll({

@@ -13,8 +13,10 @@ export async function getUsers(req, res, next) {
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Benutzer zurück gegeben", users: {} };
 
-        if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
-        if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
+        if (limit !== undefined && offset !== undefined) {
+            if (isNaN(Number(limit))) throw new ValidationError("Parameter muss eine Nummer sein");
+            if (isNaN(Number(offset))) throw new ValidationError("Parameter muss eine Nummer sein");
+        }
 
         const users = await Models.User.findAll({
             include: {
