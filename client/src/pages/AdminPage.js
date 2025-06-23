@@ -22,6 +22,7 @@ function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [serverLogSearchOptions, setServerLogSearchOptions] = useState(null);
   const [selectedServerLog, setSelectedServerLog] = useState(null);
+  const [filterOptions,setFilterOptions]=useState(null);
 
   console.log("serverLog:", serverLog);
   console.log("serverlogOffset:", serverlogOffset);
@@ -54,6 +55,21 @@ function AdminPage() {
   };
 
   useEffect(() => {
+     const fetchFilterOptions = async () => {
+    try {
+      const response = await axiosProtected.get(`/adminPage/getFilterOptionsServerLog`);
+      console.log("Server-Log-Fetch erfolgreich:", response?.data);
+      setFilterOptions(response?.data?.filterOptions);
+      
+    } catch (error) {
+      if (error.name === "CanceledError") {
+        console.log("Server-Log Filter Optionen Fetch abgebrochen");
+      } else {
+        addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+      }
+    }
+  };
+    fetchFilterOptions();
     fetchServerLog();
     setLoadingServerLog(false);
   }, []);
