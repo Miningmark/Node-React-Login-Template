@@ -4,6 +4,7 @@ import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
 import sortingAlgorithm from "util/sortingAlgorithm";
+import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOptionsModal";
 
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
@@ -23,6 +24,7 @@ function AdminPage() {
   const [serverLogSearchOptions, setServerLogSearchOptions] = useState(null);
   const [selectedServerLog, setSelectedServerLog] = useState(null);
   const [filterOptions,setFilterOptions]=useState(null);
+  const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
 
   console.log("serverLog:", serverLog);
   console.log("serverlogOffset:", serverlogOffset);
@@ -239,13 +241,22 @@ function AdminPage() {
         </div>
       </Container>
 
-      {selectedServerLog && (
+      {selectedServerLog ? (
         <ShowServerlogEntry
           show={!!selectedServerLog}
           handleClose={() => setSelectedServerLog(null)}
           serverLogEntry={serverLog.find((log) => log.id === selectedServerLog)}
         />
-      )}
+      ):null}
+
+      {showFilterOptionsModal ? (
+        <ServerLogFilterOptionsModal 
+          show={!!showFilterOptionsModal}
+          handleClose={()=>setShowFilterOptionsModal(false)}
+          filterOptions={filterOptions}
+          handleFilterOptions={handleServerLogSearch}
+          />
+          ):null}
     </>
   );
 }
