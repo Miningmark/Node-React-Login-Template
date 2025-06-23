@@ -23,7 +23,7 @@ function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [serverLogSearchOptions, setServerLogSearchOptions] = useState(null);
   const [selectedServerLog, setSelectedServerLog] = useState(null);
-  const [filterOptions,setFilterOptions]=useState(null);
+  const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
 
   console.log("serverLog:", serverLog);
@@ -57,20 +57,19 @@ function AdminPage() {
   };
 
   useEffect(() => {
-     const fetchFilterOptions = async () => {
-    try {
-      const response = await axiosProtected.get(`/adminPage/getFilterOptionsServerLog`);
-      console.log("Server-Log-Fetch erfolgreich:", response?.data);
-      setFilterOptions(response?.data?.filterOptions);
-      
-    } catch (error) {
-      if (error.name === "CanceledError") {
-        console.log("Server-Log Filter Optionen Fetch abgebrochen");
-      } else {
-        addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+    const fetchFilterOptions = async () => {
+      try {
+        const response = await axiosProtected.get(`/adminPage/getFilterOptionsServerLog`);
+        console.log("Server-Log-Fetch erfolgreich:", response?.data);
+        setFilterOptions(response?.data?.filterOptions);
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          console.log("Server-Log Filter Optionen Fetch abgebrochen");
+        } else {
+          addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+        }
       }
-    }
-  };
+    };
     fetchFilterOptions();
     fetchServerLog();
     setLoadingServerLog(false);
@@ -96,11 +95,10 @@ function AdminPage() {
               {!laodingServerLog && serverLog?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
-                   
                     <button
                       className="btn btn-primary"
                       type="button"
-                      onClick={()=>setShowFilterOptionsModal(true)}
+                      onClick={() => setShowFilterOptionsModal(true)}
                     >
                       Such/Filter Optionen
                     </button>
@@ -242,16 +240,16 @@ function AdminPage() {
           handleClose={() => setSelectedServerLog(null)}
           serverLogEntry={serverLog.find((log) => log.id === selectedServerLog)}
         />
-      ):null}
+      ) : null}
 
       {showFilterOptionsModal ? (
-        <ServerLogFilterOptionsModal 
+        <ServerLogFilterOptionsModal
           show={!!showFilterOptionsModal}
-          handleClose={()=>setShowFilterOptionsModal(false)}
+          handleClose={() => setShowFilterOptionsModal(false)}
           filterOptions={filterOptions}
           handleFilterOptions={handleServerLogSearch}
-          />
-          ):null}
+        />
+      ) : null}
     </>
   );
 }
