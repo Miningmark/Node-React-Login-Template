@@ -96,18 +96,13 @@ function AdminPage() {
               {!laodingServerLog && serverLog?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
-                    <InputGroup className="flex-grow-1">
-                      <FormControl
-                        placeholder="Suche in Logs"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </InputGroup>
+                   
                     <button
                       className="btn btn-primary"
                       type="button"
-                      onClick={handleServerLogSearch}
+                      onClick={()=>setShowFilterOptionsModal(true)}
                     >
-                      Suchen
+                      Such/Filter Optionen
                     </button>
                   </div>
 
