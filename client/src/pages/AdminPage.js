@@ -111,7 +111,7 @@ function AdminPage() {
 
                   <div
                     className="border"
-                    style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
+                    style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
                   >
                     <Table striped bordered hover className="mb-0">
                       <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
