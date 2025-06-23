@@ -38,7 +38,7 @@ function handleChange(e) {
                         <Form.Label>Log Level</Form.Label>
                         <Form.Select name="logLevel" value={formData.logLevel} onChange={handleChange}>
                             <option value="">Bitte wählen...</option>
-                            {filterOptions.levels((level,index)=><option key={index} value={level}>{level}</option>)}
+                            {filterOptions.levels.map((level,index)=><option key={index} value={level}>{level}</option>)}
                         </Form.Select>
                     </Form.Group>
 
@@ -46,7 +46,7 @@ function handleChange(e) {
                         <Form.Label>User</Form.Label>
                         <Form.Select name="user" value={formData.user} onChange={handleChange}>
                             <option value="">Bitte wählen...</option>
-                            {filterOptions.users((user,index)=><option key={user.id} value={user.id}>{user.username}</option>)}
+                            {filterOptions.users.map((user,index)=><option key={user.id} value={user.id}>{user.username}</option>)}
                         </Form.Select>
                     </Form.Group>
 
