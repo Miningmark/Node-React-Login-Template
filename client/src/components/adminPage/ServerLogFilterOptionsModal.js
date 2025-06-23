@@ -20,8 +20,9 @@ function handleChange(e) {
     }
 
     function handleSearch() {
-        handleFilterOptions(formData);
-        handleClose();
+        console.log("formData",formData)
+        //handleFilterOptions(formData);
+        //handleClose();
     }
 
 
@@ -37,9 +38,7 @@ function handleChange(e) {
                         <Form.Label>Log Level</Form.Label>
                         <Form.Select name="logLevel" value={formData.logLevel} onChange={handleChange}>
                             <option value="">Bitte wählen...</option>
-                            <option value="INFO">INFO</option>
-                            <option value="WARN">WARN</option>
-                            <option value="ERROR">ERROR</option>
+                            {filterOptions.levels((level,index)=><option key={index} value={level}>{level}</option>)}
                         </Form.Select>
                     </Form.Group>
 
@@ -47,9 +46,7 @@ function handleChange(e) {
                         <Form.Label>User</Form.Label>
                         <Form.Select name="user" value={formData.user} onChange={handleChange}>
                             <option value="">Bitte wählen...</option>
-                            <option value="admin">admin</option>
-                            <option value="user1">user1</option>
-                            <option value="user2">user2</option>
+                            {filterOptions.users((user,index)=><option key={user.id} value={user.id}>{user.username}</option>)}
                         </Form.Select>
                     </Form.Group>
 
@@ -69,7 +66,7 @@ function handleChange(e) {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Nachrichtentext</Form.Label>
+                        <Form.Label>Logtext</Form.Label>
                         <Form.Control type="text" placeholder="Nachricht enthält..." name="messageText" value={formData.messageText} onChange={handleChange} />
                     </Form.Group>
                 </Form>
