@@ -18,14 +18,13 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
 
     if (type === "select-multiple") {
       const selectedValues = Array.from(options)
-        .filter(option => option.selected)
-        .map(option => option.value);
-      setFormData(prev => ({ ...prev, [name]: selectedValues }));
+        .filter((option) => option.selected)
+        .map((option) => option.value);
+      setFormData((prev) => ({ ...prev, [name]: selectedValues }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: e.target.value }));
+      setFormData((prev) => ({ ...prev, [name]: e.target.value }));
     }
   }
-
 
   function handleSearch() {
     console.log("formData", formData);
@@ -43,25 +42,19 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Log Level</Form.Label>
-              <Form.Select
-                multiple
-                name="levels"
-                value={formData.levels}
-                onChange={handleChange}
-              >
-                 <option value="">Bitte wählen...</option>
+              <Form.Select multiple name="levels" value={formData.levels} onChange={handleChange}>
+                <option value="">Bitte wählen...</option>
                 {filterOptions.levels.map((level, index) => (
                   <option key={index} value={level}>
                     {level}
                   </option>
                 ))}
               </Form.Select>
-
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>User</Form.Label>
-              <Form.Select  multiple name="userIds" value={formData.userIds} onChange={handleChange}>
+              <Form.Select multiple name="userIds" value={formData.userIds} onChange={handleChange}>
                 <option value="">Bitte wählen...</option>
                 {filterOptions.users.map((user, index) => (
                   <option key={user.id} value={user.id}>

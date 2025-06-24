@@ -12,7 +12,7 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
-  const [filteredServerLog,setFilteredServerLog]=useState(null);
+  const [filteredServerLog, setFilteredServerLog] = useState(null);
   const [laodingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
@@ -28,7 +28,7 @@ function AdminPage() {
   const [selectedServerLog, setSelectedServerLog] = useState(null);
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
-  const[activeFilters,setActiveFilters]=useState(null);
+  const [activeFilters, setActiveFilters] = useState(null);
 
   console.log("serverLog:", serverLog);
   console.log("serverlogOffset:", serverlogOffset);
@@ -61,9 +61,13 @@ function AdminPage() {
     }
   };
 
-  const fetchFilteredServerLog = async () => {
+  const fetchFilteredServerLog = async (test) => {
     try {
-      const response = await axiosProtected.get(`/adminPage/getFilteredServerLog/50-${filteredServerlogOffset}`,{activeFilters});
+      console.log("fetchFilteredServerLog called with activeFilters:", test);
+      const response = await axiosProtected.get(
+        `/adminPage/getFilteredServerLog/50-${filteredServerlogOffset}`,
+        { test }
+      );
       console.log("Server-Log-Fetch erfolgreich:", response?.data);
       if (!filteredServerLog) {
         setFilteredServerLog(response.data.serverLogs);
@@ -105,8 +109,8 @@ function AdminPage() {
   async function handleServerLogSearch(filterOptions) {
     setLoadingServerLogPart(true);
     setActiveFilters(filterOptions);
-    console.log("FilterOptions",filterOptions);
-    fetchFilteredServerLog();
+    console.log("FilterOptions", filterOptions);
+    fetchFilteredServerLog(filterOptions);
   }
 
   return (
@@ -132,15 +136,15 @@ function AdminPage() {
                     >
                       Such/Filter Optionen
                     </button>
-                    {activeFilters ?(
+                    {activeFilters ? (
                       <button
-                      className="btn btn-danger"
-                      type="button"
-                      onClick={() => setActiveFilters(null)}
-                    >
-                      Such/Filter Löschen
-                    </button>
-                    ):null}
+                        className="btn btn-danger"
+                        type="button"
+                        onClick={() => setActiveFilters(null)}
+                      >
+                        Such/Filter Löschen
+                      </button>
+                    ) : null}
                   </div>
 
                   <div
