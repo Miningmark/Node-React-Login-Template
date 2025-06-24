@@ -1,4 +1,4 @@
-import config from "./config/config.js";
+import config from "./config/config";
 import express from "express";
 
 import helmet from "helmet";
@@ -20,6 +20,8 @@ import cookieParser from "cookie-parser";
 //import userManagementRoute from "./routes/UserManagement/userManagementRoute.js";
 //import adminPageRoute from "./routes/AdminPage/adminPageRoute.js";
 
+import usersRouter from "./routes/users";
+
 const app = express();
 
 app.use(helmet());
@@ -29,6 +31,8 @@ app.use(cors(/*corsOptions*/));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use("/api/users", usersRouter);
 
 (async () => {
     try {
@@ -53,7 +57,7 @@ app.use(cookieParser());
 */
 
         app.listen(config.backendPort, async () => {
-            console.log("Datenbank verbunden und Server läuft auf Port " + config.backendPort + " mit Version: " + config.serverVersion);
+            console.log(`Datenbank verbunden und Server läuft auf Port ${config.backendPort} mit Version: ${config.serverVersion}`);
             /*await serverLogger("INFO", "Datenbank verbunden und Server läuft auf Port " + config.backendPort + " mit Version: " + config.serverVersion, {
                 source: "startup"
             });*/

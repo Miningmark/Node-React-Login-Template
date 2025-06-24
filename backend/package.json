@@ -2,9 +2,9 @@
     "name": "server",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/server.js",
+    "main": "build/server.js",
     "scripts": {
-        "start": "node dist/server.js",
+        "start": "node build/server.js",
         "build": "tsc",
         "dev": "tsx watch src/server.ts"
     },
@@ -24,12 +24,10 @@
         "uuid": "^11.1.0"
     },
     "devDependencies": {
-        "@tsconfig/node22": "^22.0.2",
         "@types/cookie-parser": "^1.4.9",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
         "@types/node": "^24.0.3",
-        "nodemon": "^3.1.10",
         "tsx": "^4.20.3",
         "typescript": "^5.8.3"
     }
