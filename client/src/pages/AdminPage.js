@@ -25,6 +25,7 @@ function AdminPage() {
   const [selectedServerLog, setSelectedServerLog] = useState(null);
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
+ const[activeFilters,setActiveFilters]=useState(null);
 
   console.log("serverLog:", serverLog);
   console.log("serverlogOffset:", serverlogOffset);
@@ -102,6 +103,15 @@ function AdminPage() {
                     >
                       Such/Filter Optionen
                     </button>
+                    {activeFilters ?(
+                      <button
+                      className="btn btn-danger"
+                      type="button"
+                      onClick={() => setActiveFilters(null)}
+                    >
+                      Such/Filter Löschen
+                    </button>
+                    ):null}
                   </div>
 
                   <div
