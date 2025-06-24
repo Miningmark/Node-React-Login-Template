@@ -202,6 +202,8 @@ export async function passwordResetOrReactivation(req, res, next) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        if (password === userToken.User.password) throw new ValidationError("Dein Passwort kann nicht mit deinem alten Passwort gleich sein");
+
         userToken.User.password = hashedPassword;
         userToken.User.isActive = true;
 
@@ -253,7 +255,10 @@ export async function refreshAccessToken(req, res, next) {
 
         if (refreshToken === undefined) throw new ValidationError("Keinen Cookie für Erneuerung gefunden");
 
-        const refreshUserToken = await Models.UserToken.findOne({ where: { token: refreshToken, type: "refreshToken" }, include: { model: Models.User } }, { transaction: transaction });
+        const refreshUserToken = await Models.UserToken.findOne(
+            { where: { token: refreshToken, type: "refreshToken" }, include: { model: Models.User } },
+            { transaction: transaction }
+        );
 
         if (refreshUserToken === null) {
             res.clearCookie("refreshToken", {
@@ -278,9 +283,18 @@ export async function refreshAccessToken(req, res, next) {
             }
 
             const newAccessTokenExpiresAt = new Date(Date.now() + config.accessTokenExpiration * 1000);
-            const newAccessToken = accountUtils.generateJWT(decoded.UserInfo.id, decoded.UserInfo.username, routeGroups, config.accessTokenSecret, config.accessTokenExpiration);
+            const newAccessToken = accountUtils.generateJWT(
+                decoded.UserInfo.id,
+                decoded.UserInfo.username,
+                routeGroups,
+                config.accessTokenSecret,
+                config.accessTokenExpiration
+            );
 
-            await Models.UserToken.create({ userId: decoded.UserInfo.id, token: newAccessToken, type: "accessToken", expiresAt: newAccessTokenExpiresAt }, { transaction: transaction });
+            await Models.UserToken.create(
+                { userId: decoded.UserInfo.id, token: newAccessToken, type: "accessToken", expiresAt: newAccessTokenExpiresAt },
+                { transaction: transaction }
+            );
             jsonResponse.accessToken = newAccessToken;
 
             await transaction.commit();
@@ -311,6 +325,8 @@ export async function changePassword(req, res, next) {
 
         await accountUtils.validatePassword(newPassword);
         const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+        if (currentPassword === newPassword) throw new ValidationError("Dein Passwort kann nicht mit deinem alten Passwort gleich sein");
 
         foundUser.password = newHashedPassword;
         await foundUser.save({ transaction: transaction });

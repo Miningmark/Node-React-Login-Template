@@ -4,7 +4,7 @@ import { Models, sequelize } from "../controllers/modelController.js";
 import { serverLogger } from "./ServerLog/serverLogger.js";
 import config from "../config/config.js";
 
-export const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-]{5,15}$/;
+export const USERNAME_REGEX = /^[a-zA-Z0-9-]{5,15}$/;
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 export const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
@@ -30,7 +30,12 @@ export async function generateSuperAdmin() {
         let foundSuperAdmin = await Models.User.findOne({ where: { username: "SuperAdmin" } });
 
         if (foundSuperAdmin === null) {
-            foundSuperAdmin = await Models.User.create({ username: "SuperAdmin", email: "superadmin@superadmin.com", password: await bcrypt.hash(config.superAdminPassword, 10), isActive: true });
+            foundSuperAdmin = await Models.User.create({
+                username: "SuperAdmin",
+                email: "superadmin@superadmin.com",
+                password: await bcrypt.hash(config.superAdminPassword, 10),
+                isActive: true
+            });
         } else if (!(await bcrypt.compare(config.superAdminPassword, foundSuperAdmin.password))) {
             foundSuperAdmin.password = await bcrypt.hash(config.superAdminPassword, 10);
             await foundSuperAdmin.save();
