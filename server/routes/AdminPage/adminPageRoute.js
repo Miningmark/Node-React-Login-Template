@@ -11,12 +11,29 @@ export default async () => {
     const adminPagePermissionsWriteDescription = "Hat das Recht die Permissions mit den RouteGroups zu sehen und zu bearbeiten";
 
     smartRouter.get("/getServerLog{/:limit-:offset}", "adminPageServerLogRead", adminPageServerLogReadDescription, verifyAccessToken, adminPageController.getServerLog);
-    smartRouter.get("/getFilteredServerLog{/:limit-:offset}", "adminPageServerLogRead", adminPageServerLogReadDescription, verifyAccessToken, adminPageController.getFilteredServerLog);
-    smartRouter.get("/getFilterOptionsServerLog", "adminPageServerLogRead", adminPageServerLogReadDescription, verifyAccessToken, adminPageController.getFilterOptionsServerLog);
-
-    smartRouter.get("/getAllPermissionsWithRouteGroups", "adminPagePermissionsRead", adminPagePermissionsReadDescription, verifyAccessToken, adminPageController.getAllPermissionsWithRouteGroups);
+    smartRouter.get(
+        "/getFilterOptionsServerLog",
+        "adminPageServerLogRead",
+        adminPageServerLogReadDescription,
+        verifyAccessToken,
+        adminPageController.getFilterOptionsServerLog
+    );
+    smartRouter.get(
+        "/getAllPermissionsWithRouteGroups",
+        "adminPagePermissionsRead",
+        adminPagePermissionsReadDescription,
+        verifyAccessToken,
+        adminPageController.getAllPermissionsWithRouteGroups
+    );
     smartRouter.get("/getAllRouteGroups", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.getAllRouteGroups);
 
+    smartRouter.post(
+        "/getFilteredServerLog{/:limit-:offset}",
+        "adminPageServerLogRead",
+        adminPageServerLogReadDescription,
+        verifyAccessToken,
+        adminPageController.getFilteredServerLog
+    );
     smartRouter.post("/createPermission", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.createPermission);
     smartRouter.post("/updatePermission", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.updatePermission);
     smartRouter.post("/deletePermission", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.deletePermission);

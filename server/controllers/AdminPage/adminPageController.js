@@ -35,7 +35,7 @@ export async function getServerLog(req, res, next) {
 export async function getFilteredServerLog(req, res, next) {
     try {
         const { userId } = req;
-        const { userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString } = req.query || {};
+        const { userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString } = req.body || {};
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Serverlogs zurück gegeben", serverLogs: {} };
 
