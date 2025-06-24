@@ -13,7 +13,7 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
   const [filteredServerLog, setFilteredServerLog] = useState(null);
-  const [laodingServerLog, setLoadingServerLog] = useState(false);
+  const [loadingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
   const [filteredServerlogOffset, setFilteredServerlogOffset] = useState(0);
@@ -24,7 +24,6 @@ function AdminPage() {
   const [loadingAllRouteGroups, setLoadingAllRouteGroups] = useState(true);
   const [loadingAllPermissions, setLoadingAllPermissions] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [serverLogSearchOptions, setServerLogSearchOptions] = useState(null);
   const [selectedServerLog, setSelectedServerLog] = useState(null);
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
@@ -42,11 +41,17 @@ function AdminPage() {
   const fetchServerLog = async () => {
     try {
       const response = await axiosProtected.get(`/adminPage/getServerLog/50-${serverlogOffset}`);
+
       if (!serverLog) {
         setServerLog(response.data.serverLogs);
       } else {
-        setServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
+        setServerLog((prevLogs) => {
+          const existingIds = new Set(prevLogs.map((log) => log.id));
+          const newLogs = response.data.serverLogs.filter((log) => !existingIds.has(log.id));
+          return [...prevLogs, ...newLogs];
+        });
       }
+
       setServerlogOffset((prevOffset) => prevOffset + 50);
       setServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
     } catch (error) {
@@ -66,16 +71,16 @@ function AdminPage() {
       const response = await axiosProtected.get(`/adminPage/getServerLog/50-0`);
       const newLogs = response.data.serverLogs;
 
-      if (!serverLog || serverLog.length === 0) {
+      if (!serverLog?.length) {
         setServerLog(newLogs);
       } else {
-        const latestCurrentEntry = serverLog[0];
-        const index = newLogs.findIndex((log) => log.id === latestCurrentEntry.id);
+        // IDs der bisherigen Logs
+        const existingIds = new Set(serverLog.map((log) => log.id));
+        // Nur neue Logs, die noch nicht existieren
+        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
 
-        // Nur neue Einträge oben einfügen
-        const onlyNewLogs = index > 0 ? newLogs.slice(0, index) : newLogs;
-        if (onlyNewLogs.length > 0) {
-          setServerLog((prevLogs) => [...onlyNewLogs, ...prevLogs]);
+        if (onlyNewLogs.length) {
+          setServerLog((prev) => [...onlyNewLogs, ...prev]);
         }
       }
 
@@ -87,26 +92,29 @@ function AdminPage() {
     }
   };
 
-  const fetchFilteredServerLog = async (test) => {
+  const fetchFilteredServerLog = async (filters, offset = filteredServerlogOffset) => {
     try {
-      console.log("fetchFilteredServerLog called with activeFilters:", test);
-      const response = await axiosProtected.get(
-        `/adminPage/getFilteredServerLog/50-${filteredServerlogOffset}`,
-        { params: test }
+      const response = await axiosProtected.post(
+        `/adminPage/getFilteredServerLog/50-${offset}`,
+        filters
       );
-      console.log("Server-Log-Fetch erfolgreich:", response?.data);
-      if (!filteredServerLog) {
-        setFilteredServerLog(response.data.serverLogs);
-      } else {
-        setFilteredServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
-      }
-      setFilteredServerlogOffset((prevOffset) => prevOffset + 50);
+
+      const newLogs = response.data.serverLogs || [];
+
+      setFilteredServerLog((prev) => {
+        if (!prev) return newLogs;
+
+        const existingIds = new Set(prev.map((log) => log.id));
+        const filteredNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
+
+        return [...prev, ...filteredNewLogs];
+      });
+
+      setFilteredServerlogOffset((prev) => prev + 50);
       setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
     } catch (error) {
-      if (error.name === "CanceledError") {
-        console.log("Filtered-Server-Log-Fetch abgebrochen");
-      } else {
-        addToast("Fehler beim Laden des ServerLogs mit filter", "danger");
+      if (error.name !== "CanceledError") {
+        addToast("Fehler beim Laden der gefilterten Logs", "danger");
       }
     } finally {
       setLoadingServerLogPart(false);
@@ -116,29 +124,28 @@ function AdminPage() {
   const refreshFilteredServerLog = async () => {
     if (!activeFilters) return;
     setLoadingServerLogPart(true);
-
     try {
-      const response = await axiosProtected.get(`/adminPage/getFilteredServerLog/50-0`, {
-        params: activeFilters,
-      });
+      const response = await axiosProtected.post(
+        `/adminPage/getFilteredServerLog/50-0`,
+        activeFilters
+      );
+      const newLogs = response.data.serverLogs || [];
 
-      const newLogs = response.data.serverLogs;
-
-      if (!filteredServerLog || filteredServerLog.length === 0) {
+      if (!filteredServerLog?.length) {
         setFilteredServerLog(newLogs);
       } else {
-        const latestCurrentEntry = filteredServerLog[0];
-        const index = newLogs.findIndex((log) => log.id === latestCurrentEntry.id);
+        // IDs der bisherigen Logs
+        const existingIds = new Set(filteredServerLog.map((log) => log.id));
+        // Nur neue Logs, die noch nicht existieren
+        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
 
-        // Nur neue Einträge oben einfügen
-        const onlyNewLogs = index > 0 ? newLogs.slice(0, index) : newLogs;
-        if (onlyNewLogs.length > 0) {
-          setFilteredServerLog((prevLogs) => [...onlyNewLogs, ...prevLogs]);
+        if (onlyNewLogs.length) {
+          setFilteredServerLog((prev) => [...onlyNewLogs, ...prev]);
         }
       }
 
       setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
-    } catch (error) {
+    } catch {
       addToast("Fehler beim Aktualisieren der gefilterten Logs", "danger");
     } finally {
       setLoadingServerLogPart(false);
@@ -169,7 +176,7 @@ function AdminPage() {
     setFilteredServerlogOffset(0);
     setFilteredServerLog(null);
     setActiveFilters(filterOptions);
-    fetchFilteredServerLog(filterOptions);
+    fetchFilteredServerLog(filterOptions, 0);
   }
 
   return (
@@ -185,7 +192,7 @@ function AdminPage() {
               className="border p-3 mb-4"
               style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
             >
-              {!laodingServerLog && serverLog?.length > 0 ? (
+              {!loadingServerLog && serverLog?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
                     <button
@@ -259,7 +266,7 @@ function AdminPage() {
                       onClick={() => {
                         setLoadingServerLogPart(true);
                         if (activeFilters) {
-                          fetchFilteredServerLog(activeFilters);
+                          fetchFilteredServerLog(activeFilters, filteredServerlogOffset);
                         } else {
                           fetchServerLog();
                         }
