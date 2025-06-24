@@ -3,8 +3,8 @@ import { useState } from "react";
 
 const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handleClose, show }) => {
   const [formData, setFormData] = useState({
-    logLevel: "",
-    user: "",
+    logLevel: [],
+    user: [],
     fromTimestamp: "",
     toTimestamp: "",
     ipAddress: "",
@@ -14,9 +14,18 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
   console.log("filterOptions", filterOptions);
 
   function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, options, type } = e.target;
+
+    if (type === "select-multiple") {
+      const selectedValues = Array.from(options)
+        .filter(option => option.selected)
+        .map(option => option.value);
+      setFormData(prev => ({ ...prev, [name]: selectedValues }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: e.target.value }));
+    }
   }
+
 
   function handleSearch() {
     console.log("formData", formData);
@@ -34,19 +43,25 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Log Level</Form.Label>
-              <Form.Select name="logLevel" value={formData.logLevel} onChange={handleChange}>
-                <option value="">Bitte wählen...</option>
+              <Form.Select
+                multiple
+                name="logLevel"
+                value={formData.logLevel}
+                onChange={handleChange}
+              >
+                 <option value="">Bitte wählen...</option>
                 {filterOptions.levels.map((level, index) => (
                   <option key={index} value={level}>
                     {level}
                   </option>
                 ))}
               </Form.Select>
+
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>User</Form.Label>
-              <Form.Select name="user" value={formData.user} onChange={handleChange}>
+              <Form.Select  multiple name="user" value={formData.user} onChange={handleChange}>
                 <option value="">Bitte wählen...</option>
                 {filterOptions.users.map((user, index) => (
                   <option key={user.id} value={user.id}>
