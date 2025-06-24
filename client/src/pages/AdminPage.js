@@ -12,7 +12,7 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
-  const[filteredServerLog,setFilteredServerLog]=useState(null);
+  const [filteredServerLog,setFilteredServerLog]=useState(null);
   const [laodingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
@@ -63,15 +63,15 @@ function AdminPage() {
 
   const fetchFilteredServerLog = async () => {
     try {
-      const response = await axiosProtected.get(`/adminPage/getServerLog/50-${filteredServerlogOffset}`,{activeFilters});
+      const response = await axiosProtected.get(`/adminPage/getFilteredServerLog/50-${filteredServerlogOffset}`,{activeFilters});
       console.log("Server-Log-Fetch erfolgreich:", response?.data);
       if (!serverLog) {
         setFilteredServerLog(response.data.serverLogs);
       } else {
         setFilteredServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
       }
-      setFilterServerlogOffset((prevOffset) => prevOffset + 50);
-      setFilterServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+      setFilteredServerlogOffset((prevOffset) => prevOffset + 50);
+      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
     } catch (error) {
       if (error.name === "CanceledError") {
         console.log("Filtered-Server-Log-Fetch abgebrochen");
