@@ -35,7 +35,7 @@ export async function getServerLog(req, res, next) {
 export async function getFilteredServerLog(req, res, next) {
     try {
         const { userId } = req;
-        const { userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString } = req.body || {};
+        const { userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString } = req.query || {};
         const { limit, offset } = req.params || {};
         let jsonResponse = { message: "Alle angeforderten Serverlogs zurück gegeben", serverLogs: {} };
 
@@ -154,7 +154,8 @@ export async function createPermission(req, res, next) {
         const { name, description, routeGroupIds } = req.body || {};
         let jsonResponse = { message: "Recht erfolgreich erstellt" };
 
-        if (name === undefined || description === undefined || routeGroupIds === undefined || !Array.isArray(routeGroupIds)) throw new ValidationError("Es müssen alle Parameter angegeben werden");
+        if (name === undefined || description === undefined || routeGroupIds === undefined || !Array.isArray(routeGroupIds))
+            throw new ValidationError("Es müssen alle Parameter angegeben werden");
 
         const foundPermission = await Models.Permission.findOne({ where: { name: name } });
         if (foundPermission !== null) throw new ValidationError("Es gibt bereits eine Permission mit diesen Namen");
@@ -214,7 +215,8 @@ export async function updatePermission(req, res, next) {
         if (foundRouteGroups !== null) {
             await Promise.all(
                 foundRouteGroups.map(async (routeGroup) => {
-                    if (routeGroup.permissionId !== null && routeGroup.permissionId !== permissionId) throw new ValidationError("Diese RouteGroup ist bereits einem anderen Recht zugewiesen");
+                    if (routeGroup.permissionId !== null && routeGroup.permissionId !== permissionId)
+                        throw new ValidationError("Diese RouteGroup ist bereits einem anderen Recht zugewiesen");
                     await foundPermission.addRouteGroup(routeGroup, { transaction: transaction });
                 })
             );

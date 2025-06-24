@@ -3,22 +3,32 @@ import { Op } from "sequelize";
 export function buildServerLogWhereClause(userIds, levels, ipv4Address, timestampFrom, timestampTo, searchString) {
     const where = { [Op.and]: [] };
 
-    if (userIds !== undefined && Array.isArray(userIds)) {
-        const orConditions = [];
+    if (userIds !== undefined && typeof userIds === "string") {
+        try {
+            userIds = JSON.parse(userIds);
+            if (Array.isArray(userIds)) {
+                const orConditions = [];
 
-        if (userIds.length > 0) orConditions.push({ userId: { [Op.in]: userIds } });
-        if (userIds.includes(null)) orConditions.push({ userId: null });
+                if (userIds.length > 0) orConditions.push({ userId: { [Op.in]: userIds } });
+                if (userIds.includes(null)) orConditions.push({ userId: null });
 
-        if (orConditions.length === 1) {
-            where[Op.and].push(orConditions[0]);
-        } else if (orConditions.length > 1) {
-            where[Op.and].push({ [Op.or]: orConditions });
-        }
+                if (orConditions.length === 1) {
+                    where[Op.and].push(orConditions[0]);
+                } else if (orConditions.length > 1) {
+                    where[Op.and].push({ [Op.or]: orConditions });
+                }
+            }
+        } catch {}
     }
 
-    if (levels !== undefined && Array.isArray(levels)) {
-        if (levels.length === 1) where[Op.and].push({ level: levels[0] });
-        if (levels.length > 1) where[Op.and].push({ level: { [Op.in]: levels } });
+    if (levels !== undefined && typeof levels === "string") {
+        try {
+            levels = JSON.parse(levels);
+            if (Array.isArray(levels)) {
+                if (levels.length === 1) where[Op.and].push({ level: levels[0] });
+                if (levels.length > 1) where[Op.and].push({ level: { [Op.in]: levels } });
+            }
+        } catch {}
     }
 
     if (ipv4Address !== undefined) {
