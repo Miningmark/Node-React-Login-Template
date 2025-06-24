@@ -28,7 +28,7 @@ function AdminPage() {
   const [selectedServerLog, setSelectedServerLog] = useState(null);
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
- const[activeFilters,setActiveFilters]=useState(null);
+  const[activeFilters,setActiveFilters]=useState(null);
 
   console.log("serverLog:", serverLog);
   console.log("serverlogOffset:", serverlogOffset);
@@ -63,7 +63,7 @@ function AdminPage() {
 
   const fetchFilteredServerLog = async () => {
     try {
-      const response = await axiosProtected.get(`/adminPage/getServerLog/50-${serverlogOffset}`);
+      const response = await axiosProtected.get(`/adminPage/getServerLog/50-${filteredServerlogOffset}`,{activeFilters});
       console.log("Server-Log-Fetch erfolgreich:", response?.data);
       if (!serverLog) {
         setFilteredServerLog(response.data.serverLogs);
