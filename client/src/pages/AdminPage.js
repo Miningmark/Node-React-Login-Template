@@ -12,6 +12,7 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
+  const[filteredServerLog,setFilteredServerLog]=useState(null);]
   const [laodingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
@@ -57,6 +58,28 @@ function AdminPage() {
     }
   };
 
+  const fetchFilteredServerLog = async () => {
+    try {
+      const response = await axiosProtected.get(`/adminPage/getServerLog/50-${serverlogOffset}`);
+      console.log("Server-Log-Fetch erfolgreich:", response?.data);
+      if (!serverLog) {
+        setFilteredServerLog(response.data.serverLogs);
+      } else {
+        setFilteredServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
+      }
+      setServerlogOffset((prevOffset) => prevOffset + 50);
+      setServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+    } catch (error) {
+      if (error.name === "CanceledError") {
+        console.log("Filtered-Server-Log-Fetch abgebrochen");
+      } else {
+        addToast("Fehler beim Laden des ServerLogs mit filter", "danger");
+      }
+    } finally {
+      setLoadingServerLogPart(false);
+    }
+  };
+
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
@@ -77,8 +100,10 @@ function AdminPage() {
   }, []);
 
   async function handleServerLogSearch(filterOptions) {
+    setLoadingServerLogPart(true);
     setActiveFilters(filterOptions);
     console.log("FilterOptions",filterOptions);
+    fetchFilteredServerLog();
   }
 
   return (
