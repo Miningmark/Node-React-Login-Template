@@ -200,9 +200,10 @@ export async function passwordResetOrReactivation(req, res, next) {
             throw new ValidationError("Token bereits abgelaufen, neuer Token wurde an deine Email gesendet");
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const isPasswordMatching = await bcrypt.compare(password, userToken.User.password);
+        if (isPasswordMatching) throw new ValidationError("Dein Passwort kann nicht mit deinem alten Passwort gleich sein");
 
-        if (password === userToken.User.password) throw new ValidationError("Dein Passwort kann nicht mit deinem alten Passwort gleich sein");
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         userToken.User.password = hashedPassword;
         userToken.User.isActive = true;
