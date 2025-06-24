@@ -1,15 +1,23 @@
 import { Modal, Button, Form } from "react-bootstrap";
 import { useState } from "react";
 
-const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handleClose, show }) => {
-  const [formData, setFormData] = useState({
-    levels: [],
-    userIds: [],
-    timestampFrom: "",
-    timestampTo: "",
-    ipv4Address: "",
-    searchString: "",
-  });
+const ServerLogFilterOptionsModal = ({
+  filterOptions,
+  handleFilterOptions,
+  handleClose,
+  show,
+  activeFilters,
+}) => {
+  const [formData, setFormData] = useState(
+    activeFilters || {
+      levels: [],
+      userIds: [],
+      timestampFrom: "",
+      timestampTo: "",
+      ipv4Address: "",
+      searchString: "",
+    }
+  );
 
   console.log("filterOptions", filterOptions);
 

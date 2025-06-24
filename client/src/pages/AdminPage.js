@@ -30,10 +30,10 @@ function AdminPage() {
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
 
-  console.log("serverLog:", serverLog);
-  console.log("serverlogOffset:", serverlogOffset);
-  console.log("serverLogMaxEntries:", serverLogMaxEntries);
-  console.log("filtered-ServerLog", filteredServerLog);
+  //console.log("serverLog:", serverLog);
+  //console.log("serverlogOffset:", serverlogOffset);
+  //console.log("serverLogMaxEntries:", serverLogMaxEntries);
+  //console.log("filtered-ServerLog", filteredServerLog);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -42,7 +42,6 @@ function AdminPage() {
   const fetchServerLog = async () => {
     try {
       const response = await axiosProtected.get(`/adminPage/getServerLog/50-${serverlogOffset}`);
-      console.log("Server-Log-Fetch erfolgreich:", response?.data);
       if (!serverLog) {
         setServerLog(response.data.serverLogs);
       } else {
@@ -61,12 +60,39 @@ function AdminPage() {
     }
   };
 
+  const refreshServerLog = async () => {
+    setLoadingServerLogPart(true);
+    try {
+      const response = await axiosProtected.get(`/adminPage/getServerLog/50-0`);
+      const newLogs = response.data.serverLogs;
+
+      if (!serverLog || serverLog.length === 0) {
+        setServerLog(newLogs);
+      } else {
+        const latestCurrentEntry = serverLog[0];
+        const index = newLogs.findIndex((log) => log.id === latestCurrentEntry.id);
+
+        // Nur neue Einträge oben einfügen
+        const onlyNewLogs = index > 0 ? newLogs.slice(0, index) : newLogs;
+        if (onlyNewLogs.length > 0) {
+          setServerLog((prevLogs) => [...onlyNewLogs, ...prevLogs]);
+        }
+      }
+
+      setServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+    } catch (error) {
+      addToast("Fehler beim Aktualisieren des ServerLogs", "danger");
+    } finally {
+      setLoadingServerLogPart(false);
+    }
+  };
+
   const fetchFilteredServerLog = async (test) => {
     try {
       console.log("fetchFilteredServerLog called with activeFilters:", test);
       const response = await axiosProtected.get(
         `/adminPage/getFilteredServerLog/50-${filteredServerlogOffset}`,
-        { test }
+        { params: test }
       );
       console.log("Server-Log-Fetch erfolgreich:", response?.data);
       if (!filteredServerLog) {
@@ -82,6 +108,38 @@ function AdminPage() {
       } else {
         addToast("Fehler beim Laden des ServerLogs mit filter", "danger");
       }
+    } finally {
+      setLoadingServerLogPart(false);
+    }
+  };
+
+  const refreshFilteredServerLog = async () => {
+    if (!activeFilters) return;
+    setLoadingServerLogPart(true);
+
+    try {
+      const response = await axiosProtected.get(`/adminPage/getFilteredServerLog/50-0`, {
+        params: activeFilters,
+      });
+
+      const newLogs = response.data.serverLogs;
+
+      if (!filteredServerLog || filteredServerLog.length === 0) {
+        setFilteredServerLog(newLogs);
+      } else {
+        const latestCurrentEntry = filteredServerLog[0];
+        const index = newLogs.findIndex((log) => log.id === latestCurrentEntry.id);
+
+        // Nur neue Einträge oben einfügen
+        const onlyNewLogs = index > 0 ? newLogs.slice(0, index) : newLogs;
+        if (onlyNewLogs.length > 0) {
+          setFilteredServerLog((prevLogs) => [...onlyNewLogs, ...prevLogs]);
+        }
+      }
+
+      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+    } catch (error) {
+      addToast("Fehler beim Aktualisieren der gefilterten Logs", "danger");
     } finally {
       setLoadingServerLogPart(false);
     }
@@ -108,8 +166,9 @@ function AdminPage() {
 
   async function handleServerLogSearch(filterOptions) {
     setLoadingServerLogPart(true);
+    setFilteredServerlogOffset(0);
+    setFilteredServerLog(null);
     setActiveFilters(filterOptions);
-    console.log("FilterOptions", filterOptions);
     fetchFilteredServerLog(filterOptions);
   }
 
@@ -136,15 +195,37 @@ function AdminPage() {
                     >
                       Such/Filter Optionen
                     </button>
+
                     {activeFilters ? (
+                      <>
+                        <button
+                          className="btn btn-danger"
+                          type="button"
+                          onClick={() => {
+                            setActiveFilters(null);
+                            setFilteredServerLog(null);
+                            setFilteredServerlogOffset(0);
+                          }}
+                        >
+                          Such/Filter löschen
+                        </button>
+                        <button
+                          className="btn btn-outline-primary"
+                          type="button"
+                          onClick={refreshFilteredServerLog}
+                        >
+                          Gefilterte aktualisieren
+                        </button>
+                      </>
+                    ) : (
                       <button
-                        className="btn btn-danger"
+                        className="btn btn-outline-primary"
                         type="button"
-                        onClick={() => setActiveFilters(null)}
+                        onClick={refreshServerLog}
                       >
-                        Such/Filter Löschen
+                        Aktualisieren
                       </button>
-                    ) : null}
+                    )}
                   </div>
 
                   <div
@@ -161,21 +242,9 @@ function AdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {serverLog.map((log) => (
-                          <tr
-                            key={log.id}
-                            onClick={() => {
-                              setSelectedServerLog(log.id);
-                            }}
-                          >
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {log.id}
-                            </td>
+                        {(activeFilters ? filteredServerLog : serverLog)?.map((log) => (
+                          <tr key={log.id} onClick={() => setSelectedServerLog(log.id)}>
+                            <td style={{ cursor: "pointer", fontWeight: "bold" }}>{log.id}</td>
                             <td className="text-center">
                               {convertToLocalTimeStamp(log.timestamp)}
                             </td>
@@ -189,11 +258,18 @@ function AdminPage() {
                       className="btn btn-secondary mt-2"
                       onClick={() => {
                         setLoadingServerLogPart(true);
-                        fetchServerLog();
+                        if (activeFilters) {
+                          fetchFilteredServerLog(activeFilters);
+                        } else {
+                          fetchServerLog();
+                        }
                       }}
                       disabled={
                         loadingServerLogPart ||
-                        (serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
+                        (activeFilters
+                          ? filteredServerLogMaxEntries &&
+                            filteredServerlogOffset >= filteredServerLogMaxEntries
+                          : serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
                       }
                     >
                       {loadingServerLogPart ? (
@@ -291,6 +367,7 @@ function AdminPage() {
           handleClose={() => setShowFilterOptionsModal(false)}
           filterOptions={filterOptions}
           handleFilterOptions={handleServerLogSearch}
+          activeFilters={activeFilters}
         />
       ) : null}
     </>
