@@ -16,6 +16,8 @@ function AdminPage() {
   const [laodingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
+  const [filteredServerlogOffset, setFilteredServerlogOffset] = useState(0);
+  const [filteredServerLogMaxEntries, setFilteredServerLogMaxEntries] = useState(null);
   const [loadingServerLogPart, setLoadingServerLogPart] = useState(true);
   const [allRouteGroups, setAllRouteGroups] = useState([]);
   const [allPermissions, setAllPermissions] = useState([]);
@@ -31,6 +33,7 @@ function AdminPage() {
   console.log("serverLog:", serverLog);
   console.log("serverlogOffset:", serverlogOffset);
   console.log("serverLogMaxEntries:", serverLogMaxEntries);
+  console.log("filtered-ServerLog", filteredServerLog);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -67,8 +70,8 @@ function AdminPage() {
       } else {
         setFilteredServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
       }
-      setServerlogOffset((prevOffset) => prevOffset + 50);
-      setServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+      setFilterServerlogOffset((prevOffset) => prevOffset + 50);
+      setFilterServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
     } catch (error) {
       if (error.name === "CanceledError") {
         console.log("Filtered-Server-Log-Fetch abgebrochen");
