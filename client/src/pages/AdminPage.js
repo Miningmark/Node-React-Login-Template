@@ -65,7 +65,7 @@ function AdminPage() {
     try {
       const response = await axiosProtected.get(`/adminPage/getFilteredServerLog/50-${filteredServerlogOffset}`,{activeFilters});
       console.log("Server-Log-Fetch erfolgreich:", response?.data);
-      if (!serverLog) {
+      if (!filteredServerLog) {
         setFilteredServerLog(response.data.serverLogs);
       } else {
         setFilteredServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
