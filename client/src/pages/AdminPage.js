@@ -12,7 +12,7 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
-  const[filteredServerLog,setFilteredServerLog]=useState(null);]
+  const[filteredServerLog,setFilteredServerLog]=useState(null);
   const [laodingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
