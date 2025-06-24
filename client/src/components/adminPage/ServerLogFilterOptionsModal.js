@@ -3,12 +3,12 @@ import { useState } from "react";
 
 const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handleClose, show }) => {
   const [formData, setFormData] = useState({
-    logLevel: [],
-    user: [],
-    fromTimestamp: "",
-    toTimestamp: "",
-    ipAddress: "",
-    messageText: "",
+    levels: [],
+    userIds: [],
+    timestampFrom: "",
+    timestampTo: "",
+    ipv4Address: "",
+    searchString: "",
   });
 
   console.log("filterOptions", filterOptions);
@@ -29,8 +29,8 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
 
   function handleSearch() {
     console.log("formData", formData);
-    //handleFilterOptions(formData);
-    //handleClose();
+    handleFilterOptions(formData);
+    handleClose();
   }
 
   return (
@@ -45,8 +45,8 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
               <Form.Label>Log Level</Form.Label>
               <Form.Select
                 multiple
-                name="logLevel"
-                value={formData.logLevel}
+                name="levels"
+                value={formData.levels}
                 onChange={handleChange}
               >
                  <option value="">Bitte wählen...</option>
@@ -61,7 +61,7 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
 
             <Form.Group className="mb-3">
               <Form.Label>User</Form.Label>
-              <Form.Select  multiple name="user" value={formData.user} onChange={handleChange}>
+              <Form.Select  multiple name="userIds" value={formData.userIds} onChange={handleChange}>
                 <option value="">Bitte wählen...</option>
                 {filterOptions.users.map((user, index) => (
                   <option key={user.id} value={user.id}>
@@ -75,8 +75,8 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
               <Form.Label>Von Timestamp</Form.Label>
               <Form.Control
                 type="datetime-local"
-                name="fromTimestamp"
-                value={formData.fromTimestamp}
+                name="timestampFrom"
+                value={formData.timestampFrom}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -85,8 +85,8 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
               <Form.Label>Bis Timestamp</Form.Label>
               <Form.Control
                 type="datetime-local"
-                name="toTimestamp"
-                value={formData.toTimestamp}
+                name="timestampTo"
+                value={formData.timestampTo}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -96,8 +96,8 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
               <Form.Control
                 type="text"
                 placeholder="z. B. 192.168.0.1"
-                name="ipAddress"
-                value={formData.ipAddress}
+                name="ipv4Address"
+                value={formData.ipv4Address}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -107,8 +107,8 @@ const ServerLogFilterOptionsModal = ({ filterOptions, handleFilterOptions, handl
               <Form.Control
                 type="text"
                 placeholder="Nachricht enthält..."
-                name="messageText"
-                value={formData.messageText}
+                name="searchString"
+                value={formData.searchString}
                 onChange={handleChange}
               />
             </Form.Group>

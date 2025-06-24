@@ -76,8 +76,9 @@ function AdminPage() {
     setLoadingServerLog(false);
   }, []);
 
-  async function handleServerLogSearch() {
-    //TODO: API call
+  async function handleServerLogSearch(filterOptions) {
+    setActiveFilters(filterOptions);
+    console.log("FilterOptions",filterOptions);
   }
 
   return (
