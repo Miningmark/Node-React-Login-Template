@@ -32,13 +32,14 @@ function AdminPage() {
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
   const [showCreatePermissionModal,setShowCreatePermissionModal]=useState(false);
+  const [selectedPermission,setSelectedPermission]=useState(null);
 
   //console.log("serverLog:", serverLog);
   //console.log("serverlogOffset:", serverlogOffset);
   //console.log("serverLogMaxEntries:", serverLogMaxEntries);
   //console.log("filtered-ServerLog", filteredServerLog);
-  console.log("allRouteGroups", allRouteGroups);
-  console.log("allPermissions", allPermissions);
+  //console.log("allRouteGroups", allRouteGroups);
+  //console.log("allPermissions", allPermissions);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -219,8 +220,13 @@ function AdminPage() {
     fetchFilteredServerLog(filterOptions, 0);
   }
 
-  async function handleNewPermissions(permission) {
+  function handleNewPermission(permission) {
     console.log(permission);
+  }
+
+  function handleEditPermission(permission){
+    console.log(permission);
+    setSelectedPermission(null);
   }
 
   return (
@@ -400,6 +406,7 @@ function AdminPage() {
                                 fontWeight: "bold",
                               }}
                               title={permission.description}
+                              onClick={()=>setSelectedPermission(permission)}
                             >
                               {permission.name}
                             </td>
@@ -452,7 +459,9 @@ function AdminPage() {
           handleClose={()=>setShowCreatePermissionModal(false)}
           allPermissions={allPermissions}
           allRouteGroups={allRouteGroups}
-          handleNewPermissions={handleNewPermissions}
+          handleNewPermission={handleNewPermission}
+          handleEditPermission={handleEditPermission}
+          permission={selectedPermission}
         />):null}
     </>
   );

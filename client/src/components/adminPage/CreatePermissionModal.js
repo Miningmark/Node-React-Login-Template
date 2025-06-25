@@ -3,10 +3,10 @@ import { Modal, Button } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 
-const CreatePermissionModal = ({ show, handleClose, handleNewPermissions, allPermissions, allRouteGroups }) => {
-  const [name, setName] = useState("");
-  const [description,setDescription]=useState("");
-  const [routeGroupIds,setRouteGroupIds]=useState([]);
+const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleEditPermission, allPermissions, allRouteGroups ,permission}) => {
+  const [name, setName] = useState(permission ? permission.name : "");
+  const [description,setDescription]=useState(permission ? permission.description : "");
+  const [selectedRouteGroups,setSelectedRouteGroups]=useState(permission ? permission.routeGroups : []);
   const [touched, setTouched] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -14,20 +14,41 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermissions, allPer
   const { addToast } = useToast();
 
   const handleSave = async () => {
-    setIsSaving(true);
-    try {
-     
-      const response = await axiosProtected.post("/adminPage/createPermission", {name:name,description:description,routeGroupIds:routeGroupIds});
-      addToast("Permission erfolgreich erstellt", "success");
-      console.log(response.data);
-
-      //handleNewPermissions();
-      //handleClose();
-    } catch (error) {
-      addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
-    } finally {
-      setIsSaving(false);
+    if(allPermissions.includes(name)){
+        addToast("Berechtigung mit dem selben Namen existiert bereits!", "danger");
+        return;
     }
+    setIsSaving(true);
+
+    if(permission){
+         try {
+     
+            const response = await axiosProtected.post("/adminPage/updatePermission", {id:permission.id, name:name,description:description,routeGroupIds:routeGroupIds});
+            addToast("Permission erfolgreich erstellt", "success");
+            console.log(response.data);
+
+            handleEditPermission({name:name,description:description,routeGroups:selectedRouteGroups});
+            handleClose();
+        } catch (error) {
+            addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
+        } finally {
+            setIsSaving(false);
+        }
+    }else{
+         try {
+            const response = await axiosProtected.post("/adminPage/createPermission", {name:name,description:description,routeGroupIds:routeGroupIds});
+            addToast("Permission erfolgreich erstellt", "success");
+            console.log(response.data);
+
+            handleNewPermission({name:name,description:description,routeGroups:selectedRouteGroups});
+            handleClose();
+        } catch (error) {
+            addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
+        } finally {
+            setIsSaving(false);
+        }
+    }
+   
   };
 
   const closeModal = () => {
@@ -38,20 +59,22 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermissions, allPer
     handleClose();
   };
 
-    const handleCheckboxChange = (routeGroupId) => {
-    setRouteGroupIds((prev) => 
-        prev.includes(routeGroupId)
-        ? prev.filter((id) => id !== routeGroupId)
-        : [...prev, routeGroupId]
-    );
+    const handleCheckboxChange = (routeGroup) => {
+        setSelectedRouteGroups((prev) =>
+            prev.some((p) => p.id === routeGroup.id)
+            ? prev.filter((p) => p.id !== routeGroup.id)
+            : [...prev, routeGroup]
+        );
     };
+
+
 
 
 
   return (
     <Modal show={show} onHide={closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Neuen User erstellen</Modal.Title>
+        <Modal.Title>{permission ? "Berechtigung Bearbeiten":"Neue Berechtigung erstellen"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
 
@@ -92,8 +115,8 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermissions, allPer
               type="checkbox"
               className="form-check-input"
               id={`routeGroup-${routeGroup.id}`}
-              checked={routeGroupIds.some((p) => p === routeGroup.id)}
-              onChange={() => handleCheckboxChange(routeGroup.id)}
+              checked={selectedRouteGroups.some((p) => p === routeGroup.id)}
+              onChange={() => handleCheckboxChange(routeGroup)}
             />
             <label className="form-check-label" htmlFor={`routeGroup-${routeGroup.id}`}>
               {routeGroup.name}
