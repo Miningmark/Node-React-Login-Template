@@ -17,9 +17,14 @@ thead th {
 }
 
 /* Erste Spalte fixieren */
-tbody td:first-child,
-thead th:first-child {
+tbody td:first-child {
   position: sticky;
   left: 0;
   z-index: 3;
+}
+
+thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
 }

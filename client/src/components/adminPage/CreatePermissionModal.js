@@ -3,10 +3,20 @@ import { Modal, Button } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 
-const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleEditPermission, allPermissions, allRouteGroups ,permission}) => {
+const CreatePermissionModal = ({
+  show,
+  handleClose,
+  handleNewPermission,
+  handleEditPermission,
+  allPermissions,
+  allRouteGroups,
+  permission,
+}) => {
   const [name, setName] = useState(permission ? permission.name : "");
-  const [description,setDescription]=useState(permission ? permission.description : "");
-  const [selectedRouteGroups,setSelectedRouteGroups]=useState(permission ? permission.routeGroups : []);
+  const [description, setDescription] = useState(permission ? permission.description : "");
+  const [selectedRouteGroups, setSelectedRouteGroups] = useState(
+    permission ? permission.routeGroups : []
+  );
   const [touched, setTouched] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -14,42 +24,57 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
   const { addToast } = useToast();
 
   const handleSave = async () => {
-    if(allPermissions.includes(name)){
-        addToast("Berechtigung mit dem selben Namen existiert bereits!", "danger");
-        return;
+    if (allPermissions.includes(name)) {
+      addToast("Berechtigung mit dem selben Namen existiert bereits!", "danger");
+      return;
     }
     setIsSaving(true);
-    const routeGroupIds = selectedRouteGroups.map(rg => rg.id);
+    const routeGroupIds = selectedRouteGroups.map((rg) => rg.id);
 
-    if(permission){
-         try {
-     
-            const response = await axiosProtected.post("/adminPage/updatePermission", {id:permission.id, name:name,description:description,routeGroupIds:routeGroupIds});
-            addToast("Permission erfolgreich aktualisiert", "success");
-            console.log(response.data);
+    if (permission) {
+      try {
+        await axiosProtected.post("/adminPage/updatePermission", {
+          id: permission.id,
+          name: name,
+          description: description,
+          routeGroupIds: routeGroupIds,
+        });
+        addToast("Permission erfolgreich aktualisiert", "success");
 
-            handleEditPermission({name:name,description:description,routeGroups:selectedRouteGroups});
-            handleClose();
-        } catch (error) {
-            addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
-        } finally {
-            setIsSaving(false);
-        }
-    }else{
-         try {
-            const response = await axiosProtected.post("/adminPage/createPermission", {name:name,description:description,routeGroupIds:routeGroupIds});
-            addToast("Permission erfolgreich erstellt", "success");
-            console.log(response.data);
+        handleEditPermission({
+          id: permission.id,
+          name: name,
+          description: description,
+          routeGroups: selectedRouteGroups,
+        });
+        handleClose();
+      } catch (error) {
+        addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      try {
+        const response = await axiosProtected.post("/adminPage/createPermission", {
+          name: name,
+          description: description,
+          routeGroupIds: routeGroupIds,
+        });
+        addToast("Permission erfolgreich erstellt", "success");
 
-            handleNewPermission({name:name,description:description,routeGroups:selectedRouteGroups});
-            handleClose();
-        } catch (error) {
-            addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
-        } finally {
-            setIsSaving(false);
-        }
+        handleNewPermission({
+          id: response.data.permissionId,
+          name: name,
+          description: description,
+          routeGroups: selectedRouteGroups,
+        });
+        handleClose();
+      } catch (error) {
+        addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
+      } finally {
+        setIsSaving(false);
+      }
     }
-   
   };
 
   const closeModal = () => {
@@ -60,25 +85,22 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
     handleClose();
   };
 
-    const handleCheckboxChange = (routeGroup) => {
-        setSelectedRouteGroups((prev) =>
-            prev.some((p) => p.id === routeGroup.id)
-            ? prev.filter((p) => p.id !== routeGroup.id)
-            : [...prev, routeGroup]
-        );
-    };
-
-
-
-
+  const handleCheckboxChange = (routeGroup) => {
+    setSelectedRouteGroups((prev) =>
+      prev.some((p) => p.id === routeGroup.id)
+        ? prev.filter((p) => p.id !== routeGroup.id)
+        : [...prev, routeGroup]
+    );
+  };
 
   return (
     <Modal show={show} onHide={closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>{permission ? "Berechtigung Bearbeiten":"Neue Berechtigung erstellen"}</Modal.Title>
+        <Modal.Title>
+          {permission ? "Berechtigung Bearbeiten" : "Neue Berechtigung erstellen"}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-
         <div className="form-floating mb-3">
           <input
             type="text"
@@ -86,7 +108,7 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
             id="floatingName"
             placeholder="Name"
             value={name}
-            onChange={(e)=>setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
             name="name"
           />
@@ -100,7 +122,7 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
             id="floatingDescription"
             placeholder="Beschreibung"
             value={description}
-            onChange={(e)=>setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             onBlur={() => setTouched((prev) => ({ ...prev, description: true }))}
             name="description"
           />

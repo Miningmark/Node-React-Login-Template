@@ -12,6 +12,7 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
 
 import "components/adminPage/adminPage.css";
+import { all } from "axios";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
@@ -31,8 +32,8 @@ function AdminPage() {
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
-  const [showCreatePermissionModal,setShowCreatePermissionModal]=useState(false);
-  const [selectedPermission,setSelectedPermission]=useState(null);
+  const [showCreatePermissionModal, setShowCreatePermissionModal] = useState(false);
+  const [selectedPermission, setSelectedPermission] = useState(null);
 
   //console.log("serverLog:", serverLog);
   //console.log("serverlogOffset:", serverlogOffset);
@@ -204,7 +205,6 @@ function AdminPage() {
       }
     };
 
-
     fetchFilterOptions();
     fetchAllRouteGroups();
     fetchAllPermissions();
@@ -222,10 +222,13 @@ function AdminPage() {
 
   function handleNewPermission(permission) {
     console.log(permission);
+    setAllPermissions((prev) => [...prev, permission]);
+    setShowCreatePermissionModal(false);
   }
 
-  function handleEditPermission(permission){
+  function handleEditPermission(permission) {
     console.log(permission);
+    setAllPermissions((prev) => prev.map((p) => (p.id === permission.id ? permission : p)));
     setSelectedPermission(null);
   }
 
@@ -357,7 +360,7 @@ function AdminPage() {
                     <button
                       className="btn btn-primary"
                       type="button"
-                      onClick={()=>setShowCreatePermissionModal(true)}
+                      onClick={() => setShowCreatePermissionModal(true)}
                     >
                       +
                     </button>
@@ -381,19 +384,24 @@ function AdminPage() {
                     style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
                   >
                     <Table striped bordered hover className="mb-0">
-                      <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+                      <thead className="border">
                         <tr>
                           <th>Zugriffsrechte</th>
                           {allRouteGroups.map((routeGroup) => (
-                            <th key={routeGroup.id} title={routeGroup.description} style={{
-                                    writingMode: "vertical-rl",
-                                    transform: "rotate(180deg)",
-                                    whiteSpace: "nowrap",
-                                    padding: "10px",
-                                    textAlign: "left",
-                                    verticalAlign: "bottom"
-                                  }}
-                          >{routeGroup.name}</th>
+                            <th
+                              key={routeGroup.id}
+                              title={routeGroup.description}
+                              style={{
+                                writingMode: "vertical-rl",
+                                transform: "rotate(180deg)",
+                                whiteSpace: "nowrap",
+                                padding: "10px",
+                                textAlign: "left",
+                                verticalAlign: "bottom",
+                              }}
+                            >
+                              {routeGroup.name}
+                            </th>
                           ))}
                         </tr>
                       </thead>
@@ -406,21 +414,21 @@ function AdminPage() {
                                 fontWeight: "bold",
                               }}
                               title={permission.description}
-                              onClick={()=>setSelectedPermission(permission)}
+                              onClick={() => setSelectedPermission(permission)}
                             >
                               {permission.name}
                             </td>
                             {allRouteGroups.map((route, index) => (
                               <td key={index}>
-                               <input
+                                <input
                                   type="checkbox"
-                                  checked={permission.routeGroups.some(rg => rg.name === route.name)}
+                                  checked={permission.routeGroups.some(
+                                    (rg) => rg.name === route.name
+                                  )}
                                   disabled
                                 />
-
                               </td>
                             ))}
-
                           </tr>
                         ))}
                       </tbody>
@@ -453,16 +461,29 @@ function AdminPage() {
         />
       ) : null}
 
-      {showCreatePermissionModal ?(
-        <CreatePermissionModal 
+      {showCreatePermissionModal ? (
+        <CreatePermissionModal
           show={!!showCreatePermissionModal}
-          handleClose={()=>setShowCreatePermissionModal(false)}
+          handleClose={() => setShowCreatePermissionModal(false)}
           allPermissions={allPermissions}
           allRouteGroups={allRouteGroups}
           handleNewPermission={handleNewPermission}
+          handleEditPermission={null}
+          permission={null}
+        />
+      ) : null}
+
+      {selectedPermission ? (
+        <CreatePermissionModal
+          show={!!selectedPermission}
+          handleClose={() => setSelectedPermission(false)}
+          allPermissions={allPermissions}
+          allRouteGroups={allRouteGroups}
+          handleNewPermission={null}
           handleEditPermission={handleEditPermission}
-          permission={selectedPermission}
-        />):null}
+          permission={allPermissions.find((p) => p.id === selectedPermission?.id) || null}
+        />
+      ) : null}
     </>
   );
 }
