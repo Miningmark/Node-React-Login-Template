@@ -33,6 +33,8 @@ function AdminPage() {
   //console.log("serverlogOffset:", serverlogOffset);
   //console.log("serverLogMaxEntries:", serverLogMaxEntries);
   //console.log("filtered-ServerLog", filteredServerLog);
+  console.log("allRouteGroups", allRouteGroups);
+  console.log("allPermissions", allPermissions);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -186,7 +188,7 @@ function AdminPage() {
       try {
         const response = await axiosProtected.get(`/adminPage/getAllPermissionsWithRouteGroups`);
         console.log("All Permissions-Fetch erfolgreich:", response?.data);
-        //setAllPermissions(response?.data?.);
+        setAllPermissions(response?.data?.permissions);
         setLoadingAllPermissions(false);
       } catch (error) {
         if (error.name === "CanceledError") {
@@ -335,7 +337,7 @@ function AdminPage() {
               className="border p-3 p mb-4"
               style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
             >
-              {!loadingAllRouteGroups && !loadingAllPermissions && routeGroups?.length > 0 ? (
+              {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
                     <InputGroup className="flex-grow-1">
@@ -361,8 +363,8 @@ function AdminPage() {
                       <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
                         <tr>
                           <th>Zugriffsrechte</th>
-                          {routeGroups.map((routeGroup) => (
-                            <th key={routeGroup.id}>{routeGroup.name}</th>
+                          {allRouteGroups.map((routeGroup) => (
+                            <th key={routeGroup.id} title={routeGroup.description}>{routeGroup.name}</th>
                           ))}
                         </tr>
                       </thead>
@@ -374,6 +376,7 @@ function AdminPage() {
                                 cursor: "pointer",
                                 fontWeight: "bold",
                               }}
+                              title={permission.description}
                             >
                               {permission.name}
                             </td>
