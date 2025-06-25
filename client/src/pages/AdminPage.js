@@ -364,7 +364,15 @@ function AdminPage() {
                         <tr>
                           <th>Zugriffsrechte</th>
                           {allRouteGroups.map((routeGroup) => (
-                            <th key={routeGroup.id} title={routeGroup.description}>{routeGroup.name}</th>
+                            <th key={routeGroup.id} title={routeGroup.description} style={{
+                                    writingMode: "vertical-rl",
+                                    transform: "rotate(180deg)",
+                                    whiteSpace: "nowrap",
+                                    padding: "10px",
+                                    textAlign: "left",
+                                    verticalAlign: "bottom"
+                                  }}
+                          >{routeGroup.name}</th>
                           ))}
                         </tr>
                       </thead>
@@ -382,7 +390,12 @@ function AdminPage() {
                             </td>
                             {allRouteGroups.map((route, index) => (
                               <td key={index}>
-                                {index}, {permission.routeGroups.some(rg => rg.name === route.name) ? "Ja" : "Nein"}
+                               <input
+                                  type="checkbox"
+                                  checked={permission.routeGroups.some(rg => rg.name === route.name)}
+                                  disabled
+                                />
+
                               </td>
                             ))}
 
