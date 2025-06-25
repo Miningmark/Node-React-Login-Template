@@ -171,7 +171,8 @@ function AdminPage() {
       try {
         const response = await axiosProtected.get(`/adminPage/getAllRouteGroups`);
         console.log("All Route Groups-Fetch erfolgreich:", response?.data);
-        //setAllRouteGroups(response?.data?.);
+        setAllRouteGroups(response?.data?.routeGroups);
+        setLoadingAllRouteGroups(false);
       } catch (error) {
         if (error.name === "CanceledError") {
           console.log("Server-Log Filter Optionen Fetch abgebrochen");
@@ -186,6 +187,7 @@ function AdminPage() {
         const response = await axiosProtected.get(`/adminPage//getAllPermissionsWithRouteGroups`);
         console.log("All Permissions-Fetch erfolgreich:", response?.data);
         //setAllPermissions(response?.data?.);
+        setLoadingAllPermissions(false);
       } catch (error) {
         if (error.name === "CanceledError") {
           console.log("Server-Log Filter Optionen Fetch abgebrochen");
@@ -198,6 +200,7 @@ function AdminPage() {
 
     fetchFilterOptions();
     fetchAllRouteGroups();
+    fetchAllPermissions();
     fetchServerLog();
     setLoadingServerLog(false);
   }, []);
