@@ -175,24 +175,24 @@ function AdminPage() {
         setLoadingAllRouteGroups(false);
       } catch (error) {
         if (error.name === "CanceledError") {
-          console.log("Server-Log Filter Optionen Fetch abgebrochen");
+          console.log("Route Groups Fetch abgebrochen");
         } else {
-          addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+          addToast("Fehler beim Laden der Route Groups", "danger");
         }
       }
     };
 
     const fetchAllPermissions = async () => {
       try {
-        const response = await axiosProtected.get(`/adminPage//getAllPermissionsWithRouteGroups`);
+        const response = await axiosProtected.get(`/adminPage/getAllPermissionsWithRouteGroups`);
         console.log("All Permissions-Fetch erfolgreich:", response?.data);
         //setAllPermissions(response?.data?.);
         setLoadingAllPermissions(false);
       } catch (error) {
         if (error.name === "CanceledError") {
-          console.log("Server-Log Filter Optionen Fetch abgebrochen");
+          console.log("Permissions Fetch abgebrochen");
         } else {
-          addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+          addToast("Fehler beim Laden der Permissions", "danger");
         }
       }
     };
