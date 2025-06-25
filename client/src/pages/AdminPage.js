@@ -166,7 +166,38 @@ function AdminPage() {
         }
       }
     };
+
+    const fetchAllRouteGroups = async () => {
+      try {
+        const response = await axiosProtected.get(`/adminPage/getAllRouteGroups`);
+        console.log("All Route Groups-Fetch erfolgreich:", response?.data);
+        //setAllRouteGroups(response?.data?.);
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          console.log("Server-Log Filter Optionen Fetch abgebrochen");
+        } else {
+          addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+        }
+      }
+    };
+
+    const fetchAllPermissions = async () => {
+      try {
+        const response = await axiosProtected.get(`/adminPage//getAllPermissionsWithRouteGroups`);
+        console.log("All Permissions-Fetch erfolgreich:", response?.data);
+        //setAllPermissions(response?.data?.);
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          console.log("Server-Log Filter Optionen Fetch abgebrochen");
+        } else {
+          addToast("Fehler beim Laden der Server-Log Filter Optionen", "danger");
+        }
+      }
+    };
+
+
     fetchFilterOptions();
+    fetchAllRouteGroups();
     fetchServerLog();
     setLoadingServerLog(false);
   }, []);
