@@ -9,6 +9,9 @@ import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOpt
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
+import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
+
+import "components/adminPage/adminPage.css";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
@@ -28,11 +31,15 @@ function AdminPage() {
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
+  const [showCreatePermissionModal,setShowCreatePermissionModal]=useState(false);
+  const [selectedPermission,setSelectedPermission]=useState(null);
 
   //console.log("serverLog:", serverLog);
   //console.log("serverlogOffset:", serverlogOffset);
   //console.log("serverLogMaxEntries:", serverLogMaxEntries);
   //console.log("filtered-ServerLog", filteredServerLog);
+  //console.log("allRouteGroups", allRouteGroups);
+  //console.log("allPermissions", allPermissions);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -166,7 +173,41 @@ function AdminPage() {
         }
       }
     };
+
+    const fetchAllRouteGroups = async () => {
+      try {
+        const response = await axiosProtected.get(`/adminPage/getAllRouteGroups`);
+        console.log("All Route Groups-Fetch erfolgreich:", response?.data);
+        setAllRouteGroups(response?.data?.routeGroups);
+        setLoadingAllRouteGroups(false);
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          console.log("Route Groups Fetch abgebrochen");
+        } else {
+          addToast("Fehler beim Laden der Route Groups", "danger");
+        }
+      }
+    };
+
+    const fetchAllPermissions = async () => {
+      try {
+        const response = await axiosProtected.get(`/adminPage/getAllPermissionsWithRouteGroups`);
+        console.log("All Permissions-Fetch erfolgreich:", response?.data);
+        setAllPermissions(response?.data?.permissions);
+        setLoadingAllPermissions(false);
+      } catch (error) {
+        if (error.name === "CanceledError") {
+          console.log("Permissions Fetch abgebrochen");
+        } else {
+          addToast("Fehler beim Laden der Permissions", "danger");
+        }
+      }
+    };
+
+
     fetchFilterOptions();
+    fetchAllRouteGroups();
+    fetchAllPermissions();
     fetchServerLog();
     setLoadingServerLog(false);
   }, []);
@@ -177,6 +218,15 @@ function AdminPage() {
     setFilteredServerLog(null);
     setActiveFilters(filterOptions);
     fetchFilteredServerLog(filterOptions, 0);
+  }
+
+  function handleNewPermission(permission) {
+    console.log(permission);
+  }
+
+  function handleEditPermission(permission){
+    console.log(permission);
+    setSelectedPermission(null);
   }
 
   return (
@@ -301,9 +351,16 @@ function AdminPage() {
               className="border p-3 p mb-4"
               style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
             >
-              {!loadingAllRouteGroups && !loadingAllPermissions && routeGroups?.length > 0 ? (
+              {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={()=>setShowCreatePermissionModal(true)}
+                    >
+                      +
+                    </button>
                     <InputGroup className="flex-grow-1">
                       <FormControl
                         placeholder="Suche in Logs"
@@ -320,15 +377,23 @@ function AdminPage() {
                   </div>
 
                   <div
-                    className="border"
+                    className="border table-container"
                     style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
                   >
                     <Table striped bordered hover className="mb-0">
                       <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
                         <tr>
                           <th>Zugriffsrechte</th>
-                          {routeGroups.map((routeGroup) => (
-                            <th key={routeGroup.id}>{routeGroup.name}</th>
+                          {allRouteGroups.map((routeGroup) => (
+                            <th key={routeGroup.id} title={routeGroup.description} style={{
+                                    writingMode: "vertical-rl",
+                                    transform: "rotate(180deg)",
+                                    whiteSpace: "nowrap",
+                                    padding: "10px",
+                                    textAlign: "left",
+                                    verticalAlign: "bottom"
+                                  }}
+                          >{routeGroup.name}</th>
                           ))}
                         </tr>
                       </thead>
@@ -340,12 +405,22 @@ function AdminPage() {
                                 cursor: "pointer",
                                 fontWeight: "bold",
                               }}
+                              title={permission.description}
+                              onClick={()=>setSelectedPermission(permission)}
                             >
                               {permission.name}
                             </td>
-                            {permission.map((route, index) => (
-                              <td key={index}>Nein</td>
+                            {allRouteGroups.map((route, index) => (
+                              <td key={index}>
+                               <input
+                                  type="checkbox"
+                                  checked={permission.routeGroups.some(rg => rg.name === route.name)}
+                                  disabled
+                                />
+
+                              </td>
                             ))}
+
                           </tr>
                         ))}
                       </tbody>
@@ -377,6 +452,17 @@ function AdminPage() {
           activeFilters={activeFilters}
         />
       ) : null}
+
+      {showCreatePermissionModal ?(
+        <CreatePermissionModal 
+          show={!!showCreatePermissionModal}
+          handleClose={()=>setShowCreatePermissionModal(false)}
+          allPermissions={allPermissions}
+          allRouteGroups={allRouteGroups}
+          handleNewPermission={handleNewPermission}
+          handleEditPermission={handleEditPermission}
+          permission={selectedPermission}
+        />):null}
     </>
   );
 }
