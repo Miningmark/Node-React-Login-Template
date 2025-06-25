@@ -195,7 +195,7 @@ export async function updatePermission(req, res, next) {
             throw new ValidationError("Es müssen alle Parameter angegeben werden");
 
         const foundPermissionWithNewName = await Models.Permission.findOne({ where: { name: name }, include: { model: Models.RouteGroup } });
-        if (foundPermissionWithNewName !== null) throw new ValidationError("Es gibt bereits eine Permission mit diesem Namen");
+        if (foundPermissionWithNewName === null) throw new ValidationError("Es gibt keine Permission mit diesem Namen");
 
         const foundPermission = await Models.Permission.findOne({ where: { id: id }, include: { model: Models.RouteGroup } });
         if (foundPermission === null) throw new ValidationError("Es gibt keine Permission mit dieser id");
