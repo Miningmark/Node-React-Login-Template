@@ -9,6 +9,7 @@ import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOpt
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
+import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
 
 import "components/adminPage/adminPage.css";
 
@@ -30,6 +31,7 @@ function AdminPage() {
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
+  const [showCreatePermissionModal,setShowCreatePermissionModal]=useState(false);
 
   //console.log("serverLog:", serverLog);
   //console.log("serverlogOffset:", serverlogOffset);
@@ -217,6 +219,10 @@ function AdminPage() {
     fetchFilteredServerLog(filterOptions, 0);
   }
 
+  async function handleNewPermissions(permission) {
+    console.log(permission);
+  }
+
   return (
     <>
       <Container className="page-wrapper mt-4">
@@ -342,6 +348,13 @@ function AdminPage() {
               {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
                 <>
                   <div className="d-flex gap-2 mb-3">
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={()=>setShowCreatePermissionModal(true)}
+                    >
+                      +
+                    </button>
                     <InputGroup className="flex-grow-1">
                       <FormControl
                         placeholder="Suche in Logs"
@@ -432,6 +445,15 @@ function AdminPage() {
           activeFilters={activeFilters}
         />
       ) : null}
+
+      {showCreatePermissionModal ?(
+        <CreatePermissionModal 
+          show={!!showCreatePermissionModal}
+          handleClose={()=>setShowCreatePermissionModal(false)}
+          allPermissions={allPermissions}
+          allRouteGroups={allRouteGroups}
+          handleNewPermissions={handleNewPermissions}
+        />):null}
     </>
   );
 }
