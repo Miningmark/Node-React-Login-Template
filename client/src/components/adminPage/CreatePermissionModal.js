@@ -19,12 +19,13 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
         return;
     }
     setIsSaving(true);
+    const routeGroupIds = selectedRouteGroups.map(rg => rg.id);
 
     if(permission){
          try {
      
             const response = await axiosProtected.post("/adminPage/updatePermission", {id:permission.id, name:name,description:description,routeGroupIds:routeGroupIds});
-            addToast("Permission erfolgreich erstellt", "success");
+            addToast("Permission erfolgreich aktualisiert", "success");
             console.log(response.data);
 
             handleEditPermission({name:name,description:description,routeGroups:selectedRouteGroups});
@@ -54,7 +55,7 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
   const closeModal = () => {
     setName("");
     setDescription("");
-    setRouteGroupIds([]);
+    setSelectedRouteGroups([]);
     setTouched({});
     handleClose();
   };
@@ -115,7 +116,7 @@ const CreatePermissionModal = ({ show, handleClose, handleNewPermission, handleE
               type="checkbox"
               className="form-check-input"
               id={`routeGroup-${routeGroup.id}`}
-              checked={selectedRouteGroups.some((p) => p === routeGroup.id)}
+              checked={selectedRouteGroups.some((p) => p.id === routeGroup.id)}
               onChange={() => handleCheckboxChange(routeGroup)}
             />
             <label className="form-check-label" htmlFor={`routeGroup-${routeGroup.id}`}>
