@@ -238,12 +238,12 @@ export async function deletePermission(req, res, next) {
     const transaction = await sequelize.transaction();
     try {
         const { userId } = req;
-        const { permissionId } = req.body || {};
+        const { id } = req.body || {};
         let jsonResponse = { message: "Recht erfolgreich gelöscht" };
 
-        if (permissionId === undefined) throw new ValidationError("Es muss die id angegeben werden");
+        if (id === undefined) throw new ValidationError("Es muss die id angegeben werden");
 
-        const foundPermission = await Models.Permission.findOne({ where: { id: permissionId }, include: { model: Models.RouteGroup } });
+        const foundPermission = await Models.Permission.findOne({ where: { id: id }, include: { model: Models.RouteGroup } });
         if (foundPermission === null) throw new ValidationError("Es gibt keine Permission mit dieser id");
 
         if (foundPermission.RouteGroups !== undefined) {
