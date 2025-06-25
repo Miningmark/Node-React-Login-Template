@@ -35,6 +35,10 @@ export async function login(req, res, next) {
 
         const routeGroups = await accountUtils.findRouteGroups(foundUser.id);
 
+        if (foundUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) {
+            routeGroups.push("superAdmin");
+        }
+
         const accessUserToken = await Models.UserToken.findOne({ where: { userId: foundUser.id, type: "accessToken" } }, { transaction: transaction });
         const refreshUserToken = await Models.UserToken.findOne({ where: { userId: foundUser.id, type: "refreshToken" } }, { transaction: transaction });
 
@@ -468,7 +472,14 @@ export async function getRouteGroups(req, res, next) {
         const { userId } = req;
         let jsonResponse = { message: "RouteGroups erfolgreich zurückgegeben" };
 
-        jsonResponse.routeGroups = await accountUtils.findRouteGroups(userId);
+        const routeGroups = await accountUtils.findRouteGroups(userId);
+        const foundUser = await Models.User.findOne({ where: { id: userId } });
+
+        if (foundUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) {
+            routeGroups.push("superAdmin");
+        }
+
+        jsonResponse.routeGroups = routeGroups;
 
         await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "loginController", null);
         return res.status(200).json(jsonResponse);

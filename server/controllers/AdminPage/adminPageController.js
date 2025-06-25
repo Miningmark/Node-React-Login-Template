@@ -188,16 +188,16 @@ export async function updatePermission(req, res, next) {
     const transaction = await sequelize.transaction();
     try {
         const { userId } = req;
-        const { permissionId, name, description, routeGroupIds } = req.body || {};
+        const { id, name, description, routeGroupIds } = req.body || {};
         let jsonResponse = { message: "Recht erfolgreich bearbeitet" };
 
-        if (permissionId === undefined || name === undefined || description === undefined || routeGroupIds === undefined || !Array.isArray(routeGroupIds))
+        if (id === undefined || name === undefined || description === undefined || routeGroupIds === undefined || !Array.isArray(routeGroupIds))
             throw new ValidationError("Es müssen alle Parameter angegeben werden");
 
         const foundPermissionWithNewName = await Models.Permission.findOne({ where: { name: name }, include: { model: Models.RouteGroup } });
         if (foundPermissionWithNewName !== null) throw new ValidationError("Es gibt bereits eine Permission mit diesem Namen");
 
-        const foundPermission = await Models.Permission.findOne({ where: { id: permissionId }, include: { model: Models.RouteGroup } });
+        const foundPermission = await Models.Permission.findOne({ where: { id: id }, include: { model: Models.RouteGroup } });
         if (foundPermission === null) throw new ValidationError("Es gibt keine Permission mit dieser id");
 
         if (foundPermission.RouteGroups !== undefined) {
@@ -217,7 +217,7 @@ export async function updatePermission(req, res, next) {
         if (foundRouteGroups !== null) {
             await Promise.all(
                 foundRouteGroups.map(async (routeGroup) => {
-                    if (routeGroup.permissionId !== null && routeGroup.permissionId !== permissionId)
+                    if (routeGroup.permissionId !== null && routeGroup.permissionId !== id)
                         throw new ValidationError("Diese RouteGroup ist bereits einem anderen Recht zugewiesen");
                     await foundPermission.addRouteGroup(routeGroup, { transaction: transaction });
                 })
