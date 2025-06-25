@@ -380,9 +380,12 @@ function AdminPage() {
                             >
                               {permission.name}
                             </td>
-                            {permission.map((route, index) => (
-                              <td key={index}>Nein</td>
+                            {allRouteGroups.map((route, index) => (
+                              <td key={index}>
+                                {index}, {permission.routeGroups.some(rg => rg.name === route.name) ? "Ja" : "Nein"}
+                              </td>
                             ))}
+
                           </tr>
                         ))}
                       </tbody>
