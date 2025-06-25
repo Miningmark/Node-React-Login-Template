@@ -232,6 +232,11 @@ function AdminPage() {
     setSelectedPermission(null);
   }
 
+  function handleDeletePermission(permissionId) {
+    setAllPermissions((prev) => prev.filter((p) => p.id !== permissionId));
+    setSelectedPermission(null);
+  }
+
   return (
     <>
       <Container className="page-wrapper mt-4">
@@ -481,6 +486,7 @@ function AdminPage() {
           allRouteGroups={allRouteGroups}
           handleNewPermission={null}
           handleEditPermission={handleEditPermission}
+          handleDeletePermission={handleDeletePermission}
           permission={allPermissions.find((p) => p.id === selectedPermission?.id) || null}
         />
       ) : null}
