@@ -10,6 +10,8 @@ import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 
+import "components/adminPage/adminPage.css";
+
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
   const [filteredServerLog, setFilteredServerLog] = useState(null);
@@ -356,7 +358,7 @@ function AdminPage() {
                   </div>
 
                   <div
-                    className="border"
+                    className="border table-container"
                     style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
                   >
                     <Table striped bordered hover className="mb-0">
