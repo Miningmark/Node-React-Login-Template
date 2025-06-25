@@ -172,6 +172,8 @@ export async function createPermission(req, res, next) {
             );
         }
 
+        jsonResponse.permissionId = createdPermission.id;
+
         await transaction.commit();
 
         await serverLoggerForRoutes(req, "INFO", jsonResponse.message, userId, 200, jsonResponse, "adminPageController", null);
