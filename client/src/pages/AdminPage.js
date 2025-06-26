@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo} from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
@@ -37,6 +37,33 @@ function AdminPage() {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { routeGroups } = useContext(AuthContext);
+
+
+  const filteredPermission = useMemo(() => {
+    if(!allPermissions) return [];
+
+        const searchLower = searchTerm.toLowerCase();
+
+            const filtered = searchTerm
+              ? allPermissions.filter((item) =>
+                  Object.values(item).some((value) => {
+                    if (typeof value === "string") {
+                      return value.toLowerCase().includes(searchLower);
+                    }
+                    if (typeof value === "number") {
+                      return value.toString().includes(searchTerm);
+                    }
+        
+                    return false;
+                  })
+                )
+              : allPermissions;
+        
+            return sortingAlgorithm(filtered, "name", "asc");
+
+
+
+    }, [allPermissions, searchTerm]);
 
   const refreshFilteredServerLog = async () => {
     if (!activeFilters) return;
@@ -323,10 +350,11 @@ function AdminPage() {
                       </button>
                       <InputGroup className="flex-grow-1">
                         <FormControl
-                          placeholder="Suche in Logs"
+                          placeholder="Suche in Benutzerrechten"
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </InputGroup>
+                      {/*
                       <button
                         className="btn btn-primary"
                         type="button"
@@ -334,6 +362,7 @@ function AdminPage() {
                       >
                         Suchen
                       </button>
+                       */}
                     </div>
 
                     <div
@@ -363,7 +392,7 @@ function AdminPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {allPermissions.map((permission) => (
+                          {filteredPermission.map((permission) => (
                             <tr key={permission.id}>
                               <td
                                 style={{
