@@ -1,5 +1,5 @@
 import express from "express";
-import { ENV } from "./config/env";
+import { ErrorMonitoringService } from "@/services/errorMonitoring.service";
 //import { ENV } from "./config/env";
 
 /*import helmet from "helmet";
@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";*/
 
 const app = express();
 
-console.log(ENV);
+ErrorMonitoringService.getInstance();
 
 /*app.use(helmet());
 //app.use(credentials);
@@ -22,7 +22,7 @@ app.use(cookieParser());
 
 app.use("/api/users", usersRouter);*/
 
-(async () => {
+/*(async () => {
     try {
         /*await sequelize.authenticate();
         await sequelize.sync(config.deleteDatabaseOnStart ? { force: true } : {});
@@ -42,19 +42,21 @@ app.use("/api/users", usersRouter);*/
         });
 
         app.use(errorHandler);
-*/
+
 
         app.listen(ENV.BACKEND_PORT, async () => {
-            console.log(`Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ` /*${config.serverVersion}`*/);
+            console.log(`Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`);
             /*await serverLogger("INFO", "Datenbank verbunden und Server läuft auf Port " + config.backendPort + " mit Version: " + config.serverVersion, {
                 source: "startup"
-            });*/
+            });
         });
     } catch (error) {
         /*await serverLogger("CRITICAL", error.message, {
             source: "startup",
             error: error
-        });*/
+        });
         process.exit(1);
     }
-})();
+})();*/
+
+export default app;

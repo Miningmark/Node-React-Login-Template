@@ -1,5 +1,6 @@
+.vscode/
 .env
 package-lock.json
+
 node_modules/
-.vscode/
-/server/
+backend/dist/

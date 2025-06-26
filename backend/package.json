@@ -1,36 +1,38 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/app.js",
-  "scripts": {
-    "start": "node dist/app.js",
-    "build": "tsc",
-    "dev": "tsx watch src/app.ts",
-    "prepare": "husky"
-  },
-  "author": "Juli051",
-  "license": "ISC",
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.14.1",
-    "nodemailer": "^7.0.3",
-    "sequelize": "^6.37.7",
-    "uuid": "^11.1.0",
-    "zod": "^3.25.67"
-  },
-  "devDependencies": {
-    "@types/cookie-parser": "^1.4.9",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@types/node": "^24.0.3",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
-  }
+    "name": "server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "start": "node dist/index.js",
+        "build": "tsc -p . && tsc-alias",
+        "dev": "nodemon"
+    },
+    "author": "Juli051",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "helmet": "^8.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mysql2": "^3.14.1",
+        "nodemailer": "^7.0.3",
+        "sequelize": "^6.37.7",
+        "uuid": "^11.1.0",
+        "winston": "^3.17.0",
+        "zod": "^3.25.67"
+    },
+    "devDependencies": {
+        "@types/cookie-parser": "^1.4.9",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.0.4",
+        "ts-node": "^10.9.2",
+        "tsc-alias": "^1.8.16",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.8.3"
+    }
 }

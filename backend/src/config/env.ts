@@ -11,6 +11,7 @@ const envSchema = z.object({
     ENABLE_USERNAME_CHANGE: z.string().transform(Boolean),
 
     BACKEND_PORT: z.string().transform(Number),
+    BACKEND_VERSION: z.string(),
     API_VERSION: z.string(),
 
     SUPER_ADMIN_PASSWORD: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/),
