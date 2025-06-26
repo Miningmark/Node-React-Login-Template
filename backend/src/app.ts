@@ -1,38 +1,26 @@
-import config from "./config/config";
 import express from "express";
+import { ENV } from "./config/env";
+//import { ENV } from "./config/env";
 
-import helmet from "helmet";
+/*import helmet from "helmet";
 //import credentials from "./middleware/credentials.js";
 import cors from "cors";
 //import corsOptions from "./config/corsOptions.js";
-import cookieParser from "cookie-parser";
-
-//import { sequelize } from "./controllers/modelController.js";
-//import { seedDatabase } from "./seedDatabase.js";
-//import { generateSuperAdmin, removeRouteGroups } from "./utils/utils.js";
-
-//import { errorHandler } from "./middleware/errorHandler.js";
-//import { NotFoundError } from "./errors/NotFoundError.js";
-//import { serverLogger } from "./utils/ServerLog/serverLogger.js";
-
-//import accountRoute from "./routes/Account/accountRoute.js";
-
-//import userManagementRoute from "./routes/UserManagement/userManagementRoute.js";
-//import adminPageRoute from "./routes/AdminPage/adminPageRoute.js";
-
-import usersRouter from "./routes/users";
+import cookieParser from "cookie-parser";*/
 
 const app = express();
 
-app.use(helmet());
+console.log(ENV);
+
+/*app.use(helmet());
 //app.use(credentials);
-app.use(cors(/*corsOptions*/));
+app.use(cors(/*corsOptions));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/users", usersRouter);
+app.use("/api/users", usersRouter);*/
 
 (async () => {
     try {
@@ -56,8 +44,8 @@ app.use("/api/users", usersRouter);
         app.use(errorHandler);
 */
 
-        app.listen(config.backendPort, async () => {
-            console.log(`Datenbank verbunden und Server läuft auf Port ${config.backendPort} mit Version: ${config.serverVersion}`);
+        app.listen(ENV.BACKEND_PORT, async () => {
+            console.log(`Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ` /*${config.serverVersion}`*/);
             /*await serverLogger("INFO", "Datenbank verbunden und Server läuft auf Port " + config.backendPort + " mit Version: " + config.serverVersion, {
                 source: "startup"
             });*/

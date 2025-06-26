@@ -1,0 +1,10 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Git Commit Hash kurz holen
+HASH=$(git rev-parse --short HEAD)
+
+# JSON mit Version in backend schreiben
+echo "{ \"version\": \"$HASH\" }" > backend/server-version.json
+
+echo "✅ server-version.json updated with commit $HASH"
