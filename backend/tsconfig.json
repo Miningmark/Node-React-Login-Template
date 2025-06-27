@@ -32,7 +32,7 @@
       "@/*": ["./src/*"],
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
     "types": ["node"],
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     "resolveJsonModule": true                            /* Enable importing .json files */,
@@ -98,7 +98,10 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+  },
+  "ts-node": {
+    "files": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

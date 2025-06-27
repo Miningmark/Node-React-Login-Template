@@ -4,11 +4,11 @@ import "dotenv/config";
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "production"]),
 
-    CONSOLE_LOG_DATABASE_QUERRIES: z.string().transform(Boolean),
-    CONSOLE_LOG_ERRORS: z.string().transform(Boolean),
+    CONSOLE_LOG_DATABASE_QUERRIES: z.string().transform((val) => val === "true"),
+    CONSOLE_LOG_ERRORS: z.string().transform((val) => val === "true"),
 
-    ENABLE_REGISTER: z.string().transform(Boolean),
-    ENABLE_USERNAME_CHANGE: z.string().transform(Boolean),
+    ENABLE_REGISTER: z.string().transform((val) => val === "true"),
+    ENABLE_USERNAME_CHANGE: z.string().transform((val) => val === "true"),
 
     BACKEND_PORT: z.string().transform(Number),
     BACKEND_VERSION: z.string(),

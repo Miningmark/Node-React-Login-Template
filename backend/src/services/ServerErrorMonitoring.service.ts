@@ -1,4 +1,4 @@
-import { logger } from "@/config/logger";
+import { consoleLogger } from "@/config/logger";
 
 export class ErrorMonitoringService {
     private static instance: ErrorMonitoringService;
@@ -16,11 +16,11 @@ export class ErrorMonitoringService {
     }
 
     private handleUncaughtException = (error: Error) => {
-        logger.error("Unhandeld Exception, shutting Server down", { error: error.stack });
+        consoleLogger.error("Unhandeld Exception, shutting Server down", { error: error.stack });
         process.exit(1);
     };
     private handleUnhandledRejection = (reason: any) => {
-        logger.error("Unhandeld Rejection, shutting Server down", { error: reason instanceof Error ? reason.stack : new Error(String(reason)) });
+        consoleLogger.error("Unhandeld Rejection, shutting Server down", { error: reason instanceof Error ? reason.stack : new Error(String(reason)) });
         process.exit(1);
     };
 }

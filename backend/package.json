@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node dist/index.js",
         "build": "tsc -p . && tsc-alias",
-        "dev": "nodemon"
+        "dev": "npx nodemon"
     },
     "author": "Juli051",
     "license": "ISC",

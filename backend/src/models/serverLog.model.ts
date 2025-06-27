@@ -17,12 +17,12 @@ interface ServerLogAttributes {
     status?: number;
     ipv4Address?: string;
     userAgent?: string;
-    requestBody?: JSON;
-    requestHeaders?: JSON;
-    response?: JSON;
+    requestBody?: object;
+    requestHeaders?: object;
+    response?: object;
     source?: string;
     errorStack?: string;
-    timestamp?: string;
+    timestamp?: Date;
 }
 
 @Table({

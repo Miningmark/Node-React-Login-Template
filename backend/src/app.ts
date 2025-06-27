@@ -9,11 +9,12 @@ import { notFoundMiddleware } from "@/middlewares/notFoundMiddleware";
 import { errorHandlerMiddleware } from "@/middlewares/errorHandlerMiddleware";
 
 import { ENV } from "@/config/env";
-import { logger } from "@/config/logger";
+import { consoleLogger, databaseLogger } from "@/config/logger";
 import { sequelize } from "@/config/sequelize";
 
-import User from "@/models/user.model";
-import UserToken, { UserTokenType } from "@/models/userToken.model";
+import { validateRequest } from "@/middlewares/validateRequestMiddleware";
+import { signupSchema } from "@/validators/auth.validator";
+import { ServerLogLevels } from "./models/serverLog.model";
 
 const app = express();
 
@@ -26,8 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req: Request, res: Response) => {
-    logger.info("Home Route Called");
+app.post("/", validateRequest(signupSchema), async (req: Request, res: Response) => {
+    await databaseLogger(ServerLogLevels.INFO, "Home Route called", { source: "/" });
     res.status(200).json({ message: "Home Route" });
 });
 
@@ -35,16 +36,6 @@ app.get("/", (req: Request, res: Response) => {
     try {
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
-
-        const user = await User.create({ username: "test", password: "test123", email: "Juli051@gmx.net" });
-        const userToken = await UserToken.create({ userId: user.id, type: UserTokenType.REFRESH_TOKEN, token: "testToken456789" });
-        const userToken2 = await UserToken.create({ userId: user.id, type: UserTokenType.ACCESS_TOKEN, token: "testToken789" });
-
-        const user2 = await User.findOne({ where: { username: "test" }, include: UserToken });
-
-        if (!(user2 instanceof User)) throw new Error("Not Found");
-
-        console.log(user2.userTokens[0].token);
 
         //const user = new User({ username: "Juli051", email: "Juli051@gmx.net", password: "123456" });
         //await user.save();
@@ -72,7 +63,7 @@ app.get("/", (req: Request, res: Response) => {
             });
         });*/
     } catch (error) {
-        console.log(error);
+        consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
         process.exit(1);
     }
 })();
