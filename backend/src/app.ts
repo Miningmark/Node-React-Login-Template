@@ -8,13 +8,12 @@ import { setupSecurityMiddleware } from "@/middlewares/securityMiddleware";
 import { notFoundMiddleware } from "@/middlewares/notFoundMiddleware";
 import { errorHandlerMiddleware } from "@/middlewares/errorHandlerMiddleware";
 
-import { logger } from "@/config/logger";
-
-import { sequelize } from "@/config/sequelize";
 import { ENV } from "@/config/env";
+import { logger } from "@/config/logger";
+import { sequelize } from "@/config/sequelize";
 
 import User from "@/models/user.model";
-import UserToken from "@/models/userToken.model";
+import UserToken, { UserTokenType } from "@/models/userToken.model";
 
 const app = express();
 
@@ -38,7 +37,8 @@ app.get("/", (req: Request, res: Response) => {
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
 
         const user = await User.create({ username: "test", password: "test123", email: "Juli051@gmx.net" });
-        const userToken = await UserToken.create({ userId: user.id, token: "testToken456789" });
+        const userToken = await UserToken.create({ userId: user.id, type: UserTokenType.REFRESH_TOKEN, token: "testToken456789" });
+        const userToken2 = await UserToken.create({ userId: user.id, type: UserTokenType.ACCESS_TOKEN, token: "testToken789" });
 
         const user2 = await User.findOne({ where: { username: "test" }, include: UserToken });
 
