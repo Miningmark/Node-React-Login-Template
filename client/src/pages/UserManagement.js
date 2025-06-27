@@ -23,7 +23,7 @@ const UserManagement = () => {
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { routeGroups } = useContext(AuthContext);
+  const { routeGroups, checkAccess } = useContext(AuthContext);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -139,7 +139,7 @@ const UserManagement = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </InputGroup>
-                    {routeGroups?.includes("userManagementCreate") && (
+                    {checkAccess(["userManagementCreate"]) && (
                       <button
                         className="btn btn-primary"
                         type="button"

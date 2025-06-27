@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import ConfirmModal from "components/util/ConfirmModal";
+import { AuthContext } from "contexts/AuthContext";
 
 const CreatePermissionModal = ({
   show,
@@ -22,9 +23,11 @@ const CreatePermissionModal = ({
   const [touched, setTouched] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isEditing, setIsEditing] = useState(!permission);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
+  const { checkAccess } = useContext(AuthContext);
 
   const handleSave = async () => {
     if (allPermissions.includes(name)) {
@@ -131,6 +134,7 @@ const CreatePermissionModal = ({
               onChange={(e) => setName(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
               name="name"
+              disabled={!isEditing}
             />
             <label htmlFor="floatingName">Name</label>
           </div>
@@ -145,6 +149,7 @@ const CreatePermissionModal = ({
               onChange={(e) => setDescription(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, description: true }))}
               name="description"
+              disabled={!isEditing}
             />
             <label htmlFor="floatingDescription">Beschreibung</label>
           </div>
@@ -160,6 +165,7 @@ const CreatePermissionModal = ({
                 id={`routeGroup-${routeGroup.id}`}
                 checked={selectedRouteGroups.some((p) => p.id === routeGroup.id)}
                 onChange={() => handleCheckboxChange(routeGroup)}
+                disabled={!isEditing}
               />
               <label className="form-check-label" htmlFor={`routeGroup-${routeGroup.id}`}>
                 {routeGroup.name}
@@ -168,28 +174,37 @@ const CreatePermissionModal = ({
           ))}
         </Modal.Body>
         <Modal.Footer>
-          {permission ? (
+          {permission && checkAccess(["adminPagePermissionsWrite"]) && (
             <Button variant="danger" onClick={() => setConfirmDelete(true)} disabled={isSaving}>
               Löschen
             </Button>
-          ) : null}
+          )}
 
-          <Button
-            variant="success"
-            onClick={handleSave}
-            disabled={isSaving || !name || !description}
-            style={{ width: "100px" }}
-          >
-            {isSaving ? (
-              <span
-                className="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-              ></span>
-            ) : (
-              <span>{permission ? "Speichern" : "Erstellen"}</span>
-            )}
-          </Button>
+          {checkAccess(["adminPagePermissionsWrite"]) && !isEditing && (
+            <Button variant="primary" onClick={() => setIsEditing(true)}>
+              Bearbeiten
+            </Button>
+          )}
+
+          {checkAccess(["adminPagePermissionsWrite"]) && isEditing && (
+            <Button
+              variant="success"
+              onClick={handleSave}
+              disabled={isSaving || !name || !description}
+              style={{ width: "100px" }}
+            >
+              {isSaving ? (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                <span>Speichern</span>
+              )}
+            </Button>
+          )}
+
           <Button variant="secondary" onClick={closeModal} disabled={isSaving}>
             Abbrechen
           </Button>

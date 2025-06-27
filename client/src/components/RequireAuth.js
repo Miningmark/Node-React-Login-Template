@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
 
 const RequireAuth = ({ children, allowedRouteGroups }) => {
-  const { accessToken, routeGroups } = useContext(AuthContext);
+  const { accessToken, routeGroups, checkAccess } = useContext(AuthContext);
   const location = useLocation();
   const refreshAccessToken = useRefreshToken();
 
@@ -54,9 +54,7 @@ const RequireAuth = ({ children, allowedRouteGroups }) => {
     );
   }
 
-  const hasRequiredRouteGroups = allowedRouteGroups
-    ? routeGroups?.some((routeGroup) => allowedRouteGroups.includes(routeGroup))
-    : false;
+  const hasRequiredRouteGroups = checkAccess(allowedRouteGroups);
 
   console.log("Allowed RouteGroups:", allowedRouteGroups);
   if (!hasRequiredRouteGroups && allowedRouteGroups.length > 0) {

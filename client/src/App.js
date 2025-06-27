@@ -38,6 +38,7 @@ function App() {
   const hideNavBar = publicPaths.includes(location.pathname);
 
   const { setUsername, setRouteGroups, username, accessToken } = useContext(AuthContext);
+
   const axiosProtected = useAxiosProtected();
 
   console.log("Username:", username);

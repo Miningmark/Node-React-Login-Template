@@ -1,11 +1,10 @@
-import { useState, useEffect, useContext, useMemo} from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
 import sortingAlgorithm from "util/sortingAlgorithm";
 import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOptionsModal";
-
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
@@ -36,34 +35,30 @@ function AdminPage() {
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { routeGroups } = useContext(AuthContext);
-
+  const { checkAccess } = useContext(AuthContext);
 
   const filteredPermission = useMemo(() => {
-    if(!allPermissions) return [];
+    if (!allPermissions) return [];
 
-        const searchLower = searchTerm.toLowerCase();
+    const searchLower = searchTerm.toLowerCase();
 
-            const filtered = searchTerm
-              ? allPermissions.filter((item) =>
-                  Object.values(item).some((value) => {
-                    if (typeof value === "string") {
-                      return value.toLowerCase().includes(searchLower);
-                    }
-                    if (typeof value === "number") {
-                      return value.toString().includes(searchTerm);
-                    }
-        
-                    return false;
-                  })
-                )
-              : allPermissions;
-        
-            return sortingAlgorithm(filtered, "name", "asc");
+    const filtered = searchTerm
+      ? allPermissions.filter((item) =>
+          Object.values(item).some((value) => {
+            if (typeof value === "string") {
+              return value.toLowerCase().includes(searchLower);
+            }
+            if (typeof value === "number") {
+              return value.toString().includes(searchTerm);
+            }
 
+            return false;
+          })
+        )
+      : allPermissions;
 
-
-    }, [allPermissions, searchTerm]);
+    return sortingAlgorithm(filtered, "name", "asc");
+  }, [allPermissions, searchTerm]);
 
   const refreshFilteredServerLog = async () => {
     if (!activeFilters) return;
@@ -164,15 +159,27 @@ function AdminPage() {
 
   const loadInitialData = async () => {
     try {
-      const [filterRes, routeGroupRes, permissionsRes] = await Promise.all([
-        axiosProtected.get(`/adminPage/getFilterOptionsServerLog`),
-        axiosProtected.get(`/adminPage/getAllRouteGroups`),
-        axiosProtected.get(`/adminPage/getAllPermissionsWithRouteGroups`),
-      ]);
+      const promises = [];
 
-      setFilterOptions(filterRes?.data?.filterOptions || []);
-      setAllRouteGroups(routeGroupRes?.data?.routeGroups || []);
-      setAllPermissions(permissionsRes?.data?.permissions || []);
+      if (checkAccess(["adminPageServerLogRead"])) {
+        promises.push(
+          axiosProtected
+            .get(`/adminPage/getFilterOptionsServerLog`)
+            .then((res) => setFilterOptions(res?.data?.filterOptions || []))
+        );
+      }
+
+      if (checkAccess(["adminPagePermissionsRead", "adminPagePermissionsWrite"])) {
+        promises.push(
+          axiosProtected
+            .get(`/adminPage/getAllRouteGroups`)
+            .then((res) => setAllRouteGroups(res?.data?.routeGroups || [])),
+          axiosProtected
+            .get(`/adminPage/getAllPermissionsWithRouteGroups`)
+            .then((res) => setAllPermissions(res?.data?.permissions || []))
+        );
+      }
+      await Promise.all(promises);
     } catch (error) {
       addToast("Fehler beim Laden von Initialdaten", "danger");
     } finally {
@@ -184,7 +191,7 @@ function AdminPage() {
 
   useEffect(() => {
     loadInitialData();
-    fetchServerLogs();
+    checkAccess(["adminPageServerLogRead"]) && fetchServerLogs();
   }, []);
 
   function handleServerLogSearch(filters) {
@@ -220,7 +227,7 @@ function AdminPage() {
 
         <div>
           <Tabs defaultActiveKey="serverLog" id="adminPage-tabs">
-            {routeGroups.includes("adminPageServerLogRead") ? (
+            {checkAccess(["adminPageServerLogRead"]) ? (
               <Tab
                 eventKey="serverLog"
                 title="ServerLog"
@@ -330,8 +337,7 @@ function AdminPage() {
               </Tab>
             ) : null}
 
-            {routeGroups.includes("adminPagePermissionsRead") ||
-            routeGroups.includes("adminPagePermissionsWrite") ? (
+            {checkAccess(["adminPagePermissionsRead", "adminPagePermissionsWrite"]) ? (
               <Tab
                 eventKey="allPermissions"
                 title="Berechtigungsmatrix"
@@ -341,28 +347,22 @@ function AdminPage() {
                 {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
                   <>
                     <div className="d-flex gap-2 mb-3">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={() => setShowCreatePermissionModal(true)}
-                      >
-                        +
-                      </button>
+                      {checkAccess(["adminPagePermissionsWrite"]) ? (
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => setShowCreatePermissionModal(true)}
+                        >
+                          +
+                        </button>
+                      ) : null}
+
                       <InputGroup className="flex-grow-1">
                         <FormControl
                           placeholder="Suche in Benutzerrechten"
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </InputGroup>
-                      {/*
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={handleServerLogSearch}
-                      >
-                        Suchen
-                      </button>
-                       */}
                     </div>
 
                     <div
