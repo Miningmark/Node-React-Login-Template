@@ -14,6 +14,7 @@ function Login() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { addToast } = useToast();
   const { login } = useContext(AuthContext);
@@ -101,17 +102,26 @@ function Login() {
                 />
                 <label htmlFor="floatingInput">Name</label>
               </div>
-              <div className="form-floating mb-3">
+              <div className="form-floating mb-3 position-relative">
                 <input
-                  className="form-control"
+                  className="form-control pe-5"
                   id="floatingPassword"
                   placeholder="Passwort"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <label htmlFor="floatingPassword">Passwort</label>
+                <span
+                  className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 ${
+                    showPassword ? "rotate" : ""
+                  }`}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </span>
               </div>
+
               <div className="d-flex mb-3">
                 {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
                   <span
