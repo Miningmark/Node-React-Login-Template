@@ -202,7 +202,7 @@ function Login() {
           textShadow: "1px 1px 2px black",
         }}
       >
-        ABCDEFGH
+        ABCDEFGHIJKLMN
       </div>
     </div>
   );
