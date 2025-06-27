@@ -5,8 +5,10 @@ import { UnauthorizedError } from "../errors/errorClasses.js";
 export default (groupName) => {
     return async (req, res, next) => {
         try {
-            const { username } = req;
+            const { username, routeGroups } = req;
             if (!username) throw new UnauthorizedError("Keine Berechtigung diese Route aufzurufen");
+
+            if (routeGroups.includes("superAdmin")) next();
 
             const route = await Models.RouteGroup.findOne({
                 where: { name: groupName, permissionId: { [Op.ne]: null } },
