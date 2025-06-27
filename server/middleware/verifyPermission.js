@@ -8,7 +8,10 @@ export default (groupName) => {
             const { username, routeGroups } = req;
             if (!username) throw new UnauthorizedError("Keine Berechtigung diese Route aufzurufen");
 
-            if (routeGroups.includes("superAdmin")) next();
+            if (routeGroups.includes("superAdmin")) {
+                next();
+                return;
+            }
 
             const route = await Models.RouteGroup.findOne({
                 where: { name: groupName, permissionId: { [Op.ne]: null } },

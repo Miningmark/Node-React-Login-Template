@@ -25,7 +25,7 @@ export default async () => {
         verifyAccessToken,
         adminPageController.getAllPermissionsWithRouteGroups
     );
-    smartRouter.get("/getAllRouteGroups", "adminPagePermissionsWrite", adminPagePermissionsWriteDescription, verifyAccessToken, adminPageController.getAllRouteGroups);
+    smartRouter.get("/getAllRouteGroups", "adminPagePermissionsRead", adminPagePermissionsReadDescription, verifyAccessToken, adminPageController.getAllRouteGroups);
 
     smartRouter.post(
         "/getFilteredServerLog{/:limit-:offset}",
