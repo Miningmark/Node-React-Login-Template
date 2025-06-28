@@ -1,8 +1,8 @@
 import { ValidationError } from "@/errors/errorClasses";
 import { NextFunction, Request, Response } from "express";
-import { AnyZodObject, ZodError } from "zod";
+import { ZodError, ZodObject } from "zod/v4";
 
-export const validateRequest = (schema: AnyZodObject) => {
+export const validateRequest = (schema: ZodObject) => {
     return (req: Request, res: Response, next: NextFunction): void => {
         try {
             schema.parse({
@@ -14,10 +14,12 @@ export const validateRequest = (schema: AnyZodObject) => {
             next();
         } catch (error) {
             if (error instanceof ZodError) {
-                next(new ValidationError(`${(error.errors[0]?.path).toString().replace(",", ":{")}} ${error.errors[0]?.message}` || "Request Validation failed"));
+                next(
+                    new ValidationError(`{${(error.issues[0]?.path).toString().replace(",", "}:{")}} ${error.issues[0]?.message}` || "Validierung der Anfrage fehlgeschlagen")
+                );
                 return;
             }
-            next(new ValidationError("Request Validation failed"));
+            next(new ValidationError("Validierung der Anfrage fehlgeschlagen"));
         }
     };
 };

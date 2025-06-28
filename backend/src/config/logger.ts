@@ -71,6 +71,6 @@ export async function databaseLogger(level: ServerLogLevels, message: string, op
             timestamp: new Date(Date.now())
         });
     } catch (error) {
-        consoleLogger.error("Error creating serverLog Entry for Database", { error: error instanceof Error ? error.stack : "" });
+        consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", { error: error instanceof Error ? error.stack : "" });
     }
 }

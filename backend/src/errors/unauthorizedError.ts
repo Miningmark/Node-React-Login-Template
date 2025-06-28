@@ -1,7 +1,7 @@
 import { AppError } from "@/errors/errorClasses";
 
 export class UnauthorizedError extends AppError {
-    constructor(message: string = "Authentication failed") {
+    constructor(message: string = "Authentifizierung fehlgeschlagen") {
         super(message, 401);
     }
 }

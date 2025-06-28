@@ -15,10 +15,14 @@ import { sequelize } from "@/config/sequelize";
 import { validateRequest } from "@/middlewares/validateRequestMiddleware";
 import { signupSchema } from "@/validators/auth.validator";
 import { ServerLogLevels } from "./models/serverLog.model";
+import { ApiResponse } from "./utils/ApiResponse";
+import z from "zod/v4";
 
 const app = express();
 
 ErrorMonitoringService.getInstance();
+
+z.config(z.locales.de());
 
 setupSecurityMiddleware(app);
 app.use(cors({ credentials: true }));
@@ -28,8 +32,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.post("/", validateRequest(signupSchema), async (req: Request, res: Response) => {
-    await databaseLogger(ServerLogLevels.INFO, "Home Route called", { source: "/" });
-    res.status(200).json({ message: "Home Route" });
+    ApiResponse.sendSuccess(res, req, "Home Route", 200);
 });
 
 (async () => {

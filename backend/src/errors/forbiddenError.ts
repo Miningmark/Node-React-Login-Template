@@ -1,7 +1,7 @@
 import { AppError } from "@/errors/errorClasses";
 
 export class ForbiddenError extends AppError {
-    constructor(message: string = "Access denied") {
+    constructor(message: string = "Zugriff verweigert") {
         super(message, 403);
     }
 }

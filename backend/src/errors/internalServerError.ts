@@ -1,7 +1,7 @@
 import { AppError } from "@/errors/errorClasses";
 
 export class InternalServerError extends AppError {
-    constructor(message: string = "Internal Server Error") {
+    constructor(message: string = "Ein interner Serverfehler ist aufgetreten") {
         super(message, 500);
     }
 }
