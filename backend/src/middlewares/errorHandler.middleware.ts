@@ -1,8 +1,8 @@
 import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger";
 import { AppError, InternalServerError } from "@/errors/errorClasses";
 import { ServerLogLevels } from "@/models/serverLog.model";
-import { ApiResponse } from "@/utils/ApiResponse";
-import { getIpAddress } from "@/utils/miscUtils";
+import { ApiResponse } from "@/utils/apiResponse.util";
+import { getIpAddress } from "@/utils/misc.util";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, req: Request, res: Response, next: NextFunction): Promise<void> => {

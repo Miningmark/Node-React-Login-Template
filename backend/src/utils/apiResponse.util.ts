@@ -1,10 +1,10 @@
 import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger";
 import { ServerLogLevels } from "@/models/serverLog.model";
-import { getIpAddress } from "@/utils/miscUtils";
+import { getIpAddress } from "@/utils/misc.util";
 import { Request, Response } from "express";
 
 export class ApiResponse {
-    static sendSuccess(res: Response, req: Request, successMessage: string = "Success", statusCode: number = 200, jsonData: any = undefined) {
+    static async sendSuccess(res: Response, req: Request, jsonData: object = {}, statusCode: number = 200) {
         const loggerOptions: DatabaseLoggerOptions = {
             userId: req.userId,
             url: req.originalUrl,
@@ -14,12 +14,12 @@ export class ApiResponse {
             userAgent: req.headers["user-agent"],
             requestBody: req.body,
             requestHeaders: req.headers,
-            response: { message: successMessage },
+            response: jsonData,
             source: "ApiResponse"
         };
 
-        databaseLogger(ServerLogLevels.INFO, successMessage, loggerOptions);
-        res.status(statusCode).json({ message: successMessage, data: jsonData });
+        await databaseLogger(ServerLogLevels.INFO, "message" in jsonData && typeof jsonData.message === "string" ? jsonData.message : "", loggerOptions);
+        res.status(statusCode).json(jsonData);
     }
 
     static sendError(res: Response, errorMessage: string, statusCode: number = 400) {

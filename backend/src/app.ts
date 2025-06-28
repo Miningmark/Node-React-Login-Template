@@ -1,22 +1,21 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import z from "zod/v4";
 
 import { ErrorMonitoringService } from "@/services/ServerErrorMonitoring.service";
 
-import { setupSecurityMiddleware } from "@/middlewares/securityMiddleware";
-import { notFoundMiddleware } from "@/middlewares/notFoundMiddleware";
-import { errorHandlerMiddleware } from "@/middlewares/errorHandlerMiddleware";
+import { setupSecurityMiddleware } from "@/middlewares/security.middleware";
+import { notFoundMiddleware } from "@/middlewares/notFound.middleware";
+import { errorHandlerMiddleware } from "@/middlewares/errorHandler.middleware";
 
 import { ENV } from "@/config/env";
-import { consoleLogger, databaseLogger } from "@/config/logger";
+import { consoleLogger } from "@/config/logger";
 import { sequelize } from "@/config/sequelize";
 
-import { validateRequest } from "@/middlewares/validateRequestMiddleware";
-import { signupSchema } from "@/validators/auth.validator";
-import { ServerLogLevels } from "./models/serverLog.model";
-import { ApiResponse } from "./utils/ApiResponse";
-import z from "zod/v4";
+import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util";
+
+import authRoutes from "@/routes/auth.routes";
 
 const app = express();
 
@@ -31,14 +30,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.post("/", validateRequest(signupSchema), async (req: Request, res: Response) => {
-    ApiResponse.sendSuccess(res, req, "Home Route", 200);
-});
+app.use("/api/" + ENV.API_VERSION + "/user", authRoutes);
 
 (async () => {
     try {
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
+
+        await generateSuperAdmin();
+        await generateSuperAdminPermission();
 
         //const user = new User({ username: "Juli051", email: "Juli051@gmx.net", password: "123456" });
         //await user.save();

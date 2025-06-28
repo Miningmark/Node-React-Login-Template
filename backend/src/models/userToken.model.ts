@@ -14,7 +14,7 @@ interface UserTokenAttributes {
     userId: number;
     type: UserTokenType;
     token: string;
-    expiresAt?: Date;
+    expiresAt: Date;
 }
 
 @Table({
@@ -38,7 +38,6 @@ class UserToken extends Model<UserToken, UserTokenAttributes> {
     token!: string;
 
     @AllowNull(false)
-    @Default(DataType.NOW)
     @Column(DataType.DATE)
     expiresAt!: Date;
 

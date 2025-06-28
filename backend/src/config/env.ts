@@ -16,6 +16,7 @@ const envSchema = z.object({
 
     SUPER_ADMIN_PASSWORD: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/),
 
+    FRONTEND_NAME: z.string(),
     FRONTEND_URL: z.string().url(),
 
     ACCOUNT_ACTIVATION_USER_EXPIRY: z.string().regex(/^\d+[smhd]$/),
@@ -45,4 +46,4 @@ const envSchema = z.object({
     SMTP_PASSWORD: z.string()
 });
 
-export const ENV = envSchema.parse(process.env);
+export const ENV = envSchema.parse({ ...process.env, BACKEND_VERSION: "0.0.4_ts" });
