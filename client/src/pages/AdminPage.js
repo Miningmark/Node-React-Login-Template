@@ -231,8 +231,11 @@ function AdminPage() {
               <Tab
                 eventKey="serverLog"
                 title="ServerLog"
-                className="border p-3 mb-4"
-                style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
+                className="border-end border-bottom border-start p-3 mb-4"
+                style={{
+                  maxHeight: "calc(100vh - 70px)",
+                  overflowY: "auto",
+                }}
               >
                 {!loadingServerLog && serverLog?.length > 0 ? (
                   <>
@@ -281,9 +284,9 @@ function AdminPage() {
                       className="border"
                       style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
                     >
-                      <Table striped bordered hover className="mb-0">
+                      <Table striped bordered hover fixed className="mb-0">
                         <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
-                          <tr>
+                          <tr className="border">
                             <th className="text-center">ID</th>
                             <th className="text-center">Zeitstempel</th>
                             <th className="text-center">Level</th>
@@ -341,7 +344,7 @@ function AdminPage() {
               <Tab
                 eventKey="allPermissions"
                 title="Berechtigungsmatrix"
-                className="border p-3 p mb-4"
+                className="border-end border-bottom border-start p-3 p mb-4"
                 style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
               >
                 {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
@@ -366,11 +369,11 @@ function AdminPage() {
                     </div>
 
                     <div
-                      className="border table-container"
+                      className="table-container special-table"
                       style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
                     >
                       <Table striped bordered hover className="mb-0">
-                        <thead className="border">
+                        <thead>
                           <tr>
                             <th>Zugriffsrechte</th>
                             {allRouteGroups.map((routeGroup) => (
