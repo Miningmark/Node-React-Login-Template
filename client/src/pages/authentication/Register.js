@@ -1,7 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
 import { axiosPublic } from "../../util/axios";
+import { ThemeContext } from "contexts/ThemeContext";
+
+import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
+import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -22,6 +26,7 @@ function Register() {
   const repeatRef = useRef(null);
 
   const { addToast } = useToast();
+  const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
   const isEmailValid = /^[a-zA-Z0-9.%_+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(email.trim());
@@ -178,13 +183,21 @@ function Register() {
               }`}
               onClick={() => setShowPassword((prev) => !prev)}
             >
-              <img
-                src={
-                  showPassword ? "/assets/icons/visibility_off.svg" : "/assets/icons/visibility.svg"
-                }
-                alt={showPassword ? "Passwort verstecken" : "Passwort anzeigen"}
-                style={{ width: "24px", height: "24px", marginRight: "15px" }}
-              />
+              {showPassword ? (
+                <VisibilityOffIcon
+                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                  width={24}
+                  height={24}
+                  style={{ marginRight: "15px" }}
+                />
+              ) : (
+                <VisibilityIcon
+                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                  width={24}
+                  height={24}
+                  style={{ marginRight: "15px" }}
+                />
+              )}
             </span>
           </div>
 
@@ -235,15 +248,21 @@ function Register() {
               }`}
               onClick={() => setShowPassword2((prev) => !prev)}
             >
-              <img
-                src={
-                  showPassword2
-                    ? "/assets/icons/visibility_off.svg"
-                    : "/assets/icons/visibility.svg"
-                }
-                alt={showPassword2 ? "Passwort verstecken" : "Passwort anzeigen"}
-                style={{ width: "24px", height: "24px", marginRight: "15px" }}
-              />
+              {showPassword2 ? (
+                <VisibilityOffIcon
+                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                  width={24}
+                  height={24}
+                  style={{ marginRight: "15px" }}
+                />
+              ) : (
+                <VisibilityIcon
+                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                  width={24}
+                  height={24}
+                  style={{ marginRight: "15px" }}
+                />
+              )}
             </span>
           </div>
 

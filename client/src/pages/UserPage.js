@@ -4,6 +4,10 @@ import useAxiosProtected from "../hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
 import { convertToLocalDate } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
+import { ThemeContext } from "contexts/ThemeContext";
+
+import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
+import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
 
 const UserPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -23,6 +27,7 @@ const UserPage = () => {
 
   const { addToast } = useToast();
   const { setAccessToken } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
@@ -153,6 +158,8 @@ const UserPage = () => {
     }
   }
 
+  console.log("Theme:", theme);
+
   return (
     <div className="container mt-4">
       <h2>Benutzereinstellungen</h2>
@@ -175,21 +182,28 @@ const UserPage = () => {
                     ref={currentPasswordRef}
                   />
                   <label htmlFor="floatingCurrentPassword">Aktuelles Passwort</label>
+
                   <span
                     className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
                       showPassword ? "rotate" : ""
                     }`}
                     onClick={() => setShowPassword((prev) => !prev)}
                   >
-                    <img
-                      src={
-                        showPassword
-                          ? "/assets/icons/visibility_off.svg"
-                          : "/assets/icons/visibility.svg"
-                      }
-                      alt={showPassword ? "Passwort verstecken" : "Passwort anzeigen"}
-                      style={{ width: "24px", height: "24px", marginRight: "15px" }}
-                    />
+                    {showPassword ? (
+                      <VisibilityOffIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    )}
                   </span>
                 </div>
                 <div className="form-floating mb-3">
@@ -223,15 +237,21 @@ const UserPage = () => {
                     }`}
                     onClick={() => setShowPassword2((prev) => !prev)}
                   >
-                    <img
-                      src={
-                        showPassword2
-                          ? "/assets/icons/visibility_off.svg"
-                          : "/assets/icons/visibility.svg"
-                      }
-                      alt={showPassword2 ? "Passwort verstecken" : "Passwort anzeigen"}
-                      style={{ width: "24px", height: "24px", marginRight: "15px" }}
-                    />
+                    {showPassword2 ? (
+                      <VisibilityOffIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    )}
                   </span>
                 </div>
                 <ul className="mb-3 list-unstyled small">
@@ -302,18 +322,21 @@ const UserPage = () => {
                       top: "26px",
                     }}
                   >
-                    <img
-                      src={
-                        showPassword3
-                          ? "/assets/icons/visibility_off.svg"
-                          : "/assets/icons/visibility.svg"
-                      }
-                      alt={showPassword3 ? "Passwort verstecken" : "Passwort anzeigen"}
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                      }}
-                    />
+                    {showPassword3 ? (
+                      <VisibilityOffIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    )}
                   </span>
                   {touched.repeat && !passwordsMatch && (
                     <div className="invalid-feedback">Passwörter stimmen nicht überein.</div>
