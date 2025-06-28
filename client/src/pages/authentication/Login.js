@@ -113,12 +113,20 @@ function Login() {
                 />
                 <label htmlFor="floatingPassword">Passwort</label>
                 <span
-                  className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 ${
+                  className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
                     showPassword ? "rotate" : ""
                   }`}
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
-                  {showPassword ? "🙈" : "👁️"}
+                  <img
+                    src={
+                      showPassword
+                        ? "/assets/icons/visibility_off.svg"
+                        : "/assets/icons/visibility.svg"
+                    }
+                    alt={showPassword ? "Passwort verstecken" : "Passwort anzeigen"}
+                    style={{ width: "24px", height: "24px" }}
+                  />
                 </span>
               </div>
 

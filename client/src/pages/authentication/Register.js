@@ -13,6 +13,8 @@ function Register() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [touched, setTouched] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   const emailRef = useRef(null);
   const usernameRef = useRef(null);
@@ -157,7 +159,7 @@ function Register() {
 
           <div className="form-floating mb-3">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               className={`form-control ${
                 touched.password && !isLengthValid ? "is-invalid" : isLengthValid ? "is-valid" : ""
               }`}
@@ -170,6 +172,20 @@ function Register() {
               ref={passwordRef}
             />
             <label htmlFor="floatingPassword">Passwort</label>
+            <span
+              className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                showPassword ? "rotate" : ""
+              }`}
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              <img
+                src={
+                  showPassword ? "/assets/icons/visibility_off.svg" : "/assets/icons/visibility.svg"
+                }
+                alt={showPassword ? "Passwort verstecken" : "Passwort anzeigen"}
+                style={{ width: "24px", height: "24px", marginRight: "15px" }}
+              />
+            </span>
           </div>
 
           <ul className="mb-3 list-unstyled small">
@@ -196,7 +212,7 @@ function Register() {
 
           <div className="form-floating mb-3">
             <input
-              type="password"
+              type={showPassword2 ? "text" : "password"}
               className={`form-control ${
                 touched.repeat && !passwordsMatch
                   ? "is-invalid"
@@ -213,6 +229,22 @@ function Register() {
               ref={repeatRef}
             />
             <label htmlFor="floatingRepeatPassword">Passwort wiederholen</label>
+            <span
+              className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                showPassword2 ? "rotate" : ""
+              }`}
+              onClick={() => setShowPassword2((prev) => !prev)}
+            >
+              <img
+                src={
+                  showPassword2
+                    ? "/assets/icons/visibility_off.svg"
+                    : "/assets/icons/visibility.svg"
+                }
+                alt={showPassword2 ? "Passwort verstecken" : "Passwort anzeigen"}
+                style={{ width: "24px", height: "24px", marginRight: "15px" }}
+              />
+            </span>
           </div>
 
           <div className="d-flex justify-content-center">

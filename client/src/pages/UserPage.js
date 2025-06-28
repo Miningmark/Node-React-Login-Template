@@ -17,6 +17,9 @@ const UserPage = () => {
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [loadingUsername, setLoadingUsername] = useState(false);
   const [loadingLogins, setLoadingLogins] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+  const [showPassword3, setShowPassword3] = useState(false);
 
   const { addToast } = useToast();
   const { setAccessToken } = useContext(AuthContext);
@@ -162,7 +165,7 @@ const UserPage = () => {
               <form onSubmit={handleUpdatePassword}>
                 <div className="form-floating mb-3">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className={`form-control `}
                     id="floatingCurrentPassword"
                     placeholder="Aktuelles Passwort"
@@ -172,10 +175,26 @@ const UserPage = () => {
                     ref={currentPasswordRef}
                   />
                   <label htmlFor="floatingCurrentPassword">Aktuelles Passwort</label>
+                  <span
+                    className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                      showPassword ? "rotate" : ""
+                    }`}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    <img
+                      src={
+                        showPassword
+                          ? "/assets/icons/visibility_off.svg"
+                          : "/assets/icons/visibility.svg"
+                      }
+                      alt={showPassword ? "Passwort verstecken" : "Passwort anzeigen"}
+                      style={{ width: "24px", height: "24px", marginRight: "15px" }}
+                    />
+                  </span>
                 </div>
                 <div className="form-floating mb-3">
                   <input
-                    type="password"
+                    type={showPassword2 ? "text" : "password"}
                     className={`form-control ${
                       touched.password
                         ? isLengthValid &&
@@ -198,6 +217,22 @@ const UserPage = () => {
                     ref={passwordRef}
                   />
                   <label htmlFor="floatingNewPassword">Neues Passwort</label>
+                  <span
+                    className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                      showPassword2 ? "rotate" : ""
+                    }`}
+                    onClick={() => setShowPassword2((prev) => !prev)}
+                  >
+                    <img
+                      src={
+                        showPassword2
+                          ? "/assets/icons/visibility_off.svg"
+                          : "/assets/icons/visibility.svg"
+                      }
+                      alt={showPassword2 ? "Passwort verstecken" : "Passwort anzeigen"}
+                      style={{ width: "24px", height: "24px", marginRight: "15px" }}
+                    />
+                  </span>
                 </div>
                 <ul className="mb-3 list-unstyled small">
                   <li
@@ -234,9 +269,9 @@ const UserPage = () => {
                     {hasSpecialChar ? "✅" : "❌"} Mindestens ein Sonderzeichen
                   </li>
                 </ul>
-                <div className="form-floating mb-3">
+                <div className="form-floating mb-3 position-relative">
                   <input
-                    type="password"
+                    type={showPassword3 ? "text" : "password"}
                     className={`form-control ${
                       touched.repeat && !passwordsMatch
                         ? "is-invalid"
@@ -255,6 +290,31 @@ const UserPage = () => {
                     ref={repeatRef}
                   />
                   <label htmlFor="floatingConfirmPassword">Passwort wiederholen</label>
+                  <span
+                    className={`eye-icon position-absolute translate-middle-y me-3 cursor-pointer ${
+                      showPassword3 ? "rotate" : ""
+                    }`}
+                    onClick={() => setShowPassword3((prev) => !prev)}
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      right: "15px",
+                      top: "26px",
+                    }}
+                  >
+                    <img
+                      src={
+                        showPassword3
+                          ? "/assets/icons/visibility_off.svg"
+                          : "/assets/icons/visibility.svg"
+                      }
+                      alt={showPassword3 ? "Passwort verstecken" : "Passwort anzeigen"}
+                      style={{
+                        width: "24px",
+                        height: "24px",
+                      }}
+                    />
+                  </span>
                   {touched.repeat && !passwordsMatch && (
                     <div className="invalid-feedback">Passwörter stimmen nicht überein.</div>
                   )}
