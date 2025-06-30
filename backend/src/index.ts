@@ -2,15 +2,24 @@ import app from "@/app";
 import { ENV } from "@/config/env";
 import { consoleLogger, databaseLogger } from "@/config/logger";
 import { sequelize } from "@/config/sequelize";
-import { Server } from "http";
 import { ServerLogLevels } from "./models/serverLog.model";
+import { generateSuperAdmin, generateSuperAdminPermission } from "./utils/superAdmin.util";
 
 const server = app.listen(ENV.BACKEND_PORT, async () => {
-    setTimeout(async () => {
+    try {
+        await sequelize.authenticate();
+        await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
+
         await databaseLogger(ServerLogLevels.INFO, `Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`, {
             source: "startup"
         });
-    }, 2000);
+
+        await generateSuperAdmin();
+        await generateSuperAdminPermission();
+    } catch (error) {
+        consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
+        process.exit(1);
+    }
 });
 
 const shutdown = async () => {

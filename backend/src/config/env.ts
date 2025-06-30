@@ -46,4 +46,4 @@ const envSchema = z.object({
     SMTP_PASSWORD: z.string()
 });
 
-export const ENV = envSchema.parse({ ...process.env, BACKEND_VERSION: "0.0.4_ts" });
+export const ENV = envSchema.parse({ ...process.env, BACKEND_VERSION: "0.0.5_ts" });

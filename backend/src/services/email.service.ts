@@ -36,14 +36,15 @@ export class EmailService {
 
     async sendHTMLTemplateEmail(to: string, subject: string, htmlTemplate: string) {
         try {
-            const info = await this.transporter.sendMail({
-                from: this.fromAddress,
-                to: to,
-                subject: subject,
-                html: htmlTemplate
-            });
-            console.log(info);
-            //await databaseLogger(ServerLogLevels.INFO, "Email erfolgreich versendet", { source: "EmailService" });
+            if (ENV.NODE_ENV === "production") {
+                const info = await this.transporter.sendMail({
+                    from: this.fromAddress,
+                    to: to,
+                    subject: subject,
+                    html: htmlTemplate
+                });
+                await databaseLogger(ServerLogLevels.INFO, `Email erfolgreich versendet ID: ${info.messageId}`, { source: "EmailService" });
+            }
         } catch (error) {
             await databaseLogger(ServerLogLevels.ERROR, "Error", { error: error instanceof Error ? error : undefined });
         }
