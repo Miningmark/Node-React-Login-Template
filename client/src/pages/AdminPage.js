@@ -33,6 +33,12 @@ function AdminPage() {
   const [showCreatePermissionModal, setShowCreatePermissionModal] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState(null);
 
+  const [showCreateUserNotificationModal, setShowCreateUserNotificationModal] = useState(false);
+  const [userNotifications, setUserNotifications] = useState(null);
+  const [selectedUserNotification,setSelectedUserNotification] = useState(null);
+  const [filteredUserNotifications, setFilteredUserNotifications] = useState(null);
+  const [loadingUserNotifications, setLoadingUserNotifications] = useState(false);
+
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
@@ -429,6 +435,105 @@ function AdminPage() {
                 )}
               </Tab>
             ) : null}
+
+            {true ? (
+              <Tab
+                eventKey="userNotifications"
+                title="User Notifications"
+                className="border-end border-bottom border-start p-3 mb-4"
+                style={{
+                  maxHeight: "calc(100vh - 70px)",
+                  overflowY: "auto",
+                }}
+              >
+                {!loadingUserNotifications && userNotifications !== null ? (
+                  <>
+                    <div className="d-flex gap-2 mb-3">
+                      {true ? (
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => setShowCreateUserNotificationModal(true)}
+                        >
+                          +
+                        </button>
+                      ) : null}
+
+                      <InputGroup className="flex-grow-1">
+                        <FormControl
+                          placeholder="Suche in Benachrichtigungen"
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </InputGroup>
+                      <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => {}}
+                        >
+                          Suchen
+                        </button>
+                    </div>
+
+                    <div
+                      className="border"
+                      style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
+                    >
+                      <Table striped bordered hover fixed className="mb-0">
+                        <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+                          <tr className="border">
+                            <th className="text-center">ID</th>
+                            <th className="text-center">Titel</th>
+                            <th className="text-center">Freigegeben</th>
+                            <th className="text-center">Datum</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {userNotifications.map((notification) => (
+                            <tr
+                              key={notification.id}
+                              onClick={() => setSelectedUserNotification(notification.id)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <td>{notification.id}</td>
+                              <td className="text-center">{notification.title}</td>
+                              <td className="text-center">{notification.active}</td>
+                              <td className="text-center">
+                                {convertToLocalTimeStamp(notification.timestamp)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                      { /* //TODO: Button ändern auf notifications                 */}
+                      <div className="text-center my-3">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            if (activeFilters) {
+                              fetchFilteredLogs(activeFilters, filteredServerlogOffset);
+                            } else {
+                              console.log("Lade mehr Server-Logs", serverlogOffset);
+                              fetchServerLogs(serverlogOffset);
+                            }
+                          }}
+                          disabled={
+                            loadingServerLogPart ||
+                            (activeFilters
+                              ? filteredServerLogMaxEntries &&
+                                filteredServerlogOffset >= filteredServerLogMaxEntries
+                              : serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
+                          }
+                        >
+                          {loadingServerLogPart ? "Lade mehr..." : "Mehr laden"}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <TableLoadingAnimation />
+                )}
+                </Tab>
+            ):null}
           </Tabs>
         </div>
       </Container>
