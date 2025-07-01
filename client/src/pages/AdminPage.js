@@ -36,7 +36,6 @@ function AdminPage() {
   const [showCreateUserNotificationModal, setShowCreateUserNotificationModal] = useState(false);
   const [userNotifications, setUserNotifications] = useState(null);
   const [selectedUserNotification,setSelectedUserNotification] = useState(null);
-  const [filteredUserNotifications, setFilteredUserNotifications] = useState(null);
   const [loadingUserNotifications, setLoadingUserNotifications] = useState(false);
 
   const axiosProtected = useAxiosProtected();
