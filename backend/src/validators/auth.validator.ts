@@ -12,3 +12,10 @@ export const registerSchema = z.object({
         password: passwordString
     })
 });
+
+export const loginSchema = z.object({
+    body: z.object({
+        username: z.string(),
+        password: z.string()
+    })
+});

@@ -10,7 +10,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
             email: "example@example.com",
             password: "Test123!"
         });
-        expect(res.statusCode).toBe(200);
+        expect(res.statusCode).toBe(201);
         expect(res.body.message).toContain("erfolgreich");
     });
 
@@ -178,5 +178,15 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("vergeben");
+    });
+});
+describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
+    it("should successfully login", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
+            username: "TestUser",
+            password: "TestUser"
+        });
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toContain("erfolgreich");
     });
 });

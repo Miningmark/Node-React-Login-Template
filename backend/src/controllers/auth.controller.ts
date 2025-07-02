@@ -13,4 +13,11 @@ export class AuthController extends BaseController {
             return await this.authService.register(username, email, password);
         });
     };
+
+    login = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { username, password } = req.body;
+            return await this.authService.login(username, password, req, res);
+        });
+    };
 }

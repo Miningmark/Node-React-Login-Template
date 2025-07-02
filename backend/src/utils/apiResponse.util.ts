@@ -4,7 +4,7 @@ import { getIpAddress } from "@/utils/misc.util";
 import { Request, Response } from "express";
 
 export class ApiResponse {
-    static async sendSuccess(res: Response, req: Request, jsonData: object = {}, statusCode: number = 200) {
+    static async sendSuccess(res: Response, req: Request, jsonData: any, statusCode: number = 200) {
         const loggerOptions: DatabaseLoggerOptions = {
             userId: req.userId,
             url: req.originalUrl,
@@ -18,7 +18,7 @@ export class ApiResponse {
             source: "ApiResponse"
         };
 
-        await databaseLogger(ServerLogLevels.INFO, "message" in jsonData && typeof jsonData.message === "string" ? jsonData.message : "", loggerOptions);
+        await databaseLogger(ServerLogLevels.INFO, jsonData?.message, loggerOptions);
         res.status(statusCode).json(jsonData);
     }
 

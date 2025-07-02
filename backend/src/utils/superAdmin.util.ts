@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import jsonwebtoken from "jsonwebtoken";
 import { ENV } from "@/config/env";
 import User from "@/models/user.model";
 import Permission from "@/models/permission.model";

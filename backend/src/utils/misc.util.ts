@@ -38,6 +38,8 @@ export function parseTimeOffsetToDate(timeOffset: string): Date {
             return new Date(Date.now() + value * 60 * 60 * 1000);
         case "d":
             return new Date(Date.now() + value * 24 * 60 * 60 * 1000);
+        case "y":
+            return new Date(Date.now() + value * 365 * 24 * 60 * 60 * 1000);
         default:
             throw new Error("Ungültige Einheit");
     }

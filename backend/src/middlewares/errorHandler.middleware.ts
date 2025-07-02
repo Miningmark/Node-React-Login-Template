@@ -7,6 +7,7 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (!(error instanceof AppError)) {
+        console.log(error);
         error = new InternalServerError();
     }
 

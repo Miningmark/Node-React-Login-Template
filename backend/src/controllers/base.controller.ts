@@ -5,7 +5,14 @@ export abstract class BaseController {
     protected async handleRequest(req: Request, res: Response, next: NextFunction, serviceFunction: () => Promise<any>): Promise<void> {
         try {
             const jsonResult = await serviceFunction();
-            ApiResponse.sendSuccess(res, req, jsonResult);
+            let statusCode = undefined;
+
+            if (typeof jsonResult.statusCode === "number") {
+                statusCode = jsonResult.statusCode;
+                delete jsonResult.statusCode;
+            }
+
+            ApiResponse.sendSuccess(res, req, jsonResult, statusCode);
         } catch (error) {
             next(error);
         }

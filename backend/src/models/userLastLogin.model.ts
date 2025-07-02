@@ -1,14 +1,14 @@
 import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement, ForeignKey, BelongsTo, Default } from "sequelize-typescript";
 import User from "@/models/user.model";
 
-interface UserLastLoginAttributes {
+export interface UserLastLoginAttributes {
     id?: number;
-    userId: string;
+    userId: number;
     ipv4Address: string;
-    userAgent: string;
+    userAgent?: string;
     country: string;
     regionName: string;
-    loginAt: Date;
+    loginTime: Date;
     successfully: boolean;
 }
 
@@ -47,7 +47,7 @@ class UserLastLogin extends Model<UserLastLogin, UserLastLoginAttributes> {
     @AllowNull(false)
     @Default(DataType.NOW)
     @Column(DataType.DATE)
-    loginAt!: Date;
+    loginTime!: Date;
 
     @AllowNull(false)
     @Default(false)
