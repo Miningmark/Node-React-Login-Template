@@ -1,4 +1,5 @@
 import { BaseController } from "@/controllers/base.controller.js";
+import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { AuthService } from "@/services/auth.service.js";
 import { NextFunction, Request, Response } from "express";
 
@@ -18,6 +19,22 @@ export class AuthController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { username, password } = req.body;
             return await this.authService.login(username, password, req, res);
+        });
+    };
+
+    logout = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req;
+            if (userId === undefined) throw new UnauthorizedError();
+
+            return await this.authService.logout(userId, res);
+        });
+    };
+
+    accountActivation = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { token } = req.body;
+            return await this.authService.accountActivation(token);
         });
     };
 }

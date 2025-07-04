@@ -1,17 +1,17 @@
 import app from "@/app";
-import bcrypt from "bcrypt";
 import { ENV } from "@/config/env";
-import request from "supertest";
-import { beforeAll, describe, expect, it } from "vitest";
-import "../setup/testDbSetup";
 import User from "@/models/user.model";
+import UserToken from "@/models/userToken.model";
+import bcrypt from "bcrypt";
+import request from "supertest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, () => {
     it("should successfully register", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "Example",
-            email: "example@example.com",
-            password: "Test123!"
+            username: "testRegister",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(201);
         expect(res.body.message).toContain("erfolgreich");
@@ -34,7 +34,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because body is missing email", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "Example"
+            username: "testRegister"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Ungültige Eingabe");
@@ -44,8 +44,8 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because body is missing password", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "Example",
-            email: "example@example.com"
+            username: "testRegister",
+            email: "testRegister@testRegister.com"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Ungültige Eingabe");
@@ -55,9 +55,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because username is to short", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "ex",
-            email: "example@example.com",
-            password: "Test123!"
+            username: "12",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Zu klein");
@@ -67,9 +67,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because username is to long", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "exdfghndfgujoidsfgfijdsjfdsjuffdsjnojdsfnjuosjfn",
-            email: "example@example.com",
-            password: "Test123!"
+            username: "testRegister156615616165165161561665165165",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Zu groß");
@@ -79,9 +79,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because username contain invalid character", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "exdfghndf$",
-            email: "example@example.com",
-            password: "Test123!"
+            username: "testRegister$",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Anforderungen");
@@ -91,9 +91,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because email is not valid", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "exdfghnd",
-            email: "example@examp",
-            password: "Test123!"
+            username: "testRegister",
+            email: "testRegister@testRegister",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Anforderungen");
@@ -103,9 +103,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because password is to short", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "exdfgh",
-            email: "example@example.com",
-            password: "Test"
+            username: "testRegister",
+            email: "testRegister@testRegister.com",
+            password: "t"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Zu klein");
@@ -115,9 +115,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because password is to long", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "exdfgh",
-            email: "example@example.com",
-            password: "Test123!468as8486468486a4"
+            username: "testRegister",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!5165816566165616846846"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Zu groß");
@@ -127,9 +127,9 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
 
     it("should fail because password contain invalid character", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "exdfgh",
-            email: "example@example.com",
-            password: "Test123!`"
+            username: "testRegister",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!`"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Anforderungen");
@@ -140,8 +140,8 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
     it("should fail because username can`t be SuperAdmin", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
             username: "SuperAdmin",
-            email: "example@example.com",
-            password: "Test123!"
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("SuperAdmin");
@@ -152,8 +152,8 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
     it("should fail because username can`t be superadmin", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
             username: "superadmin",
-            email: "example@example.com",
-            password: "Test123!"
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("SuperAdmin");
@@ -164,8 +164,8 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
     it("should fail because username can`t be superadmin", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
             username: "superAdmin",
-            email: "example@example.com",
-            password: "Test123!"
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("SuperAdmin");
@@ -174,24 +174,30 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
     });
 
     it("should fail because username and email is already used", async () => {
+        await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
+            username: "testRegister",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
+        });
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
-            username: "Example",
-            email: "example@example.com",
-            password: "Test123!"
+            username: "testRegister",
+            email: "testRegister@testRegister.com",
+            password: "testRegister123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("vergeben");
     });
 });
+
 describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
-    beforeAll(async () => {
-        await User.create({ username: "testLogin", password: await bcrypt.hash("testLoginPassword", 10), email: "testLoginEmail@testLoginEmail.com", isActive: true });
+    beforeEach(async () => {
+        await User.create({ username: "testLogin", password: await bcrypt.hash("testLogin123!", 10), email: "testLogin@testLogin.com", isActive: true });
     });
 
     it("should successfully login", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword"
+            password: "testLogin123!"
         });
         expect(res.statusCode).toBe(200);
         expect(res.body.message).toContain("erfolgreich");
@@ -214,7 +220,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
 
     it("should fail because body is missing password", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
-            username: "login"
+            username: "testLogin"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("Ungültige Eingabe");
@@ -224,8 +230,8 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
 
     it("should fail user does not exist", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
-            username: "login",
-            password: "loginPassword"
+            username: "testLogin1",
+            password: "testLogin123!"
         });
         expect(res.statusCode).toBe(400);
         expect(res.body.message).toContain("nicht");
@@ -240,7 +246,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
 
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword"
+            password: "testLogin123!"
         });
         expect(res.statusCode).toBe(403);
         expect(res.body.message).toContain("gesperrt");
@@ -255,7 +261,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
 
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword"
+            password: "testLogin123!"
         });
         expect(res.statusCode).toBe(403);
         expect(res.body.message).toContain("nicht");
@@ -270,7 +276,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
 
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword123"
+            password: "testLogin123!1"
         });
         expect(res.statusCode).toBe(401);
         expect(res.body.message).toContain("Passwort");
@@ -281,19 +287,23 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
     it("should fail because of too many faild logins and user should be deactivated", async () => {
         await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword123"
+            password: "testLogin123!1"
         });
         await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword123"
+            password: "testLogin123!1"
         });
         await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword123"
+            password: "testLogin123!1"
+        });
+        await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
+            username: "testLogin",
+            password: "testLogin123!1"
         });
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
             username: "testLogin",
-            password: "testLoginPassword123"
+            password: "testLogin123!1"
         });
 
         expect(res.statusCode).toBe(403);
@@ -301,8 +311,123 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
         expect(res.body.message).toContain("deaktiviert");
 
         const user = await User.findOne({ where: { username: "testLogin" } });
-        if (user === null) throw new Error();
+        if (user === null) throw new Error("Benutzer nicht gefunden");
 
         expect(user.isActive).toBe(false);
+    });
+});
+
+describe(`POST /api/${ENV.API_VERSION}/users/accountActivation - Activate User`, () => {
+    it("should successfully activate a user", async () => {
+        const resRegister = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
+            username: "testActivation",
+            email: "testActivation@testActivation.com",
+            password: "testActivation123!"
+        });
+        expect(resRegister.statusCode).toBe(201);
+
+        const databaseUser = await User.findOne({ where: { username: "testActivation" } });
+        if (databaseUser === null) throw new Error("Benutzer nicht gefunden");
+
+        const databaseToken = await UserToken.findOne({ where: { userId: databaseUser.id } });
+        if (databaseToken === null) throw new Error("Token nicht gefunden");
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send({
+            token: databaseToken.token
+        });
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toContain("erfolgreich");
+        expect(res.body.message).toContain("freigeschaltet");
+    });
+
+    it("should fail because body is missing", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send();
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Ungültige Eingabe");
+        expect(res.body.message).toContain("body");
+    });
+
+    it("should fail because token is missing", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send({});
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Ungültige Eingabe");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("token");
+    });
+
+    it("should fail because token is to short", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send({
+            token: "4"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Zu klein");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("token");
+    });
+
+    it("should fail because token is to long", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send({
+            token: "461854168546851658418658565615614856914698514698514685148561465865885665651465"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Zu groß");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("token");
+    });
+
+    it("should fail because token is not valid", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send({
+            token: "4618541685468516584186585656156148566848866448686156489484894869"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("ungültig");
+    });
+
+    it("should fail because token is expired", async () => {
+        const resRegister = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
+            username: "testActivation",
+            email: "testActivation@testActivation.com",
+            password: "testActivation123!"
+        });
+        expect(resRegister.statusCode).toBe(201);
+
+        const databaseUser = await User.findOne({ where: { username: "testActivation" } });
+        if (databaseUser === null) throw new Error("Benutzer nicht gefunden");
+
+        const databaseToken = await UserToken.findOne({ where: { userId: databaseUser.id } });
+        if (databaseToken === null) throw new Error("Token nicht gefunden");
+        databaseToken.expiresAt = new Date(Date.now() - 2000);
+        await databaseToken.save();
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/accountActivation`).send({
+            token: databaseToken.token
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("abgelaufen");
+    });
+});
+
+describe(`POST /api/${ENV.API_VERSION}/users/logout - Logout User`, () => {
+    let accessToken = "";
+    beforeEach(async () => {
+        await User.create({ username: "testLogout", password: await bcrypt.hash("testLogout123!", 10), email: "testLogout@testLogout.com", isActive: true });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
+            username: "testLogout",
+            password: "testLogout123!"
+        });
+        expect(resLogin.statusCode).toBe(200);
+        accessToken = resLogin.body.accessToken;
+    });
+
+    it("should successfully logout a user", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/logout`).set("authorization", `Bearer ${accessToken}`).send();
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toContain("erfolgreich");
+        expect(res.body.message).toContain("abgemeldet");
     });
 });

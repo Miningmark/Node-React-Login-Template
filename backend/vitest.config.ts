@@ -8,6 +8,10 @@ export default defineConfig({
         }
     },
     test: {
+        setupFiles: ["tests/setup/setupDB.ts"],
+        sequence: {
+            concurrent: false
+        },
         globals: true,
         environment: "node",
         include: ["tests/**/*.test.ts"],

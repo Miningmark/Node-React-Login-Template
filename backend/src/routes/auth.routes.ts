@@ -1,7 +1,9 @@
+import { ENV } from "@/config/env.js";
 import { AuthController } from "@/controllers/auth.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
+import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { AuthService } from "@/services/auth.service.js";
-import { loginSchema, registerSchema } from "@/validators/auth.validator.js";
+import { accountActivationSchema, loginSchema, registerSchema } from "@/validators/auth.validator.js";
 import { Router } from "express";
 
 const router = Router();
@@ -9,7 +11,12 @@ const router = Router();
 const authService = new AuthService();
 const authController = new AuthController(authService);
 
-router.post("/register", validateRequest(registerSchema), authController.register);
+if (ENV.ENABLE_REGISTER) {
+    router.post("/register", validateRequest(registerSchema), authController.register);
+    router.post("/accountActivation", validateRequest(accountActivationSchema), authController.accountActivation);
+}
+
 router.post("/login", validateRequest(loginSchema), authController.login);
+router.post("/logout", verifyAuth(), authController.logout);
 
 export default router;

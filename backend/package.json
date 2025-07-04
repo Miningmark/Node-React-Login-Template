@@ -28,6 +28,7 @@
         "zod": "^3.25.67"
     },
     "devDependencies": {
+        "@sequelize/sqlite3": "^7.0.0-alpha.46",
         "@types/bcrypt": "^5.0.2",
         "@types/cookie-parser": "^1.4.9",
         "@types/cors": "^2.8.19",

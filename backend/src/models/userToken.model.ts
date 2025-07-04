@@ -28,7 +28,7 @@ class UserToken extends Model<InferAttributes<UserToken>, InferCreationAttribute
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @NotNull
-    declare userId: number;
+    declare userId: CreationOptional<number>;
 
     @Attribute(DataTypes.ENUM(...Object.values(UserTokenType)))
     @PrimaryKey
@@ -43,7 +43,7 @@ class UserToken extends Model<InferAttributes<UserToken>, InferCreationAttribute
     @Default(DataTypes.NOW)
     declare expiresAt: CreationOptional<Date> | null;
 
-    declare user?: NonAttribute<User>;
+    declare user: NonAttribute<User>;
 
     declare getUser: BelongsToGetAssociationMixin<User>;
     declare setUser: BelongsToSetAssociationMixin<User, number>;

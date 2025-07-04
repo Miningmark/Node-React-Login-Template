@@ -19,3 +19,9 @@ export const loginSchema = z.object({
         password: z.string()
     })
 });
+
+export const accountActivationSchema = z.object({
+    body: z.object({
+        token: z.string().length(64)
+    })
+});

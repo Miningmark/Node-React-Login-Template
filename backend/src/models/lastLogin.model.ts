@@ -52,7 +52,7 @@ class LastLogin extends Model<InferAttributes<LastLogin>, InferCreationAttribute
     @NotNull
     declare successfully: CreationOptional<boolean>;
 
-    declare user?: NonAttribute<User>;
+    declare user: NonAttribute<User>;
 
     declare getUser: BelongsToGetAssociationMixin<User>;
     declare setUser: BelongsToSetAssociationMixin<User, number>;

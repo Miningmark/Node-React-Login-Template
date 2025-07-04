@@ -2,9 +2,9 @@ import { ENV } from "@/config/env.js";
 import { ForbiddenError } from "@/errors/forbiddenError.js";
 import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { ValidationError } from "@/errors/validationError.js";
+import LastLogin from "@/models/lastLogin.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
-import { default as LastLogin, default as UserLastLogin } from "@/models/lastLogin.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { getAccountLockedEmailTemplate, getCompleteRegistrationEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
@@ -83,7 +83,46 @@ export class AuthService {
         return jsonResponse;
     }
 
-    private async setRefreshTokenCookie(res: Response, refreshToken: string) {
+    async logout(userId: number, res: Response) {
+        let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich abgemeldet" };
+
+        const databaseUser = await User.findOne({ where: { id: userId } });
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+
+        await this.removeJWTs(databaseUser);
+        this.clearRefreshTokenCookie(res);
+
+        return jsonResponse;
+    }
+
+    async accountActivation(token: string) {
+        let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich freigeschaltet" };
+
+        const databaseUserToken = await UserToken.findOne({ where: { type: UserTokenType.USER_REGISTRATION_TOKEN, token: token }, include: { model: User } });
+        if (databaseUserToken === null) throw new ValidationError("Token nicht vorhanden oder ungültig");
+
+        if (databaseUserToken.expiresAt !== null && new Date(Date.now()) > databaseUserToken.expiresAt) {
+            await databaseUserToken.user?.destroy();
+            throw new ValidationError("Token abgelaufen, bitte neu registrieren");
+        }
+
+        databaseUserToken.user.isActive = true;
+        await databaseUserToken.user.save();
+
+        await databaseUserToken.destroy();
+
+        return jsonResponse;
+    }
+
+    private clearRefreshTokenCookie(res: Response) {
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "lax",
+            ...(ENV.NODE_ENV === "production" ? { secure: true } : {})
+        });
+    }
+
+    private setRefreshTokenCookie(res: Response, refreshToken: string) {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             sameSite: "lax",
@@ -130,7 +169,7 @@ export class AuthService {
     private async generateRouteGroupArray(databaseUser: User): Promise<string[]> {
         let routeGroupsArray: string[] = [];
 
-        const userPermissions = await databaseUser.getPermissions({ include: [{ model: RouteGroup }] });
+        const userPermissions = await databaseUser.getPermissions({ include: { model: RouteGroup } });
         if (userPermissions === null) return routeGroupsArray;
 
         userPermissions.map((userPermission) => {
@@ -234,7 +273,7 @@ export class AuthService {
                 userLastLogin.regionName = "IP Lookup nicht erfolgreich";
             }
         }
-        await UserLastLogin.create(userLastLogin);
+        await LastLogin.create(userLastLogin);
     }
 
     private async generateHexUserToken(userId: number, type: UserTokenType, expiresIn: string | null) {

@@ -39,7 +39,7 @@ class Permission extends Model<InferAttributes<Permission>, InferCreationAttribu
     @Attribute(DataTypes.STRING)
     declare description: string | null;
 
-    declare users?: NonAttribute<User[]>;
+    declare users: NonAttribute<User[]>;
 
     declare getUsers: BelongsToManyGetAssociationsMixin<User>;
     declare setUsers: BelongsToManySetAssociationsMixin<User, number>;
@@ -58,7 +58,7 @@ class Permission extends Model<InferAttributes<Permission>, InferCreationAttribu
         otherKey: "routeGroupId",
         inverse: { as: "permissions" }
     })
-    declare routeGroups?: NonAttribute<RouteGroup[]>;
+    declare routeGroups: NonAttribute<RouteGroup[]>;
 
     declare getRouteGroups: BelongsToManyGetAssociationsMixin<RouteGroup>;
     declare setRouteGroups: BelongsToManySetAssociationsMixin<RouteGroup, number>;

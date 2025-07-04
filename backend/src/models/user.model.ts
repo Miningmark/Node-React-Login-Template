@@ -69,7 +69,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare isDisabled: CreationOptional<boolean>;
 
     @HasMany(() => UserToken, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
-    declare userTokens?: NonAttribute<UserToken[]>;
+    declare userTokens: NonAttribute<UserToken[]>;
 
     declare getUserTokens: HasManyGetAssociationsMixin<UserToken>;
     declare setUserTokens: HasManySetAssociationsMixin<UserToken, number>;
@@ -83,7 +83,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare countUserTokens: HasManyCountAssociationsMixin<UserToken>;
 
     @HasMany(() => LastLogin, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
-    declare lastLogins?: NonAttribute<LastLogin[]>;
+    declare lastLogins: NonAttribute<LastLogin[]>;
 
     declare getLastLogins: HasManyGetAssociationsMixin<LastLogin>;
     declare setLastLogins: HasManySetAssociationsMixin<LastLogin, number>;
@@ -97,7 +97,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare countLastLogins: HasManyCountAssociationsMixin<LastLogin>;
 
     @HasMany(() => ServerLog, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
-    declare serverLogs?: NonAttribute<ServerLog[]>;
+    declare serverLogs: NonAttribute<ServerLog[]>;
 
     declare getServerLogs: HasManyGetAssociationsMixin<ServerLog>;
     declare setServerLogs: HasManySetAssociationsMixin<ServerLog, number>;
@@ -111,7 +111,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare countServerLogs: HasManyCountAssociationsMixin<ServerLog>;
 
     @BelongsToMany(() => Permission, { through: { model: "user_permission", timestamps: false }, foreignKey: "userId", otherKey: "permissionId", inverse: { as: "users" } })
-    declare permissions?: NonAttribute<Permission[]>;
+    declare permissions: NonAttribute<Permission[]>;
 
     declare getPermissions: BelongsToManyGetAssociationsMixin<Permission>;
     declare setPermissions: BelongsToManySetAssociationsMixin<Permission, number>;
