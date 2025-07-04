@@ -4,6 +4,7 @@ import { consoleLogger, databaseLogger } from "@/config/logger.js";
 import { sequelize } from "@/config/sequelize.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
+import { scheduleAllCronJobs } from "@/croner/scheduler";
 
 const server = app.listen(ENV.BACKEND_PORT, async () => {
     try {
@@ -16,6 +17,8 @@ const server = app.listen(ENV.BACKEND_PORT, async () => {
 
         await generateSuperAdmin();
         await generateSuperAdminPermission();
+
+        await scheduleAllCronJobs();
     } catch (error) {
         consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
         process.exit(1);
