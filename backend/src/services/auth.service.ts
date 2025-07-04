@@ -75,7 +75,7 @@ export class AuthService {
 
         jsonResponse.accessToken = resultJWTs.accessToken;
         jsonResponse.username = databaseUser.username;
-        jsonResponse.username = routeGroupsArray;
+        jsonResponse.routeGroups = routeGroupsArray;
 
         await this.addUserLastLogin(databaseUser.id, req, true);
         await this.checkHasLocationChanged(databaseUser);
@@ -179,7 +179,7 @@ export class AuthService {
 
     private async checkUserLastLogins(databaseUser: User) {
         let unsuccefullyLogins = 0;
-        const userLastLogins = await databaseUser.getLastLogins({ limit: 5, order: [["loginTime", "DESC"]] });
+        const userLastLogins = await databaseUser.getLastLogins({ limit: 5, order: [["id", "DESC"]] });
 
         userLastLogins.forEach((userLastLogin) => {
             if (!userLastLogin.successfully) unsuccefullyLogins++;
