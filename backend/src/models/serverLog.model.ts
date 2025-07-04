@@ -1,103 +1,83 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement, ForeignKey, BelongsTo, Default } from "sequelize-typescript";
-import User from "@/models/user.model";
+import User from "@/models/user.model.js";
+import {
+    BelongsToGetAssociationMixin,
+    BelongsToSetAssociationMixin,
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "@sequelize/core";
+import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
-export enum ServerLogLevels {
+export enum ServerLogTypes {
     INFO = "INFO",
     WARN = "WARN",
     ERROR = "ERROR"
 }
 
-interface ServerLogAttributes {
-    id?: number;
-    level: ServerLogLevels;
-    message: string;
-    userId?: number;
-    url?: string;
-    method?: string;
-    status?: number;
-    ipv4Address?: string;
-    userAgent?: string;
-    requestBody?: object;
-    requestHeaders?: object;
-    response?: object;
-    source?: string;
-    errorStack?: string;
-    timestamp?: Date;
-}
-
 @Table({
-    tableName: "serverLogs",
+    tableName: "server_log",
     timestamps: false
 })
-class ServerLog extends Model<ServerLog, ServerLogAttributes> {
+class ServerLog extends Model<InferAttributes<ServerLog>, InferCreationAttributes<ServerLog>> {
+    @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @AutoIncrement
-    @AllowNull(false)
-    @Column(DataType.INTEGER)
-    id!: number;
+    @NotNull
+    declare id: CreationOptional<number>;
 
-    @AllowNull(false)
-    @Column(DataType.ENUM(...Object.values(ServerLogLevels)))
-    level!: ServerLogLevels;
+    @Attribute(DataTypes.ENUM(...Object.values(ServerLogTypes)))
+    @NotNull
+    declare type: ServerLogTypes;
 
-    @AllowNull(false)
-    @Column(DataType.TEXT)
+    @Attribute(DataTypes.TEXT)
+    @NotNull
     message!: string;
 
-    @ForeignKey(() => User)
-    @AllowNull(true)
-    @Column(DataType.INTEGER)
-    userId!: number;
+    @Attribute(DataTypes.INTEGER)
+    declare userId: number | null;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    url!: string;
+    @Attribute(DataTypes.STRING)
+    declare url: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    method!: string;
+    @Attribute(DataTypes.STRING)
+    declare method: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.INTEGER)
-    status!: number;
+    @Attribute(DataTypes.INTEGER)
+    declare status: number | null;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    ipv4Address!: string;
+    @Attribute(DataTypes.STRING)
+    declare ipv4Address: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    userAgent!: string;
+    @Attribute(DataTypes.STRING)
+    declare userAgent: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    requestBody!: JSON;
+    @Attribute(DataTypes.JSON)
+    declare requestBody: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    requestHeaders!: JSON;
+    @Attribute(DataTypes.JSON)
+    declare requestHeaders: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.JSON)
-    response!: JSON;
+    @Attribute(DataTypes.JSON)
+    declare response: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    source!: string;
+    @Attribute(DataTypes.STRING)
+    declare source: string | null;
 
-    @AllowNull(true)
-    @Column(DataType.TEXT)
-    errorStack!: string;
+    @Attribute(DataTypes.TEXT)
+    declare errorStack: string | null;
 
-    @AllowNull(false)
-    @Default(DataType.NOW)
-    @Column(DataType.DATE)
-    timestamp!: Date;
+    @Attribute(DataTypes.DATE)
+    @Default(DataTypes.NOW)
+    @NotNull
+    declare createdAt: CreationOptional<Date>;
 
-    @BelongsTo(() => User, {
-        onDelete: "CASCADE"
-    })
-    user!: User;
+    declare user?: NonAttribute<User>;
+
+    declare getUser: BelongsToGetAssociationMixin<User>;
+    declare setUser: BelongsToSetAssociationMixin<User, number>;
 }
 
 export default ServerLog;

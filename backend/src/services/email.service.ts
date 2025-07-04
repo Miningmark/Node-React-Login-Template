@@ -1,6 +1,6 @@
-import { ENV } from "@/config/env";
-import { databaseLogger } from "@/config/logger";
-import { ServerLogLevels } from "@/models/serverLog.model";
+import { ENV } from "@/config/env.js";
+import { databaseLogger } from "@/config/logger.js";
+import { ServerLogTypes } from "@/models/serverLog.model.js";
 import nodemailer from "nodemailer";
 
 export class EmailService {
@@ -20,15 +20,17 @@ export class EmailService {
 
         this.fromAddress = ENV.SMTP_USER;
 
-        this.verifyConnection();
+        setTimeout(async () => {
+            this.verifyConnection();
+        }, 3000);
     }
 
     private async verifyConnection() {
         try {
             await this.transporter.verify();
-            await databaseLogger(ServerLogLevels.INFO, "EmailService verbunden", { source: "EmailService" });
+            await databaseLogger(ServerLogTypes.INFO, "EmailService verbunden", { source: "EmailService" });
         } catch (error) {
-            await databaseLogger(ServerLogLevels.ERROR, "EmailService konnte sich nicht mit dem Email Server verbinden", {
+            await databaseLogger(ServerLogTypes.ERROR, "EmailService konnte sich nicht mit dem Email Server verbinden", {
                 error: error instanceof Error ? error : undefined
             });
         }
@@ -43,10 +45,10 @@ export class EmailService {
                     subject: subject,
                     html: htmlTemplate
                 });
-                await databaseLogger(ServerLogLevels.INFO, `Email erfolgreich versendet ID: ${info.messageId}`, { source: "EmailService" });
+                await databaseLogger(ServerLogTypes.INFO, `Email erfolgreich versendet ID: ${info.messageId}`, { source: "EmailService" });
             }
         } catch (error) {
-            await databaseLogger(ServerLogLevels.ERROR, "Error", { error: error instanceof Error ? error : undefined });
+            await databaseLogger(ServerLogTypes.ERROR, "Error", { error: error instanceof Error ? error : undefined });
         }
     }
 }

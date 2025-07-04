@@ -1,12 +1,11 @@
+import { ENV } from "@/config/env.js";
+import { databaseLogger } from "@/config/logger.js";
+import { ValidationError } from "@/errors/validationError.js";
+import Permission from "@/models/permission.model.js";
+import RouteGroup from "@/models/routeGroup.model.js";
+import { ServerLogTypes } from "@/models/serverLog.model.js";
+import User from "@/models/user.model.js";
 import bcrypt from "bcrypt";
-import { ENV } from "@/config/env";
-import User from "@/models/user.model";
-import Permission from "@/models/permission.model";
-import { databaseLogger } from "@/config/logger";
-import { ServerLogLevels } from "@/models/serverLog.model";
-import { ValidationError } from "@/errors/validationError";
-import RouteGroup from "@/models/routeGroup.model";
-import UserToken, { UserTokenType } from "@/models/userToken.model";
 
 export async function generateSuperAdmin() {
     try {
@@ -22,9 +21,9 @@ export async function generateSuperAdmin() {
                 await databaseUser.save();
             }
         }
-        await databaseLogger(ServerLogLevels.INFO, "SuperAdmin erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
+        await databaseLogger(ServerLogTypes.INFO, "SuperAdmin erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
     } catch (error) {
-        await databaseLogger(ServerLogLevels.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
+        await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
     }
 }
 
@@ -41,16 +40,17 @@ export async function generateSuperAdminPermission() {
 
         const databaseRouteGroups = await RouteGroup.findAll();
 
-        await databaseUser.$set("permissions", databasePermission);
-        await databasePermission.$set("routeGroups", databaseRouteGroups);
+        await databaseUser.setPermissions([databasePermission]);
+        await databasePermission.setRouteGroups(databaseRouteGroups);
 
-        await databaseLogger(ServerLogLevels.INFO, "SuperAdmin Berechtigung erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
+        await databaseLogger(ServerLogTypes.INFO, "SuperAdmin Berechtigung erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
     } catch (error) {
-        await databaseLogger(ServerLogLevels.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
+        await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
     }
 }
 
 export async function removeRouteGroups() {
+    //TODO:
     /*const transaction = await sequelize.transaction();
     try {
         let dateNow = new Date(Date.now());

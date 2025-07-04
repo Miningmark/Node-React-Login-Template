@@ -1,4 +1,4 @@
-import { AppError } from "@/errors/errorClasses";
+import { AppError } from "@/errors/errorClasses.js";
 
 export class UnauthorizedError extends AppError {
     constructor(message: string = "Authentifizierung fehlgeschlagen") {

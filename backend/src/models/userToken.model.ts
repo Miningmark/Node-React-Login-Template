@@ -1,5 +1,15 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull, ForeignKey, BelongsTo, Default } from "sequelize-typescript";
-import User from "@/models/user.model";
+import User from "@/models/user.model.js";
+import {
+    BelongsToGetAssociationMixin,
+    BelongsToSetAssociationMixin,
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "@sequelize/core";
+import { Attribute, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
 export enum UserTokenType {
     REFRESH_TOKEN = "refreshToken",
@@ -10,41 +20,33 @@ export enum UserTokenType {
     ACCOUNT_REACTIVATION_TOKEN = "accountReactivation"
 }
 
-interface UserTokenAttributes {
-    userId: number;
-    type: UserTokenType;
-    token: string;
-    expiresAt: Date | null;
-}
-
 @Table({
     tableName: "user_tokens",
     timestamps: false
 })
-class UserToken extends Model<UserToken, UserTokenAttributes> {
+class UserToken extends Model<InferAttributes<UserToken>, InferCreationAttributes<UserToken>> {
+    @Attribute(DataTypes.INTEGER)
     @PrimaryKey
-    @ForeignKey(() => User)
-    @AllowNull(false)
-    @Column(DataType.INTEGER)
-    userId!: number;
+    @NotNull
+    declare userId: number;
 
+    @Attribute(DataTypes.ENUM(...Object.values(UserTokenType)))
     @PrimaryKey
-    @AllowNull(false)
-    @Column(DataType.ENUM(...Object.values(UserTokenType)))
-    type!: UserTokenType;
+    @NotNull
+    declare type: UserTokenType;
 
-    @AllowNull(false)
-    @Column(DataType.TEXT)
-    token!: string;
+    @Attribute(DataTypes.TEXT)
+    @NotNull
+    declare token: string;
 
-    @AllowNull(true)
-    @Column(DataType.DATE)
-    expiresAt!: Date;
+    @Attribute(DataTypes.DATE)
+    @Default(DataTypes.NOW)
+    declare expiresAt: CreationOptional<Date> | null;
 
-    @BelongsTo(() => User, {
-        onDelete: "CASCADE"
-    })
-    user!: User;
+    declare user?: NonAttribute<User>;
+
+    declare getUser: BelongsToGetAssociationMixin<User>;
+    declare setUser: BelongsToSetAssociationMixin<User, number>;
 }
 
 export default UserToken;

@@ -1,6 +1,6 @@
-import helmet from "helmet";
+import { ENV } from "@/config/env.js";
 import { Express } from "express";
-import { ENV } from "@/config/env";
+import helmet from "helmet";
 
 export const setupSecurityMiddleware = (app: Express) => {
     app.disable("x-powered-by");

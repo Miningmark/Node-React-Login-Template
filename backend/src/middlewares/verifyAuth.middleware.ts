@@ -1,8 +1,8 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { ForbiddenError, ValidationError } from "@/errors/errorClasses";
+import { ENV } from "@/config/env.js";
+import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
+import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { NextFunction, Request, Response } from "express";
-import { ENV } from "@/config/env";
-import UserToken, { UserTokenType } from "@/models/userToken.model";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const verifyAuth = () => {
     return async (req: Request, res: Response, next: NextFunction) => {

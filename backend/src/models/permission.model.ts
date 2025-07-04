@@ -1,40 +1,75 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement, Unique, BelongsToMany } from "sequelize-typescript";
-import User from "@/models/user.model";
-import UserPermission from "@/models/userPermission.model";
-import RouteGroup from "./routeGroup.model";
-import PermissionRouteGroup from "./permissionRouteGroup.model";
-
-interface PermissionAttributes {
-    id?: number;
-    name: string;
-    description?: string;
-}
+import User from "@/models/user.model.js";
+import {
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyAddAssociationsMixin,
+    BelongsToManyCountAssociationsMixin,
+    BelongsToManyCreateAssociationMixin,
+    BelongsToManyGetAssociationsMixin,
+    BelongsToManyHasAssociationMixin,
+    BelongsToManyHasAssociationsMixin,
+    BelongsToManyRemoveAssociationMixin,
+    BelongsToManyRemoveAssociationsMixin,
+    BelongsToManySetAssociationsMixin,
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "@sequelize/core";
+import { Attribute, AutoIncrement, BelongsToMany, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
+import RouteGroup from "./routeGroup.model.js";
 
 @Table({
     tableName: "permissions",
     timestamps: false
 })
-class Permission extends Model<Permission, PermissionAttributes> {
+class Permission extends Model<InferAttributes<Permission>, InferCreationAttributes<Permission>> {
+    @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @AutoIncrement
-    @AllowNull(false)
-    @Column(DataType.INTEGER)
-    id!: number;
+    @NotNull
+    declare id: CreationOptional<number>;
 
+    @Attribute(DataTypes.STRING)
     @Unique
-    @AllowNull(false)
-    @Column(DataType.STRING)
-    name!: string;
+    @NotNull
+    declare name: string;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    description!: string;
+    @Attribute(DataTypes.STRING)
+    declare description: string | null;
 
-    @BelongsToMany(() => User, () => UserPermission)
-    users!: User[];
+    declare users?: NonAttribute<User[]>;
 
-    @BelongsToMany(() => RouteGroup, () => PermissionRouteGroup)
-    routeGroups!: RouteGroup[];
+    declare getUsers: BelongsToManyGetAssociationsMixin<User>;
+    declare setUsers: BelongsToManySetAssociationsMixin<User, number>;
+    declare addUser: BelongsToManyAddAssociationMixin<User, number>;
+    declare addUsers: BelongsToManyAddAssociationsMixin<User, number>;
+    declare removeUser: BelongsToManyRemoveAssociationMixin<User, number>;
+    declare removeUsers: BelongsToManyRemoveAssociationsMixin<User, number>;
+    declare createUser: BelongsToManyCreateAssociationMixin<User>;
+    declare hasUser: BelongsToManyHasAssociationMixin<User, number>;
+    declare hasUsers: BelongsToManyHasAssociationsMixin<User, number>;
+    declare countUsers: BelongsToManyCountAssociationsMixin<User>;
+
+    @BelongsToMany(() => RouteGroup, {
+        through: { model: "permission_route_group", timestamps: false },
+        foreignKey: "permissionId",
+        otherKey: "routeGroupId",
+        inverse: { as: "permissions" }
+    })
+    declare routeGroups?: NonAttribute<RouteGroup[]>;
+
+    declare getRouteGroups: BelongsToManyGetAssociationsMixin<RouteGroup>;
+    declare setRouteGroups: BelongsToManySetAssociationsMixin<RouteGroup, number>;
+    declare addRouteGroup: BelongsToManyAddAssociationMixin<RouteGroup, number>;
+    declare addURouteGroups: BelongsToManyAddAssociationsMixin<RouteGroup, number>;
+    declare removeRouteGroup: BelongsToManyRemoveAssociationMixin<RouteGroup, number>;
+    declare removeRouteGroups: BelongsToManyRemoveAssociationsMixin<RouteGroup, number>;
+    declare createRouteGroup: BelongsToManyCreateAssociationMixin<RouteGroup>;
+    declare hasRouteGroup: BelongsToManyHasAssociationMixin<RouteGroup, number>;
+    declare hasRouteGroups: BelongsToManyHasAssociationsMixin<RouteGroup, number>;
+    declare countRouteGroups: BelongsToManyCountAssociationsMixin<RouteGroup>;
 }
 
 export default Permission;

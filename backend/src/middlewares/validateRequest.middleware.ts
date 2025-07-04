@@ -1,4 +1,4 @@
-import { ValidationError } from "@/errors/errorClasses";
+import { ValidationError } from "@/errors/errorClasses.js";
 import { NextFunction, Request, Response } from "express";
 import { ZodError, ZodObject } from "zod/v4";
 

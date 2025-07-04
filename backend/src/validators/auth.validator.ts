@@ -1,4 +1,4 @@
-import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "@/utils/misc.util";
+import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "@/utils/misc.util.js";
 import { z, ZodString } from "zod/v4";
 
 const usernameString: ZodString = z.string().min(5).max(15).regex(USERNAME_REGEX, "Benutzername entspricht nicht den Anforderungen");

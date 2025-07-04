@@ -1,41 +1,60 @@
-import { Table, Column, Model, DataType, PrimaryKey, AllowNull, AutoIncrement, Unique, BelongsToMany, Default } from "sequelize-typescript";
-import Permission from "@/models/permission.model";
-import PermissionRouteGroup from "@/models/permissionRouteGroup.model";
-
-interface RouteGroupAttributes {
-    id?: number;
-    name: string;
-    description?: string;
-    createdAt?: Date;
-}
+import Permission from "@/models/permission.model.js";
+import {
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyAddAssociationsMixin,
+    BelongsToManyCountAssociationsMixin,
+    BelongsToManyCreateAssociationMixin,
+    BelongsToManyGetAssociationsMixin,
+    BelongsToManyHasAssociationMixin,
+    BelongsToManyHasAssociationsMixin,
+    BelongsToManyRemoveAssociationMixin,
+    BelongsToManyRemoveAssociationsMixin,
+    BelongsToManySetAssociationsMixin,
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "@sequelize/core";
+import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "route_groups",
     timestamps: false
 })
-class RouteGroup extends Model<RouteGroup, RouteGroupAttributes> {
+class RouteGroup extends Model<InferAttributes<RouteGroup>, InferCreationAttributes<RouteGroup>> {
+    @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @AutoIncrement
-    @AllowNull(false)
-    @Column(DataType.INTEGER)
-    id!: number;
+    @NotNull
+    declare id: CreationOptional<number>;
 
+    @Attribute(DataTypes.STRING)
     @Unique
-    @AllowNull(false)
-    @Column(DataType.STRING)
-    name!: string;
+    @NotNull
+    declare name: string;
 
-    @AllowNull(true)
-    @Column(DataType.STRING)
-    description!: string;
+    @Attribute(DataTypes.STRING)
+    declare description: string;
 
-    @AllowNull(false)
-    @Default(DataType.NOW)
-    @Column(DataType.DATE)
-    updatedAt!: Date;
+    @Attribute(DataTypes.DATE)
+    @Default(DataTypes.NOW)
+    @NotNull
+    declare updatedAt: CreationOptional<Date>;
 
-    @BelongsToMany(() => Permission, () => PermissionRouteGroup)
-    permissions!: Permission[];
+    declare permissions?: NonAttribute<Permission[]>;
+
+    declare getPermissions: BelongsToManyGetAssociationsMixin<Permission>;
+    declare setPermissions: BelongsToManySetAssociationsMixin<Permission, number>;
+    declare addPermission: BelongsToManyAddAssociationMixin<Permission, number>;
+    declare addPermissions: BelongsToManyAddAssociationsMixin<Permission, number>;
+    declare removePermission: BelongsToManyRemoveAssociationMixin<Permission, number>;
+    declare removePermissions: BelongsToManyRemoveAssociationsMixin<Permission, number>;
+    declare createPermission: BelongsToManyCreateAssociationMixin<Permission>;
+    declare hasPermission: BelongsToManyHasAssociationMixin<Permission, number>;
+    declare hasPermissions: BelongsToManyHasAssociationsMixin<Permission, number>;
+    declare countPermissions: BelongsToManyCountAssociationsMixin<Permission>;
 }
 
 export default RouteGroup;

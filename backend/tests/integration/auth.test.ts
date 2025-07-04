@@ -1,7 +1,7 @@
-import request from "supertest";
-import "../setup/testDbSetup";
 import app from "@/app";
 import { ENV } from "@/config/env";
+import request from "supertest";
+import "../setup/testDbSetup";
 
 describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, () => {
     it("should successfully register", async () => {

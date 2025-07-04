@@ -1,6 +1,6 @@
-import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger";
-import { ServerLogLevels } from "@/models/serverLog.model";
-import { getIpAddress } from "@/utils/misc.util";
+import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
+import { ServerLogTypes } from "@/models/serverLog.model.js";
+import { getIpAddress } from "@/utils/misc.util.js";
 import { Request, Response } from "express";
 
 export class ApiResponse {
@@ -18,7 +18,7 @@ export class ApiResponse {
             source: "ApiResponse"
         };
 
-        await databaseLogger(ServerLogLevels.INFO, jsonData?.message, loggerOptions);
+        await databaseLogger(ServerLogTypes.INFO, jsonData?.message, loggerOptions);
         res.status(statusCode).json(jsonData);
     }
 

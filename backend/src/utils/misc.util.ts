@@ -1,4 +1,4 @@
-import { ValidationError } from "@/errors/validationError";
+import { ValidationError } from "@/errors/validationError.js";
 import { Request } from "express";
 
 export const USERNAME_REGEX = /^[a-zA-Z0-9-]{5,15}$/;

@@ -1,4 +1,4 @@
-import { AppError } from "@/errors/errorClasses";
+import { AppError } from "@/errors/errorClasses.js";
 
 export class BadRequestError extends AppError {
     constructor(message: string = "Ungültige Anfrage/Eingabe") {

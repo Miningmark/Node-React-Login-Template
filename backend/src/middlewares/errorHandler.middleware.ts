@@ -1,8 +1,8 @@
-import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger";
-import { AppError, InternalServerError } from "@/errors/errorClasses";
-import { ServerLogLevels } from "@/models/serverLog.model";
-import { ApiResponse } from "@/utils/apiResponse.util";
-import { getIpAddress } from "@/utils/misc.util";
+import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
+import { AppError, InternalServerError } from "@/errors/errorClasses.js";
+import { ServerLogTypes } from "@/models/serverLog.model.js";
+import { ApiResponse } from "@/utils/apiResponse.util.js";
+import { getIpAddress } from "@/utils/misc.util.js";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -25,6 +25,6 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, 
         error: error
     };
 
-    await databaseLogger(ServerLogLevels.ERROR, error.message, loggerOptions);
+    await databaseLogger(ServerLogTypes.ERROR, error.message, loggerOptions);
     ApiResponse.sendError(res, error.message, error instanceof AppError ? error.statusCode : 500);
 };

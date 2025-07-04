@@ -1,17 +1,13 @@
-import express from "express";
-import cors from "cors";
+import { ENV } from "@/config/env.js";
+import { errorHandlerMiddleware } from "@/middlewares/errorHandler.middleware.js";
+import { notFoundMiddleware } from "@/middlewares/notFound.middleware.js";
+import { setupSecurityMiddleware } from "@/middlewares/security.middleware.js";
+import authRoutes from "@/routes/auth.routes.js";
+import { ErrorMonitoringService } from "@/services/ServerErrorMonitoring.service.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
 import z from "zod/v4";
-
-import { ErrorMonitoringService } from "@/services/ServerErrorMonitoring.service";
-
-import { setupSecurityMiddleware } from "@/middlewares/security.middleware";
-import { notFoundMiddleware } from "@/middlewares/notFound.middleware";
-import { errorHandlerMiddleware } from "@/middlewares/errorHandler.middleware";
-
-import { ENV } from "@/config/env";
-
-import authRoutes from "@/routes/auth.routes";
 
 const app = express();
 

@@ -1,16 +1,16 @@
-import app from "@/app";
-import { ENV } from "@/config/env";
-import { consoleLogger, databaseLogger } from "@/config/logger";
-import { sequelize } from "@/config/sequelize";
-import { ServerLogLevels } from "./models/serverLog.model";
-import { generateSuperAdmin, generateSuperAdminPermission } from "./utils/superAdmin.util";
+import app from "@/app.js";
+import { ENV } from "@/config/env.js";
+import { consoleLogger, databaseLogger } from "@/config/logger.js";
+import { sequelize } from "@/config/sequelize.js";
+import { ServerLogTypes } from "@/models/serverLog.model.js";
+import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
 
 const server = app.listen(ENV.BACKEND_PORT, async () => {
     try {
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
 
-        await databaseLogger(ServerLogLevels.INFO, `Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`, {
+        await databaseLogger(ServerLogTypes.INFO, `Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`, {
             source: "startup"
         });
 
@@ -23,7 +23,7 @@ const server = app.listen(ENV.BACKEND_PORT, async () => {
 });
 
 const shutdown = async () => {
-    await databaseLogger(ServerLogLevels.WARN, "Server fährt runter", { source: "shutdown" });
+    await databaseLogger(ServerLogTypes.WARN, "Server fährt runter", { source: "shutdown" });
 
     app.disable("connection");
 

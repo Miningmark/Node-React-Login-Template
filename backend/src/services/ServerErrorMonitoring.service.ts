@@ -1,4 +1,4 @@
-import { consoleLogger } from "@/config/logger";
+import { consoleLogger } from "@/config/logger.js";
 
 export class ErrorMonitoringService {
     private static instance: ErrorMonitoringService;

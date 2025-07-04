@@ -1,6 +1,5 @@
-import { z } from "zod/v4";
 import "dotenv/config";
-import ms from "ms";
+import { z } from "zod/v4";
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "production"]),
@@ -18,7 +17,7 @@ const envSchema = z.object({
     SUPER_ADMIN_PASSWORD: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/),
 
     FRONTEND_NAME: z.string(),
-    FRONTEND_URL: z.string().url(),
+    FRONTEND_URL: z.url(),
 
     ACCOUNT_ACTIVATION_USER_EXPIRY: z.string().regex(/^\d+[smhd]$/),
     ACCOUNT_ACTIVATION_ADMIN_EXPIRY: z.string().regex(/^\d+[smhd]$/),

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { ApiResponse } from "@/utils/apiResponse.util";
+import { ApiResponse } from "@/utils/apiResponse.util.js";
+import { NextFunction, Request, Response } from "express";
 
 export abstract class BaseController {
     protected async handleRequest(req: Request, res: Response, next: NextFunction, serviceFunction: () => Promise<any>): Promise<void> {

@@ -1,6 +1,6 @@
-import ServerLog, { ServerLogLevels } from "@/models/serverLog.model";
+import { ENV } from "@/config/env.js";
+import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import winston from "winston";
-import { ENV } from "./env";
 
 export interface DatabaseLoggerOptions {
     userId?: number;
@@ -30,7 +30,7 @@ export const consoleLogger = winston.createLogger({
     transports: [new winston.transports.Console()]
 });
 
-export async function databaseLogger(level: ServerLogLevels, message: string, options: DatabaseLoggerOptions) {
+export async function databaseLogger(type: ServerLogTypes, message: string, options: DatabaseLoggerOptions) {
     try {
         const { userId, url, method, status, ipv4Address, userAgent, requestBody, requestHeaders, response, source, error } = options;
 
@@ -45,17 +45,17 @@ export async function databaseLogger(level: ServerLogLevels, message: string, op
         }
 
         if (ENV.CONSOLE_LOG_ERRORS) {
-            if (level === ServerLogLevels.INFO) {
+            if (type === ServerLogTypes.INFO) {
                 consoleLogger.info(message);
-            } else if (level === ServerLogLevels.WARN) {
+            } else if (type === ServerLogTypes.WARN) {
                 consoleLogger.warn(message);
-            } else if (level === ServerLogLevels.ERROR) {
+            } else if (type === ServerLogTypes.ERROR) {
                 consoleLogger.error(message, { error: error?.stack });
             }
         }
 
         await ServerLog.create({
-            level: level,
+            type: type,
             message: message,
             userId: userId,
             url: url,
@@ -63,12 +63,11 @@ export async function databaseLogger(level: ServerLogLevels, message: string, op
             status: status,
             ipv4Address: ipv4Address,
             userAgent: userAgent,
-            requestBody: requestBody,
-            requestHeaders: requestHeaders,
-            response: response,
+            requestBody: JSON.stringify(requestBody),
+            requestHeaders: JSON.stringify(requestHeaders),
+            response: JSON.stringify(response),
             source: source,
-            errorStack: error?.stack?.split("\n").slice(1).join("\n"),
-            timestamp: new Date(Date.now())
+            errorStack: error?.stack?.split("\n").slice(1).join("\n")
         });
     } catch (error) {
         consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", { error: error instanceof Error ? error.stack : "" });

@@ -1,20 +1,20 @@
+import { ENV } from "@/config/env.js";
+import { ForbiddenError } from "@/errors/forbiddenError.js";
+import { UnauthorizedError } from "@/errors/unauthorizedError.js";
+import { ValidationError } from "@/errors/validationError.js";
+import RouteGroup from "@/models/routeGroup.model.js";
+import User from "@/models/user.model.js";
+import { default as LastLogin, default as UserLastLogin } from "@/models/lastLogin.model.js";
+import UserToken, { UserTokenType } from "@/models/userToken.model.js";
+import { EmailService } from "@/services/email.service.js";
+import { getAccountLockedEmailTemplate, getCompleteRegistrationEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
+import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX, parseTimeOffsetToDate } from "@/utils/misc.util.js";
+import { CreationAttributes, Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import { Request, Response } from "express";
 import jsonwebtoken from "jsonwebtoken";
 import ms from "ms";
-import { ValidationError } from "@/errors/validationError";
-import User from "@/models/user.model";
-import { Op } from "sequelize";
-import UserToken, { UserTokenType } from "@/models/userToken.model";
-import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX, parseTimeOffsetToDate } from "@/utils/misc.util";
-import { ENV } from "@/config/env";
-import { EmailService } from "./email.service";
-import { getAccountLockedEmailTemplate, getCompleteRegistrationEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/template/email/auth.template.email";
-import { ForbiddenError } from "@/errors/forbiddenError";
-import { Request, Response } from "express";
-import UserLastLogin, { UserLastLoginAttributes } from "@/models/userLastLogin.model";
-import { UnauthorizedError } from "@/errors/unauthorizedError";
-import RouteGroup from "@/models/routeGroup.model";
 
 export class AuthService {
     private emailService: EmailService;
@@ -130,11 +130,11 @@ export class AuthService {
     private async generateRouteGroupArray(databaseUser: User): Promise<string[]> {
         let routeGroupsArray: string[] = [];
 
-        const userPermissions = await databaseUser.$get("permissions", { include: [{ model: RouteGroup }] });
+        const userPermissions = await databaseUser.getPermissions({ include: [{ model: RouteGroup }] });
         if (userPermissions === null) return routeGroupsArray;
 
         userPermissions.map((userPermission) => {
-            userPermission.routeGroups.map((routeGroup) => {
+            userPermission.routeGroups?.map((routeGroup) => {
                 routeGroupsArray.push(routeGroup.name);
             });
         });
@@ -143,9 +143,7 @@ export class AuthService {
     }
 
     private async removeJWTs(databaseUser: User) {
-        const userTokens = await databaseUser.$get("userTokens", {
-            where: { [Op.or]: [{ type: UserTokenType.ACCESS_TOKEN }, { type: UserTokenType.REFRESH_TOKEN }] }
-        });
+        const userTokens = await databaseUser.getUserTokens({ where: { [Op.or]: [{ type: UserTokenType.ACCESS_TOKEN }, { type: UserTokenType.REFRESH_TOKEN }] } });
 
         await Promise.all(
             userTokens.map(async (userToken) => {
@@ -155,10 +153,7 @@ export class AuthService {
     }
 
     private async checkHasLocationChanged(databaseUser: User) {
-        const userLastLogins = await databaseUser.$get("userLastLogins", {
-            limit: 2,
-            order: [["loginTime", "DESC"]]
-        });
+        const userLastLogins = await databaseUser.getLastLogins({ limit: 2, order: [["loginTime", "DESC"]] });
 
         if (userLastLogins.length < 2) return;
 
@@ -184,10 +179,7 @@ export class AuthService {
 
     private async checkUserLastLogins(databaseUser: User) {
         let unsuccefullyLogins = 0;
-        const userLastLogins = await databaseUser.$get("userLastLogins", {
-            limit: 5,
-            order: [["loginTime", "DESC"]]
-        });
+        const userLastLogins = await databaseUser.getLastLogins({ limit: 5, order: [["loginTime", "DESC"]] });
 
         userLastLogins.forEach((userLastLogin) => {
             if (!userLastLogin.successfully) unsuccefullyLogins++;
@@ -215,7 +207,7 @@ export class AuthService {
         const ipv4Address = getIpv4Address(req);
         const userAgent = req.headers["user-agent"] || "Ungültiger UserAgent";
 
-        let userLastLogin: UserLastLoginAttributes = {
+        let userLastLogin: CreationAttributes<LastLogin> = {
             userId: userId,
             userAgent: userAgent,
             loginTime: new Date(Date.now()),
