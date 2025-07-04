@@ -37,4 +37,11 @@ export class AuthController extends BaseController {
             return await this.authService.accountActivation(token);
         });
     };
+
+    refreshAccessToken = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { refreshToken } = req.cookies;
+            return await this.authService.refreshAccessToken(refreshToken, res);
+        });
+    };
 }

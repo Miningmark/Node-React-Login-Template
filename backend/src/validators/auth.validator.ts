@@ -20,8 +20,26 @@ export const loginSchema = z.object({
     })
 });
 
+export const logoutSchema = z.object({
+    headers: z.object({
+        authorization: z
+            .string()
+            .min(1, "Kein AccessToken vorhanden")
+            .regex(/^Bearer\s[\w-]+\.[\w-]+\.[\w-]+$/, "Kein AccessToken vorhanden")
+    })
+});
+
 export const accountActivationSchema = z.object({
     body: z.object({
         token: z.string().length(64)
+    })
+});
+
+export const refreshTokenSchema = z.object({
+    headers: z.object({
+        cookie: z
+            .string()
+            .min(1, "Kein RefreshToken vorhanden")
+            .refine((val) => val.includes("refreshToken="), { message: "Kein RefreshToken vorhanden" })
     })
 });

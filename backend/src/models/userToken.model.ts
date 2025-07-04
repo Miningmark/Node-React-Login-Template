@@ -28,7 +28,7 @@ class UserToken extends Model<InferAttributes<UserToken>, InferCreationAttribute
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @NotNull
-    declare userId: CreationOptional<number>;
+    declare userId: number;
 
     @Attribute(DataTypes.ENUM(...Object.values(UserTokenType)))
     @PrimaryKey

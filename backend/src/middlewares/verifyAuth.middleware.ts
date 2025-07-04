@@ -8,7 +8,7 @@ export const verifyAuth = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const accessToken = req.headers.authorization?.split(" ")[1];
-            if (!accessToken) throw new ValidationError("Kein AccessToken vorhanden");
+            if (accessToken === undefined) return;
 
             const foundAccessToken = await UserToken.findOne({ where: { token: accessToken, type: UserTokenType.ACCESS_TOKEN } });
             if (foundAccessToken === null) throw new ForbiddenError("AccessToken nicht mehr gültig");

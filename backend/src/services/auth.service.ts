@@ -11,6 +11,7 @@ import { getAccountLockedEmailTemplate, getCompleteRegistrationEmailTemplate, ge
 import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { CreationAttributes, Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
+import { error } from "console";
 import crypto from "crypto";
 import { Request, Response } from "express";
 import jsonwebtoken from "jsonwebtoken";
@@ -110,6 +111,43 @@ export class AuthService {
         await databaseUserToken.user.save();
 
         await databaseUserToken.destroy();
+
+        return jsonResponse;
+    }
+
+    async refreshAccessToken(token: string, res: Response) {
+        let jsonResponse: Record<string, any> = { message: "Token erfolgreich erneuert" };
+
+        const refreshUserToken = await UserToken.findOne({ where: { type: UserTokenType.REFRESH_TOKEN, token: token }, include: { model: User } });
+
+        if (refreshUserToken === null) {
+            this.clearRefreshTokenCookie(res);
+            throw new UnauthorizedError("Token nicht vorhanden, bitte neuanmelden");
+        }
+
+        const accessUserToken = await UserToken.findOne({ where: { type: UserTokenType.ACCESS_TOKEN, userId: refreshUserToken.user.id } });
+        if (accessUserToken !== null) await accessUserToken.destroy();
+
+        try {
+            const decoded = jsonwebtoken.verify(refreshUserToken.token, ENV.REFRESH_TOKEN_SECRET);
+            if (decoded === undefined || typeof decoded === "string" || decoded.userId !== refreshUserToken.user.id) {
+                await refreshUserToken.destroy();
+                throw new Error();
+            }
+        } catch (error) {
+            throw new ValidationError("Token konnte nicht verifiziert werden");
+        }
+
+        const routeGroupsArray = await this.generateRouteGroupArray(refreshUserToken.user);
+        const accessToken = await this.generateJWT(
+            refreshUserToken.user,
+            UserTokenType.ACCESS_TOKEN,
+            routeGroupsArray,
+            ENV.ACCESS_TOKEN_SECRET,
+            ENV.ACCESS_TOKEN_EXPIRY as ms.StringValue
+        );
+
+        jsonResponse.accessToken = accessToken;
 
         return jsonResponse;
     }

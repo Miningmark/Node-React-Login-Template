@@ -1,7 +1,7 @@
 import app from "@/app";
 import { ENV } from "@/config/env";
 import User from "@/models/user.model";
-import UserToken from "@/models/userToken.model";
+import UserToken, { UserTokenType } from "@/models/userToken.model";
 import bcrypt from "bcrypt";
 import request from "supertest";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -429,5 +429,78 @@ describe(`POST /api/${ENV.API_VERSION}/users/logout - Logout User`, () => {
         expect(res.statusCode).toBe(200);
         expect(res.body.message).toContain("erfolgreich");
         expect(res.body.message).toContain("abgemeldet");
+    });
+});
+
+describe(`GET /api/${ENV.API_VERSION}/users/refreshAccessToken - Refresh Access Token`, () => {
+    let refreshToken = "";
+    beforeEach(async () => {
+        await User.create({
+            username: "testRefreshAccessToken",
+            password: await bcrypt.hash("testRefreshAccessToken123!", 10),
+            email: "testRefreshAccessToken@testRefreshAccessToken.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
+            username: "testRefreshAccessToken",
+            password: "testRefreshAccessToken123!"
+        });
+        expect(resLogin.statusCode).toBe(200);
+        expect(resLogin.headers["set-cookie"][0]).toContain("refreshToken=");
+        refreshToken = resLogin.headers["set-cookie"][0];
+    });
+
+    it("should successfully refresh an accessToken", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", refreshToken).send();
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("erneuert");
+    });
+
+    it("should fail because no Cookie set", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).send();
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Ungültige");
+        expect(res.body.message).toContain("headers");
+        expect(res.body.message).toContain("cookie");
+    });
+
+    it("should fail because Cookie is invalid", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", "").send();
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Kein");
+        expect(res.body.message).toContain("vorhanden");
+        expect(res.body.message).toContain("headers");
+        expect(res.body.message).toContain("cookie");
+    });
+
+    it("should fail because Cookie is not in database", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", "refreshToken=123").send();
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("vorhanden");
+        expect(res.body.message).toContain("neuanmelden");
+    });
+
+    it("should fail because token can not be decoded", async () => {
+        const databaseUser = await User.findOne({ where: { username: "testRefreshAccessToken" } });
+        if (databaseUser === null) throw new Error("User nicht vorhanden");
+
+        const databaseRefreshToken = await UserToken.findOne({ where: { userId: databaseUser.id, type: UserTokenType.REFRESH_TOKEN } });
+        if (databaseRefreshToken === null) throw new Error("Token nicht vorhanden");
+
+        databaseRefreshToken.token = "123";
+        await databaseRefreshToken.save();
+
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", "refreshToken=123").send();
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("verifiziert");
     });
 });
