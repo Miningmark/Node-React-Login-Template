@@ -6,12 +6,11 @@ import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
-    name: "removeInactiveRegistrations",
+    name: "removeInvalidJWTs",
     schedule: "* * */2 * * *",
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
-            where: { type: UserTokenType.USER_REGISTRATION_TOKEN, expiresAt: { [Op.lte]: new Date(Date.now()) } },
-            include: { model: User }
+            where: { [Op.or]: [{ type: UserTokenType.ACCESS_TOKEN }, { type: UserTokenType.REFRESH_TOKEN }], expiresAt: { [Op.lte]: new Date(Date.now()) } }
         });
         const destroyedCount = databaseUserTokens.length;
 
@@ -19,7 +18,7 @@ const job: CronJobDefinition = {
 
         await Promise.all(
             databaseUserTokens.map(async (databaseUserToken) => {
-                await databaseUserToken.user?.destroy();
+                await databaseUserToken.destroy();
             })
         );
 
