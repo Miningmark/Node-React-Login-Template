@@ -2,9 +2,9 @@ import app from "@/app.js";
 import { ENV } from "@/config/env.js";
 import { consoleLogger, databaseLogger } from "@/config/logger.js";
 import { sequelize } from "@/config/sequelize.js";
+import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
-import { scheduleAllCronJobs } from "@/croner/scheduler";
 
 const server = app.listen(ENV.BACKEND_PORT, async () => {
     try {
