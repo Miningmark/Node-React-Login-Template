@@ -1,6 +1,7 @@
 import { sequelize } from "@/config/sequelize";
 import User from "@/models/user.model";
 import bcrypt from "bcrypt";
+import { afterAll, beforeAll } from "vitest";
 
 beforeAll(async () => {
     await sequelize.authenticate();

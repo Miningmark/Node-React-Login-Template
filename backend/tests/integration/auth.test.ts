@@ -1,6 +1,7 @@
 import app from "@/app";
 import { ENV } from "@/config/env";
 import request from "supertest";
+import { describe, expect, it } from "vitest";
 import "../setup/testDbSetup";
 
 describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, () => {
