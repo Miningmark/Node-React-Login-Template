@@ -1,19 +1,24 @@
 import { ConflictError } from "@/errors/conflictError.js";
 import { ValidationError } from "@/errors/validationError.js";
+import LastLogin from "@/models/lastLogin.model.js";
 import User from "@/models/user.model.js";
+import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { capitalizeFirst } from "@/utils/misc.util.js";
 import bcrypt from "bcrypt";
 import { Response } from "express";
 
 export class UserService {
     private tokenService: TokenService;
+    private routeGroupService: RouteGroupService;
 
     constructor() {
         this.tokenService = new TokenService();
+        this.routeGroupService = new RouteGroupService();
     }
 
     async updateUsername(userId: number, newUsername: string, res: Response) {
-        let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert, bitte neu anmelden" };
+        let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
@@ -25,9 +30,6 @@ export class UserService {
 
         databaseUser.username = newUsername;
         await databaseUser.save();
-
-        this.tokenService.removeJWTs(databaseUser);
-        this.tokenService.clearRefreshTokenCookie(res);
 
         return jsonResponse;
     }
@@ -65,6 +67,45 @@ export class UserService {
 
         this.tokenService.removeJWTs(databaseUser);
         this.tokenService.clearRefreshTokenCookie(res);
+
+        return jsonResponse;
+    }
+
+    async getUsername(userId: number) {
+        let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich zurückgegeben" };
+
+        const databaseUser = await User.findOne({ where: { id: userId } });
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+
+        jsonResponse.username = capitalizeFirst(databaseUser.username);
+
+        return jsonResponse;
+    }
+
+    async getRouteGroups(userId: number) {
+        let jsonResponse: Record<string, any> = { message: "LastLogins erfolgreich zurückgegeben" };
+
+        const databaseUser = await User.findOne({ where: { id: userId } });
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+
+        jsonResponse.routeGroups = await this.routeGroupService.generateRouteGroupArray(databaseUser);
+
+        return jsonResponse;
+    }
+
+    async getLastLogins(userId: number) {
+        let jsonResponse: Record<string, any> = { message: "RouteGroups erfolgreich zurückgegeben" };
+
+        const databaseUser = await User.findOne({ where: { id: userId }, include: { model: LastLogin, limit: 5, order: [["loginTime", "DESC"]] } });
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+
+        jsonResponse.lastLogins = databaseUser.lastLogins.map((lastLogin) => ({
+            ipv4Address: lastLogin.ipv4Address,
+            country: lastLogin.country,
+            regionName: lastLogin.regionName,
+            loginTime: lastLogin.loginTime,
+            successfully: lastLogin.successfully
+        }));
 
         return jsonResponse;
     }

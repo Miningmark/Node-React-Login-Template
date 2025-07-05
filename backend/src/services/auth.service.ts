@@ -2,14 +2,14 @@ import { ENV } from "@/config/env.js";
 import { ForbiddenError } from "@/errors/forbiddenError.js";
 import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { ValidationError } from "@/errors/validationError.js";
-import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
+import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserActivityService } from "@/services/userActivity.service.js";
 import { getCompleteRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
-import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
+import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
@@ -20,11 +20,13 @@ export class AuthService {
     private emailService: EmailService;
     private tokenService: TokenService;
     private userActivityService: UserActivityService;
+    private routeGroupService: RouteGroupService;
 
     constructor() {
         this.emailService = EmailService.getInstance();
         this.tokenService = new TokenService();
         this.userActivityService = new UserActivityService();
+        this.routeGroupService = new RouteGroupService();
     }
 
     async register(username: string, email: string, password: string) {
@@ -72,13 +74,13 @@ export class AuthService {
 
         await this.tokenService.removeJWTs(databaseUser);
 
-        const routeGroupsArray = await this.generateRouteGroupArray(databaseUser);
+        const routeGroupsArray = await this.routeGroupService.generateRouteGroupArray(databaseUser);
         const resultJWTs = await this.tokenService.generateJWTs(databaseUser, routeGroupsArray);
 
         this.tokenService.setRefreshTokenCookie(res, resultJWTs.refreshToken);
 
         jsonResponse.accessToken = resultJWTs.accessToken;
-        jsonResponse.username = databaseUser.username;
+        jsonResponse.username = capitalizeFirst(databaseUser.username);
         jsonResponse.routeGroups = routeGroupsArray;
 
         await this.userActivityService.addUserLastLogin(databaseUser.id, req, true);
@@ -142,7 +144,7 @@ export class AuthService {
             throw new ValidationError("Token konnte nicht verifiziert werden, bitte neuanmelden");
         }
 
-        const routeGroupsArray = await this.generateRouteGroupArray(refreshUserToken.user);
+        const routeGroupsArray = await this.routeGroupService.generateRouteGroupArray(refreshUserToken.user);
         const accessToken = await this.tokenService.generateJWT(
             refreshUserToken.user,
             UserTokenType.ACCESS_TOKEN,
@@ -212,20 +214,5 @@ export class AuthService {
         await databaseUserToken.destroy();
 
         return jsonResponse;
-    }
-
-    private async generateRouteGroupArray(databaseUser: User): Promise<string[]> {
-        let routeGroupsArray: string[] = [];
-
-        const userPermissions = await databaseUser.getPermissions({ include: { model: RouteGroup } });
-        if (userPermissions === null) return routeGroupsArray;
-
-        userPermissions.map((userPermission) => {
-            userPermission.routeGroups?.map((routeGroup) => {
-                routeGroupsArray.push(routeGroup.name);
-            });
-        });
-
-        return routeGroupsArray;
     }
 }

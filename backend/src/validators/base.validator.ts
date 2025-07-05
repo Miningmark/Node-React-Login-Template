@@ -19,3 +19,9 @@ export const authorizationValidation: ZodString = z
     .string()
     .min(1, "Kein AccessToken vorhanden")
     .regex(/^Bearer\s[\w-]+\.[\w-]+\.[\w-]+$/, "Kein AccessToken vorhanden");
+
+export const onlyAuthorizationHeader = z.object({
+    headers: z.object({
+        authorization: authorizationValidation
+    })
+});

@@ -17,7 +17,6 @@ export const verifyAuth = () => {
                 const decodedPayload = jwt.verify(accessToken, ENV.ACCESS_TOKEN_SECRET) as JwtPayload;
 
                 req.userId = decodedPayload.userId;
-                req.username = decodedPayload.username;
                 req.routeGroups = decodedPayload.routeGroups;
 
                 next();

@@ -49,7 +49,6 @@ export class TokenService {
         const token = jsonwebtoken.sign(
             {
                 userId: databaseUser.id,
-                username: databaseUser.username,
                 routeGroups: routeGroupsArray
             },
             secret,

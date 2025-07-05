@@ -40,4 +40,31 @@ export class UserController extends BaseController {
             return await this.userService.updatePassword(userId, currentPassword, newPassword, res);
         });
     };
+
+    getUsername = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req;
+            if (userId === undefined) throw new UnauthorizedError();
+
+            return await this.userService.getUsername(userId);
+        });
+    };
+
+    getRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req;
+            if (userId === undefined) throw new UnauthorizedError();
+
+            return await this.userService.getRouteGroups(userId);
+        });
+    };
+
+    getLastLogins = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req;
+            if (userId === undefined) throw new UnauthorizedError();
+
+            return await this.userService.getLastLogins(userId);
+        });
+    };
 }

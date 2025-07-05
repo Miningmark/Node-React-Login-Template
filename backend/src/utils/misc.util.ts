@@ -54,3 +54,7 @@ export function formatDate(date: Date): string {
 
     return new Intl.DateTimeFormat("de-DE", options).format(date);
 }
+
+export function capitalizeFirst(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}

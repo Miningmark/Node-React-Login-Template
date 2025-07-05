@@ -474,3 +474,81 @@ describe(`POST /api/${ENV.API_VERSION}/user/updatePassword - updates password fo
         expect(res.body.message).toContain("alten");
     });
 });
+
+describe(`GET /api/${ENV.API_VERSION}/user/getUsername - return username for an user`, () => {
+    let accessToken = "";
+    beforeEach(async () => {
+        await User.create({
+            username: "testGetUsername",
+            password: await bcrypt.hash("testGetUsername123!", 10),
+            email: "testGetUsername@testGetUsername.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "testGetUsername",
+            password: "testGetUsername123!"
+        });
+        expect(resLogin.statusCode).toBe(200);
+        accessToken = resLogin.body.accessToken;
+    });
+
+    it("should successfully return username", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/user/getUsername`).set("authorization", `Bearer ${accessToken}`).send();
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.username).toContain("TestGetUsername");
+    });
+});
+
+describe(`GET /api/${ENV.API_VERSION}/user/getRouteGroups - returns all RouteGroups for an user`, () => {
+    let accessToken = "";
+    beforeEach(async () => {
+        await User.create({
+            username: "testGetRouteGroups",
+            password: await bcrypt.hash("testGetRouteGroups123!", 10),
+            email: "testGetRouteGroups@testGetRouteGroups.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "testGetRouteGroups",
+            password: "testGetRouteGroups123!"
+        });
+        expect(resLogin.statusCode).toBe(200);
+        accessToken = resLogin.body.accessToken;
+    });
+
+    it("should successfully return all route groups a user have", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/user/getRouteGroups`).set("authorization", `Bearer ${accessToken}`).send();
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.routeGroups).toBeDefined();
+    });
+});
+
+describe(`GET /api/${ENV.API_VERSION}/user/getLastLogins - returns the last 5 logins`, () => {
+    let accessToken = "";
+    beforeEach(async () => {
+        await User.create({
+            username: "testGetLastLogins",
+            password: await bcrypt.hash("testGetLastLogins123!", 10),
+            email: "testGetLastLogins@testGetLastLogins.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "testGetLastLogins",
+            password: "testGetLastLogins123!"
+        });
+        expect(resLogin.statusCode).toBe(200);
+        accessToken = resLogin.body.accessToken;
+    });
+
+    it("should successfully return last 5 logins", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/user/getLastLogins`).set("authorization", `Bearer ${accessToken}`).send();
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.lastLogins).toBeDefined();
+    });
+});
