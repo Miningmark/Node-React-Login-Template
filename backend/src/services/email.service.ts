@@ -4,6 +4,7 @@ import { ServerLogTypes } from "@/models/serverLog.model.js";
 import nodemailer from "nodemailer";
 
 export class EmailService {
+    private static instance: EmailService;
     private transporter!: nodemailer.Transporter;
     private readonly fromAddress: string;
 
@@ -23,6 +24,13 @@ export class EmailService {
         setTimeout(async () => {
             this.verifyConnection();
         }, 3000);
+    }
+
+    public static getInstance(): EmailService {
+        if (!EmailService.instance) {
+            EmailService.instance = new EmailService();
+        }
+        return EmailService.instance;
     }
 
     private async verifyConnection() {

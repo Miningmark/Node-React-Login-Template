@@ -1,4 +1,5 @@
 import { BaseController } from "@/controllers/base.controller.js";
+import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { UserService } from "@/services/user.service.js";
 import { NextFunction, Request, Response } from "express";
 
@@ -9,8 +10,12 @@ export class UserController extends BaseController {
 
     updatePassword = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
+            const { userId } = req;
+            if (userId === undefined) throw new UnauthorizedError();
+
             const { currentPassword, newPassword } = req.body;
-            return await this.userService.updatePassword(currentPassword, newPassword);
+
+            return await this.userService.updatePassword(userId, currentPassword, newPassword, res);
         });
     };
 }

@@ -1,9 +1,12 @@
 import { z } from "zod/v4";
-import { passwordBaseValidation } from "@/validators/base.validator.js";
+import { authorizationValidation, passwordBaseValidation } from "@/validators/base.validator.js";
 
 export const updatePasswordSchema = z.object({
+    headers: z.object({
+        authorization: authorizationValidation
+    }),
     body: z.object({
-        currentPassword: passwordBaseValidation,
-        oldPassword: passwordBaseValidation
+        currentPassword: z.string(),
+        newPassword: passwordBaseValidation
     })
 });

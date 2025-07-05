@@ -10,6 +10,6 @@ const router = Router();
 const userService = new UserService();
 const userController = new UserController(userService);
 
-router.post("/logout", validateRequest(updatePasswordSchema), verifyAuth(), userController.updatePassword);
+router.post("/updatePassword", validateRequest(updatePasswordSchema), verifyAuth(), userController.updatePassword);
 
 export default router;

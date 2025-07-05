@@ -22,7 +22,7 @@ export const verifyAuth = () => {
 
                 next();
             } catch (error) {
-                next(new ForbiddenError("AccessToken nicht gültig"));
+                next(new ForbiddenError("AccessToken konnte nicht verifiziert werden"));
             }
         } catch (error) {
             next(error);

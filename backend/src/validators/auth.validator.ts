@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
+import { authorizationValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
 
 export const registerSchema = z.object({
     body: z.object({
@@ -18,10 +18,7 @@ export const loginSchema = z.object({
 
 export const logoutSchema = z.object({
     headers: z.object({
-        authorization: z
-            .string()
-            .min(1, "Kein AccessToken vorhanden")
-            .regex(/^Bearer\s[\w-]+\.[\w-]+\.[\w-]+$/, "Kein AccessToken vorhanden")
+        authorization: authorizationValidation
     })
 });
 
