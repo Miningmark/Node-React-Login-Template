@@ -3,6 +3,10 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
 import { axiosPublic } from "../../util/axios";
+import { ThemeContext } from "contexts/ThemeContext";
+
+import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
+import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
@@ -14,9 +18,11 @@ function Login() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { addToast } = useToast();
   const { login } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -101,17 +107,40 @@ function Login() {
                 />
                 <label htmlFor="floatingInput">Name</label>
               </div>
-              <div className="form-floating mb-3">
+              <div className="form-floating mb-3 position-relative">
                 <input
-                  className="form-control"
+                  className="form-control pe-5"
                   id="floatingPassword"
                   placeholder="Passwort"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <label htmlFor="floatingPassword">Passwort</label>
+                <span
+                  className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                    showPassword ? "rotate" : ""
+                  }`}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? (
+                    <VisibilityOffIcon
+                      fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                      width={24}
+                      height={24}
+                      style={{ marginRight: "15px" }}
+                    />
+                  ) : (
+                    <VisibilityIcon
+                      fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                      width={24}
+                      height={24}
+                      style={{ marginRight: "15px" }}
+                    />
+                  )}
+                </span>
               </div>
+
               <div className="d-flex mb-3">
                 {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
                   <span
@@ -192,7 +221,7 @@ function Login() {
           textShadow: "1px 1px 2px black",
         }}
       >
-        ABCDEFGH
+        ABCDEFGHIJKLMN
       </div>
     </div>
   );

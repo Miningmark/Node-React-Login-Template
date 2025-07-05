@@ -4,6 +4,10 @@ import useAxiosProtected from "../hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
 import { convertToLocalDate } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
+import { ThemeContext } from "contexts/ThemeContext";
+
+import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
+import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
 
 const UserPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -17,9 +21,13 @@ const UserPage = () => {
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [loadingUsername, setLoadingUsername] = useState(false);
   const [loadingLogins, setLoadingLogins] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+  const [showPassword3, setShowPassword3] = useState(false);
 
   const { addToast } = useToast();
   const { setAccessToken } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
 
@@ -150,6 +158,8 @@ const UserPage = () => {
     }
   }
 
+  console.log("Theme:", theme);
+
   return (
     <div className="container mt-4">
       <h2>Benutzereinstellungen</h2>
@@ -162,7 +172,7 @@ const UserPage = () => {
               <form onSubmit={handleUpdatePassword}>
                 <div className="form-floating mb-3">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className={`form-control `}
                     id="floatingCurrentPassword"
                     placeholder="Aktuelles Passwort"
@@ -172,10 +182,33 @@ const UserPage = () => {
                     ref={currentPasswordRef}
                   />
                   <label htmlFor="floatingCurrentPassword">Aktuelles Passwort</label>
+
+                  <span
+                    className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                      showPassword ? "rotate" : ""
+                    }`}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? (
+                      <VisibilityOffIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    )}
+                  </span>
                 </div>
                 <div className="form-floating mb-3">
                   <input
-                    type="password"
+                    type={showPassword2 ? "text" : "password"}
                     className={`form-control ${
                       touched.password
                         ? isLengthValid &&
@@ -198,6 +231,28 @@ const UserPage = () => {
                     ref={passwordRef}
                   />
                   <label htmlFor="floatingNewPassword">Neues Passwort</label>
+                  <span
+                    className={`eye-icon position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer ${
+                      showPassword2 ? "rotate" : ""
+                    }`}
+                    onClick={() => setShowPassword2((prev) => !prev)}
+                  >
+                    {showPassword2 ? (
+                      <VisibilityOffIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    )}
+                  </span>
                 </div>
                 <ul className="mb-3 list-unstyled small">
                   <li
@@ -234,9 +289,9 @@ const UserPage = () => {
                     {hasSpecialChar ? "✅" : "❌"} Mindestens ein Sonderzeichen
                   </li>
                 </ul>
-                <div className="form-floating mb-3">
+                <div className="form-floating mb-3 position-relative">
                   <input
-                    type="password"
+                    type={showPassword3 ? "text" : "password"}
                     className={`form-control ${
                       touched.repeat && !passwordsMatch
                         ? "is-invalid"
@@ -255,6 +310,34 @@ const UserPage = () => {
                     ref={repeatRef}
                   />
                   <label htmlFor="floatingConfirmPassword">Passwort wiederholen</label>
+                  <span
+                    className={`eye-icon position-absolute translate-middle-y me-3 cursor-pointer ${
+                      showPassword3 ? "rotate" : ""
+                    }`}
+                    onClick={() => setShowPassword3((prev) => !prev)}
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      right: "15px",
+                      top: "26px",
+                    }}
+                  >
+                    {showPassword3 ? (
+                      <VisibilityOffIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                        width={24}
+                        height={24}
+                        style={{ marginRight: "15px" }}
+                      />
+                    )}
+                  </span>
                   {touched.repeat && !passwordsMatch && (
                     <div className="invalid-feedback">Passwörter stimmen nicht überein.</div>
                   )}

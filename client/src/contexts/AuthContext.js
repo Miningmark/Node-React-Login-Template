@@ -19,6 +19,18 @@ export const AuthProvider = ({ children }) => {
     setRouteGroups(null);
   }
 
+  function checkAccess(allowedGroupNames) {
+    if (!routeGroups) return false;
+
+    if (routeGroups.includes("superAdmin")) {
+      return true;
+    }
+
+    if (!allowedGroupNames || allowedGroupNames.length === 0) return false;
+
+    return allowedGroupNames.some((group) => routeGroups.includes(group));
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -30,6 +42,7 @@ export const AuthProvider = ({ children }) => {
         setRouteGroups,
         login,
         logout,
+        checkAccess,
       }}
     >
       {children}

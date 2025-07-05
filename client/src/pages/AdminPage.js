@@ -1,11 +1,10 @@
-import { useState, useEffect, useContext, useMemo} from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
 import sortingAlgorithm from "util/sortingAlgorithm";
 import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOptionsModal";
-
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
@@ -34,36 +33,37 @@ function AdminPage() {
   const [showCreatePermissionModal, setShowCreatePermissionModal] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState(null);
 
+  const [showCreateUserNotificationModal, setShowCreateUserNotificationModal] = useState(false);
+  const [userNotifications, setUserNotifications] = useState(null);
+  const [selectedUserNotification,setSelectedUserNotification] = useState(null);
+  const [loadingUserNotifications, setLoadingUserNotifications] = useState(false);
+
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { routeGroups } = useContext(AuthContext);
-
+  const { checkAccess } = useContext(AuthContext);
 
   const filteredPermission = useMemo(() => {
-    if(!allPermissions) return [];
+    if (!allPermissions) return [];
 
-        const searchLower = searchTerm.toLowerCase();
+    const searchLower = searchTerm.toLowerCase();
 
-            const filtered = searchTerm
-              ? allPermissions.filter((item) =>
-                  Object.values(item).some((value) => {
-                    if (typeof value === "string") {
-                      return value.toLowerCase().includes(searchLower);
-                    }
-                    if (typeof value === "number") {
-                      return value.toString().includes(searchTerm);
-                    }
-        
-                    return false;
-                  })
-                )
-              : allPermissions;
-        
-            return sortingAlgorithm(filtered, "name", "asc");
+    const filtered = searchTerm
+      ? allPermissions.filter((item) =>
+          Object.values(item).some((value) => {
+            if (typeof value === "string") {
+              return value.toLowerCase().includes(searchLower);
+            }
+            if (typeof value === "number") {
+              return value.toString().includes(searchTerm);
+            }
 
+            return false;
+          })
+        )
+      : allPermissions;
 
-
-    }, [allPermissions, searchTerm]);
+    return sortingAlgorithm(filtered, "name", "asc");
+  }, [allPermissions, searchTerm]);
 
   const refreshFilteredServerLog = async () => {
     if (!activeFilters) return;
@@ -164,15 +164,27 @@ function AdminPage() {
 
   const loadInitialData = async () => {
     try {
-      const [filterRes, routeGroupRes, permissionsRes] = await Promise.all([
-        axiosProtected.get(`/adminPage/getFilterOptionsServerLog`),
-        axiosProtected.get(`/adminPage/getAllRouteGroups`),
-        axiosProtected.get(`/adminPage/getAllPermissionsWithRouteGroups`),
-      ]);
+      const promises = [];
 
-      setFilterOptions(filterRes?.data?.filterOptions || []);
-      setAllRouteGroups(routeGroupRes?.data?.routeGroups || []);
-      setAllPermissions(permissionsRes?.data?.permissions || []);
+      if (checkAccess(["adminPageServerLogRead"])) {
+        promises.push(
+          axiosProtected
+            .get(`/adminPage/getFilterOptionsServerLog`)
+            .then((res) => setFilterOptions(res?.data?.filterOptions || []))
+        );
+      }
+
+      if (checkAccess(["adminPagePermissionsRead", "adminPagePermissionsWrite"])) {
+        promises.push(
+          axiosProtected
+            .get(`/adminPage/getAllRouteGroups`)
+            .then((res) => setAllRouteGroups(res?.data?.routeGroups || [])),
+          axiosProtected
+            .get(`/adminPage/getAllPermissionsWithRouteGroups`)
+            .then((res) => setAllPermissions(res?.data?.permissions || []))
+        );
+      }
+      await Promise.all(promises);
     } catch (error) {
       addToast("Fehler beim Laden von Initialdaten", "danger");
     } finally {
@@ -184,7 +196,7 @@ function AdminPage() {
 
   useEffect(() => {
     loadInitialData();
-    fetchServerLogs();
+    checkAccess(["adminPageServerLogRead"]) && fetchServerLogs();
   }, []);
 
   function handleServerLogSearch(filters) {
@@ -220,12 +232,15 @@ function AdminPage() {
 
         <div>
           <Tabs defaultActiveKey="serverLog" id="adminPage-tabs">
-            {routeGroups.includes("adminPageServerLogRead") ? (
+            {checkAccess(["adminPageServerLogRead"]) ? (
               <Tab
                 eventKey="serverLog"
                 title="ServerLog"
-                className="border p-3 mb-4"
-                style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
+                className="border-end border-bottom border-start p-3 mb-4"
+                style={{
+                  maxHeight: "calc(100vh - 70px)",
+                  overflowY: "auto",
+                }}
               >
                 {!loadingServerLog && serverLog?.length > 0 ? (
                   <>
@@ -274,9 +289,9 @@ function AdminPage() {
                       className="border"
                       style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
                     >
-                      <Table striped bordered hover className="mb-0">
+                      <Table striped bordered hover fixed className="mb-0">
                         <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
-                          <tr>
+                          <tr className="border">
                             <th className="text-center">ID</th>
                             <th className="text-center">Zeitstempel</th>
                             <th className="text-center">Level</th>
@@ -330,47 +345,40 @@ function AdminPage() {
               </Tab>
             ) : null}
 
-            {routeGroups.includes("adminPagePermissionsRead") ||
-            routeGroups.includes("adminPagePermissionsWrite") ? (
+            {checkAccess(["adminPagePermissionsRead", "adminPagePermissionsWrite"]) ? (
               <Tab
                 eventKey="allPermissions"
                 title="Berechtigungsmatrix"
-                className="border p-3 p mb-4"
+                className="border-end border-bottom border-start p-3 p mb-4"
                 style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
               >
                 {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
                   <>
                     <div className="d-flex gap-2 mb-3">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={() => setShowCreatePermissionModal(true)}
-                      >
-                        +
-                      </button>
+                      {checkAccess(["adminPagePermissionsWrite"]) ? (
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => setShowCreatePermissionModal(true)}
+                        >
+                          +
+                        </button>
+                      ) : null}
+
                       <InputGroup className="flex-grow-1">
                         <FormControl
                           placeholder="Suche in Benutzerrechten"
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </InputGroup>
-                      {/*
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={handleServerLogSearch}
-                      >
-                        Suchen
-                      </button>
-                       */}
                     </div>
 
                     <div
-                      className="border table-container"
+                      className="table-container special-table"
                       style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
                     >
                       <Table striped bordered hover className="mb-0">
-                        <thead className="border">
+                        <thead>
                           <tr>
                             <th>Zugriffsrechte</th>
                             {allRouteGroups.map((routeGroup) => (
@@ -426,6 +434,105 @@ function AdminPage() {
                 )}
               </Tab>
             ) : null}
+
+            {true ? (
+              <Tab
+                eventKey="userNotifications"
+                title="User Notifications"
+                className="border-end border-bottom border-start p-3 mb-4"
+                style={{
+                  maxHeight: "calc(100vh - 70px)",
+                  overflowY: "auto",
+                }}
+              >
+                {!loadingUserNotifications && userNotifications !== null ? (
+                  <>
+                    <div className="d-flex gap-2 mb-3">
+                      {true ? (
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => setShowCreateUserNotificationModal(true)}
+                        >
+                          +
+                        </button>
+                      ) : null}
+
+                      <InputGroup className="flex-grow-1">
+                        <FormControl
+                          placeholder="Suche in Benachrichtigungen"
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </InputGroup>
+                      <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => {}}
+                        >
+                          Suchen
+                        </button>
+                    </div>
+
+                    <div
+                      className="border"
+                      style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
+                    >
+                      <Table striped bordered hover fixed className="mb-0">
+                        <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+                          <tr className="border">
+                            <th className="text-center">ID</th>
+                            <th className="text-center">Titel</th>
+                            <th className="text-center">Freigegeben</th>
+                            <th className="text-center">Datum</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {userNotifications.map((notification) => (
+                            <tr
+                              key={notification.id}
+                              onClick={() => setSelectedUserNotification(notification.id)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <td>{notification.id}</td>
+                              <td className="text-center">{notification.title}</td>
+                              <td className="text-center">{notification.active}</td>
+                              <td className="text-center">
+                                {convertToLocalTimeStamp(notification.timestamp)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                      { /* //TODO: Button ändern auf notifications                 */}
+                      <div className="text-center my-3">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            if (activeFilters) {
+                              fetchFilteredLogs(activeFilters, filteredServerlogOffset);
+                            } else {
+                              console.log("Lade mehr Server-Logs", serverlogOffset);
+                              fetchServerLogs(serverlogOffset);
+                            }
+                          }}
+                          disabled={
+                            loadingServerLogPart ||
+                            (activeFilters
+                              ? filteredServerLogMaxEntries &&
+                                filteredServerlogOffset >= filteredServerLogMaxEntries
+                              : serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
+                          }
+                        >
+                          {loadingServerLogPart ? "Lade mehr..." : "Mehr laden"}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <TableLoadingAnimation />
+                )}
+                </Tab>
+            ):null}
           </Tabs>
         </div>
       </Container>
