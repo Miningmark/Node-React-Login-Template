@@ -1,15 +1,11 @@
-import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "@/utils/misc.util.js";
-import { z, ZodString } from "zod/v4";
-
-const usernameString: ZodString = z.string().min(5).max(15).regex(USERNAME_REGEX, "Benutzername entspricht nicht den Anforderungen");
-const emailString: ZodString = z.string().regex(EMAIL_REGEX, "Email entspricht nicht den Anforderungen");
-const passwordString: ZodString = z.string().min(8).max(24).regex(PASSWORD_REGEX, "Passwort entspricht nicht den Anforderungen");
+import { z } from "zod/v4";
+import { emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
 
 export const registerSchema = z.object({
     body: z.object({
-        username: usernameString.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Benutzername kann nicht SuperAdmin enthalten!"),
-        email: emailString.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Email kann nicht SuperAdmin enthalten!"),
-        password: passwordString
+        username: usernameBaseValidation.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Benutzername kann nicht SuperAdmin enthalten!"),
+        email: emailBaseValidation.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Email kann nicht SuperAdmin enthalten!"),
+        password: passwordBaseValidation
     })
 });
 
@@ -58,6 +54,6 @@ export const requestPasswordResetSchema = z.object({
 export const handlePasswordRecoverySchema = z.object({
     body: z.object({
         token: z.string().length(64),
-        password: passwordString
+        password: passwordBaseValidation
     })
 });

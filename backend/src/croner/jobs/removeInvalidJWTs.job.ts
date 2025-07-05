@@ -7,7 +7,7 @@ import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
     name: "removeInvalidJWTs",
-    schedule: "* * */2 * * *",
+    schedule: "? ? /2 * * *",
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
             where: { [Op.or]: [{ type: UserTokenType.ACCESS_TOKEN }, { type: UserTokenType.REFRESH_TOKEN }], expiresAt: { [Op.lte]: new Date(Date.now()) } }

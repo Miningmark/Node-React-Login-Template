@@ -30,6 +30,7 @@ export async function scheduleAllCronJobs() {
             new Cron(job.schedule, { timezone: "Europe/Berlin" }, async () => {
                 await job.job();
             });
+
             await databaseLogger(ServerLogTypes.INFO, `Job "${job.name}" erfolgreich erstellt mit dem Zeitplan "${job.schedule}"`, {
                 source: "scheduler"
             });
@@ -39,6 +40,7 @@ export async function scheduleAllCronJobs() {
             source: "scheduler"
         });
     } catch (err) {
+        console.log(err);
         await databaseLogger(ServerLogTypes.ERROR, "Fehler beim erstellen der CronJobs", {
             source: "scheduler"
         });

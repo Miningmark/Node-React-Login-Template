@@ -3,6 +3,7 @@ import { errorHandlerMiddleware } from "@/middlewares/errorHandler.middleware.js
 import { notFoundMiddleware } from "@/middlewares/notFound.middleware.js";
 import { setupSecurityMiddleware } from "@/middlewares/security.middleware.js";
 import authRoutes from "@/routes/auth.routes.js";
+import userRoutes from "@/routes/user.routes.js";
 import { ErrorMonitoringService } from "@/services/ServerErrorMonitoring.service.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/" + ENV.API_VERSION + "/auth", authRoutes);
+app.use("/api/" + ENV.API_VERSION + "/users", userRoutes);
 
 app.use(notFoundMiddleware);
 

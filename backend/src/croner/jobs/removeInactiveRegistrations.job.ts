@@ -7,7 +7,7 @@ import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
     name: "removeInactiveRegistrations",
-    schedule: "* * */2 * * *",
+    schedule: "? ? /2 * * *",
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
             where: { type: UserTokenType.USER_REGISTRATION_TOKEN, expiresAt: { [Op.lte]: new Date(Date.now()) } },

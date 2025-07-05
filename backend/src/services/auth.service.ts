@@ -29,7 +29,7 @@ export class AuthService {
     }
 
     async register(username: string, email: string, password: string) {
-        const jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert", statusCode: 201 };
+        let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert", statusCode: 201 };
 
         let databaseUser = await User.findOne({ where: { [Op.or]: [{ username: username }, { email: email }] } });
         if (databaseUser !== null) throw new ValidationError("Benutzername oder Email bereits vergeben");
