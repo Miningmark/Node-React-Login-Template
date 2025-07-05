@@ -4,7 +4,7 @@ import { notFoundMiddleware } from "@/middlewares/notFound.middleware.js";
 import { setupSecurityMiddleware } from "@/middlewares/security.middleware.js";
 import authRoutes from "@/routes/auth.routes.js";
 import userRoutes from "@/routes/user.routes.js";
-import { ErrorMonitoringService } from "@/services/ServerErrorMonitoring.service.js";
+import { ErrorMonitoringService } from "@/services/serverErrorMonitoring.service.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";

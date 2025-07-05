@@ -6,11 +6,14 @@ import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
-    name: "removeInvalidJWTs",
+    name: "removeInvalidUserTokens",
     schedule: "? ? /2 * * *",
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
-            where: { [Op.or]: [{ type: UserTokenType.ACCESS_TOKEN }, { type: UserTokenType.REFRESH_TOKEN }], expiresAt: { [Op.lte]: new Date(Date.now()) } }
+            where: {
+                type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN, UserTokenType.PASSWORD_RESET_TOKEN] },
+                expiresAt: { [Op.lte]: new Date(Date.now()) }
+            }
         });
         const destroyedCount = databaseUserTokens.length;
 
@@ -20,7 +23,7 @@ const job: CronJobDefinition = {
             })
         );
 
-        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} Zugangstoken gelöscht`, {
+        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} User Token gelöscht`, {
             source: job.name
         });
     }
