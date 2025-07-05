@@ -15,7 +15,7 @@ describe("MIDDLEWARE verifyAuth", () => {
             isActive: true
         });
 
-        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/users/login`).send({
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
             username: "testVerifyAuth",
             password: "testVerifyAuth123!"
         });
@@ -24,7 +24,7 @@ describe("MIDDLEWARE verifyAuth", () => {
     });
 
     it("should successfully logout a user", async () => {
-        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/logout`).set("authorization", `Bearer ${accessToken}`).send();
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/auth/logout`).set("authorization", `Bearer ${accessToken}`).send();
 
         expect(res.statusCode).toBe(200);
     });

@@ -16,7 +16,6 @@ import {
 import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { CreationAttributes, Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
-import { error } from "console";
 import crypto from "crypto";
 import { Request, Response } from "express";
 import jsonwebtoken from "jsonwebtoken";
@@ -77,7 +76,7 @@ export class AuthService {
         const routeGroupsArray = await this.generateRouteGroupArray(databaseUser);
         const resultJWTs = await this.generateJWTs(databaseUser, routeGroupsArray);
 
-        await this.setRefreshTokenCookie(res, resultJWTs.refreshToken);
+        this.setRefreshTokenCookie(res, resultJWTs.refreshToken);
 
         jsonResponse.accessToken = resultJWTs.accessToken;
         jsonResponse.username = databaseUser.username;
@@ -183,6 +182,35 @@ export class AuthService {
         return jsonResponse;
     }
 
+    async handlePasswordRecovery(token: string, password: string) {
+        let jsonResponse: Record<string, any> = { message: "Passwort erfolgreich gespeichert" };
+
+        const databaseUserToken = await UserToken.findOne({
+            where: { token: token, type: { [Op.or]: [UserTokenType.ADMIN_REGISTRATION_TOKEN, UserTokenType.PASSWORD_RESET_TOKEN, UserTokenType.ACCOUNT_REACTIVATION_TOKEN] } },
+            include: { model: User }
+        });
+        if (databaseUserToken === null) throw new ValidationError("Token nicht vorhanden oder abgelaufen");
+
+        if (databaseUserToken.expiresAt !== null && new Date(Date.now()) > databaseUserToken.expiresAt) {
+            if (databaseUserToken.type === UserTokenType.ADMIN_REGISTRATION_TOKEN)
+                throw new UnauthorizedError("Zeit zum abschließen der Registrierung leider abgelaufen bitte selbst registrieren oder einen Admin darum bitten");
+
+            await this.requestPasswordReset(databaseUserToken.user.username);
+            throw new ValidationError("Zeit zum zurücksetzten leider schon abgelaufen, es wurde Ihnen eine neue Email gesendet");
+        }
+
+        const isPasswordMatching = await bcrypt.compare(password, databaseUserToken.user.password);
+        if (isPasswordMatching === true) throw new ValidationError("Ihr neues Passwort kann nicht mit ihrem alten Passwort gleich sein");
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        databaseUserToken.user.password = hashedPassword;
+        await databaseUserToken.user.save();
+        await databaseUserToken.destroy();
+
+        return jsonResponse;
+    }
+
     private clearRefreshTokenCookie(res: Response) {
         res.clearCookie("refreshToken", {
             httpOnly: true,
@@ -251,7 +279,7 @@ export class AuthService {
     }
 
     private async removeJWTs(databaseUser: User) {
-        const userTokens = await databaseUser.getUserTokens({ where: { [Op.or]: [{ type: UserTokenType.ACCESS_TOKEN }, { type: UserTokenType.REFRESH_TOKEN }] } });
+        const userTokens = await databaseUser.getUserTokens({ where: { type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN] } } });
 
         await Promise.all(
             userTokens.map(async (userToken) => {

@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/" + ENV.API_VERSION + "/users", authRoutes);
+app.use("/api/" + ENV.API_VERSION + "/auth", authRoutes);
 
 app.use(notFoundMiddleware);
 
