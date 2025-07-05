@@ -3,6 +3,8 @@ import { Modal, Button } from "react-bootstrap";
 const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
   if (!serverLogEntry) return null;
 
+  console.log("log entry", serverLogEntry);
+
   const renderJsonIfPossible = (value) => {
     try {
       const parsed = JSON.parse(value);

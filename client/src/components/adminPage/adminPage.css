@@ -1,0 +1,30 @@
+.table-container {
+  overflow: auto;
+  max-height: calc(100vh - 185px);
+  position: relative;
+}
+
+th,
+td {
+  white-space: nowrap;
+}
+
+/* Header fixieren */
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Erste Spalte fixieren */
+tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+}

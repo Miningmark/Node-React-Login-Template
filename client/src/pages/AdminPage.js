@@ -1,51 +1,117 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo} from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import { Table, InputGroup, FormControl, Tabs, Tab, Container } from "react-bootstrap";
 import sortingAlgorithm from "util/sortingAlgorithm";
+import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOptionsModal";
 
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
+import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
+
+import "components/adminPage/adminPage.css";
 
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
-  const [laodingServerLog, setLoadingServerLog] = useState(false);
+  const [filteredServerLog, setFilteredServerLog] = useState(null);
+  const [loadingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
   const [serverLogMaxEntries, setServerLogMaxEntries] = useState(null);
+  const [filteredServerlogOffset, setFilteredServerlogOffset] = useState(0);
+  const [filteredServerLogMaxEntries, setFilteredServerLogMaxEntries] = useState(null);
   const [loadingServerLogPart, setLoadingServerLogPart] = useState(true);
   const [allRouteGroups, setAllRouteGroups] = useState([]);
   const [allPermissions, setAllPermissions] = useState([]);
   const [loadingAllRouteGroups, setLoadingAllRouteGroups] = useState(true);
   const [loadingAllPermissions, setLoadingAllPermissions] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [serverLogSearchOptions, setServerLogSearchOptions] = useState(null);
   const [selectedServerLog, setSelectedServerLog] = useState(null);
-
-  console.log("serverLog:", serverLog);
-  console.log("serverlogOffset:", serverlogOffset);
-  console.log("serverLogMaxEntries:", serverLogMaxEntries);
+  const [filterOptions, setFilterOptions] = useState(null);
+  const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
+  const [activeFilters, setActiveFilters] = useState(null);
+  const [showCreatePermissionModal, setShowCreatePermissionModal] = useState(false);
+  const [selectedPermission, setSelectedPermission] = useState(null);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { routeGroups } = useContext(AuthContext);
 
-  const fetchServerLog = async () => {
+
+  const filteredPermission = useMemo(() => {
+    if(!allPermissions) return [];
+
+        const searchLower = searchTerm.toLowerCase();
+
+            const filtered = searchTerm
+              ? allPermissions.filter((item) =>
+                  Object.values(item).some((value) => {
+                    if (typeof value === "string") {
+                      return value.toLowerCase().includes(searchLower);
+                    }
+                    if (typeof value === "number") {
+                      return value.toString().includes(searchTerm);
+                    }
+        
+                    return false;
+                  })
+                )
+              : allPermissions;
+        
+            return sortingAlgorithm(filtered, "name", "asc");
+
+
+
+    }, [allPermissions, searchTerm]);
+
+  const refreshFilteredServerLog = async () => {
+    if (!activeFilters) return;
+    setLoadingServerLogPart(true);
     try {
-      const response = await axiosProtected.get(`/adminPage/getServerLog/50-${serverlogOffset}`);
-      console.log("Server-Log-Fetch erfolgreich:", response?.data);
-      if (!serverLog) {
-        setServerLog(response.data.serverLogs);
+      const response = await axiosProtected.post(
+        `/adminPage/getFilteredServerLog/50-0`,
+        activeFilters
+      );
+      const newLogs = response.data.serverLogs || [];
+
+      if (!filteredServerLog?.length) {
+        setFilteredServerLog(newLogs);
       } else {
-        setServerLog((prevLogs) => [...prevLogs, ...response.data.serverLogs]);
+        // IDs der bisherigen Logs
+        const existingIds = new Set(filteredServerLog.map((log) => log.id));
+        // Nur neue Logs, die noch nicht existieren
+        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
+
+        if (onlyNewLogs.length) {
+          setFilteredServerLog((prev) => [...onlyNewLogs, ...prev]);
+        }
       }
-      setServerlogOffset((prevOffset) => prevOffset + 50);
-      setServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+
+      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+    } catch {
+      addToast("Fehler beim Aktualisieren der gefilterten Logs", "danger");
+    } finally {
+      setLoadingServerLogPart(false);
+    }
+  };
+
+  const mergeNewLogs = (existingLogs, newLogs) => {
+    const existingIds = new Set(existingLogs.map((log) => log.id));
+    return [...existingLogs, ...newLogs.filter((log) => !existingIds.has(log.id))];
+  };
+
+  const fetchServerLogs = async (offset = 0) => {
+    setLoadingServerLogPart(true);
+    try {
+      const { data } = await axiosProtected.get(`/adminPage/getServerLog/50-${offset}`);
+      const logs = data?.serverLogs || [];
+
+      setServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
+      setServerlogOffset((prev) => prev + 50);
+      setServerLogMaxEntries(Number(data?.serverLogCount) || null);
     } catch (error) {
-      if (error.name === "CanceledError") {
-        console.log("Server-Log-Fetch abgebrochen");
-      } else {
+      if (error.name !== "CanceledError") {
         addToast("Fehler beim Laden des ServerLogs", "danger");
       }
     } finally {
@@ -53,13 +119,98 @@ function AdminPage() {
     }
   };
 
+  const refreshServerLogs = async () => {
+    setLoadingServerLogPart(true);
+    try {
+      const { data } = await axiosProtected.get(`/adminPage/getServerLog/50-0`);
+      const newLogs = data?.serverLogs || [];
+
+      setServerLog((prev = []) => {
+        const existingIds = new Set(prev.map((log) => log.id));
+        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
+        return onlyNewLogs.length ? [...onlyNewLogs, ...prev] : prev;
+      });
+
+      setServerLogMaxEntries(Number(data?.serverLogCount) || null);
+    } catch (error) {
+      if (error.name !== "CanceledError") {
+        addToast("Fehler beim Aktualisieren der ServerLogs", "danger");
+      }
+    } finally {
+      setLoadingServerLogPart(false);
+    }
+  };
+
+  const fetchFilteredLogs = async (filters, offset = 0) => {
+    setLoadingServerLogPart(true);
+    try {
+      const { data } = await axiosProtected.post(
+        `/adminPage/getFilteredServerLog/50-${offset}`,
+        filters
+      );
+      const logs = data?.serverLogs || [];
+
+      setFilteredServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
+      setFilteredServerlogOffset(offset + 50);
+      setFilteredServerLogMaxEntries(Number(data?.serverLogCount) || null);
+    } catch (error) {
+      if (error.name !== "CanceledError") {
+        addToast("Fehler beim Laden der gefilterten Logs", "danger");
+      }
+    } finally {
+      setLoadingServerLogPart(false);
+    }
+  };
+
+  const loadInitialData = async () => {
+    try {
+      const [filterRes, routeGroupRes, permissionsRes] = await Promise.all([
+        axiosProtected.get(`/adminPage/getFilterOptionsServerLog`),
+        axiosProtected.get(`/adminPage/getAllRouteGroups`),
+        axiosProtected.get(`/adminPage/getAllPermissionsWithRouteGroups`),
+      ]);
+
+      setFilterOptions(filterRes?.data?.filterOptions || []);
+      setAllRouteGroups(routeGroupRes?.data?.routeGroups || []);
+      setAllPermissions(permissionsRes?.data?.permissions || []);
+    } catch (error) {
+      addToast("Fehler beim Laden von Initialdaten", "danger");
+    } finally {
+      setLoadingAllRouteGroups(false);
+      setLoadingAllPermissions(false);
+      setLoadingServerLog(false);
+    }
+  };
+
   useEffect(() => {
-    fetchServerLog();
-    setLoadingServerLog(false);
+    loadInitialData();
+    fetchServerLogs();
   }, []);
 
-  async function handleServerLogSearch() {
-    //TODO: API call
+  function handleServerLogSearch(filters) {
+    setActiveFilters(filters);
+    setFilteredServerlogOffset(0);
+    setFilteredServerLog(null);
+    fetchFilteredLogs(filters, 0);
+  }
+
+  function handleRefreshLogs() {
+    activeFilters ? fetchFilteredLogs(activeFilters, 0) : refreshServerLogs();
+  }
+
+  function handleNewPermission(permission) {
+    setAllPermissions((prev) => [...prev, permission]);
+    setShowCreatePermissionModal(false);
+  }
+
+  function handleEditPermission(permission) {
+    setAllPermissions((prev) => prev.map((p) => (p.id === permission.id ? permission : p)));
+    setSelectedPermission(null);
+  }
+
+  function handleDeletePermission(permissionId) {
+    setAllPermissions((prev) => prev.filter((p) => p.id !== permissionId));
+    setSelectedPermission(null);
   }
 
   return (
@@ -69,167 +220,258 @@ function AdminPage() {
 
         <div>
           <Tabs defaultActiveKey="serverLog" id="adminPage-tabs">
-            <Tab
-              eventKey="serverLog"
-              title="ServerLog"
-              className="border p-3 mb-4"
-              style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
-            >
-              {!laodingServerLog && serverLog?.length > 0 ? (
-                <>
-                  <div className="d-flex gap-2 mb-3">
-                    <InputGroup className="flex-grow-1">
-                      <FormControl
-                        placeholder="Suche in Logs"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </InputGroup>
-                    <button
-                      className="btn btn-primary"
-                      type="button"
-                      onClick={handleServerLogSearch}
-                    >
-                      Suchen
-                    </button>
-                  </div>
+            {routeGroups.includes("adminPageServerLogRead") ? (
+              <Tab
+                eventKey="serverLog"
+                title="ServerLog"
+                className="border p-3 mb-4"
+                style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
+              >
+                {!loadingServerLog && serverLog?.length > 0 ? (
+                  <>
+                    <div className="d-flex gap-2 mb-3">
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={() => setShowFilterOptionsModal(true)}
+                      >
+                        Such/Filter Optionen
+                      </button>
 
-                  <div
-                    className="border"
-                    style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
-                  >
-                    <Table striped bordered hover className="mb-0">
-                      <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
-                        <tr>
-                          <th className="text-center">ID</th>
-                          <th className="text-center">Zeitstempel</th>
-                          <th className="text-center">Level</th>
-                          <th className="text-center">Nachricht</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {serverLog.map((log) => (
-                          <tr
-                            key={log.id}
+                      {activeFilters ? (
+                        <>
+                          <button
+                            className="btn btn-danger"
+                            type="button"
                             onClick={() => {
-                              setSelectedServerLog(log.id);
+                              setActiveFilters(null);
+                              setFilteredServerLog(null);
+                              setFilteredServerlogOffset(0);
                             }}
                           >
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {log.id}
-                            </td>
-                            <td className="text-center">
-                              {convertToLocalTimeStamp(log.timestamp)}
-                            </td>
-                            <td className="text-center">{log.level}</td>
-                            <td className="text-center">{log.message}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                    <button
-                      className="btn btn-secondary mt-2"
-                      onClick={() => {
-                        setLoadingServerLogPart(true);
-                        fetchServerLog();
-                      }}
-                      disabled={
-                        loadingServerLogPart ||
-                        (serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
-                      }
-                    >
-                      {loadingServerLogPart ? (
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
+                            Such/Filter löschen
+                          </button>
+                          <button
+                            className="btn btn-outline-primary"
+                            type="button"
+                            onClick={refreshFilteredServerLog}
+                          >
+                            Gefilterte aktualisieren
+                          </button>
+                        </>
                       ) : (
-                        "Mehr laden"
+                        <button
+                          className="btn btn-outline-primary"
+                          type="button"
+                          onClick={handleRefreshLogs}
+                        >
+                          Aktualisieren
+                        </button>
                       )}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <TableLoadingAnimation />
-              )}
-            </Tab>
-            <Tab
-              eventKey="allPermissions"
-              title="Berechtigungsmatrix"
-              className="border p-3 p mb-4"
-              style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
-            >
-              {!loadingAllRouteGroups && !loadingAllPermissions && routeGroups?.length > 0 ? (
-                <>
-                  <div className="d-flex gap-2 mb-3">
-                    <InputGroup className="flex-grow-1">
-                      <FormControl
-                        placeholder="Suche in Logs"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </InputGroup>
-                    <button
-                      className="btn btn-primary"
-                      type="button"
-                      onClick={handleServerLogSearch}
-                    >
-                      Suchen
-                    </button>
-                  </div>
+                    </div>
 
-                  <div
-                    className="border"
-                    style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
-                  >
-                    <Table striped bordered hover className="mb-0">
-                      <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
-                        <tr>
-                          <th>Zugriffsrechte</th>
-                          {routeGroups.map((routeGroup) => (
-                            <th key={routeGroup.id}>{routeGroup.name}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allPermissions.map((permission) => (
-                          <tr key={permission.id}>
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
+                    <div
+                      className="border"
+                      style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
+                    >
+                      <Table striped bordered hover className="mb-0">
+                        <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+                          <tr>
+                            <th className="text-center">ID</th>
+                            <th className="text-center">Zeitstempel</th>
+                            <th className="text-center">Level</th>
+                            <th className="text-center">Nachricht</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(activeFilters ? filteredServerLog : serverLog)?.map((log) => (
+                            <tr
+                              key={log.id}
+                              onClick={() => setSelectedServerLog(log.id)}
+                              style={{ cursor: "pointer" }}
                             >
-                              {permission.name}
-                            </td>
-                            {permission.map((route, index) => (
-                              <td key={index}>Nein</td>
+                              <td>{log.id}</td>
+                              <td className="text-center">
+                                {convertToLocalTimeStamp(log.timestamp)}
+                              </td>
+                              <td className="text-center">{log.level}</td>
+                              <td className="text-center">{log.message}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                      <div className="text-center my-3">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            if (activeFilters) {
+                              fetchFilteredLogs(activeFilters, filteredServerlogOffset);
+                            } else {
+                              console.log("Lade mehr Server-Logs", serverlogOffset);
+                              fetchServerLogs(serverlogOffset);
+                            }
+                          }}
+                          disabled={
+                            loadingServerLogPart ||
+                            (activeFilters
+                              ? filteredServerLogMaxEntries &&
+                                filteredServerlogOffset >= filteredServerLogMaxEntries
+                              : serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
+                          }
+                        >
+                          {loadingServerLogPart ? "Lade mehr..." : "Mehr laden"}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <TableLoadingAnimation />
+                )}
+              </Tab>
+            ) : null}
+
+            {routeGroups.includes("adminPagePermissionsRead") ||
+            routeGroups.includes("adminPagePermissionsWrite") ? (
+              <Tab
+                eventKey="allPermissions"
+                title="Berechtigungsmatrix"
+                className="border p-3 p mb-4"
+                style={{ maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}
+              >
+                {!loadingAllRouteGroups && !loadingAllPermissions && allRouteGroups?.length > 0 ? (
+                  <>
+                    <div className="d-flex gap-2 mb-3">
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={() => setShowCreatePermissionModal(true)}
+                      >
+                        +
+                      </button>
+                      <InputGroup className="flex-grow-1">
+                        <FormControl
+                          placeholder="Suche in Benutzerrechten"
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </InputGroup>
+                      {/*
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={handleServerLogSearch}
+                      >
+                        Suchen
+                      </button>
+                       */}
+                    </div>
+
+                    <div
+                      className="border table-container"
+                      style={{ maxHeight: "calc(100vh - 185px)", overflowY: "auto" }}
+                    >
+                      <Table striped bordered hover className="mb-0">
+                        <thead className="border">
+                          <tr>
+                            <th>Zugriffsrechte</th>
+                            {allRouteGroups.map((routeGroup) => (
+                              <th
+                                key={routeGroup.id}
+                                title={routeGroup.description}
+                                style={{
+                                  writingMode: "vertical-rl",
+                                  transform: "rotate(180deg)",
+                                  whiteSpace: "nowrap",
+                                  padding: "10px",
+                                  textAlign: "left",
+                                  verticalAlign: "bottom",
+                                }}
+                              >
+                                {routeGroup.name}
+                              </th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                </>
-              ) : (
-                <TableLoadingAnimation />
-              )}
-            </Tab>
+                        </thead>
+                        <tbody>
+                          {filteredPermission.map((permission) => (
+                            <tr key={permission.id}>
+                              <td
+                                style={{
+                                  cursor: "pointer",
+                                  fontWeight: "bold",
+                                }}
+                                title={permission.description}
+                                onClick={() => setSelectedPermission(permission)}
+                              >
+                                {permission.name}
+                              </td>
+                              {allRouteGroups.map((route, index) => (
+                                <td key={index}>
+                                  <input
+                                    type="checkbox"
+                                    checked={permission.routeGroups.some(
+                                      (rg) => rg.name === route.name
+                                    )}
+                                    disabled
+                                  />
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </>
+                ) : (
+                  <TableLoadingAnimation />
+                )}
+              </Tab>
+            ) : null}
           </Tabs>
         </div>
       </Container>
 
-      {selectedServerLog && (
+      {selectedServerLog ? (
         <ShowServerlogEntry
           show={!!selectedServerLog}
           handleClose={() => setSelectedServerLog(null)}
           serverLogEntry={serverLog.find((log) => log.id === selectedServerLog)}
         />
-      )}
+      ) : null}
+
+      {showFilterOptionsModal ? (
+        <ServerLogFilterOptionsModal
+          show={!!showFilterOptionsModal}
+          handleClose={() => setShowFilterOptionsModal(false)}
+          filterOptions={filterOptions}
+          handleFilterOptions={handleServerLogSearch}
+          activeFilters={activeFilters}
+        />
+      ) : null}
+
+      {showCreatePermissionModal ? (
+        <CreatePermissionModal
+          show={!!showCreatePermissionModal}
+          handleClose={() => setShowCreatePermissionModal(false)}
+          allPermissions={allPermissions}
+          allRouteGroups={allRouteGroups}
+          handleNewPermission={handleNewPermission}
+          handleEditPermission={null}
+          permission={null}
+        />
+      ) : null}
+
+      {selectedPermission ? (
+        <CreatePermissionModal
+          show={!!selectedPermission}
+          handleClose={() => setSelectedPermission(false)}
+          allPermissions={allPermissions}
+          allRouteGroups={allRouteGroups}
+          handleNewPermission={null}
+          handleEditPermission={handleEditPermission}
+          handleDeletePermission={handleDeletePermission}
+          permission={allPermissions.find((p) => p.id === selectedPermission?.id) || null}
+        />
+      ) : null}
     </>
   );
 }

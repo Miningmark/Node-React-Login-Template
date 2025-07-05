@@ -22,7 +22,7 @@ function Register() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(email.trim());
+  const isEmailValid = /^[a-zA-Z0-9.%_+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(email.trim());
 
   const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(username.trim());
 
@@ -67,7 +67,7 @@ function Register() {
     try {
       await axiosPublic.post("/user/register", { email, username, password });
 
-      addToast("Registrierung erfolgreich! E-Mail Adresse Bestätigen.", "success");
+      addToast("Registrierung erfolgreich! Bitte E-Mail Adresse bestätigen.", "success");
       navigate("/login");
     } catch (error) {
       if (error.response?.reason === "email") {
