@@ -193,6 +193,72 @@ describe(`POST /api/${ENV.API_VERSION}/user/updateUsername - updates username fo
         expect(res.body.message).toContain("Benutzer");
         expect(res.body.message).toContain("vergeben");
     });
+
+    it("should fail because username change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "SuperAdmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "SuperAdmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updateUsername`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            newUsername: "testUpdateU2"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Benutzername");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
+
+    it("should fail because username change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "superAdmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "superAdmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updateUsername`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            newUsername: "testUpdateU2"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Benutzername");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
+
+    it("should fail because username change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "superadmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "superadmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updateUsername`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            newUsername: "testUpdateU2"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Benutzername");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
 });
 
 describe(`POST /api/${ENV.API_VERSION}/user/updateEmail - updates email for an user`, () => {
@@ -363,6 +429,72 @@ describe(`POST /api/${ENV.API_VERSION}/user/updateEmail - updates email for an u
         expect(res.body.message).toContain("Email");
         expect(res.body.message).toContain("vergeben");
     });
+
+    it("should fail because email change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "SuperAdmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "SuperAdmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updateEmail`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            newEmail: "testUpdateU3@testUpdateU3.com"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Email");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
+
+    it("should fail because email change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "superAdmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "superAdmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updateEmail`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            newEmail: "testUpdateU3@testUpdateU3.com"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Email");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
+
+    it("should fail because email change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "superadmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "superadmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updateEmail`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            newEmail: "testUpdateU3@testUpdateU3.com"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Email");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
 });
 
 describe(`POST /api/${ENV.API_VERSION}/user/updatePassword - updates password for an user`, () => {
@@ -472,6 +604,75 @@ describe(`POST /api/${ENV.API_VERSION}/user/updatePassword - updates password fo
         expect(res.body.message).toContain("Passwort");
         expect(res.body.message).toContain("nicht");
         expect(res.body.message).toContain("alten");
+    });
+
+    it("should fail because password change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "SuperAdmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "SuperAdmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updatePassword`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            currentPassword: "testUpdatePassword123!",
+            newPassword: "testUpdateU1234!"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Passwort");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
+
+    it("should fail because password change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "superAdmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "superAdmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updatePassword`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            currentPassword: "testUpdatePassword123!",
+            newPassword: "testUpdateU1234!"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Passwort");
+        expect(res.body.message).toContain("SuperAdmin");
+    });
+
+    it("should fail because password change for SuperAdmin is not available", async () => {
+        await User.create({
+            username: "superadmin",
+            password: await bcrypt.hash("testUpdateU123!", 10),
+            email: "testUpdateU2@testUpdateU2.com",
+            isActive: true
+        });
+
+        const resLogin = await request(app).post(`/api/${ENV.API_VERSION}/auth/login`).send({
+            username: "superadmin",
+            password: "testUpdateU123!"
+        });
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/user/updatePassword`).set("authorization", `Bearer ${resLogin.body.accessToken}`).send({
+            currentPassword: "testUpdatePassword123!",
+            newPassword: "testUpdateU1234!"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Passwort");
+        expect(res.body.message).toContain("SuperAdmin");
     });
 });
 
