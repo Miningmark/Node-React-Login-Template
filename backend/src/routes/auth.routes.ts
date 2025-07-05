@@ -19,7 +19,7 @@ const router = Router();
 const authService = new AuthService();
 const authController = new AuthController(authService);
 
-if (ENV.ENABLE_REGISTER) {
+if (ENV.ENABLE_REGISTER === true) {
     router.post("/register", validateRequest(registerSchema), authController.register);
     router.post("/accountActivation", validateRequest(accountActivationSchema), authController.accountActivation);
 }

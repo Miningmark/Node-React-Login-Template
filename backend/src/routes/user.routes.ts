@@ -1,3 +1,4 @@
+import { ENV } from "@/config/env";
 import { UserController } from "@/controllers/user.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
@@ -10,7 +11,9 @@ const router = Router();
 const userService = new UserService();
 const userController = new UserController(userService);
 
-router.post("/updateUsername", validateRequest(updateUsernameSchema), verifyAuth(), userController.updateUsername);
+if (ENV.ENABLE_USERNAME_CHANGE === true) {
+    router.post("/updateUsername", validateRequest(updateUsernameSchema), verifyAuth(), userController.updateUsername);
+}
 router.post("/updateEmail", validateRequest(updateEmailSchema), verifyAuth(), userController.updateEmail);
 router.post("/updatePassword", validateRequest(updatePasswordSchema), verifyAuth(), userController.updatePassword);
 
