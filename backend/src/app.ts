@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/" + ENV.API_VERSION + "/auth", authRoutes);
-app.use("/api/" + ENV.API_VERSION + "/users", userRoutes);
+app.use("/api/" + ENV.API_VERSION + "/user", userRoutes);
 
 app.use(notFoundMiddleware);
 

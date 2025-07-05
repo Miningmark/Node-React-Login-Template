@@ -106,7 +106,7 @@ export class AuthService {
         if (databaseUserToken === null) throw new ValidationError("Token nicht vorhanden oder ungültig");
 
         if (databaseUserToken.expiresAt !== null && new Date(Date.now()) > databaseUserToken.expiresAt) {
-            await databaseUserToken.user?.destroy();
+            await databaseUserToken.user.destroy();
             throw new ValidationError("Token abgelaufen, bitte neu registrieren");
         }
 
@@ -138,7 +138,8 @@ export class AuthService {
                 throw new Error();
             }
         } catch (error) {
-            throw new ValidationError("Token konnte nicht verifiziert werden");
+            await refreshUserToken.destroy();
+            throw new ValidationError("Token konnte nicht verifiziert werden, bitte neuanmelden");
         }
 
         const routeGroupsArray = await this.generateRouteGroupArray(refreshUserToken.user);
@@ -191,9 +192,12 @@ export class AuthService {
         if (databaseUserToken === null) throw new ValidationError("Token nicht vorhanden oder abgelaufen");
 
         if (databaseUserToken.expiresAt !== null && new Date(Date.now()) > databaseUserToken.expiresAt) {
-            if (databaseUserToken.type === UserTokenType.ADMIN_REGISTRATION_TOKEN)
+            if (databaseUserToken.type === UserTokenType.ADMIN_REGISTRATION_TOKEN) {
+                await databaseUserToken.destroy();
                 throw new UnauthorizedError("Zeit zum abschließen der Registrierung leider abgelaufen bitte selbst registrieren oder einen Admin darum bitten");
+            }
 
+            await databaseUserToken.destroy();
             await this.requestPasswordReset(databaseUserToken.user.username);
             throw new ValidationError("Zeit zum zurücksetzten leider schon abgelaufen, es wurde Ihnen eine neue Email gesendet");
         }

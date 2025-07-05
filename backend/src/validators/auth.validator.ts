@@ -3,8 +3,8 @@ import { authorizationValidation, emailBaseValidation, passwordBaseValidation, u
 
 export const registerSchema = z.object({
     body: z.object({
-        username: usernameBaseValidation.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Benutzername kann nicht SuperAdmin enthalten!"),
-        email: emailBaseValidation.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Email kann nicht SuperAdmin enthalten!"),
+        username: usernameBaseValidation,
+        email: emailBaseValidation,
         password: passwordBaseValidation
     })
 });
