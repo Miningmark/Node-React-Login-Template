@@ -7,7 +7,7 @@ const passwordString: ZodString = z.string().min(8).max(24).regex(PASSWORD_REGEX
 
 export const registerSchema = z.object({
     body: z.object({
-        username: usernameString.refine((val) => val.toLowerCase() !== "SuperAdmin".toLowerCase(), "Benutzername kann nicht SuperAdmin sein!"),
+        username: usernameString.refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Benutzername kann nicht SuperAdmin enthalten!"),
         email: emailString,
         password: passwordString
     })
@@ -41,5 +41,16 @@ export const refreshTokenSchema = z.object({
             .string()
             .min(1, "Kein RefreshToken vorhanden")
             .refine((val) => val.includes("refreshToken="), { message: "Kein RefreshToken vorhanden" })
+    })
+});
+
+export const requestPasswordResetSchema = z.object({
+    body: z.object({
+        usernameOrEmail: z
+            .string()
+            .refine(
+                (val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()),
+                "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!"
+            )
     })
 });

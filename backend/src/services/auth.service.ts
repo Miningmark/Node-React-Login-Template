@@ -7,7 +7,12 @@ import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
-import { getAccountLockedEmailTemplate, getCompleteRegistrationEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
+import {
+    getAccountLockedEmailTemplate,
+    getCompleteRegistrationEmailTemplate,
+    getPasswordResetEmailTemplate,
+    getSuspiciousLoginEmailTemplate
+} from "@/templates/email/auth.template.email.js";
 import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { CreationAttributes, Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
@@ -152,6 +157,32 @@ export class AuthService {
         return jsonResponse;
     }
 
+    async requestPasswordReset(usernameOrEmail: string) {
+        let jsonResponse: Record<string, any> = { message: "Email zum Passwort ändern erfolgreich versandt" };
+
+        const databaseUser = await User.findOne({ where: { [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }] } });
+
+        if (databaseUser === null) throw new ValidationError("Es existiert kein Benutzer mit diesem Benutzername oder Email");
+        if (databaseUser.isDisabled) throw new ForbiddenError("Benutzer gesperrt, zurücksetzten des Passworts nicht möglich");
+
+        const databaseUserToken = await UserToken.findOne({ where: { userId: databaseUser.id, type: UserTokenType.PASSWORD_RESET_TOKEN } });
+        if (databaseUserToken !== null) await databaseUserToken.destroy();
+
+        const token = await this.generateHexUserToken(databaseUser.id, UserTokenType.PASSWORD_RESET_TOKEN, ENV.PASSWORD_RESET_EXPIRY);
+        await this.emailService.sendHTMLTemplateEmail(
+            databaseUser.email,
+            "Passwort vergessen?",
+            getPasswordResetEmailTemplate(
+                ENV.FRONTEND_NAME,
+                databaseUser.username,
+                `${ENV.FRONTEND_URL}password-reset?token=${token}`,
+                formatDate(parseTimeOffsetToDate(ENV.PASSWORD_RESET_EXPIRY))
+            )
+        );
+
+        return jsonResponse;
+    }
+
     private clearRefreshTokenCookie(res: Response) {
         res.clearCookie("refreshToken", {
             httpOnly: true,
@@ -266,12 +297,12 @@ export class AuthService {
             databaseUser.isActive = false;
             await databaseUser.save();
 
-            const userToken = await this.generateHexUserToken(databaseUser.id, UserTokenType.ACCOUNT_REACTIVATION_TOKEN, null);
+            const token = await this.generateHexUserToken(databaseUser.id, UserTokenType.ACCOUNT_REACTIVATION_TOKEN, null);
 
             await this.emailService.sendHTMLTemplateEmail(
                 databaseUser.email,
                 "Konto vorübergehend deaktiviert",
-                getAccountLockedEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${userToken}`)
+                getAccountLockedEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`)
             );
 
             return true;

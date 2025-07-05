@@ -14,15 +14,13 @@ const job: CronJobDefinition = {
         });
         const destroyedCount = databaseUserTokens.length;
 
-        if (destroyedCount === 0) return;
-
         await Promise.all(
             databaseUserTokens.map(async (databaseUserToken) => {
                 await databaseUserToken.destroy();
             })
         );
 
-        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} Benutzer wegen versämter aktivierung gelöscht`, {
+        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} Zugangstoken gelöscht`, {
             source: job.name
         });
     }

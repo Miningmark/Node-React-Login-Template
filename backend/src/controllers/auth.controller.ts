@@ -44,4 +44,11 @@ export class AuthController extends BaseController {
             return await this.authService.refreshAccessToken(refreshToken, res);
         });
     };
+
+    requestPasswordReset = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { usernameOrEmail } = req.body;
+            return await this.authService.requestPasswordReset(usernameOrEmail);
+        });
+    };
 }

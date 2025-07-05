@@ -20,7 +20,7 @@ export async function scheduleAllCronJobs() {
         const files = await fs.readdir(jobsDir);
 
         for (const file of files) {
-            if (!file.endsWith(".job.ts")) continue;
+            if (!(file.endsWith(".job.ts") || file.endsWith(".job.js"))) continue;
 
             const fullPath = path.join(jobsDir, file);
             const moduleUrl = pathToFileURL(fullPath).toString();

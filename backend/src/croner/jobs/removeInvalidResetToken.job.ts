@@ -6,22 +6,21 @@ import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
-    name: "removeInactiveRegistrations",
+    name: "removeInvalidResetToken",
     schedule: "* * */2 * * *",
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
-            where: { type: UserTokenType.USER_REGISTRATION_TOKEN, expiresAt: { [Op.lte]: new Date(Date.now()) } },
-            include: { model: User }
+            where: { type: UserTokenType.PASSWORD_RESET_TOKEN, expiresAt: { [Op.lte]: new Date(Date.now()) } }
         });
         const destroyedCount = databaseUserTokens.length;
 
         await Promise.all(
             databaseUserTokens.map(async (databaseUserToken) => {
-                await databaseUserToken.user?.destroy();
+                await databaseUserToken.destroy();
             })
         );
 
-        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} Benutzer wegen abgelaufener aktivierung gelöscht`, {
+        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} abgelaufene Passwort vergessen Tokens gelöscht`, {
             source: job.name
         });
     }

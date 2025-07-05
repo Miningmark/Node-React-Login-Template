@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import request from "supertest";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, () => {
+describe(`POST /api/${ENV.API_VERSION}/users/register - register a new user`, () => {
     it("should successfully register", async () => {
         const res = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
             username: "testRegister",
@@ -189,7 +189,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/register - register a new User`, ()
     });
 });
 
-describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
+describe(`POST /api/${ENV.API_VERSION}/users/login - login a user`, () => {
     beforeEach(async () => {
         await User.create({ username: "testLogin", password: await bcrypt.hash("testLogin123!", 10), email: "testLogin@testLogin.com", isActive: true });
     });
@@ -317,7 +317,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/login - user login`, () => {
     });
 });
 
-describe(`POST /api/${ENV.API_VERSION}/users/accountActivation - Activate User`, () => {
+describe(`POST /api/${ENV.API_VERSION}/users/accountActivation - activate a user`, () => {
     it("should successfully activate a user", async () => {
         const resRegister = await request(app).post(`/api/${ENV.API_VERSION}/users/register`).send({
             username: "testActivation",
@@ -410,7 +410,7 @@ describe(`POST /api/${ENV.API_VERSION}/users/accountActivation - Activate User`,
     });
 });
 
-describe(`POST /api/${ENV.API_VERSION}/users/logout - Logout User`, () => {
+describe(`POST /api/${ENV.API_VERSION}/users/logout -logout a user`, () => {
     let accessToken = "";
     beforeEach(async () => {
         await User.create({ username: "testLogout", password: await bcrypt.hash("testLogout123!", 10), email: "testLogout@testLogout.com", isActive: true });
@@ -503,4 +503,204 @@ describe(`GET /api/${ENV.API_VERSION}/users/refreshAccessToken - Refresh Access 
         expect(res.body.message).toContain("Token");
         expect(res.body.message).toContain("verifiziert");
     });
+});
+
+describe(`GET /api/${ENV.API_VERSION}/users/requestPasswordReset - request an email for password reseting`, () => {
+    let refreshToken = "";
+    beforeEach(async () => {
+        await User.create({
+            username: "testRequestPasswordReset",
+            password: await bcrypt.hash("testRequestPasswordReset123!", 10),
+            email: "testRequestPasswordReset@testRequestPasswordReset.com",
+            isActive: true
+        });
+    });
+
+    it("should successfully request an email for passwordReset with username", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "testRequestPasswordReset"
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toContain("Email");
+        expect(res.body.message).toContain("erfolgreich");
+    });
+
+    it("should successfully request an email for passwordReset with email", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "testRequestPasswordReset@testRequestPasswordReset.com"
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toContain("Email");
+        expect(res.body.message).toContain("erfolgreich");
+    });
+
+    it("should fail because body is missing", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send();
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Ungültige Eingabe");
+        expect(res.body.message).toContain("body");
+    });
+
+    it("should fail because body is missing username or email", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({});
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Ungültige Eingabe");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t be SuperAdmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "SuperAdmin"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t be superadmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "superadmin"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t be superAdmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "superAdmin"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t contain SuperAdmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "SuperAdmin12345"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t contain superadmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "superadmin12345"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t contain superAdmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "superAdmin12345"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t contain SuperAdmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "12345SuperAdmin"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t contain superadmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "12345superadmin"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because username can`t contain superAdmin", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "12345superAdmin"
+        });
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("SuperAdmin");
+        expect(res.body.message).toContain("body");
+        expect(res.body.message).toContain("usernameOrEmail");
+    });
+
+    it("should fail because user does not exist", async () => {
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "testRequestPasswordReset1"
+        });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("existiert");
+        expect(res.body.message).toContain("kein");
+        expect(res.body.message).toContain("Benutzer");
+    });
+
+    it("should fail because user does not exist", async () => {
+        const databaseUser = await User.findOne({ where: { username: "testRequestPasswordReset" } });
+
+        if (databaseUser === null) throw new Error("Benutzer existiert nicht");
+        databaseUser.isDisabled = true;
+        await databaseUser.save();
+
+        const res = await request(app).post(`/api/${ENV.API_VERSION}/users/requestPasswordReset`).send({
+            usernameOrEmail: "testRequestPasswordReset"
+        });
+
+        expect(res.statusCode).toBe(403);
+        expect(res.body.message).toContain("Benutzer");
+        expect(res.body.message).toContain("gesperrt");
+    });
+
+    /*it("should fail because Cookie is invalid", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", "").send();
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Kein");
+        expect(res.body.message).toContain("vorhanden");
+        expect(res.body.message).toContain("headers");
+        expect(res.body.message).toContain("cookie");
+    });
+
+    it("should fail because Cookie is not in database", async () => {
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", "refreshToken=123").send();
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("vorhanden");
+        expect(res.body.message).toContain("neuanmelden");
+    });
+
+    it("should fail because token can not be decoded", async () => {
+        const databaseUser = await User.findOne({ where: { username: "testRefreshAccessToken" } });
+        if (databaseUser === null) throw new Error("User nicht vorhanden");
+
+        const databaseRefreshToken = await UserToken.findOne({ where: { userId: databaseUser.id, type: UserTokenType.REFRESH_TOKEN } });
+        if (databaseRefreshToken === null) throw new Error("Token nicht vorhanden");
+
+        databaseRefreshToken.token = "123";
+        await databaseRefreshToken.save();
+
+        const res = await request(app).get(`/api/${ENV.API_VERSION}/users/refreshAccessToken`).set("Cookie", "refreshToken=123").send();
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toContain("Token");
+        expect(res.body.message).toContain("verifiziert");
+    });*/
 });

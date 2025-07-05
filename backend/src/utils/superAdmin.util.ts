@@ -30,7 +30,7 @@ export async function generateSuperAdmin() {
 export async function generateSuperAdminPermission() {
     try {
         const databaseUser = await User.findOne({ where: { username: "SuperAdmin" } });
-        let databasePermission = await Permission.findOne({ where: { name: "SuperAdmin" } });
+        let databasePermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
 
         if (databaseUser === null) throw new ValidationError("SuperAdmin existiert nicht");
 
