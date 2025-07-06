@@ -48,30 +48,3 @@ export async function generateSuperAdminPermission() {
         await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
     }
 }
-
-export async function removeRouteGroups() {
-    //TODO:
-    /*const transaction = await sequelize.transaction();
-    try {
-        let dateNow = new Date(Date.now());
-        const routeGroups = await Models.RouteGroup.findAll({ transaction: transaction });
-
-        if (routeGroups !== null) {
-            await Promise.all(
-                routeGroups.map(async (routeGroup) => {
-                    if (Math.abs(dateNow - new Date(routeGroup.updatedAt)) > 2 * 1000) {
-                        await routeGroup.destroy({ transaction: transaction });
-                    }
-                })
-            );
-        }
-
-        await transaction.commit();
-    } catch (error) {
-        await transaction.rollback();
-        await serverLogger("CRITICAL", "Löschen der nicht mehr benutzen RouteGroups fehlgeschlagen", {
-            source: "routeGroupRemoval",
-            error: error
-        });
-    }*/
-}

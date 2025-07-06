@@ -4,6 +4,7 @@ import { consoleLogger, databaseLogger } from "@/config/logger.js";
 import { sequelize } from "@/config/sequelize.js";
 import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
+import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
 
 const server = app.listen(ENV.BACKEND_PORT, async () => {
@@ -16,6 +17,8 @@ const server = app.listen(ENV.BACKEND_PORT, async () => {
         });
 
         await initApp();
+
+        await RouteGroupService.removeUnusedRouteGroups();
 
         await generateSuperAdmin();
         await generateSuperAdminPermission();

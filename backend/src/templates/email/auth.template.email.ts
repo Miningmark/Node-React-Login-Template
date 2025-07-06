@@ -1,4 +1,4 @@
-export const getCompleteRegistrationEmailTemplate = (websiteName: string, username: string, url: string, expiryDate: string) => `
+export const getCompleteUserRegistrationEmailTemplate = (websiteName: string, username: string, url: string, expiryDate: string) => `
 <!DOCTYPE html>
 <html lang="de">
   <head>

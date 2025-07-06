@@ -25,7 +25,7 @@ if (ENV.ENABLE_REGISTER === true) {
 }
 
 router.post("/login", validateRequest(loginSchema), authController.login);
-router.post("/logout", validateRequest(logoutSchema), verifyAuth(), authController.logout);
+router.post("/logout", verifyAuth(), validateRequest(logoutSchema), authController.logout);
 
 router.post("/requestPasswordReset", validateRequest(requestPasswordResetSchema), authController.requestPasswordReset);
 router.post("/handlePasswordRecovery", validateRequest(handlePasswordRecoverySchema), authController.handlePasswordRecovery);

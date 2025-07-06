@@ -8,7 +8,7 @@ import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserActivityService } from "@/services/userActivity.service.js";
-import { getCompleteRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
+import { getCompleteUserRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
 import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
@@ -30,6 +30,7 @@ export class AuthService {
     }
 
     async register(username: string, email: string, password: string) {
+        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert", statusCode: 201 };
 
         let databaseUser = await User.findOne({ where: { [Op.or]: [{ username: username }, { email: email }] } });
@@ -42,7 +43,7 @@ export class AuthService {
         await this.emailService.sendHTMLTemplateEmail(
             databaseUser.email,
             "Abschluss deiner Registrierung",
-            getCompleteRegistrationEmailTemplate(
+            getCompleteUserRegistrationEmailTemplate(
                 ENV.FRONTEND_NAME,
                 databaseUser.username,
                 `${ENV.FRONTEND_URL}account-activation?token=${token}`,
@@ -54,6 +55,7 @@ export class AuthService {
     }
 
     async login(username: string, password: string, req: Request, res: Response) {
+        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich angemeldet" };
 
         const databaseUser = await User.findOne({ where: { username: username } });
@@ -74,7 +76,7 @@ export class AuthService {
 
         await this.tokenService.removeJWTs(databaseUser);
 
-        const routeGroupsArray = await this.routeGroupService.generateRouteGroupArray(databaseUser);
+        const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
         const resultJWTs = await this.tokenService.generateJWTs(databaseUser, routeGroupsArray);
 
         this.tokenService.setRefreshTokenCookie(res, resultJWTs.refreshToken);
@@ -102,6 +104,7 @@ export class AuthService {
     }
 
     async accountActivation(token: string) {
+        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich freigeschaltet" };
 
         const databaseUserToken = await UserToken.findOne({ where: { type: UserTokenType.USER_REGISTRATION_TOKEN, token: token }, include: { model: User } });
@@ -144,7 +147,7 @@ export class AuthService {
             throw new ValidationError("Token konnte nicht verifiziert werden, bitte neuanmelden");
         }
 
-        const routeGroupsArray = await this.routeGroupService.generateRouteGroupArray(refreshUserToken.user);
+        const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(refreshUserToken.user);
         const accessToken = await this.tokenService.generateJWT(
             refreshUserToken.user,
             UserTokenType.ACCESS_TOKEN,
@@ -185,6 +188,7 @@ export class AuthService {
     }
 
     async handlePasswordRecovery(token: string, password: string) {
+        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Passwort erfolgreich gespeichert" };
 
         const databaseUserToken = await UserToken.findOne({
@@ -209,7 +213,9 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        databaseUserToken.user.isActive = true;
         databaseUserToken.user.password = hashedPassword;
+
         await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 

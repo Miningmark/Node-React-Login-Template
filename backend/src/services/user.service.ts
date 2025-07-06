@@ -18,6 +18,8 @@ export class UserService {
     }
 
     async updateUsername(userId: number, newUsername: string, res: Response) {
+        //TODO: SocketIO inform all who seeing users over change
+        //TODO: SocketIO inform single user over his new username
         let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -38,6 +40,8 @@ export class UserService {
     }
 
     async updateEmail(userId: number, newEmail: string, res: Response) {
+        //TODO: SocketIO inform all who seeing users over change
+        //TODO: SocketIO inform single user over his new email ? is it anywhere visible ?
         let jsonResponse: Record<string, any> = { message: "Email erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -96,7 +100,7 @@ export class UserService {
         const databaseUser = await User.findOne({ where: { id: userId } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        jsonResponse.routeGroups = await this.routeGroupService.generateRouteGroupArray(databaseUser);
+        jsonResponse.routeGroups = await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
 
         return jsonResponse;
     }

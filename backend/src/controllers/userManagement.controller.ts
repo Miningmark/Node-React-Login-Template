@@ -24,19 +24,25 @@ export class UserManagementController extends BaseController {
 
     updateUserPermissions = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.userManagementService.updateUserPermissions();
+            const { id, permissionIds } = req.body;
+
+            return await this.userManagementService.updateUserPermissions(id, permissionIds);
         });
     };
 
     updateUser = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.userManagementService.updateUser();
+            const { id, username, email, isActive, isDisabled, permissionIds } = req.body;
+
+            return await this.userManagementService.updateUser(id, username, email, isActive, isDisabled, permissionIds);
         });
     };
 
     addUser = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.userManagementService.addUser();
+            const { username, email, permissionIds } = req.body;
+
+            return await this.userManagementService.addUser(username, email, permissionIds);
         });
     };
 }
