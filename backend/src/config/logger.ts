@@ -54,6 +54,7 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
             }
         }
 
+        //TODO: SocketIO inform all who seeing serverLogs over change
         await ServerLog.create({
             type: type,
             message: message,
