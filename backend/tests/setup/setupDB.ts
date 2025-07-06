@@ -1,3 +1,4 @@
+import { initApp } from "@/app";
 import { ENV } from "@/config/env.js";
 import { models } from "@/models/index.js";
 import Sequelize from "@sequelize/core";
@@ -18,6 +19,8 @@ const sequelize = new Sequelize({
 
 beforeAll(async () => {
     await sequelize.authenticate();
+    await sequelize.sync({ force: true });
+    await initApp();
 });
 
 beforeEach(async () => {

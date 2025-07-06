@@ -1,4 +1,4 @@
-import app from "@/app.js";
+import app, { initApp } from "@/app.js";
 import { ENV } from "@/config/env.js";
 import { consoleLogger, databaseLogger } from "@/config/logger.js";
 import { sequelize } from "@/config/sequelize.js";
@@ -14,6 +14,8 @@ const server = app.listen(ENV.BACKEND_PORT, async () => {
         await databaseLogger(ServerLogTypes.INFO, `Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`, {
             source: "startup"
         });
+
+        await initApp();
 
         await generateSuperAdmin();
         await generateSuperAdminPermission();
