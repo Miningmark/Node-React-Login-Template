@@ -2,7 +2,7 @@ import { ENV } from "@/config/env.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
-import { UserTokenType } from "@/models/userToken.model.js";
+import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
@@ -63,6 +63,8 @@ export class UserManagementService {
         const databaseUser = await User.findOne({ where: { id: userId } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
+        if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ForbiddenError("SuperAdmin kann nicht bearbeitet werden");
+
         const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
         await databaseUser.setPermissions(databasePermissions);
 
@@ -83,7 +85,15 @@ export class UserManagementService {
         const databaseUser = await User.findOne({ where: { id: userId } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
+        const databaseUserTokens = await UserToken.findAll({
+            where: { type: { [Op.or]: [UserTokenType.USER_REGISTRATION_TOKEN, UserTokenType.ADMIN_REGISTRATION_TOKEN] }, expiresAt: { [Op.gte]: new Date(Date.now()) } }
+        });
+
         if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ForbiddenError("SuperAdmin kann nicht bearbeitet werden");
+
+        const onlyPermissionIds = username === undefined && email === undefined && isActive === undefined && isDisabled === undefined;
+        if (!onlyPermissionIds && databaseUser.isActive === false && databaseUserTokens.length !== 0)
+            throw new ForbiddenError("Es können nur Rechte editiert solange der Registrierungsprozess nicht abgeschlossen ist");
 
         if (username !== undefined) {
             //TODO: SocketIO inform single user over his new username

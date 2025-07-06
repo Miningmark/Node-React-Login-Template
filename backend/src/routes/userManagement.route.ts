@@ -19,7 +19,7 @@ export default async () => {
     smartRouter.post("/updateUserPermissions", UserManagementRouteGroups.WRITE, verifyAuth(), validateRequest(updateUserPermissionsSchema), userManagementController.updateUserPermissions);
     smartRouter.post("/updateUser", UserManagementRouteGroups.WRITE, verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
 
-    smartRouter.get("/addUser", UserManagementRouteGroups.CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.addUser);
+    smartRouter.post("/addUser", UserManagementRouteGroups.CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.addUser);
 
     return smartRouter.getExpressRouter();
 };

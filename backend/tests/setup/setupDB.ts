@@ -19,12 +19,11 @@ const sequelize = new Sequelize({
 
 beforeAll(async () => {
     await sequelize.authenticate();
-    await sequelize.sync({ force: true });
-    await initApp();
 });
 
 beforeEach(async () => {
     await sequelize.sync({ force: true });
+    await initApp();
 });
 
 afterAll(async () => {
