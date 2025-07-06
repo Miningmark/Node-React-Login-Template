@@ -1,4 +1,4 @@
-export class AdminPanelService {
+export class AdminPageService {
     constructor() {}
 
     async getServerLogs(limit: number | undefined, offset: number | undefined) {

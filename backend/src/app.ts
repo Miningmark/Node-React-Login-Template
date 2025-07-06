@@ -2,7 +2,7 @@ import { ENV } from "@/config/env.js";
 import { errorHandlerMiddleware } from "@/middlewares/errorHandler.middleware.js";
 import { notFoundMiddleware } from "@/middlewares/notFound.middleware.js";
 import { setupSecurityMiddleware } from "@/middlewares/security.middleware.js";
-import adminPanelRoutes from "@/routes/adminPanel.route.js";
+import adminPageRoutes from "@/routes/adminPage.route.js";
 import authRoutes from "@/routes/auth.route.js";
 import userRoutes from "@/routes/user.route.js";
 import userManagementRoutes from "@/routes/userManagement.route.js";
@@ -31,7 +31,7 @@ export async function initApp() {
     app.use("/api/" + ENV.API_VERSION + "/user", userRoutes);
 
     app.use("/api/" + ENV.API_VERSION + "/userManagement", await userManagementRoutes());
-    app.use("/api/" + ENV.API_VERSION + "/adminPanel", await adminPanelRoutes());
+    app.use("/api/" + ENV.API_VERSION + "/adminPage", await adminPageRoutes());
 
     app.use(notFoundMiddleware);
 

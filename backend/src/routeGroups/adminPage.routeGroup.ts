@@ -1,6 +1,6 @@
 import { GroupEntry } from "@/routeGroups/index.js";
 
-export class AdminPanelRouteGroups {
+export class AdminPageRouteGroups {
     static readonly ADMIN_PANEL_SERVER_LOG_READ: GroupEntry = {
         groupName: "adminPageServerLogRead",
         groupDescription: "Hat das Recht den Serverlog zu sehen"

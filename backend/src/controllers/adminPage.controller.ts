@@ -1,9 +1,9 @@
 import { BaseController } from "@/controllers/base.controller.js";
-import { AdminPanelService } from "@/services/adminPanel.service.js";
+import { AdminPageService } from "@/services/adminPage.service.js";
 import { NextFunction, Request, Response } from "express";
 
-export class AdminPanelController extends BaseController {
-    constructor(private adminPanelService: AdminPanelService) {
+export class AdminPageController extends BaseController {
+    constructor(private adminPanelService: AdminPageService) {
         super();
     }
 

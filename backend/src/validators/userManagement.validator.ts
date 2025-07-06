@@ -6,8 +6,8 @@ export const getUsersSchema = z.object({
         authorization: authorizationBaseValidation
     }),
     params: z.object({
-        limit: numberBaseValidation,
-        offset: numberBaseValidation
+        limit: numberBaseValidation.optional(),
+        offset: numberBaseValidation.optional()
     })
 });
 

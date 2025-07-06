@@ -23,8 +23,7 @@ export const authorizationBaseValidation = z
 export const numberBaseValidation = z
     .string()
     .refine((val) => !isNaN(Number(val)), { message: "Muss eine Nummer sein" })
-    .transform((val) => Number(val))
-    .optional();
+    .transform((val) => Number(val));
 
 export const onlyAuthorizationHeader = z.object({
     headers: z.object({
