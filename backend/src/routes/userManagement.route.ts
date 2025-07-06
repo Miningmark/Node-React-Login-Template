@@ -13,13 +13,13 @@ export default async () => {
     const userManagementService = new UserManagementService();
     const userManagementController = new UserManagementController(userManagementService);
 
-    smartRouter.get("/getUsers{/:limit-:offset}", UserManagementRouteGroups.READ, verifyAuth(), validateRequest(getUsersSchema), userManagementController.getUsers);
+    smartRouter.get("/getUsers{/:limit-:offset}", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(getUsersSchema), userManagementController.getUsers);
 
-    smartRouter.get("/getAllPermissions", UserManagementRouteGroups.WRITE, verifyAuth(), validateRequest(onlyAuthorizationHeader), userManagementController.getAllPermissions);
-    smartRouter.post("/updateUserPermissions", UserManagementRouteGroups.WRITE, verifyAuth(), validateRequest(updateUserPermissionsSchema), userManagementController.updateUserPermissions);
-    smartRouter.post("/updateUser", UserManagementRouteGroups.WRITE, verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
+    smartRouter.get("/getAllPermissions", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(onlyAuthorizationHeader), userManagementController.getAllPermissions);
+    smartRouter.post("/updateUserPermissions", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(updateUserPermissionsSchema), userManagementController.updateUserPermissions);
+    smartRouter.post("/updateUser", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
 
-    smartRouter.post("/addUser", UserManagementRouteGroups.CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.addUser);
+    smartRouter.post("/addUser", UserManagementRouteGroups.USER_MANAGEMENT_CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.addUser);
 
     return smartRouter.getExpressRouter();
 };
