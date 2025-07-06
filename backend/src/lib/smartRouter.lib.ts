@@ -1,19 +1,19 @@
 import { verifyPermission } from "@/middlewares/verifyPermission.middleware.js";
 import RouteGroup from "@/models/routeGroup.model.js";
+import { GroupEntry } from "@/routeGroups/index.js";
 import express, { RequestHandler, Router } from "express";
-
-enum HttpMethods {
-    GET = "get",
-    POST = "post"
-}
 
 interface RouteEntry {
     method: HttpMethods;
     path: string;
-    groupName: string;
-    groupDescription: string;
+    groupEntry: GroupEntry;
     middlewares: RequestHandler[];
     handler: RequestHandler;
+}
+
+enum HttpMethods {
+    GET = "get",
+    POST = "post"
 }
 
 class SmartRouter {
@@ -25,42 +25,42 @@ class SmartRouter {
         this.queueEntries = [];
     }
 
-    private queue(method: HttpMethods, path: string, groupName: string, groupDescription: string, ...handlers: RequestHandler[]) {
+    private queue(method: HttpMethods, path: string, groupEntry: GroupEntry, ...handlers: RequestHandler[]) {
         const handler = handlers.pop()!;
         const middlewares = handlers;
 
-        this.queueEntries.push({ method, path, groupName, groupDescription, middlewares, handler });
+        this.queueEntries.push({ method, path, groupEntry, middlewares, handler });
     }
 
     async init(): Promise<void> {
         for (const entry of this.queueEntries) {
-            const { method, path, groupName, groupDescription, middlewares, handler } = entry;
+            const { method, path, groupEntry, middlewares, handler } = entry;
 
             const [routeGroup, isRouteGroupCreated] = await RouteGroup.findOrCreate({
-                where: { name: groupName },
-                defaults: { name: groupName, description: groupDescription }
+                where: { name: groupEntry.groupName },
+                defaults: { name: groupEntry.groupName, description: groupEntry.groupDescription }
             });
 
-            if (!isRouteGroupCreated) {
-                if (routeGroup.description !== groupDescription) {
-                    routeGroup.description = groupDescription;
+            if (isRouteGroupCreated === false) {
+                if (routeGroup.description !== groupEntry.groupDescription) {
+                    routeGroup.description = groupEntry.groupDescription;
                 }
                 routeGroup.updatedAt = new Date(Date.now());
                 routeGroup.save();
             }
 
-            const permissionMiddleware = verifyPermission(groupName);
+            const permissionMiddleware = verifyPermission(groupEntry.groupName);
 
             this.router[method](path, ...middlewares, permissionMiddleware, handler);
         }
     }
 
-    get(path: string, groupName: string, groupDescription: string, ...handlers: RequestHandler[]) {
-        this.queue(HttpMethods.GET, path, groupName, groupDescription, ...handlers);
+    get(path: string, groupEntry: GroupEntry, ...handlers: RequestHandler[]) {
+        this.queue(HttpMethods.GET, path, groupEntry, ...handlers);
     }
 
-    post(path: string, groupName: string, groupDescription: string, ...handlers: RequestHandler[]) {
-        this.queue(HttpMethods.POST, path, groupName, groupDescription, ...handlers);
+    post(path: string, groupEntry: GroupEntry, ...handlers: RequestHandler[]) {
+        this.queue(HttpMethods.POST, path, groupEntry, ...handlers);
     }
 
     async getExpressRouter() {

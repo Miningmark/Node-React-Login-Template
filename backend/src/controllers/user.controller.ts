@@ -10,9 +10,7 @@ export class UserController extends BaseController {
 
     updateUsername = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
-
+            const { userId } = req as { userId: number };
             const { newUsername } = req.body;
 
             return await this.userService.updateUsername(userId, newUsername, res);
@@ -21,9 +19,7 @@ export class UserController extends BaseController {
 
     updateEmail = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
-
+            const { userId } = req as { userId: number };
             const { newEmail } = req.body;
 
             return await this.userService.updateEmail(userId, newEmail, res);
@@ -32,9 +28,7 @@ export class UserController extends BaseController {
 
     updatePassword = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
-
+            const { userId } = req as { userId: number };
             const { currentPassword, newPassword } = req.body;
 
             return await this.userService.updatePassword(userId, currentPassword, newPassword, res);
@@ -43,8 +37,7 @@ export class UserController extends BaseController {
 
     getUsername = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
+            const { userId } = req as { userId: number };
 
             return await this.userService.getUsername(userId);
         });
@@ -52,8 +45,7 @@ export class UserController extends BaseController {
 
     getRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
+            const { userId } = req as { userId: number };
 
             return await this.userService.getRouteGroups(userId);
         });
@@ -61,8 +53,7 @@ export class UserController extends BaseController {
 
     getLastLogins = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
+            const { userId } = req as { userId: number };
 
             return await this.userService.getLastLogins(userId);
         });

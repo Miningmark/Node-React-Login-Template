@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { authorizationValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
+import { authorizationBaseValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
 
 export const registerSchema = z.object({
     body: z.object({
@@ -18,7 +18,7 @@ export const loginSchema = z.object({
 
 export const logoutSchema = z.object({
     headers: z.object({
-        authorization: authorizationValidation
+        authorization: authorizationBaseValidation
     })
 });
 
@@ -41,10 +41,7 @@ export const requestPasswordResetSchema = z.object({
     body: z.object({
         usernameOrEmail: z
             .string()
-            .refine(
-                (val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()),
-                "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!"
-            )
+            .refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!")
     })
 });
 

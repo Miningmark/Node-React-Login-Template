@@ -11,6 +11,7 @@ export class AuthController extends BaseController {
     register = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { username, email, password } = req.body;
+
             return await this.authService.register(username, email, password);
         });
     };
@@ -18,14 +19,14 @@ export class AuthController extends BaseController {
     login = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { username, password } = req.body;
+
             return await this.authService.login(username, password, req, res);
         });
     };
 
     logout = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { userId } = req;
-            if (userId === undefined) throw new UnauthorizedError();
+            const { userId } = req as { userId: number };
 
             return await this.authService.logout(userId, res);
         });
@@ -34,6 +35,7 @@ export class AuthController extends BaseController {
     accountActivation = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { token } = req.body;
+
             return await this.authService.accountActivation(token);
         });
     };
@@ -41,6 +43,7 @@ export class AuthController extends BaseController {
     refreshAccessToken = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { refreshToken } = req.cookies;
+
             return await this.authService.refreshAccessToken(refreshToken, res);
         });
     };
@@ -48,6 +51,7 @@ export class AuthController extends BaseController {
     requestPasswordReset = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { usernameOrEmail } = req.body;
+
             return await this.authService.requestPasswordReset(usernameOrEmail);
         });
     };
@@ -55,6 +59,7 @@ export class AuthController extends BaseController {
     handlePasswordRecovery = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { token, password } = req.body;
+
             return await this.authService.handlePasswordRecovery(token, password);
         });
     };

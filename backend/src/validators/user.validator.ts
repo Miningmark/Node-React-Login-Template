@@ -1,9 +1,9 @@
 import { z } from "zod/v4";
-import { authorizationValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
+import { authorizationBaseValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
 
 export const updateUsernameSchema = z.object({
     headers: z.object({
-        authorization: authorizationValidation
+        authorization: authorizationBaseValidation
     }),
     body: z.object({
         newUsername: usernameBaseValidation
@@ -12,7 +12,7 @@ export const updateUsernameSchema = z.object({
 
 export const updateEmailSchema = z.object({
     headers: z.object({
-        authorization: authorizationValidation
+        authorization: authorizationBaseValidation
     }),
     body: z.object({
         newEmail: emailBaseValidation
@@ -21,7 +21,7 @@ export const updateEmailSchema = z.object({
 
 export const updatePasswordSchema = z.object({
     headers: z.object({
-        authorization: authorizationValidation
+        authorization: authorizationBaseValidation
     }),
     body: z.object({
         currentPassword: z.string(),

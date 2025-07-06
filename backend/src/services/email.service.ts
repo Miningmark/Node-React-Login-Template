@@ -21,9 +21,7 @@ export class EmailService {
 
         this.fromAddress = ENV.SMTP_USER;
 
-        setTimeout(async () => {
-            this.verifyConnection();
-        }, 3000);
+        this.verifyConnection();
     }
 
     public static getInstance(): EmailService {
