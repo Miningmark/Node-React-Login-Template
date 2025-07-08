@@ -12,7 +12,7 @@ export default async () => {
     const adminPageService = new AdminPageService();
     const adminPageController = new AdminPageController(adminPageService);
 
-    smartRouter.get("/getServerLog{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
+    smartRouter.get("/getServerLogs{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
     //smartRouter.get("/getFilterOptionsServerLog", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(), adminPageController.getFilterOptionsServerLog);
     //smartRouter.post("/getFilteredServerLog{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
 
