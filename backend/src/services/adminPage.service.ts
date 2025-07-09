@@ -7,7 +7,6 @@ export class AdminPageService {
         this.serverLogService = new ServerLogService();
     }
 
-    //TODO: add tests
     async getServerLogs(limit: number | undefined, offset: number | undefined) {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten ServerLogs zurück gegeben", logResponse: false };
 
@@ -15,6 +14,32 @@ export class AdminPageService {
 
         jsonResponse.serverLogCount = await ServerLog.count();
         jsonResponse.serverLogs = await this.serverLogService.generateJSONResponse(databaseServerLogs);
+
+        return jsonResponse;
+    }
+
+    async getFilteredServerLogs(limit?: number, offset?: number, userIds?: number[], types?: string[], ipv4Adress?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string) {
+        let jsonResponse: Record<string, any> = { message: "Alle angeforderten Serverlogs zurück gegeben", logResponse: false };
+
+        const buildServerLogQueryConditions = this.serverLogService.buildServerLogQueryConditions(userIds, types, ipv4Adress, createdAtFrom, createdAtTo, searchString);
+
+        console.log(limit, offset);
+        const databaseServerLogs = await ServerLog.findAll({
+            where: buildServerLogQueryConditions,
+            ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}),
+            order: [["id", "DESC"]]
+        });
+
+        jsonResponse.serverLogCount = await ServerLog.count({ where: buildServerLogQueryConditions });
+        jsonResponse.serverLogs = await this.serverLogService.generateJSONResponse(databaseServerLogs);
+
+        return jsonResponse;
+    }
+
+    async getFilterOptionsServerLog() {
+        let jsonResponse: Record<string, any> = { message: "Alle angeforderten Serverlogs zurück gegeben", logResponse: false };
+
+        //TODO:
 
         return jsonResponse;
     }

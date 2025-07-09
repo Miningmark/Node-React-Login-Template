@@ -4,7 +4,8 @@ import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
 import { AdminPageService } from "@/services/adminPage.service.js";
-import { getServerLogSchema } from "@/validators/adminPage.validator.js";
+import { getFilteredServerLogSchema, getServerLogSchema } from "@/validators/adminPage.validator.js";
+import { onlyAuthorizationHeader } from "@/validators/base.validator";
 
 export default async () => {
     const smartRouter = new SmartRouter();
@@ -13,8 +14,8 @@ export default async () => {
     const adminPageController = new AdminPageController(adminPageService);
 
     smartRouter.get("/getServerLogs{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
-    //smartRouter.get("/getFilterOptionsServerLog", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(), adminPageController.getFilterOptionsServerLog);
-    //smartRouter.post("/getFilteredServerLog{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
+    smartRouter.get("/getFilterOptionsServerLog", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), adminPageController.getFilterOptionsServerLog);
+    smartRouter.post("/getFilteredServerLog{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
 
     //smartRouter.get("/getAllPermissionsWithRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(), adminPageController.getAllPermissionsWithRouteGroups);
     //smartRouter.get("/getAllRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(), adminPageController.getAllRouteGroups);

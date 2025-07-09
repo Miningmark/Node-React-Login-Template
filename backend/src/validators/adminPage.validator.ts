@@ -11,7 +11,7 @@ export const getServerLogSchema = z.object({
     })
 });
 
-/*export const getFilteredServerLogSchema = z.object({
+export const getFilteredServerLogSchema = z.object({
     headers: z.object({
         authorization: authorizationBaseValidation
     }),
@@ -21,10 +21,10 @@ export const getServerLogSchema = z.object({
     }),
     body: z.object({
         userIds: z.array(z.number()).optional(),
-        levels: z.array(z.number()).optional(),
+        types: z.array(z.string()).optional(),
         ipv4Address: z.string().optional(),
-        timestampFrom: z.iso.datetime().optional(),
-        timestampTo: z.iso.datetime().optional(),
-        searchString: z.string().optional
+        createdAtFrom: z.iso.datetime().optional(),
+        createdAtTo: z.iso.datetime().optional(),
+        searchString: z.string().optional()
     })
-});*/
+});

@@ -15,4 +15,21 @@ export class AdminPageController extends BaseController {
             return await this.adminPanelService.getServerLogs(limit, offset);
         });
     };
+
+    getFilteredServerLogs = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const limit = req.params.limit !== undefined ? parseInt(req.params.limit) : undefined;
+            const offset = req.params.offset !== undefined ? parseInt(req.params.offset) : undefined;
+
+            const { userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString } = req.body;
+
+            return await this.adminPanelService.getFilteredServerLogs(limit, offset, userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString);
+        });
+    };
+
+    getFilterOptionsServerLog = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            return await this.adminPanelService.getFilterOptionsServerLog();
+        });
+    };
 }
