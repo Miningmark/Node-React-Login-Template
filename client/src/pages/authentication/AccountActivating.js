@@ -15,6 +15,14 @@ function AccountActivating() {
   useEffect(() => {
     const token = searchParams.get("token");
 
+    if (token.length !== 64) {
+      setStatus((prev) => {
+        if (prev !== "error") addToast("Kein gültiger Token vorhanden", "danger");
+        return "error";
+      });
+      return;
+    }
+
     if (!token) {
       setStatus((prev) => {
         if (prev !== "error") addToast("Kein Token in der URL vorhanden", "danger");

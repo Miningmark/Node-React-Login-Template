@@ -37,14 +37,35 @@ const CreatePermissionModal = ({
     setIsSaving(true);
     const routeGroupIds = selectedRouteGroups.map((rg) => rg.id);
 
+    const changedData = { id: permission.id };
+
+    if (name !== permission.name) {
+      changedData.name = name;
+    }
+    if (description !== permission.description) {
+      changedData.description = description;
+    }
+
+    // Vergleiche routeGroups (IDs vergleichen)
+    const originalRouteGroupIds = permission.routeGroups.map((rg) => rg.id).sort();
+    const currentRouteGroupIds = selectedRouteGroups.map((rg) => rg.id).sort();
+
+    const areRouteGroupsChanged =
+      JSON.stringify(originalRouteGroupIds) !== JSON.stringify(currentRouteGroupIds);
+
+    if (areRouteGroupsChanged) {
+      changedData.routeGroupIds = currentRouteGroupIds;
+    }
+
     if (permission) {
+      if (Object.keys(changedData).length === 1) {
+        // Nur `id` ist enthalten
+        addToast("Keine Änderungen vorgenommen", "info");
+        setIsSaving(false);
+        return;
+      }
       try {
-        await axiosProtected.post("/adminPage/updatePermission", {
-          id: permission.id,
-          name: name,
-          description: description,
-          routeGroupIds: routeGroupIds,
-        });
+        await axiosProtected.post("/adminPage/updatePermission", changedData);
         addToast("Permission erfolgreich aktualisiert", "success");
 
         handleEditPermission({
@@ -55,7 +76,7 @@ const CreatePermissionModal = ({
         });
         handleClose();
       } catch (error) {
-        addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
+        addToast(error.response?.data?.message || "Bearbeitung fehlgeschlagen", "danger");
       } finally {
         setIsSaving(false);
       }
