@@ -10,10 +10,10 @@ const ServerLogFilterOptionsModal = ({
 }) => {
   const [formData, setFormData] = useState(
     activeFilters || {
-      levels: [],
+      types: [],
       userIds: [],
-      timestampFrom: "",
-      timestampTo: "",
+      createdAtFrom: "",
+      createdAtTo: "",
       ipv4Address: "",
       searchString: "",
     }
@@ -36,6 +36,7 @@ const ServerLogFilterOptionsModal = ({
 
   function handleSearch() {
     console.log("formData", formData);
+
     handleFilterOptions(formData);
     handleClose();
   }
@@ -50,11 +51,11 @@ const ServerLogFilterOptionsModal = ({
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Log Level</Form.Label>
-              <Form.Select multiple name="levels" value={formData.levels} onChange={handleChange}>
+              <Form.Select multiple name="types" value={formData.types} onChange={handleChange}>
                 <option value="">Bitte wählen...</option>
-                {filterOptions.levels.map((level, index) => (
-                  <option key={index} value={level}>
-                    {level}
+                {filterOptions.types.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
                   </option>
                 ))}
               </Form.Select>
@@ -76,8 +77,8 @@ const ServerLogFilterOptionsModal = ({
               <Form.Label>Von Timestamp</Form.Label>
               <Form.Control
                 type="datetime-local"
-                name="timestampFrom"
-                value={formData.timestampFrom}
+                name="createdAtFrom"
+                value={formData.createdAtFrom}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -86,8 +87,8 @@ const ServerLogFilterOptionsModal = ({
               <Form.Label>Bis Timestamp</Form.Label>
               <Form.Control
                 type="datetime-local"
-                name="timestampTo"
-                value={formData.timestampTo}
+                name="createdAtTo"
+                value={formData.createdAtTo}
                 onChange={handleChange}
               />
             </Form.Group>

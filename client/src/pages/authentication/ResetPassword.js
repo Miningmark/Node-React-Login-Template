@@ -14,7 +14,7 @@ import Form from "react-bootstrap/Form";
 function ResetPassword() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState({ password: false, repeat: false });
   const [token, setToken] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
@@ -45,7 +45,7 @@ function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!token || token.length !== 32) {
+    if (!token || token.length !== 64) {
       addToast("Kein gültiger Token vorhanden", "danger");
       return;
     }
@@ -61,7 +61,7 @@ function ResetPassword() {
     }
 
     try {
-      await axiosPublic.post("/user/passwordResetOrReactivation", {
+      await axiosPublic.post("/auth/handlePasswordRecovery", {
         token,
         password,
       });

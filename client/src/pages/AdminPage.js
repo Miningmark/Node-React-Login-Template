@@ -12,6 +12,31 @@ import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
 
 import "components/adminPage/adminPage.css";
 
+function clearFilters(filters) {
+  const clearedFilters = { ...filters };
+  Object.keys(clearedFilters).forEach((key, index) => {
+    console.log("test", index, key, clearedFilters[key]);
+    if (
+      clearedFilters[key] === "" ||
+      clearedFilters[key] === null ||
+      clearedFilters[key] === undefined ||
+      clearedFilters[key].length === 0
+    ) {
+      delete clearedFilters[key];
+    } else {
+      if (key === "createdAtFrom" || key === "createdAtTo") {
+        clearedFilters[key] = new Date(clearedFilters[key]).toISOString();
+      }
+      if (key === "userIds") {
+        clearedFilters[key] = clearedFilters[key].map((id) => Number(id));
+      }
+    }
+  });
+
+  console.log("Cleared Filters:", clearedFilters);
+  return clearedFilters;
+}
+
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
   const [filteredServerLog, setFilteredServerLog] = useState(null);
@@ -35,7 +60,7 @@ function AdminPage() {
 
   const [showCreateUserNotificationModal, setShowCreateUserNotificationModal] = useState(false);
   const [userNotifications, setUserNotifications] = useState(null);
-  const [selectedUserNotification,setSelectedUserNotification] = useState(null);
+  const [selectedUserNotification, setSelectedUserNotification] = useState(null);
   const [loadingUserNotifications, setLoadingUserNotifications] = useState(false);
 
   const axiosProtected = useAxiosProtected();
@@ -70,8 +95,8 @@ function AdminPage() {
     setLoadingServerLogPart(true);
     try {
       const response = await axiosProtected.post(
-        `/adminPage/getFilteredServerLog/50-0`,
-        activeFilters
+        `/adminPage/getFilteredServerLogs/50-0`,
+        clearFilters(activeFilters)
       );
       const newLogs = response.data.serverLogs || [];
 
@@ -104,7 +129,7 @@ function AdminPage() {
   const fetchServerLogs = async (offset = 0) => {
     setLoadingServerLogPart(true);
     try {
-      const { data } = await axiosProtected.get(`/adminPage/getServerLog/50-${offset}`);
+      const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-${offset}`);
       const logs = data?.serverLogs || [];
 
       setServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
@@ -122,7 +147,7 @@ function AdminPage() {
   const refreshServerLogs = async () => {
     setLoadingServerLogPart(true);
     try {
-      const { data } = await axiosProtected.get(`/adminPage/getServerLog/50-0`);
+      const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-0`);
       const newLogs = data?.serverLogs || [];
 
       setServerLog((prev = []) => {
@@ -143,10 +168,11 @@ function AdminPage() {
 
   const fetchFilteredLogs = async (filters, offset = 0) => {
     setLoadingServerLogPart(true);
+
     try {
       const { data } = await axiosProtected.post(
-        `/adminPage/getFilteredServerLog/50-${offset}`,
-        filters
+        `/adminPage/getFilteredServerLogs/50-${offset}`,
+        clearFilters(filters)
       );
       const logs = data?.serverLogs || [];
 
@@ -177,10 +203,10 @@ function AdminPage() {
       if (checkAccess(["adminPagePermissionsRead", "adminPagePermissionsWrite"])) {
         promises.push(
           axiosProtected
-            .get(`/adminPage/getAllRouteGroups`)
+            .get(`/adminPage/getRouteGroups`)
             .then((res) => setAllRouteGroups(res?.data?.routeGroups || [])),
           axiosProtected
-            .get(`/adminPage/getAllPermissionsWithRouteGroups`)
+            .get(`/adminPage/getPermissionsWithRouteGroups`)
             .then((res) => setAllPermissions(res?.data?.permissions || []))
         );
       }
@@ -207,6 +233,7 @@ function AdminPage() {
   }
 
   function handleRefreshLogs() {
+    console.log("activeFilters", activeFilters);
     activeFilters ? fetchFilteredLogs(activeFilters, 0) : refreshServerLogs();
   }
 
@@ -294,7 +321,7 @@ function AdminPage() {
                           <tr className="border">
                             <th className="text-center">ID</th>
                             <th className="text-center">Zeitstempel</th>
-                            <th className="text-center">Level</th>
+                            <th className="text-center">Type</th>
                             <th className="text-center">Nachricht</th>
                           </tr>
                         </thead>
@@ -307,9 +334,9 @@ function AdminPage() {
                             >
                               <td>{log.id}</td>
                               <td className="text-center">
-                                {convertToLocalTimeStamp(log.timestamp)}
+                                {convertToLocalTimeStamp(log.createdAt)}
                               </td>
-                              <td className="text-center">{log.level}</td>
+                              <td className="text-center">{log.type}</td>
                               <td className="text-center">{log.message}</td>
                             </tr>
                           ))}
@@ -464,13 +491,9 @@ function AdminPage() {
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </InputGroup>
-                      <button
-                          className="btn btn-primary"
-                          type="button"
-                          onClick={() => {}}
-                        >
-                          Suchen
-                        </button>
+                      <button className="btn btn-primary" type="button" onClick={() => {}}>
+                        Suchen
+                      </button>
                     </div>
 
                     <div
@@ -503,7 +526,7 @@ function AdminPage() {
                           ))}
                         </tbody>
                       </Table>
-                      { /* //TODO: Button ändern auf notifications                 */}
+                      {/* //TODO: Button ändern auf notifications                 */}
                       <div className="text-center my-3">
                         <button
                           className="btn btn-primary"
@@ -531,8 +554,8 @@ function AdminPage() {
                 ) : (
                   <TableLoadingAnimation />
                 )}
-                </Tab>
-            ):null}
+              </Tab>
+            ) : null}
           </Tabs>
         </div>
       </Container>

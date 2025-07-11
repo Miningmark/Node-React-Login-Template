@@ -57,20 +57,19 @@ jobs:
               pm2 start npx --name $FRONTEND_NAME -- serve -s build -l $FRONTEND_PORT
             fi
 
-            # Backend: Node.js server
-            cd ../server
+            # Backend: Node.js backend
+            cd ../backend
             npm install
+            npm run build
 
             if pm2 list | grep -q $BACKEND_NAME; then
               echo "Restarting backend: $BACKEND_NAME"
               pm2 restart $BACKEND_NAME
             else
+            cd ./dist/src
               echo "Starting backend: $BACKEND_NAME"
               pm2 start index.js --name $BACKEND_NAME -- --port $BACKEND_PORT
             fi
 
             pm2 save
           EOF
-
-
-

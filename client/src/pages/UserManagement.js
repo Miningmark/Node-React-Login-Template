@@ -47,7 +47,7 @@ const UserManagement = () => {
 
     const fetchAllPermissions = async () => {
       try {
-        const response = await axiosProtected.get("/userManagement/getAllPermissions", {
+        const response = await axiosProtected.get("/userManagement/getPermissions", {
           signal: controller.signal,
         });
         setAllPermissions(response.data.permissions);
