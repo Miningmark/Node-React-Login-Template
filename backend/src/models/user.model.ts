@@ -54,7 +54,6 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare email: string;
 
     @Attribute(DataTypes.STRING)
-    @Unique
     @NotNull
     declare password: string;
 
