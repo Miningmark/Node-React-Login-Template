@@ -40,6 +40,10 @@ httpServer.listen(ENV.BACKEND_PORT, async () => {
 
         socketService.init(io);
         await socketService.setup();
+
+        setInterval(() => {
+            SocketService.getInstance().emitToRoom("user:list", "user:update", { test: "123456" });
+        }, 10_000);
     } catch (error) {
         consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
         process.exit(1);

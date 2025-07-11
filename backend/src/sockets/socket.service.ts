@@ -84,3 +84,4 @@ export class SocketService {
         this.getIO().to(room).emit(event, data);
     }
 }
+2;
