@@ -7,7 +7,7 @@ export async function initializeSocket(accessToken) {
     console.log("Socket is already initializing or connected.");
     return;
   }
-  const serverUrl = `${process.env.REACT_APP_SERVER_URL}${process.env.REACT_APP_SERVER_PORT}`;
+  const serverUrl = `${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SOCKET_PORT}`;
   console.log("Connecting to socket server at:", serverUrl);
   try {
     socket = io(serverUrl, {
