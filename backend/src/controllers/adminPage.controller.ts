@@ -32,4 +32,16 @@ export class AdminPageController extends BaseController {
             return await this.adminPanelService.getFilterOptionsServerLog();
         });
     };
+
+    getPermissionsWithRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            return await this.adminPanelService.getPermissionsWithRouteGroups();
+        });
+    };
+
+    getRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            return await this.adminPanelService.getRouteGroups();
+        });
+    };
 }

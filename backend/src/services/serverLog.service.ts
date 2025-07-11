@@ -39,8 +39,9 @@ export class ServerLogService {
                 orConditions.push({ userId: null });
             }
 
-            if (orConditions.length === 1) conditions.push(orConditions[0]);
-            else if (orConditions.length > 1) {
+            if (orConditions.length === 1) {
+                conditions.push(orConditions[0]);
+            } else if (orConditions.length > 1) {
                 const orClause = { [Op.or]: orConditions };
                 conditions.push(orClause);
             }
@@ -55,22 +56,16 @@ export class ServerLogService {
         }
 
         if (createdAtFrom !== undefined) {
-            conditions.push({
-                createdAt: { [Op.gte]: createdAtFrom }
-            });
+            conditions.push({ createdAt: { [Op.gte]: createdAtFrom } });
         }
 
         if (createdAtTo !== undefined) {
-            conditions.push({
-                createdAt: { [Op.lte]: createdAtTo }
-            });
+            conditions.push({ createdAt: { [Op.lte]: createdAtTo } });
         }
 
         if (searchString) {
             const like = { [Op.like]: `%${searchString}%` };
-            conditions.push({
-                [Op.or]: [{ message: like }, { url: like }, { method: like }, !isNaN(Number(searchString)) ? { status: Number(searchString) } : {}, { userAgent: like }]
-            });
+            conditions.push({ [Op.or]: [{ message: like }, { url: like }, { method: like }, !isNaN(Number(searchString)) ? { status: Number(searchString) } : {}, { userAgent: like }] });
         }
 
         return conditions.length > 0 ? { [Op.and]: conditions } : {};

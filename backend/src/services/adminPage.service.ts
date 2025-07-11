@@ -1,5 +1,8 @@
-import ServerLog from "@/models/serverLog.model.js";
+import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ServerLogService } from "./serverLog.service.js";
+import User from "@/models/user.model.js";
+import RouteGroup from "@/models/routeGroup.model.js";
+import Permission from "@/models/permission.model.js";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
@@ -23,7 +26,6 @@ export class AdminPageService {
 
         const buildServerLogQueryConditions = this.serverLogService.buildServerLogQueryConditions(userIds, types, ipv4Adress, createdAtFrom, createdAtTo, searchString);
 
-        console.log(limit, offset);
         const databaseServerLogs = await ServerLog.findAll({
             where: buildServerLogQueryConditions,
             ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}),
@@ -37,9 +39,56 @@ export class AdminPageService {
     }
 
     async getFilterOptionsServerLog() {
-        let jsonResponse: Record<string, any> = { message: "Alle angeforderten Serverlogs zurück gegeben", logResponse: false };
+        let jsonResponse: Record<string, any> = { message: "Alle Filter Optionen zurück gegeben" };
 
-        //TODO:
+        const databaseUsers = await User.findAll({});
+
+        jsonResponse.filterOptions = {};
+        jsonResponse.filterOptions.users = databaseUsers.map((databaseUser) => {
+            return {
+                id: databaseUser.id,
+                username: databaseUser.username
+            };
+        });
+
+        jsonResponse.filterOptions.levels = Object.values(ServerLogTypes);
+
+        return jsonResponse;
+    }
+
+    async getPermissionsWithRouteGroups() {
+        let jsonResponse: Record<string, any> = { message: "Alle Rechte mit RouteGroups zurück gegeben" };
+
+        const databasePermissions = await Permission.findAll({ include: { model: RouteGroup } });
+
+        jsonResponse.permissions = databasePermissions.map((databasePermission) => {
+            return {
+                id: databasePermission.id,
+                name: databasePermission.name,
+                description: databasePermission.description,
+                routeGroups: databasePermission.routeGroups.map((databaseRouteGroup) => ({
+                    id: databaseRouteGroup.id,
+                    name: databaseRouteGroup.name,
+                    description: databaseRouteGroup.description
+                }))
+            };
+        });
+
+        return jsonResponse;
+    }
+
+    async getRouteGroups() {
+        let jsonResponse: Record<string, any> = { message: "Alle RouteGroups zurück gegeben" };
+
+        const databaseRouteGroups = await RouteGroup.findAll();
+
+        jsonResponse.routeGroups = databaseRouteGroups.map((databaseRouteGroup) => {
+            return {
+                id: databaseRouteGroup.id,
+                name: databaseRouteGroup.name,
+                description: databaseRouteGroup.description
+            };
+        });
 
         return jsonResponse;
     }
