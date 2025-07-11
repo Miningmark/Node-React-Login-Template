@@ -18,7 +18,7 @@ export class UserManagementService {
         this.tokenService = new TokenService();
     }
 
-    async getUsers(limit: number | undefined, offset: number | undefined) {
+    async getUsers(limit?: number, offset?: number) {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten Benutzer zurück gegeben" };
 
         const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit && offset ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
@@ -71,7 +71,7 @@ export class UserManagementService {
         return jsonResponse;
     }
 
-    async updateUser(userId: number, username: string | undefined, email: string | undefined, isActive: boolean | undefined, isDisabled: boolean | undefined, permissionIds: number[] | undefined) {
+    async updateUser(userId: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissionIds?: number[]) {
         //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich bearbeitet" };
 

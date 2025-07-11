@@ -4,8 +4,8 @@ import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
 import { AdminPageService } from "@/services/adminPage.service.js";
-import { getFilteredServerLogSchema, getServerLogSchema } from "@/validators/adminPage.validator.js";
-import { onlyAuthorizationHeader } from "@/validators/base.validator";
+import { createPermissionSchema, deletePermissionSchema, getFilteredServerLogSchema, getServerLogSchema, updatePermissionSchema } from "@/validators/adminPage.validator.js";
+import { onlyAuthorizationHeader } from "@/validators/base.validator.js";
 
 export default async () => {
     const smartRouter = new SmartRouter();
@@ -20,9 +20,9 @@ export default async () => {
     smartRouter.get("/getPermissionsWithRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), adminPageController.getPermissionsWithRouteGroups);
     smartRouter.get("/getRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), adminPageController.getRouteGroups);
 
-    //smartRouter.post("/createPermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(), adminPageController.createPermission);
-    //smartRouter.post("/updatePermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(), adminPageController.updatePermission);
-    //smartRouter.post("/deletePermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(), adminPageController.deletePermission);
+    smartRouter.post("/createPermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(createPermissionSchema), adminPageController.createPermission);
+    smartRouter.post("/updatePermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(updatePermissionSchema), adminPageController.updatePermission);
+    smartRouter.post("/deletePermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(deletePermissionSchema), adminPageController.deletePermission);
 
     return smartRouter.getExpressRouter();
 };

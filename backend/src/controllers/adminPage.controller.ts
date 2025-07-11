@@ -44,4 +44,28 @@ export class AdminPageController extends BaseController {
             return await this.adminPanelService.getRouteGroups();
         });
     };
+
+    createPermission = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { name, routeGroupIds, description } = req.body;
+
+            return await this.adminPanelService.createPermission(name, routeGroupIds, description);
+        });
+    };
+
+    updatePermission = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { id, name, description, routeGroupIds } = req.body;
+
+            return await this.adminPanelService.updatePermission(id, name, description, routeGroupIds);
+        });
+    };
+
+    deletePermission = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { id } = req.body;
+
+            return await this.adminPanelService.deletePermission(id);
+        });
+    };
 }

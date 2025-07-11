@@ -3,6 +3,8 @@ import { ServerLogService } from "./serverLog.service.js";
 import User from "@/models/user.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import Permission from "@/models/permission.model.js";
+import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
+import { Op } from "@sequelize/core";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
@@ -10,7 +12,7 @@ export class AdminPageService {
         this.serverLogService = new ServerLogService();
     }
 
-    async getServerLogs(limit: number | undefined, offset: number | undefined) {
+    async getServerLogs(limit?: number, offset?: number) {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten ServerLogs zurück gegeben", logResponse: false };
 
         const databaseServerLogs = await ServerLog.findAll({ ...(limit && offset ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
@@ -89,6 +91,63 @@ export class AdminPageService {
                 description: databaseRouteGroup.description
             };
         });
+
+        return jsonResponse;
+    }
+
+    async createPermission(name: string, routeGroupIds: number[], description?: string) {
+        let jsonResponse: Record<string, any> = { message: "Recht erfolgreich erstellt" };
+
+        const databasePermissionNew = await Permission.findOne({ where: { name: name } });
+        if (databasePermissionNew !== null) throw new ValidationError("Der Name für die Permission ist schon belegt");
+
+        const databasePermission = await Permission.create({ name: name, description: description });
+        const databaseRouteGroups = await RouteGroup.findAll({ where: { id: { [Op.in]: routeGroupIds } } });
+
+        await databasePermission.setRouteGroups(databaseRouteGroups);
+
+        jsonResponse.permissionId = databasePermission.id;
+
+        return jsonResponse;
+    }
+
+    async updatePermission(id: number, name?: string, description?: string, routeGroupIds?: number[]) {
+        let jsonResponse: Record<string, any> = { message: "Recht erfolgreich bearbeitet" };
+
+        const databasePermission = await Permission.findOne({ where: { id: id } });
+        if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser Id");
+        console.log(databasePermission.name);
+        if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht bearbeitet werden");
+
+        if (name !== undefined) {
+            const databasePermissionNew = await Permission.findOne({ where: { name: name } });
+            if (databasePermissionNew !== null) throw new ValidationError("Der Name für die Permission ist schon belegt");
+
+            databasePermission.name = name;
+        }
+
+        if (description !== undefined) {
+            databasePermission.description = description;
+        }
+
+        if (routeGroupIds !== undefined) {
+            const databaseRouteGroups = await RouteGroup.findAll({ where: { id: { [Op.in]: routeGroupIds } } });
+            await databasePermission.setRouteGroups(databaseRouteGroups);
+        }
+
+        await databasePermission.save();
+
+        return jsonResponse;
+    }
+
+    async deletePermission(id: number) {
+        let jsonResponse: Record<string, any> = { message: "Recht erfolgreich gelöscht" };
+
+        const databasePermission = await Permission.findOne({ where: { id: id } });
+        if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser ID");
+        if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht gelöscht werden");
+
+        await databasePermission.destroy();
 
         return jsonResponse;
     }
