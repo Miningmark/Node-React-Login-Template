@@ -6,7 +6,7 @@ import adminPageRoutes from "@/routes/adminPage.route.js";
 import authRoutes from "@/routes/auth.route.js";
 import userRoutes from "@/routes/user.route.js";
 import userManagementRoutes from "@/routes/userManagement.route.js";
-import { ErrorMonitoringService } from "@/services/serverErrorMonitoring.service.js";
+import { ErrorMonitoringService } from "@/services/ServerErrorMonitoring1.service.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";

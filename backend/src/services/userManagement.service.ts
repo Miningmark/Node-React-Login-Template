@@ -88,7 +88,7 @@ export class UserManagementService {
             const databaseSuperAdminPermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
             if (databaseSuperAdminPermission === null) throw new ValidationError("SuperAdmin Berechtigung nicht gefunden!");
 
-            if (permissionIds.includes(databaseSuperAdminPermission.id)) throw new ForbiddenError("SuperAdmin Berechtigung kann keinen anderen Benutzern zugewiesen werden");
+            if (permissionIds.includes(databaseSuperAdminPermission.id)) throw new ForbiddenError("SuperAdmin Berechtigung kann keinem anderen Benutzern zugewiesen werden");
         }
 
         const onlyPermissionIds = username === undefined && email === undefined && isActive === undefined;
