@@ -138,6 +138,8 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
+        jsonResponse.userId = databaseUser.id;
+
         return jsonResponse;
     }
 }
