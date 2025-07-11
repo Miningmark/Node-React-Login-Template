@@ -113,7 +113,7 @@ function AdminPage() {
         }
       }
 
-      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || null);
+      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || 0);
     } catch {
       addToast("Fehler beim Aktualisieren der gefilterten Logs", "danger");
     } finally {
@@ -178,7 +178,7 @@ function AdminPage() {
 
       setFilteredServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
       setFilteredServerlogOffset(offset + 50);
-      setFilteredServerLogMaxEntries(Number(data?.serverLogCount) || null);
+      setFilteredServerLogMaxEntries(Number(data?.serverLogCount) || 0);
     } catch (error) {
       if (error.name !== "CanceledError") {
         addToast("Fehler beim Laden der gefilterten Logs", "danger");
@@ -251,6 +251,10 @@ function AdminPage() {
     setAllPermissions((prev) => prev.filter((p) => p.id !== permissionId));
     setSelectedPermission(null);
   }
+
+  console.log("filteredServerLogMaxEntries", filteredServerLogMaxEntries);
+  console.log("filteredServerlogOffset", filteredServerlogOffset);
+  console.log("activeFilters", activeFilters);
 
   return (
     <>
@@ -356,9 +360,8 @@ function AdminPage() {
                           disabled={
                             loadingServerLogPart ||
                             (activeFilters
-                              ? filteredServerLogMaxEntries &&
-                                filteredServerlogOffset >= filteredServerLogMaxEntries
-                              : serverLogMaxEntries && serverlogOffset >= serverLogMaxEntries)
+                              ? filteredServerlogOffset >= filteredServerLogMaxEntries
+                              : serverlogOffset >= serverLogMaxEntries)
                           }
                         >
                           {loadingServerLogPart ? "Lade mehr..." : "Mehr laden"}
