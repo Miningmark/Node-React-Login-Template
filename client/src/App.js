@@ -49,6 +49,7 @@ function App() {
   const hideNavBar = publicPaths.includes(location.pathname);
 
   const { setUsername, setRouteGroups, username, accessToken } = useContext(AuthContext);
+
   const { socket } = useContext(SocketContext);
 
   useEffect(() => {
