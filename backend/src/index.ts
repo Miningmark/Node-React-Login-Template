@@ -6,8 +6,21 @@ import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
+//import { Server, Socket } from "socket.io";
+import http from "http";
+//import { setupSocketIO } from "@/sockets/index.js";
 
-const server = app.listen(ENV.BACKEND_PORT, async () => {
+const httpServer = http.createServer(app);
+/*const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+setupSocketIO(io);*/
+
+httpServer.listen(ENV.BACKEND_PORT, async () => {
     try {
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
@@ -35,7 +48,7 @@ const shutdown = async () => {
 
     app.disable("connection");
 
-    server.close(async () => {
+    httpServer.close(async () => {
         try {
             await sequelize.close();
             consoleLogger.warn("Datenbank Verbindung erfolgreich geschlossen");
@@ -55,5 +68,3 @@ const shutdown = async () => {
 
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
-
-export default server;

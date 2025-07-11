@@ -84,6 +84,13 @@ export class UserManagementService {
 
         if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ForbiddenError("SuperAdmin kann nicht bearbeitet werden");
 
+        if (permissionIds !== undefined) {
+            const databaseSuperAdminPermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
+            if (databaseSuperAdminPermission === null) throw new ValidationError("SuperAdmin Berechtigung nicht gefunden!");
+
+            if (permissionIds.includes(databaseSuperAdminPermission.id)) throw new ForbiddenError("SuperAdmin Berechtigung kann keinen anderen Benutzern zugewiesen werden");
+        }
+
         const onlyPermissionIds = username === undefined && email === undefined && isActive === undefined;
         if (!onlyPermissionIds && databaseUser.isActive === false && databaseUserTokens.length !== 0)
             throw new ForbiddenError("Es können nur Rechte editiert und der Benutzer gesperrt werden solange der Registrierungsprozess nicht abgeschlossen ist");
@@ -126,6 +133,11 @@ export class UserManagementService {
     async createUser(username: string, email: string, permissionIds: number[]) {
         //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert" };
+
+        const databaseSuperAdminPermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
+        if (databaseSuperAdminPermission === null) throw new ValidationError("SuperAdmin Berechtigung nicht gefunden!");
+
+        if (permissionIds.includes(databaseSuperAdminPermission.id)) throw new ForbiddenError("SuperAdmin Berechtigung kann keinen anderen Benutzern zugewiesen werden");
 
         const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
 
