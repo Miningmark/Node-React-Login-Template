@@ -1,4 +1,4 @@
-import { UserManagementRouteGroups } from "@/routeGroups/userManagement.routeGroup";
+import { UserManagementRouteGroups } from "@/routeGroups/userManagement.routeGroup.js";
 import { ClientToServerEvents, ServerToClientEvents } from "@/sockets/types.js";
 import { Socket } from "socket.io";
 
