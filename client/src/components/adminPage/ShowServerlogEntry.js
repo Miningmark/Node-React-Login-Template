@@ -24,10 +24,13 @@ const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
           <strong>ID:</strong> {serverLogEntry.id}
         </p>
         <p>
-          <strong>Timestamp:</strong> {new Date(serverLogEntry.timestamp).toLocaleString()}
+          <strong>Timestamp:</strong> {new Date(serverLogEntry.createdAt).toLocaleString()}
         </p>
         <p>
-          <strong>Level:</strong> {serverLogEntry.level}
+          <strong>Level:</strong> {serverLogEntry.type}
+        </p>
+        <p>
+          <strong>User:</strong> {serverLogEntry.userId || "—"}
         </p>
         <p>
           <strong>Source:</strong> {serverLogEntry.source}
