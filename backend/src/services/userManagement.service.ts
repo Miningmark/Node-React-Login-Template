@@ -40,7 +40,7 @@ export class UserManagementService {
         return jsonResponse;
     }
 
-    async getAllPermissions() {
+    async getPermissions() {
         let jsonResponse: Record<string, any> = { message: "Alle Permissions zurück gegeben" };
 
         const databasePermissions = await Permission.findAll();

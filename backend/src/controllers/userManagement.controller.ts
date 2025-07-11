@@ -16,9 +16,9 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    getAllPermissions = (req: Request, res: Response, next: NextFunction): void => {
+    getPermissions = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.userManagementService.getAllPermissions();
+            return await this.userManagementService.getPermissions();
         });
     };
 
