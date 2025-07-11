@@ -29,3 +29,7 @@ Backend:
 
     Typescript:
         make a branch to port project to typescript for easier validation and maintaining of code 
+
+    User Notifacations at Login
+
+    Wartungsmodus -> nur Admins dürfen sich einloggen

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { convertToLocalDate } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
 import { ThemeContext } from "contexts/ThemeContext";
+import { Table } from "react-bootstrap";
 
 import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
 import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
@@ -159,6 +160,7 @@ const UserPage = () => {
   }
 
   console.log("Theme:", theme);
+  console.log("Logins:", logins);
 
   return (
     <div className="container mt-4">
@@ -453,12 +455,13 @@ const UserPage = () => {
                 </div>
               ) : logins.length > 0 ? (
                 <div className="table-responsive">
-                  <table className="table table-striped table-bordered align-middle">
-                    <thead className="table-light">
+                  <Table striped bordered hover className="mb-0">
+                    <thead>
                       <tr>
                         <th scope="col">Zeitpunkt</th>
                         <th scope="col">IPv4-Adresse</th>
                         <th scope="col">Region / Land</th>
+                        <th scope="col">Erfolgreich</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -471,10 +474,11 @@ const UserPage = () => {
                               ? entry.regionName
                               : `${entry.regionName} / ${entry.country}`}
                           </td>
+                          <td className="text-center">{entry.successfully ? "✅" : "❌"}</td>
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </Table>
                 </div>
               ) : (
                 <p className="text-muted">Keine Login-Daten verfügbar.</p>

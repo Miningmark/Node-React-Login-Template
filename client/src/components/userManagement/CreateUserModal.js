@@ -105,20 +105,23 @@ const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) =
         <p>
           <strong>Berechtigungen:</strong>
         </p>
-        {allPermissions.map((perm) => (
-          <div key={perm.id} className="form-check mb-2">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id={`perm-${perm.id}`}
-              checked={newUser.permissions.some((p) => p.name === perm.name)}
-              onChange={() => handleCheckboxChange(perm)}
-            />
-            <label className="form-check-label" htmlFor={`perm-${perm.id}`}>
-              {perm.name}
-            </label>
-          </div>
-        ))}
+        {allPermissions.length < 2 ? <p>Noch keine berechtigungen erstellt.</p> : null}
+        {allPermissions
+          .filter((permission) => permission.name !== "SuperAdmin Berechtigung")
+          .map((perm) => (
+            <div key={perm.id} className="form-check mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id={`perm-${perm.id}`}
+                checked={newUser.permissions.some((p) => p.name === perm.name)}
+                onChange={() => handleCheckboxChange(perm)}
+              />
+              <label className="form-check-label" htmlFor={`perm-${perm.id}`}>
+                {perm.name}
+              </label>
+            </div>
+          ))}
       </Modal.Body>
       <Modal.Footer>
         <Button
