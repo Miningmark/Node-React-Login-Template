@@ -18,12 +18,19 @@ export class RouteGroupService {
     }
 
     static async removeUnusedRouteGroups() {
-        let dateNow = new Date(Date.now()).getMilliseconds();
+        let lastUpdatedAt = new Date(0);
+
         const databaseRouteGroups = await RouteGroup.findAll();
+
+        databaseRouteGroups.map(async (databaseRouteGroup) => {
+            if (databaseRouteGroup.updatedAt.getTime() > lastUpdatedAt.getTime()) {
+                lastUpdatedAt = databaseRouteGroup.updatedAt;
+            }
+        });
 
         await Promise.all(
             databaseRouteGroups.map(async (databaseRouteGroup) => {
-                if (Math.abs(dateNow - databaseRouteGroup.updatedAt.getMilliseconds()) > 1000) {
+                if (Math.abs(databaseRouteGroup.updatedAt.getTime() - lastUpdatedAt.getTime()) > 1000) {
                     await databaseRouteGroup.destroy();
                 }
             })

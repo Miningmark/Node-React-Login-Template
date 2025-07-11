@@ -45,8 +45,9 @@ class SmartRouter {
                 if (routeGroup.description !== groupEntry.groupDescription) {
                     routeGroup.description = groupEntry.groupDescription;
                 }
+
                 routeGroup.updatedAt = new Date(Date.now());
-                routeGroup.save();
+                await routeGroup.save();
             }
 
             const permissionMiddleware = verifyPermission(groupEntry.groupName);

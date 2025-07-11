@@ -1,10 +1,10 @@
-import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
-import { ServerLogService } from "./serverLog.service.js";
-import User from "@/models/user.model.js";
-import RouteGroup from "@/models/routeGroup.model.js";
-import Permission from "@/models/permission.model.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
+import Permission from "@/models/permission.model.js";
+import RouteGroup from "@/models/routeGroup.model.js";
+import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
+import User from "@/models/user.model.js";
 import { Op } from "@sequelize/core";
+import { ServerLogService } from "./serverLog.service.js";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
