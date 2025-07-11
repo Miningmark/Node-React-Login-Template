@@ -20,8 +20,8 @@ export async function initializeSocket(accessToken) {
       console.log("Socket connected:", socket.id);
     });
 
-    socket.on("connect_error", (err) => {
-      console.error("Socket connection error:", err.message);
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
     });
 
     socket.on("disconnect", (reason) => {
