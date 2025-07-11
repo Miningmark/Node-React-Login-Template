@@ -16,9 +16,9 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    getAllPermissions = (req: Request, res: Response, next: NextFunction): void => {
+    getPermissions = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.userManagementService.getAllPermissions();
+            return await this.userManagementService.getPermissions();
         });
     };
 
@@ -38,11 +38,11 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    addUser = (req: Request, res: Response, next: NextFunction): void => {
+    createUser = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { username, email, permissionIds } = req.body;
 
-            return await this.userManagementService.addUser(username, email, permissionIds);
+            return await this.userManagementService.createUser(username, email, permissionIds);
         });
     };
 }

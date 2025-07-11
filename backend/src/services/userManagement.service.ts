@@ -40,7 +40,7 @@ export class UserManagementService {
         return jsonResponse;
     }
 
-    async getAllPermissions() {
+    async getPermissions() {
         let jsonResponse: Record<string, any> = { message: "Alle Permissions zurück gegeben" };
 
         const databasePermissions = await Permission.findAll();
@@ -122,7 +122,7 @@ export class UserManagementService {
         return jsonResponse;
     }
 
-    async addUser(username: string, email: string, permissionIds: number[]) {
+    async createUser(username: string, email: string, permissionIds: number[]) {
         //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert" };
 
