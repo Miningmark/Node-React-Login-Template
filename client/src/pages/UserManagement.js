@@ -172,98 +172,26 @@ const UserManagement = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.map((user) => (
-                          <tr key={user.id}>
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUserClick(user.id);
-                              }}
-                            >
-                              {user.username}
-                            </td>
-                            <td className="d-none d-sm-table-cell">{user.email}</td>
-                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
-                          </tr>
-                        ))}
-                        {/* //TODO: LÖSCHEN */}
-                        {filteredUsers.map((user) => (
-                          <tr key={user.id}>
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUserClick(user.id);
-                              }}
-                            >
-                              {user.username}
-                            </td>
-                            <td className="d-none d-sm-table-cell">{user.email}</td>
-                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
-                          </tr>
-                        ))}
-                        {filteredUsers.map((user) => (
-                          <tr key={user.id}>
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUserClick(user.id);
-                              }}
-                            >
-                              {user.username}
-                            </td>
-                            <td className="d-none d-sm-table-cell">{user.email}</td>
-                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
-                          </tr>
-                        ))}
-                        {filteredUsers.map((user) => (
-                          <tr key={user.id}>
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUserClick(user.id);
-                              }}
-                            >
-                              {user.username}
-                            </td>
-                            <td className="d-none d-sm-table-cell">{user.email}</td>
-                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
-                          </tr>
-                        ))}
-                        {filteredUsers.map((user) => (
-                          <tr key={user.id}>
-                            <td
-                              style={{
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                              }}
-                              onClick={() => {
-                                handleUserClick(user.id);
-                              }}
-                            >
-                              {user.username}
-                            </td>
-                            <td className="d-none d-sm-table-cell">{user.email}</td>
-                            <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                            <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
-                          </tr>
-                        ))}
-                        {/* //TODO: LÖSCHEN */}
+                        {filteredUsers
+                          .filter((user) => user.username !== "SuperAdmin")
+                          .map((user) => (
+                            <tr key={user.id}>
+                              <td
+                                style={{
+                                  cursor: "pointer",
+                                  fontWeight: "bold",
+                                }}
+                                onClick={() => {
+                                  handleUserClick(user.id);
+                                }}
+                              >
+                                {user.username}
+                              </td>
+                              <td className="d-none d-sm-table-cell">{user.email}</td>
+                              <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
+                              <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
+                            </tr>
+                          ))}
                       </tbody>
                     </Table>
                   </div>
@@ -287,12 +215,14 @@ const UserManagement = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {allPermissions.map((permission) => (
-                      <tr key={permission.id}>
-                        <td>{permission.name}</td>
-                        <td>{permission.description}</td>
-                      </tr>
-                    ))}
+                    {allPermissions
+                      .filter((permission) => permission.name !== "SuperAdmin Berechtigung")
+                      .map((permission) => (
+                        <tr key={permission.id}>
+                          <td>{permission.name}</td>
+                          <td>{permission.description}</td>
+                        </tr>
+                      ))}
                   </tbody>
                 </Table>
               ) : (

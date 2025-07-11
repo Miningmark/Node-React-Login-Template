@@ -146,20 +146,22 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions 
             <p>
               <strong>Berechtigungen:</strong>
             </p>
-            {allPermissions.map((perm) => (
-              <div key={perm.id} className="form-check mb-2">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id={`perm-${perm.id}`}
-                  checked={editedUser.permissions.some((p) => p.name === perm.name)}
-                  onChange={() => handleCheckboxChange(perm)}
-                />
-                <label className="form-check-label" htmlFor={`perm-${perm.id}`}>
-                  {perm.name}
-                </label>
-              </div>
-            ))}
+            {allPermissions
+              .filter((permission) => permission.name !== "SuperAdmin Berechtigung")
+              .map((perm) => (
+                <div key={perm.id} className="form-check mb-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id={`perm-${perm.id}`}
+                    checked={editedUser.permissions.some((p) => p.name === perm.name)}
+                    onChange={() => handleCheckboxChange(perm)}
+                  />
+                  <label className="form-check-label" htmlFor={`perm-${perm.id}`}>
+                    {perm.name}
+                  </label>
+                </div>
+              ))}
           </>
         ) : (
           <>

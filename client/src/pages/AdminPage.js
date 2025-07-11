@@ -430,31 +430,33 @@ function AdminPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredPermission.map((permission) => (
-                            <tr key={permission.id}>
-                              <td
-                                style={{
-                                  cursor: "pointer",
-                                  fontWeight: "bold",
-                                }}
-                                title={permission.description}
-                                onClick={() => setSelectedPermission(permission)}
-                              >
-                                {permission.name}
-                              </td>
-                              {allRouteGroups.map((route, index) => (
-                                <td key={index}>
-                                  <input
-                                    type="checkbox"
-                                    checked={permission.routeGroups.some(
-                                      (rg) => rg.name === route.name
-                                    )}
-                                    disabled
-                                  />
+                          {filteredPermission
+                            .filter((permission) => permission.name !== "SuperAdmin Berechtigung")
+                            .map((permission) => (
+                              <tr key={permission.id}>
+                                <td
+                                  style={{
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                  }}
+                                  title={permission.description}
+                                  onClick={() => setSelectedPermission(permission)}
+                                >
+                                  {permission.name}
                                 </td>
-                              ))}
-                            </tr>
-                          ))}
+                                {allRouteGroups.map((route, index) => (
+                                  <td key={index}>
+                                    <input
+                                      type="checkbox"
+                                      checked={permission.routeGroups.some(
+                                        (rg) => rg.name === route.name
+                                      )}
+                                      disabled
+                                    />
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
                         </tbody>
                       </Table>
                     </div>
