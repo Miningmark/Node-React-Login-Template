@@ -37,27 +37,26 @@ const CreatePermissionModal = ({
     setIsSaving(true);
     const routeGroupIds = selectedRouteGroups.map((rg) => rg.id);
 
-    const changedData = { id: permission.id };
-
-    if (name !== permission.name) {
-      changedData.name = name;
-    }
-    if (description !== permission.description) {
-      changedData.description = description;
-    }
-
-    // Vergleiche routeGroups (IDs vergleichen)
-    const originalRouteGroupIds = permission.routeGroups.map((rg) => rg.id).sort();
-    const currentRouteGroupIds = selectedRouteGroups.map((rg) => rg.id).sort();
-
-    const areRouteGroupsChanged =
-      JSON.stringify(originalRouteGroupIds) !== JSON.stringify(currentRouteGroupIds);
-
-    if (areRouteGroupsChanged) {
-      changedData.routeGroupIds = currentRouteGroupIds;
-    }
-
     if (permission) {
+      const changedData = { id: permission.id };
+
+      if (name !== permission.name) {
+        changedData.name = name;
+      }
+      if (description !== permission.description) {
+        changedData.description = description;
+      }
+
+      // Vergleiche routeGroups (IDs vergleichen)
+      const originalRouteGroupIds = permission.routeGroups.map((rg) => rg.id).sort();
+      const currentRouteGroupIds = selectedRouteGroups.map((rg) => rg.id).sort();
+
+      const areRouteGroupsChanged =
+        JSON.stringify(originalRouteGroupIds) !== JSON.stringify(currentRouteGroupIds);
+
+      if (areRouteGroupsChanged) {
+        changedData.routeGroupIds = currentRouteGroupIds;
+      }
       if (Object.keys(changedData).length === 1) {
         // Nur `id` ist enthalten
         addToast("Keine Änderungen vorgenommen", "info");

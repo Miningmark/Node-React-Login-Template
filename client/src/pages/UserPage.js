@@ -464,7 +464,7 @@ const UserPage = () => {
                     <tbody>
                       {logins.map((entry, idx) => (
                         <tr key={idx}>
-                          <td>{convertToLocalDate(entry.loginAt)}</td>
+                          <td>{convertToLocalDate(entry.loginTime)}</td>
                           <td>{entry.ipv4Address}</td>
                           <td>
                             {entry.regionName === "IP Lookup nicht erfolgreich"
