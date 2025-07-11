@@ -102,7 +102,7 @@ const UserPage = () => {
     }
     setLoadingPassword(true);
     try {
-      await axiosProtected.post("/user/changePassword", { currentPassword, newPassword });
+      await axiosProtected.post("/user/updatePassword", { currentPassword, newPassword });
 
       addToast("Passwort änderung erfolgreich.", "success");
       setAccessToken("");
@@ -124,7 +124,7 @@ const UserPage = () => {
     }
     setLoadingEmail(true);
     try {
-      await axiosProtected.post("/user/changeEmail", { newEmail });
+      await axiosProtected.post("/user/updateEmail", { newEmail });
 
       addToast("E-Mail-Adresse erfolgreich aktualisiert.", "success");
       setNewEmail("");
@@ -146,7 +146,7 @@ const UserPage = () => {
     }
     setLoadingUsername(true);
     try {
-      await axiosProtected.post("/user/changeUsername", { newUsername });
+      await axiosProtected.post("/user/updateUsername", { newUsername });
 
       addToast("Benutzername erfolgreich aktualisiert.", "success");
       setAccessToken("");

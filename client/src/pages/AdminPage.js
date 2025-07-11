@@ -35,7 +35,7 @@ function AdminPage() {
 
   const [showCreateUserNotificationModal, setShowCreateUserNotificationModal] = useState(false);
   const [userNotifications, setUserNotifications] = useState(null);
-  const [selectedUserNotification,setSelectedUserNotification] = useState(null);
+  const [selectedUserNotification, setSelectedUserNotification] = useState(null);
   const [loadingUserNotifications, setLoadingUserNotifications] = useState(false);
 
   const axiosProtected = useAxiosProtected();
@@ -70,7 +70,7 @@ function AdminPage() {
     setLoadingServerLogPart(true);
     try {
       const response = await axiosProtected.post(
-        `/adminPage/getFilteredServerLog/50-0`,
+        `/adminPage/getFilteredServerLogs/50-0`,
         activeFilters
       );
       const newLogs = response.data.serverLogs || [];
@@ -104,7 +104,7 @@ function AdminPage() {
   const fetchServerLogs = async (offset = 0) => {
     setLoadingServerLogPart(true);
     try {
-      const { data } = await axiosProtected.get(`/adminPage/getServerLog/50-${offset}`);
+      const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-${offset}`);
       const logs = data?.serverLogs || [];
 
       setServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
@@ -122,7 +122,7 @@ function AdminPage() {
   const refreshServerLogs = async () => {
     setLoadingServerLogPart(true);
     try {
-      const { data } = await axiosProtected.get(`/adminPage/getServerLog/50-0`);
+      const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-0`);
       const newLogs = data?.serverLogs || [];
 
       setServerLog((prev = []) => {
@@ -145,7 +145,7 @@ function AdminPage() {
     setLoadingServerLogPart(true);
     try {
       const { data } = await axiosProtected.post(
-        `/adminPage/getFilteredServerLog/50-${offset}`,
+        `/adminPage/getFilteredServerLogs/50-${offset}`,
         filters
       );
       const logs = data?.serverLogs || [];
@@ -177,10 +177,10 @@ function AdminPage() {
       if (checkAccess(["adminPagePermissionsRead", "adminPagePermissionsWrite"])) {
         promises.push(
           axiosProtected
-            .get(`/adminPage/getAllRouteGroups`)
+            .get(`/adminPage/getRouteGroups`)
             .then((res) => setAllRouteGroups(res?.data?.routeGroups || [])),
           axiosProtected
-            .get(`/adminPage/getAllPermissionsWithRouteGroups`)
+            .get(`/adminPage/getPermissionsWithRouteGroups`)
             .then((res) => setAllPermissions(res?.data?.permissions || []))
         );
       }
@@ -464,13 +464,9 @@ function AdminPage() {
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </InputGroup>
-                      <button
-                          className="btn btn-primary"
-                          type="button"
-                          onClick={() => {}}
-                        >
-                          Suchen
-                        </button>
+                      <button className="btn btn-primary" type="button" onClick={() => {}}>
+                        Suchen
+                      </button>
                     </div>
 
                     <div
@@ -503,7 +499,7 @@ function AdminPage() {
                           ))}
                         </tbody>
                       </Table>
-                      { /* //TODO: Button ändern auf notifications                 */}
+                      {/* //TODO: Button ändern auf notifications                 */}
                       <div className="text-center my-3">
                         <button
                           className="btn btn-primary"
@@ -531,8 +527,8 @@ function AdminPage() {
                 ) : (
                   <TableLoadingAnimation />
                 )}
-                </Tab>
-            ):null}
+              </Tab>
+            ) : null}
           </Tabs>
         </div>
       </Container>

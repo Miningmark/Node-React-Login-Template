@@ -30,7 +30,7 @@ function AccountActivating() {
       hasActivated = true;
 
       try {
-        await axiosPublic.post("/user/accountActivation", { token });
+        await axiosPublic.post("/auth/accountActivation", { token });
 
         addToast("Account erfolgreich aktiviert", "success");
         setStatus("success");

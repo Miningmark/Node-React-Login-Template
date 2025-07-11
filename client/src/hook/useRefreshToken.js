@@ -10,7 +10,7 @@ const useRefreshToken = () => {
 
   const refreshAccessToken = async () => {
     try {
-      const response = await axiosPublic.get("/user/refreshAccessToken", {
+      const response = await axiosPublic.get("/auth/refreshAccessToken", {
         withCredentials: true,
       });
       login(response.data.accessToken);

@@ -61,7 +61,7 @@ function ResetPassword() {
     }
 
     try {
-      await axiosPublic.post("/user/passwordResetOrReactivation", {
+      await axiosPublic.post("/auth/handlePasswordRecovery", {
         token,
         password,
       });

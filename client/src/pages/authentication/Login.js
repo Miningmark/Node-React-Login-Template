@@ -38,7 +38,7 @@ function Login() {
 
     try {
       const res = await axiosPublic.post(
-        "/user/login",
+        "/auth/login",
         {
           username: name,
           password,
@@ -64,7 +64,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      await axiosPublic.post("/user/requestPasswordReset", {
+      await axiosPublic.post("/auth/requestPasswordReset", {
         usernameOrEmail: name,
       });
       setIsFlipped(false);
