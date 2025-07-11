@@ -15,7 +15,7 @@ export class AdminPageService {
     async getServerLogs(limit?: number, offset?: number) {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten ServerLogs zurück gegeben", logResponse: false };
 
-        const databaseServerLogs = await ServerLog.findAll({ ...(limit && offset ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
+        const databaseServerLogs = await ServerLog.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.serverLogCount = await ServerLog.count();
         jsonResponse.serverLogs = await this.serverLogService.generateJSONResponse(databaseServerLogs);

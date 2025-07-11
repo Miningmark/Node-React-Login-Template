@@ -21,7 +21,7 @@ export class UserManagementService {
     async getUsers(limit?: number, offset?: number) {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten Benutzer zurück gegeben" };
 
-        const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit && offset ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
+        const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.users = databaseUsers.map((databaseUser) => {
             return {
