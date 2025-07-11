@@ -7,7 +7,7 @@ import { ClientToServerEvents, ServerToClientEvents } from "@/sockets/types.js";
 import { ValidationError } from "@sequelize/core";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Server } from "socket.io";
-import { registerUserSocket } from "./user.socket";
+import { registerUserSocket } from "@/sockets/user.socket.js";
 
 export class SocketService {
     private static instance: SocketService;
