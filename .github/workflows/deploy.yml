@@ -33,7 +33,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           TARGET_DIR: ${{ secrets.TARGET_DIR }}
           FRONTEND_NAME: client
-          BACKEND_NAME: server
+          BACKEND_NAME: backend
           FRONTEND_PORT: ${{ secrets.PORT_FRONTEND }}
           BACKEND_PORT: ${{ secrets.PORT_BACKEND }}
         run: |
