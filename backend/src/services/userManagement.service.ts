@@ -84,8 +84,9 @@ export class UserManagementService {
 
         if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ForbiddenError("SuperAdmin kann nicht bearbeitet werden");
 
-        const onlyPermissionIds = username === undefined && email === undefined && isActive === undefined && isDisabled === undefined;
-        if (!onlyPermissionIds && databaseUser.isActive === false && databaseUserTokens.length !== 0) throw new ForbiddenError("Es können nur Rechte editiert solange der Registrierungsprozess nicht abgeschlossen ist");
+        const onlyPermissionIds = username === undefined && email === undefined && isActive === undefined;
+        if (!onlyPermissionIds && databaseUser.isActive === false && databaseUserTokens.length !== 0)
+            throw new ForbiddenError("Es können nur Rechte editiert und der Benutzer gesperrt werden solange der Registrierungsprozess nicht abgeschlossen ist");
 
         if (username !== undefined) {
             //TODO: SocketIO inform single user over his new username
