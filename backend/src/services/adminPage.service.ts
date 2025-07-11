@@ -53,7 +53,7 @@ export class AdminPageService {
             };
         });
 
-        jsonResponse.filterOptions.levels = Object.values(ServerLogTypes);
+        jsonResponse.filterOptions.types = Object.values(ServerLogTypes);
 
         return jsonResponse;
     }
