@@ -5,20 +5,20 @@ import { sequelize } from "@/config/sequelize.js";
 import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
+import { SocketService } from "@/sockets/socket.service.js";
 import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
-//import { Server, Socket } from "socket.io";
 import http from "http";
-//import { setupSocketIO } from "@/sockets/index.js";
+import { Server } from "socket.io";
 
 const httpServer = http.createServer(app);
-/*const io = new Server(httpServer, {
+
+const socketService = SocketService.getInstance();
+const io = new Server(httpServer, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
     }
 });
-
-setupSocketIO(io);*/
 
 httpServer.listen(ENV.BACKEND_PORT, async () => {
     try {
@@ -37,6 +37,9 @@ httpServer.listen(ENV.BACKEND_PORT, async () => {
         await generateSuperAdminPermission();
 
         await scheduleAllCronJobs();
+
+        socketService.init(io);
+        await socketService.setup();
     } catch (error) {
         consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
         process.exit(1);

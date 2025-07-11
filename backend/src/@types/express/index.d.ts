@@ -16,3 +16,10 @@ declare module "jsonwebtoken" {
         routeGroups: string[];
     }
 }
+
+declare module "socket.io" {
+    export interface Socket {
+        userId: number;
+        routeGroups: string[];
+    }
+}
