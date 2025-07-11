@@ -52,6 +52,7 @@ function Login() {
       console.log("RouteGroups:", res.data.routeGroups);
       login(res.data.accessToken, res.data.username, res.data.routeGroups);
       addToast("Login erfolgreich", "success");
+
       navigate("/dashboard");
     } catch (error) {
       setPassword("");
