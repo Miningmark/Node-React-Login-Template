@@ -17,10 +17,21 @@ import PublicRoute from "./components/PublicRoute";
 import { useContext, useEffect } from "react";
 import UserManagement from "./pages/UserManagement";
 import useAxiosProtected from "./hook/useAxiosProtected";
+import { SocketProvider } from "contexts/SocketProvider";
 
 function AppWrapper() {
   return (
     <AuthProvider>
+      <InnerProviders />
+    </AuthProvider>
+  );
+}
+
+function InnerProviders() {
+  const { accessToken } = useContext(AuthContext);
+
+  return (
+    <SocketProvider accessToken={accessToken}>
       <ToastProvider>
         <ThemeProvider>
           <BrowserRouter>
@@ -28,7 +39,7 @@ function AppWrapper() {
           </BrowserRouter>
         </ThemeProvider>
       </ToastProvider>
-    </AuthProvider>
+    </SocketProvider>
   );
 }
 
@@ -46,6 +57,7 @@ function App() {
 
   useEffect(() => {
     if (!accessToken) return;
+
     const controller = new AbortController();
     const signal = controller.signal;
     let isMounted = true;
