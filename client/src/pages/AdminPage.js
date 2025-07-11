@@ -12,6 +12,31 @@ import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
 
 import "components/adminPage/adminPage.css";
 
+function clearFilters(filters) {
+  const clearedFilters = { ...filters };
+  Object.keys(clearedFilters).forEach((key, index) => {
+    console.log("test", index, key, clearedFilters[key]);
+    if (
+      clearedFilters[key] === "" ||
+      clearedFilters[key] === null ||
+      clearedFilters[key] === undefined ||
+      clearedFilters[key].length === 0
+    ) {
+      delete clearedFilters[key];
+    } else {
+      if (key === "createdAtFrom" || key === "createdAtTo") {
+        clearedFilters[key] = new Date(clearedFilters[key]).toISOString();
+      }
+      if (key === "userIds") {
+        clearedFilters[key] = clearedFilters[key].map((id) => Number(id));
+      }
+    }
+  });
+
+  console.log("Cleared Filters:", clearedFilters);
+  return clearedFilters;
+}
+
 function AdminPage() {
   const [serverLog, setServerLog] = useState(null);
   const [filteredServerLog, setFilteredServerLog] = useState(null);
@@ -71,7 +96,7 @@ function AdminPage() {
     try {
       const response = await axiosProtected.post(
         `/adminPage/getFilteredServerLogs/50-0`,
-        activeFilters
+        clearFilters(activeFilters)
       );
       const newLogs = response.data.serverLogs || [];
 
@@ -143,10 +168,11 @@ function AdminPage() {
 
   const fetchFilteredLogs = async (filters, offset = 0) => {
     setLoadingServerLogPart(true);
+
     try {
       const { data } = await axiosProtected.post(
         `/adminPage/getFilteredServerLogs/50-${offset}`,
-        filters
+        clearFilters(filters)
       );
       const logs = data?.serverLogs || [];
 
@@ -207,6 +233,7 @@ function AdminPage() {
   }
 
   function handleRefreshLogs() {
+    console.log("activeFilters", activeFilters);
     activeFilters ? fetchFilteredLogs(activeFilters, 0) : refreshServerLogs();
   }
 
@@ -294,7 +321,7 @@ function AdminPage() {
                           <tr className="border">
                             <th className="text-center">ID</th>
                             <th className="text-center">Zeitstempel</th>
-                            <th className="text-center">Level</th>
+                            <th className="text-center">Type</th>
                             <th className="text-center">Nachricht</th>
                           </tr>
                         </thead>
@@ -307,9 +334,9 @@ function AdminPage() {
                             >
                               <td>{log.id}</td>
                               <td className="text-center">
-                                {convertToLocalTimeStamp(log.timestamp)}
+                                {convertToLocalTimeStamp(log.createdAt)}
                               </td>
-                              <td className="text-center">{log.level}</td>
+                              <td className="text-center">{log.type}</td>
                               <td className="text-center">{log.message}</td>
                             </tr>
                           ))}
