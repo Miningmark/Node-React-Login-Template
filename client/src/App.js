@@ -17,7 +17,7 @@ import PublicRoute from "./components/PublicRoute";
 import { useContext, useEffect } from "react";
 import UserManagement from "./pages/UserManagement";
 import useAxiosProtected from "./hook/useAxiosProtected";
-import { SocketProvider } from "contexts/SocketProvider";
+import { SocketProvider, SocketContext } from "contexts/SocketProvider";
 
 function AppWrapper() {
   return (
@@ -49,6 +49,17 @@ function App() {
   const hideNavBar = publicPaths.includes(location.pathname);
 
   const { setUsername, setRouteGroups, username, accessToken } = useContext(AuthContext);
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("user:watchList");
+
+      socket.on("user:update", (data) => {
+        console.log(data);
+      });
+    }
+  }, [socket]);
 
   const axiosProtected = useAxiosProtected();
 

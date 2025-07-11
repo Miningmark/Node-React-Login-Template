@@ -1,11 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { initializeSocket, getSocket } from "util/socket";
 
 export const SocketContext = createContext(null);
 
 export const SocketProvider = ({ accessToken, children }) => {
   const [socket, setSocket] = useState(null);
-  console.log("Initializing socket with accessToken:", accessToken);
 
   useEffect(() => {
     if (accessToken) {
