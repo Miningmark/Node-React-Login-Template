@@ -66,11 +66,11 @@ jobs:
               echo "Restarting backend: $BACKEND_NAME"
               pm2 restart $BACKEND_NAME
             else
-            cd ./dist/src
+            cd dist/src
               echo "Starting backend: $BACKEND_NAME"
               pm2 start index.js --name $BACKEND_NAME -- --port $BACKEND_PORT
             fi
 
             pm2 save
-            
+
           EOF
