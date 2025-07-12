@@ -8,6 +8,10 @@
   table-layout: fixed;
   width: max-content;
   min-width: 100%;
+  position: relative;
+  overflow-y: auto;
+  border-collapse: separate; /* Don't collapse */
+  border-spacing: 0;
 }
 
 /* Sticky Header */
@@ -43,6 +47,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: 1px solid #dee2e6;
 }
 .resizable-table td {
   padding: 0.5rem 1rem;

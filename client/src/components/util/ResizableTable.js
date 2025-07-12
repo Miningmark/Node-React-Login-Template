@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import "./css/ResizableTable.css";
 import Table from "react-bootstrap/Table";
 
-const ResizableTable = ({ columns, children }) => {
+const ResizableTable = ({ columns, tableHeight = 300, children }) => {
   const tableRef = useRef();
 
   useEffect(() => {
@@ -43,13 +43,30 @@ const ResizableTable = ({ columns, children }) => {
   }, []);
 
   return (
-    <div className="resizable-table-wrapper">
-      <Table striped bordered hover ref={tableRef} className="table resizable-table mb-0">
-        <thead className="sticky-header">
+    <div
+      className="resizable-table-wrapper"
+      style={{ height: `${tableHeight}`, overflow: "auto", position: "relative" }}
+    >
+      <Table striped bordered hover ref={tableRef} className=" resizable-table mb-0">
+        <thead
+          className="border"
+          style={{
+            position: "sticky",
+            top: "0px",
+            zIndex: 2,
+          }}
+        >
           <tr>
             {columns.map((col, index) => (
-              <th className="text-center" key={index} style={{ minWidth: "70px" }}>
-                {col}
+              <th
+                className="text-center "
+                key={index}
+                style={{
+                  minWidth: "50px",
+                  width: col.width ? `${col.width}px` : undefined,
+                }}
+              >
+                {col.title}
               </th>
             ))}
           </tr>
