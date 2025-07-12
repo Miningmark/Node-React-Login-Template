@@ -20,186 +20,197 @@ import useAxiosProtected from "./hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
 
 function AppWrapper() {
-    return (
-        <AuthProvider>
-            <InnerProviders />
-        </AuthProvider>
-    );
+  return (
+    <AuthProvider>
+      <InnerProviders />
+    </AuthProvider>
+  );
 }
 
 function InnerProviders() {
-    const { accessToken } = useContext(AuthContext);
+  const { accessToken } = useContext(AuthContext);
 
-    return (
-        <SocketProvider accessToken={accessToken}>
-            <ToastProvider>
-                <ThemeProvider>
-                    <BrowserRouter>
-                        <App />
-                    </BrowserRouter>
-                </ThemeProvider>
-            </ToastProvider>
-        </SocketProvider>
-    );
+  return (
+    <SocketProvider accessToken={accessToken}>
+      <ToastProvider>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ThemeProvider>
+      </ToastProvider>
+    </SocketProvider>
+  );
 }
 
 function App() {
-    const location = useLocation();
-    const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
-    const hideNavBar = publicPaths.includes(location.pathname);
+  const location = useLocation();
+  const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
+  const hideNavBar = publicPaths.includes(location.pathname);
 
-    const { setUsername, setRouteGroups, username, accessToken } = useContext(AuthContext);
+  const { setUsername, setRouteGroups, username, routeGroups, accessToken } =
+    useContext(AuthContext);
 
-    const { socket } = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
 
-    useEffect(() => {
-        if (socket) {
-            setTimeout(() => {
-                console.log("EMIT");
-                socket.emit("user:watchList");
+  useEffect(() => {
+    if (socket) {
+      setTimeout(() => {
+        console.log("EMIT");
+        socket.emit("user:watchList");
 
-                socket.on("user:update", (data) => {
-                    console.log(data);
-                });
-            }, 1000);
+        socket.on("user:update", (data) => {
+          console.log(data);
+        });
+      }, 1000);
+    }
+  }, [socket]);
+
+  const axiosProtected = useAxiosProtected();
+
+  console.log("Username:", username);
+  console.log("RouteGroups:", useContext(AuthContext).routeGroups);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    if (username && routeGroups) return;
+
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let isMounted = true;
+
+    const fetchUser = async () => {
+      console.log("Fetching user data...");
+      try {
+        const [userRes, routesRes] = await Promise.all([
+          axiosProtected.get("/user/getUsername", { signal }),
+          axiosProtected.get("/user/getRouteGroups", { signal }),
+        ]);
+
+        if (isMounted) {
+          console.log("User data fetched successfully:");
+          if (userRes.data?.username) setUsername(userRes.data.username);
+          if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
         }
-    }, [socket]);
+      } catch (err) {
+        if (err.name === "CanceledError") {
+          console.log("Anfrage abgebrochen");
+        } else {
+          console.warn("Kein gültiger Login gefunden.");
+        }
+      }
+    };
 
-    const axiosProtected = useAxiosProtected();
+    if (!username) {
+      fetchUser();
+    }
 
-    console.log("Username:", username);
-    console.log("RouteGroups:", useContext(AuthContext).routeGroups);
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [accessToken]);
 
-    useEffect(() => {
-        if (!accessToken) return;
+  return (
+    <>
+      {!hideNavBar && <NavBar />}
+      <Routes>
+        {/* Öffentlich, aber geschützt wenn bereits eingeloggt */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/password-reset"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/account-activation"
+          element={
+            <PublicRoute>
+              <AccountActivating />
+            </PublicRoute>
+          }
+        />
 
-        const controller = new AbortController();
-        const signal = controller.signal;
-        let isMounted = true;
-
-        const fetchUser = async () => {
-            console.log("Fetching user data...");
-            try {
-                const [userRes, routesRes] = await Promise.all([axiosProtected.get("/user/getUsername", { signal }), axiosProtected.get("/user/getRouteGroups", { signal })]);
-
-                if (isMounted) {
-                    console.log("User data fetched successfully:");
-                    if (userRes.data?.username) setUsername(userRes.data.username);
-                    if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
-                }
-            } catch (err) {
-                if (err.name === "CanceledError") {
-                    console.log("Anfrage abgebrochen");
-                } else {
-                    console.warn("Kein gültiger Login gefunden.");
-                }
+        {/* Nur anzeigen, wenn Registrierung aktiv ist */}
+        {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
             }
-        };
+          />
+        ) : null}
 
-        if (!username) {
-            fetchUser();
-        }
+        {/* Authentifizierte Routen */}
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth allowedRouteGroups={[]}>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
 
-        return () => {
-            isMounted = false;
-            controller.abort();
-        };
-    }, [accessToken]);
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth
+              allowedRouteGroups={[
+                "adminPageServerLogRead",
+                "adminPagePermissionsRead",
+                "adminPagePermissionsWrite",
+              ]}
+            >
+              <AdminPage />
+            </RequireAuth>
+          }
+        />
 
-    return (
-        <>
-            {!hideNavBar && <NavBar />}
-            <Routes>
-                {/* Öffentlich, aber geschützt wenn bereits eingeloggt */}
-                <Route
-                    path="/"
-                    element={
-                        <PublicRoute>
-                            <Login />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/login"
-                    element={
-                        <PublicRoute>
-                            <Login />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/password-reset"
-                    element={
-                        <PublicRoute>
-                            <ResetPassword />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/account-activation"
-                    element={
-                        <PublicRoute>
-                            <AccountActivating />
-                        </PublicRoute>
-                    }
-                />
+        <Route
+          path="/usermanagement"
+          element={
+            <RequireAuth allowedRouteGroups={["userManagementRead"]}>
+              <UserManagement />
+            </RequireAuth>
+          }
+        />
 
-                {/* Nur anzeigen, wenn Registrierung aktiv ist */}
-                {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
-                    <Route
-                        path="/register"
-                        element={
-                            <PublicRoute>
-                                <Register />
-                            </PublicRoute>
-                        }
-                    />
-                ) : null}
+        <Route
+          path="/userpage"
+          element={
+            <RequireAuth allowedRouteGroups={[]}>
+              <UserPage />
+            </RequireAuth>
+          }
+        />
 
-                {/* Authentifizierte Routen */}
-                <Route
-                    path="/dashboard"
-                    element={
-                        <RequireAuth allowedRouteGroups={[]}>
-                            <Dashboard />
-                        </RequireAuth>
-                    }
-                />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
-                <Route
-                    path="/admin"
-                    element={
-                        <RequireAuth allowedRouteGroups={["adminPageServerLogRead", "adminPagePermissionsRead", "adminPagePermissionsWrite"]}>
-                            <AdminPage />
-                        </RequireAuth>
-                    }
-                />
-
-                <Route
-                    path="/usermanagement"
-                    element={
-                        <RequireAuth allowedRouteGroups={["userManagementRead"]}>
-                            <UserManagement />
-                        </RequireAuth>
-                    }
-                />
-
-                <Route
-                    path="/userpage"
-                    element={
-                        <RequireAuth allowedRouteGroups={[]}>
-                            <UserPage />
-                        </RequireAuth>
-                    }
-                />
-
-                <Route path="/unauthorized" element={<Unauthorized />} />
-
-                {/* Catch-all route for 404 Not Found */}
-                <Route path="*" element={<NotFound />} />
-            </Routes>
-        </>
-    );
+        {/* Catch-all route for 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
 }
 
 export default AppWrapper;
