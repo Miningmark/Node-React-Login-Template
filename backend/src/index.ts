@@ -56,6 +56,12 @@ const shutdown = async () => {
 
     app.disable("connection");
 
+    SocketService.getInstance()
+        .getIO()
+        .sockets.sockets.forEach((socket) => {
+            socket.disconnect();
+        });
+
     httpServer.close(async () => {
         try {
             await sequelize.close();
