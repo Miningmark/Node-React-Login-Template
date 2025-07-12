@@ -3,7 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 
-const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) => {
+const CreateUserModal = ({ show, handleClose, allPermissions /*  onUserCreated */ }) => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
@@ -45,11 +45,13 @@ const CreateUserModal = ({ show, handleClose, allPermissions, onUserCreated }) =
         permissionIds: newUser.permissions.map((p) => p.id),
       };
 
-      const response = await axiosProtected.post("/userManagement/createUser", payload);
+      /*const response = */ await axiosProtected.post("/userManagement/createUser", payload);
       addToast("User erfolgreich erstellt", "success");
 
+      /* 
       if (onUserCreated)
         onUserCreated({ ...payload, id: response.data.userId, permissions: newUser.permissions });
+      */
       handleClose();
     } catch (error) {
       addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
