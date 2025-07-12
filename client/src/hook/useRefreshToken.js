@@ -9,18 +9,29 @@ const useRefreshToken = () => {
   const { login } = useContext(AuthContext);
 
   const refreshAccessToken = async () => {
-    try {
-      const response = await axiosPublic.get("/auth/refreshAccessToken", {
-        withCredentials: true,
-      });
-      login(response.data.accessToken);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let isMounted = true;
 
-      return response;
+    try {
+      if (isMounted) {
+        const response = await axiosPublic.get("/auth/refreshAccessToken", {
+          signal,
+          withCredentials: true,
+        });
+        login(response.data.accessToken);
+
+        return response;
+      }
     } catch (err) {
       if (err?.response?.status === 403 || err?.response?.status === 401) {
         navigate("/login", { state: { from: location.pathname }, replace: true });
       }
     }
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   };
   return refreshAccessToken;
 };
