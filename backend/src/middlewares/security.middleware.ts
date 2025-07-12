@@ -64,7 +64,7 @@ export const setupSecurityMiddleware = (app: Express) => {
             origin(origin, callback) {
                 if (ENV.NODE_ENV !== "production") {
                     callback(null, true);
-                } else if (origin !== undefined && ENV.CORS_ALLOWED_ORIGINS.indexOf(origin) !== 1) {
+                } else if (origin !== undefined && ENV.CORS_ALLOWED_ORIGINS.includes(origin)) {
                     callback(null, true);
                 } else {
                     console.log(origin);
