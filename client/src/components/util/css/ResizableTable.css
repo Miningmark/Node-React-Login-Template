@@ -1,0 +1,55 @@
+.resizable-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+}
+
+.resizable-table {
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Sticky Header */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Resizer handle */
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  background-color: transparent;
+  z-index: 2;
+}
+
+.resizer:hover {
+  background-color: #ccc;
+}
+
+/* Responsive typography and spacing */
+.resizable-table th {
+  padding: 0.5rem 1rem;
+  font-size: clamp(0.9rem, 1vw, 1.2rem);
+  font-weight: bold;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.resizable-table td {
+  padding: 0.5rem 1rem;
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}

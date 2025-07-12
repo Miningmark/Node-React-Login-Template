@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { convertToLocalDate } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
 import { ThemeContext } from "contexts/ThemeContext";
-import { Table } from "react-bootstrap";
+import Table from "react-bootstrap/Table";
+import ResizableTable from "components/util/ResizableTable";
+import TableLoadingAnimation from "components/TableLoadingAnimation";
+import "components/util/css/ResizableTable.css";
 
 import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
 import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
@@ -450,20 +453,12 @@ const UserPage = () => {
             <div className="card-header fw-bold">Letzte Logins</div>
             <div className="card-body">
               {loadingLogins ? (
-                <div className="d-flex justify-content-center py-3">
-                  <div className="spinner-border text-primary" role="status" aria-hidden="true" />
-                </div>
-              ) : logins.length > 0 ? (
-                <div className="table-responsive">
-                  <Table striped bordered hover className="mb-0">
-                    <thead>
-                      <tr>
-                        <th scope="col">Zeitpunkt</th>
-                        <th scope="col">IPv4-Adresse</th>
-                        <th scope="col">Region / Land</th>
-                        <th scope="col">Erfolgreich</th>
-                      </tr>
-                    </thead>
+                <TableLoadingAnimation />
+              ) : (
+                <>
+                  <ResizableTable
+                    columns={["Zeitpunkt", "IPv4-Adresse", "Region / Land", "Erfolgreich"]}
+                  >
                     <tbody>
                       {logins.map((entry, idx) => (
                         <tr key={idx}>
@@ -478,10 +473,8 @@ const UserPage = () => {
                         </tr>
                       ))}
                     </tbody>
-                  </Table>
-                </div>
-              ) : (
-                <p className="text-muted">Keine Login-Daten verfügbar.</p>
+                  </ResizableTable>
+                </>
               )}
             </div>
           </div>
