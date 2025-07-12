@@ -68,11 +68,13 @@ export class AdminPageService {
                 id: databasePermission.id,
                 name: databasePermission.name,
                 description: databasePermission.description,
-                routeGroups: databasePermission.routeGroups.map((databaseRouteGroup) => ({
-                    id: databaseRouteGroup.id,
-                    name: databaseRouteGroup.name,
-                    description: databaseRouteGroup.description
-                }))
+                routeGroups: databasePermission.routeGroups
+                    ? databasePermission.routeGroups.map((databaseRouteGroup) => ({
+                          id: databaseRouteGroup.id,
+                          name: databaseRouteGroup.name,
+                          description: databaseRouteGroup.description
+                      }))
+                    : []
             };
         });
 
@@ -116,7 +118,6 @@ export class AdminPageService {
 
         const databasePermission = await Permission.findOne({ where: { id: id } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser Id");
-        console.log(databasePermission.name);
         if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht bearbeitet werden");
 
         if (name !== undefined) {

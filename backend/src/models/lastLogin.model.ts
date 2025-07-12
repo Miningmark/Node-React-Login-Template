@@ -1,14 +1,5 @@
 import User from "@/models/user.model.js";
-import {
-    BelongsToGetAssociationMixin,
-    BelongsToSetAssociationMixin,
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-    NonAttribute
-} from "@sequelize/core";
+import { BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "@sequelize/core";
 import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
 @Table({
@@ -52,7 +43,7 @@ class LastLogin extends Model<InferAttributes<LastLogin>, InferCreationAttribute
     @NotNull
     declare successfully: CreationOptional<boolean>;
 
-    declare user: NonAttribute<User>;
+    declare user?: NonAttribute<User>;
 
     declare getUser: BelongsToGetAssociationMixin<User>;
     declare setUser: BelongsToSetAssociationMixin<User, number>;

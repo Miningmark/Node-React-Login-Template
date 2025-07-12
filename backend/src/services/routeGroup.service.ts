@@ -9,9 +9,11 @@ export class RouteGroupService {
         if (userPermissions === null) return routeGroupsArray;
 
         userPermissions.map((userPermission) => {
-            userPermission.routeGroups.map((routeGroup) => {
-                routeGroupsArray.push(routeGroup.name);
-            });
+            userPermission.routeGroups
+                ? userPermission.routeGroups.map((routeGroup) => {
+                      routeGroupsArray.push(routeGroup.name);
+                  })
+                : [];
         });
 
         return routeGroupsArray;
