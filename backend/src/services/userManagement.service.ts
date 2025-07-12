@@ -134,7 +134,7 @@ export class UserManagementService {
 
         const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
 
-        const databaseUser = await User.create({ username: username, email: email, password: "" }, { include: { model: Permission } });
+        const databaseUser = await User.create({ username: username, email: email, password: "" });
         await databaseUser.setPermissions(databasePermissions);
         databaseUser.permissions = await databaseUser.getPermissions();
 

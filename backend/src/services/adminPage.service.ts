@@ -118,7 +118,6 @@ export class AdminPageService {
 
         const databasePermission = await Permission.findOne({ where: { id: id } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser Id");
-        console.log(databasePermission.name);
         if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht bearbeitet werden");
 
         if (name !== undefined) {
