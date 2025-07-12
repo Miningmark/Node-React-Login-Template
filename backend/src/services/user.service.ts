@@ -121,14 +121,14 @@ export class UserService {
         return jsonResponse;
     }
 
-    async generateJSONUserResponse(databaseUser: User): Promise<Record<string, any>> {
+    generateJSONUserResponse(databaseUser: User): Record<string, any> {
         return {
             id: databaseUser.id,
             username: databaseUser.username,
             email: databaseUser.email,
             isActive: databaseUser.isActive,
             isDisabled: databaseUser.isDisabled,
-            permissions: databaseUser.permissions.map((databasePermission) => ({
+            permissions: databaseUser.permissions?.map((databasePermission) => ({
                 id: databasePermission.id,
                 name: databasePermission.name
             }))
