@@ -51,11 +51,11 @@ const UserManagement = () => {
       );
     };
 
-    socket.on("listen:users:watchlist", handleUserAdd);
+    socket.on("listen:users:watchList", handleUserAdd);
     socket.on("users:update", handleUserUpdate);
 
     return () => {
-      socket.off("users:create", handleUserAdd);
+      socket.off("listen:users:watchList", handleUserAdd);
       socket.off("users:update", handleUserUpdate);
     };
   }, [socket]);
