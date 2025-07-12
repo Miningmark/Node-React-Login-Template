@@ -3,9 +3,21 @@ import { ClientToServerEvents, ServerToClientEvents } from "@/sockets/types.js";
 import { Socket } from "socket.io";
 
 export const registerUserSocket = (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>) => {
-    socket.on("user:watchList", () => {
+    socket.on("subscribe:users:watchList", () => {
+        if (socket.routeGroups.includes(UserManagementRouteGroups.USER_MANAGEMENT_READ.groupName)) {
+            socket.join("listen:users:watchList");
+        }
+    });
+
+    /*socket.on("user:watchList", () => {
         if (socket.routeGroups.includes(UserManagementRouteGroups.USER_MANAGEMENT_READ.groupName)) {
             socket.join("user:list");
         }
-    });
+    });*/
+
+    /*socket.on("user:watchList", () => {
+        if (socket.routeGroups.includes(UserManagementRouteGroups.USER_MANAGEMENT_READ.groupName)) {
+            socket.join("user:list");
+        }
+    });*/
 };

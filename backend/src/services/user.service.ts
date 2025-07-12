@@ -66,8 +66,7 @@ export class UserService {
         const databaseUser = await User.findOne({ where: { id: userId } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase())
-            throw new ValidationError("Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!");
+        if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ValidationError("Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!");
 
         const passwordMatching = await bcrypt.compare(currentPassword, databaseUser.password);
         if (passwordMatching === false) throw new ValidationError("Passwörter stimmt nicht überein");
@@ -120,5 +119,19 @@ export class UserService {
         }));
 
         return jsonResponse;
+    }
+
+    async generateJSONUserResponse(databaseUser: User): Promise<Record<string, any>> {
+        return {
+            id: databaseUser.id,
+            username: databaseUser.username,
+            email: databaseUser.email,
+            isActive: databaseUser.isActive,
+            isDisabled: databaseUser.isDisabled,
+            permissions: databaseUser.permissions.map((databasePermission) => ({
+                id: databasePermission.id,
+                name: databasePermission.name
+            }))
+        };
     }
 }
