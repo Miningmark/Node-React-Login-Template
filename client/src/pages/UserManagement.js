@@ -34,7 +34,8 @@ const UserManagement = () => {
     socket.emit("subscribe:users:watchList");
 
     const handleUserAdd = (data) => {
-      setUsers((prevUsers) => [...prevUsers, data]);
+      console.log("New user added:", data);
+      //setUsers((prevUsers) => [...prevUsers, data]);
     };
 
     const handleUserUpdate = (updatedUser) => {
@@ -50,7 +51,7 @@ const UserManagement = () => {
       );
     };
 
-    socket.on("users:create", handleUserAdd);
+    socket.on("listen:users:watchlist", handleUserAdd);
     socket.on("users:update", handleUserUpdate);
 
     return () => {

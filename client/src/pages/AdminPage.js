@@ -9,6 +9,7 @@ import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
+import ResizableTable from "components/util/ResizableTable";
 
 import "components/adminPage/adminPage.css";
 
@@ -320,15 +321,7 @@ function AdminPage() {
                       className="border"
                       style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
                     >
-                      <Table striped bordered hover fixed className="mb-0">
-                        <thead className="border" style={{ position: "sticky", top: 0, zIndex: 1 }}>
-                          <tr className="border">
-                            <th className="text-center">ID</th>
-                            <th className="text-center">Zeitstempel</th>
-                            <th className="text-center">Type</th>
-                            <th className="text-center">Nachricht</th>
-                          </tr>
-                        </thead>
+                      <ResizableTable columns={["ID", "Zeitstempel", "Type", "Nachricht"]}>
                         <tbody>
                           {(activeFilters ? filteredServerLog : serverLog)?.map((log) => (
                             <tr
@@ -345,7 +338,7 @@ function AdminPage() {
                             </tr>
                           ))}
                         </tbody>
-                      </Table>
+                      </ResizableTable>
                       <div className="text-center my-3">
                         <button
                           className="btn btn-primary"
