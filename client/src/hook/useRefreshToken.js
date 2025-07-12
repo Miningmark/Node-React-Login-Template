@@ -10,29 +10,26 @@ const useRefreshToken = () => {
 
   const refreshAccessToken = async () => {
     const controller = new AbortController();
-    const signal = controller.signal;
-    let isMounted = true;
 
     try {
-      if (isMounted) {
-        const response = await axiosPublic.get("/auth/refreshAccessToken", {
-          signal,
-          withCredentials: true,
-        });
-        login(response.data.accessToken);
-
-        return response;
-      }
+      const response = await axiosPublic.get("/auth/refreshAccessToken", {
+        signal: controller.signal,
+        withCredentials: true,
+      });
+      login(response.data.accessToken);
+      return response;
     } catch (err) {
-      if (err?.response?.status === 403 || err?.response?.status === 401) {
+      if (err?.name === "CanceledError") {
+        console.log("Request was cancelled");
+      } else if (err?.response?.status === 403 || err?.response?.status === 401) {
         navigate("/login", { state: { from: location.pathname }, replace: true });
+      } else {
+        console.error("Refresh token error:", err);
       }
+      return null;
     }
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
   };
+
   return refreshAccessToken;
 };
 
