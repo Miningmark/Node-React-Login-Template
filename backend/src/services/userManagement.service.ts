@@ -5,17 +5,21 @@ import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { SocketService } from "@/sockets/socket.service";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
 import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
+import { UserService } from "@/services/user.service.js";
 
 export class UserManagementService {
     private emailService: EmailService;
     private tokenService: TokenService;
+    private userService: UserService;
 
     constructor() {
         this.emailService = EmailService.getInstance();
         this.tokenService = new TokenService();
+        this.userService = new UserService();
     }
 
     async getUsers(limit?: number, offset?: number) {
@@ -24,17 +28,7 @@ export class UserManagementService {
         const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.users = databaseUsers.map((databaseUser) => {
-            return {
-                id: databaseUser.id,
-                username: databaseUser.username,
-                email: databaseUser.email,
-                isActive: databaseUser.isActive,
-                isDisabled: databaseUser.isDisabled,
-                permissions: databaseUser.permissions.map((databasePermission) => ({
-                    id: databasePermission.id,
-                    name: databasePermission.name
-                }))
-            };
+            return this.userService.generateJSONUserResponse(databaseUser);
         });
 
         return jsonResponse;
@@ -153,6 +147,7 @@ export class UserManagementService {
 
         jsonResponse.userId = databaseUser.id;
 
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "user:create", this.userService.generateJSONUserResponse(databaseUser));
         return jsonResponse;
     }
 }
