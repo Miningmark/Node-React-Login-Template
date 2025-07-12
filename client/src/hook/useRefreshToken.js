@@ -6,7 +6,7 @@ import { AuthContext } from "../contexts/AuthContext";
 const useRefreshToken = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useContext(AuthContext);
+  const { setAccessToken } = useContext(AuthContext);
 
   const refreshAccessToken = async () => {
     const controller = new AbortController();
@@ -16,7 +16,7 @@ const useRefreshToken = () => {
         signal: controller.signal,
         withCredentials: true,
       });
-      login(response.data.accessToken);
+      setAccessToken(response.data.accessToken);
       return response;
     } catch (err) {
       if (err?.name === "CanceledError") {
