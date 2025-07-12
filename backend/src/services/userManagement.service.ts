@@ -144,7 +144,10 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser));
+        //TODO: change
+        const databaseUser1 = await User.findOne({ where: { id: databaseUser.id } });
+        if (databaseUser1 === null) throw new Error("");
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser1));
         return jsonResponse;
     }
 }

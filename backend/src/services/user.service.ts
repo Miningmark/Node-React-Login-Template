@@ -128,7 +128,7 @@ export class UserService {
             email: databaseUser.email,
             isActive: databaseUser.isActive,
             isDisabled: databaseUser.isDisabled,
-            permissions: databaseUser.permissions?.map((databasePermission) => ({
+            permissions: databaseUser.permissions.map((databasePermission) => ({
                 id: databasePermission.id,
                 name: databasePermission.name
             }))
