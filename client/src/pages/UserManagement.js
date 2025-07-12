@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, use } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
@@ -7,6 +7,8 @@ import sortingAlgorithm from "util/sortingAlgorithm";
 import UserDetailsModal from "components/userManagement/UserDetailsModal";
 import CreateUserModal from "components/userManagement/CreateUserModal";
 import TableLoadingAnimation from "components/TableLoadingAnimation";
+import { SocketContext } from "contexts/SocketProvider";
+
 import "components/userManagement/userManagement.css";
 
 const UserManagement = () => {
@@ -24,6 +26,38 @@ const UserManagement = () => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { routeGroups, checkAccess } = useContext(AuthContext);
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.emit("subscribe:users:watchList");
+
+    const handleUserAdd = (data) => {
+      setUsers((prevUsers) => [...prevUsers, data]);
+    };
+
+    const handleUserUpdate = (updatedUser) => {
+      const oldUser = users.find((user) => user.id === updatedUser.id);
+      if (!oldUser) {
+        console.warn("User not found for update:", updatedUser);
+        return;
+      }
+      const newUser = { ...oldUser, ...updatedUser };
+      console.log("Updating user:", newUser);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === updatedUser.id ? newUser : user))
+      );
+    };
+
+    socket.on("users:add", handleUserAdd);
+    socket.on("users:update", handleUserUpdate);
+
+    return () => {
+      socket.off("users:add", handleUserAdd);
+      socket.off("users:update", handleUserUpdate);
+    };
+  }, [socket]);
 
   useEffect(() => {
     const controller = new AbortController();
