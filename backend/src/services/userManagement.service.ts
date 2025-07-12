@@ -147,7 +147,7 @@ export class UserManagementService {
 
         jsonResponse.userId = databaseUser.id;
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "user:create", this.userService.generateJSONUserResponse(databaseUser));
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser));
         return jsonResponse;
     }
 }
