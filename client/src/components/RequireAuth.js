@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import useRefreshToken from "../hook/useRefreshToken";
-import useAxiosProtected from "./hook/useAxiosProtected";
+import { AuthContext } from "contexts/AuthContext";
+import useRefreshToken from "hook/useRefreshToken";
+import useAxiosProtected from "hook/useAxiosProtected";
 
 const RequireAuth = ({ children, allowedRouteGroups }) => {
   const location = useLocation();
