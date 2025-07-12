@@ -125,7 +125,6 @@ export class UserManagementService {
     }
 
     async createUser(username: string, email: string, permissionIds: number[]) {
-        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert" };
 
         const databaseSuperAdminPermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
@@ -144,8 +143,6 @@ export class UserManagementService {
             "Abschluss deiner Registrierung",
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
-
-        jsonResponse.userId = databaseUser.id;
 
         SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser));
         return jsonResponse;
