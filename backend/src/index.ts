@@ -15,15 +15,7 @@ const httpServer = http.createServer(app);
 const socketService = SocketService.getInstance();
 const io = new Server(httpServer, {
     cors: {
-        origin(origin, callback) {
-            if (ENV.NODE_ENV !== "production") {
-                callback(null, true);
-            } else if (!origin || ENV.CORS_ALLOWED_ORIGINS.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
+        origin: ENV.CORS_ALLOWED_ORIGINS,
         methods: ["GET", "POST"],
         credentials: true
     }
