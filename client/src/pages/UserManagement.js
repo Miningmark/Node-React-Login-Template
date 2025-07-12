@@ -52,10 +52,12 @@ const UserManagement = () => {
     };
 
     socket.on("listen:users:watchList", handleUserAdd);
+    socket.on("users:create", handleUserAdd);
     socket.on("users:update", handleUserUpdate);
 
     return () => {
       socket.off("listen:users:watchList", handleUserAdd);
+      socket.off("users:create", handleUserAdd);
       socket.off("users:update", handleUserUpdate);
     };
   }, [socket]);
