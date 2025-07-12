@@ -2,11 +2,14 @@ import { useContext, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
+import useAxiosProtected from "./hook/useAxiosProtected";
 
 const RequireAuth = ({ children, allowedRouteGroups }) => {
-  const { accessToken, routeGroups, checkAccess } = useContext(AuthContext);
   const location = useLocation();
   const refreshAccessToken = useRefreshToken();
+  const axiosProtected = useAxiosProtected();
+  const { setUsername, setRouteGroups, username, accessToken, routeGroups, checkAccess } =
+    useContext(AuthContext);
 
   const [isLoading, setIsLoading] = useState(!accessToken);
 
@@ -39,8 +42,46 @@ const RequireAuth = ({ children, allowedRouteGroups }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  async function test() {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let isMounted = true;
+
+    const fetchUser = async () => {
+      console.log("Fetching user data...");
+      try {
+        const [userRes, routesRes] = await Promise.all([
+          axiosProtected.get("/user/getUsername", { signal }),
+          axiosProtected.get("/user/getRouteGroups", { signal }),
+        ]);
+
+        if (isMounted) {
+          console.log("User data fetched successfully:");
+          if (userRes.data?.username) setUsername(userRes.data.username);
+          if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
+        }
+      } catch (err) {
+        if (err.name === "CanceledError") {
+          console.log("Anfrage abgebrochen");
+        } else {
+          console.warn("Kein gültiger Login gefunden.");
+        }
+      }
+    };
+
+    if (!username) {
+      fetchUser();
+    }
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }
+
   console.log("RouteGroups:", routeGroups);
   if (!routeGroups) {
+    test();
     return (
       <div className="d-flex flex-column justify-content-center align-items-center vh-100">
         <div
