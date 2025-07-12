@@ -110,13 +110,15 @@ export class UserService {
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: LastLogin, limit: 5, order: [["loginTime", "DESC"]] } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        jsonResponse.lastLogins = databaseUser.lastLogins.map((lastLogin) => ({
-            ipv4Address: lastLogin.ipv4Address,
-            country: lastLogin.country,
-            regionName: lastLogin.regionName,
-            loginTime: lastLogin.loginTime,
-            successfully: lastLogin.successfully
-        }));
+        jsonResponse.lastLogins = databaseUser.lastLogins
+            ? databaseUser.lastLogins.map((lastLogin) => ({
+                  ipv4Address: lastLogin.ipv4Address,
+                  country: lastLogin.country,
+                  regionName: lastLogin.regionName,
+                  loginTime: lastLogin.loginTime,
+                  successfully: lastLogin.successfully
+              }))
+            : [];
 
         return jsonResponse;
     }
@@ -128,10 +130,12 @@ export class UserService {
             email: databaseUser.email,
             isActive: databaseUser.isActive,
             isDisabled: databaseUser.isDisabled,
-            permissions: databaseUser.permissions.map((databasePermission) => ({
-                id: databasePermission.id,
-                name: databasePermission.name
-            }))
+            permissions: databaseUser.permissions
+                ? databaseUser.permissions.map((databasePermission) => ({
+                      id: databasePermission.id,
+                      name: databasePermission.name
+                  }))
+                : []
         };
     }
 }

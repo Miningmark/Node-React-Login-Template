@@ -68,11 +68,13 @@ export class AdminPageService {
                 id: databasePermission.id,
                 name: databasePermission.name,
                 description: databasePermission.description,
-                routeGroups: databasePermission.routeGroups.map((databaseRouteGroup) => ({
-                    id: databaseRouteGroup.id,
-                    name: databaseRouteGroup.name,
-                    description: databaseRouteGroup.description
-                }))
+                routeGroups: databasePermission.routeGroups
+                    ? databasePermission.routeGroups.map((databaseRouteGroup) => ({
+                          id: databaseRouteGroup.id,
+                          name: databaseRouteGroup.name,
+                          description: databaseRouteGroup.description
+                      }))
+                    : []
             };
         });
 

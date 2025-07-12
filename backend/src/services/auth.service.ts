@@ -104,7 +104,7 @@ export class AuthService {
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich freigeschaltet" };
 
         const databaseUserToken = await UserToken.findOne({ where: { type: UserTokenType.USER_REGISTRATION_TOKEN, token: token }, include: { model: User } });
-        if (databaseUserToken === null) throw new ValidationError("Token nicht vorhanden oder ungültig");
+        if (databaseUserToken === null || databaseUserToken.user === undefined) throw new ValidationError("Token nicht vorhanden oder ungültig");
 
         if (databaseUserToken.expiresAt !== null && new Date(Date.now()) > databaseUserToken.expiresAt) {
             await databaseUserToken.user.destroy();
@@ -124,7 +124,7 @@ export class AuthService {
 
         const refreshUserToken = await UserToken.findOne({ where: { type: UserTokenType.REFRESH_TOKEN, token: token }, include: { model: User } });
 
-        if (refreshUserToken === null) {
+        if (refreshUserToken === null || refreshUserToken.user === undefined) {
             this.tokenService.clearRefreshTokenCookie(res);
             throw new UnauthorizedError("Token nicht vorhanden, bitte neuanmelden");
         }
@@ -151,7 +151,7 @@ export class AuthService {
         SocketService.getInstance()
             .getIO()
             .sockets.sockets.forEach((socket) => {
-                if (socket.userId === refreshUserToken.user.id) {
+                if (socket.userId === refreshUserToken.user!.id) {
                     socket.routeGroups = routeGroupsArray;
                 }
             });
@@ -188,7 +188,7 @@ export class AuthService {
             where: { token: token, type: { [Op.or]: [UserTokenType.ADMIN_REGISTRATION_TOKEN, UserTokenType.PASSWORD_RESET_TOKEN, UserTokenType.ACCOUNT_REACTIVATION_TOKEN] } },
             include: { model: User }
         });
-        if (databaseUserToken === null) throw new ValidationError("Token nicht vorhanden oder abgelaufen");
+        if (databaseUserToken === null || databaseUserToken.user === undefined) throw new ValidationError("Token nicht vorhanden oder abgelaufen");
 
         if (databaseUserToken.expiresAt !== null && new Date(Date.now()) > databaseUserToken.expiresAt) {
             if (databaseUserToken.type === UserTokenType.ADMIN_REGISTRATION_TOKEN) {

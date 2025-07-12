@@ -134,8 +134,9 @@ export class UserManagementService {
 
         const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
 
-        const databaseUser = await User.create({ username: username, email: email, password: "" });
+        const databaseUser = await User.create({ username: username, email: email, password: "" }, { include: { model: Permission } });
         await databaseUser.setPermissions(databasePermissions);
+        databaseUser.permissions = await databaseUser.getPermissions();
 
         const token = await this.tokenService.generateHexUserToken(databaseUser.id, UserTokenType.ADMIN_REGISTRATION_TOKEN, ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY);
         await this.emailService.sendHTMLTemplateEmail(
@@ -144,10 +145,7 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
-        //TODO: change
-        const databaseUser1 = await User.findOne({ where: { id: databaseUser.id } });
-        if (databaseUser1 === null) throw new Error("");
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser1));
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser));
         return jsonResponse;
     }
 }

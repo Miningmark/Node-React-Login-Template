@@ -43,7 +43,7 @@ class RouteGroup extends Model<InferAttributes<RouteGroup>, InferCreationAttribu
     @NotNull
     declare updatedAt: CreationOptional<Date>;
 
-    declare permissions: NonAttribute<Permission[]>;
+    declare permissions?: NonAttribute<Permission[]>;
 
     declare getPermissions: BelongsToManyGetAssociationsMixin<Permission>;
     declare setPermissions: BelongsToManySetAssociationsMixin<Permission, number>;
