@@ -8,7 +8,6 @@ import userRoutes from "@/routes/user.route.js";
 import userManagementRoutes from "@/routes/userManagement.route.js";
 import { ErrorMonitoringService } from "@/services/serverErrorMonitoring.service.js";
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import express from "express";
 import z from "zod/v4";
 
@@ -21,7 +20,6 @@ export async function initApp() {
     z.config(z.locales.de());
 
     setupSecurityMiddleware(app);
-    app.use(cors({ credentials: true }));
 
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());

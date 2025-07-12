@@ -1,4 +1,5 @@
 import { ENV } from "@/config/env.js";
+import cors from "cors";
 import { Express } from "express";
 import helmet from "helmet";
 
@@ -57,4 +58,19 @@ export const setupSecurityMiddleware = (app: Express) => {
             next();
         });
     }
+
+    app.use(
+        cors({
+            origin(origin, callback) {
+                if (ENV.NODE_ENV !== "production") {
+                    callback(null, true);
+                } else if (origin !== undefined && ENV.CORS_ALLOWED_ORIGINS.indexOf(origin) !== 1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error("Not allowed by CORS"));
+                }
+            },
+            credentials: true
+        })
+    );
 };
