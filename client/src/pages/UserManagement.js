@@ -35,7 +35,7 @@ const UserManagement = () => {
 
     const handleUserAdd = (data) => {
       console.log("New user added:", data);
-      //setUsers((prevUsers) => [...prevUsers, data]);
+      setUsers((prevUsers) => [...prevUsers, data]);
     };
 
     const handleUserUpdate = (updatedUser) => {
@@ -51,12 +51,10 @@ const UserManagement = () => {
       );
     };
 
-    socket.on("listen:users:watchList", handleUserAdd);
     socket.on("users:create", handleUserAdd);
     socket.on("users:update", handleUserUpdate);
 
     return () => {
-      socket.off("listen:users:watchList", handleUserAdd);
       socket.off("users:create", handleUserAdd);
       socket.off("users:update", handleUserUpdate);
     };
@@ -151,9 +149,11 @@ const UserManagement = () => {
     );
   };
 
+  /* 
   const handleNewUser = (newUser) => {
     setUsers((prevUsers) => [...prevUsers, newUser]);
   };
+  */
 
   return (
     <>
@@ -291,7 +291,7 @@ const UserManagement = () => {
             setCreateUser(false);
           }}
           allPermissions={allPermissions}
-          onUserCreated={handleNewUser}
+          //onUserCreated={handleNewUser}
         />
       ) : null}
     </>
