@@ -67,6 +67,7 @@ export const setupSecurityMiddleware = (app: Express) => {
                 } else if (origin !== undefined && ENV.CORS_ALLOWED_ORIGINS.indexOf(origin) !== 1) {
                     callback(null, true);
                 } else {
+                    console.log(origin);
                     callback(new Error("Not allowed by CORS"));
                 }
             },
