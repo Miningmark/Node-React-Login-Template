@@ -59,7 +59,7 @@ const shutdown = async () => {
     SocketService.getInstance()
         .getIO()
         .sockets.sockets.forEach((socket) => {
-            socket.disconnect();
+            socket.disconnect(true);
         });
 
     httpServer.close(async () => {

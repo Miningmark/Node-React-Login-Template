@@ -8,6 +8,7 @@ import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserActivityService } from "@/services/userActivity.service.js";
+import { SocketService } from "@/sockets/socket.service.js";
 import { getCompleteUserRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
 import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
@@ -43,12 +44,7 @@ export class AuthService {
         await this.emailService.sendHTMLTemplateEmail(
             databaseUser.email,
             "Abschluss deiner Registrierung",
-            getCompleteUserRegistrationEmailTemplate(
-                ENV.FRONTEND_NAME,
-                databaseUser.username,
-                `${ENV.FRONTEND_URL}account-activation?token=${token}`,
-                formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_USER_EXPIRY))
-            )
+            getCompleteUserRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}account-activation?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_USER_EXPIRY)))
         );
 
         return jsonResponse;
@@ -148,15 +144,17 @@ export class AuthService {
         }
 
         const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(refreshUserToken.user);
-        const accessToken = await this.tokenService.generateJWT(
-            refreshUserToken.user,
-            UserTokenType.ACCESS_TOKEN,
-            routeGroupsArray,
-            ENV.ACCESS_TOKEN_SECRET,
-            ENV.ACCESS_TOKEN_EXPIRY as ms.StringValue
-        );
+        const accessToken = await this.tokenService.generateJWT(refreshUserToken.user, UserTokenType.ACCESS_TOKEN, routeGroupsArray, ENV.ACCESS_TOKEN_SECRET, ENV.ACCESS_TOKEN_EXPIRY as ms.StringValue);
 
         jsonResponse.accessToken = accessToken;
+
+        SocketService.getInstance()
+            .getIO()
+            .sockets.sockets.forEach((socket) => {
+                if (socket.userId === refreshUserToken.user.id) {
+                    socket.routeGroups = routeGroupsArray;
+                }
+            });
 
         return jsonResponse;
     }
@@ -176,12 +174,7 @@ export class AuthService {
         await this.emailService.sendHTMLTemplateEmail(
             databaseUser.email,
             "Passwort vergessen?",
-            getPasswordResetEmailTemplate(
-                ENV.FRONTEND_NAME,
-                databaseUser.username,
-                `${ENV.FRONTEND_URL}password-reset?token=${token}`,
-                formatDate(parseTimeOffsetToDate(ENV.PASSWORD_RESET_EXPIRY))
-            )
+            getPasswordResetEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.PASSWORD_RESET_EXPIRY)))
         );
 
         return jsonResponse;

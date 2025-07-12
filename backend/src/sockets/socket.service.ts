@@ -67,13 +67,13 @@ export class SocketService {
                 source: "socket.io"
             });
 
-            registerUserSocket(socket);
-        });
-
-        this.getIO().on("disconnect", async (socket) => {
-            await databaseLogger(ServerLogTypes.INFO, `Socket getrennt: \"${socket.id}\"`, {
-                source: "socket.io"
+            socket.on("disconnecting", async (reason) => {
+                await databaseLogger(ServerLogTypes.INFO, `Socket getrennt \"${socket.id}\ mit der Begründung: \"${reason}\"`, {
+                    source: "socket.io"
+                });
             });
+
+            registerUserSocket(socket);
         });
 
         await databaseLogger(ServerLogTypes.INFO, "SocketIO erfolgreich gestartet", {
