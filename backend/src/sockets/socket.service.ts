@@ -70,6 +70,12 @@ export class SocketService {
             registerUserSocket(socket);
         });
 
+        this.getIO().on("disconnect", async (socket) => {
+            await databaseLogger(ServerLogTypes.INFO, `Socket getrennt: \"${socket.id}\"`, {
+                source: "socket.io"
+            });
+        });
+
         await databaseLogger(ServerLogTypes.INFO, "SocketIO erfolgreich gestartet", {
             source: "socket.io"
         });
@@ -84,4 +90,3 @@ export class SocketService {
         this.getIO().to(room).emit(event, data);
     }
 }
-2;
