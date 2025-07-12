@@ -50,11 +50,11 @@ const UserManagement = () => {
       );
     };
 
-    socket.on("users:add", handleUserAdd);
+    socket.on("users:create", handleUserAdd);
     socket.on("users:update", handleUserUpdate);
 
     return () => {
-      socket.off("users:add", handleUserAdd);
+      socket.off("users:create", handleUserAdd);
       socket.off("users:update", handleUserUpdate);
     };
   }, [socket]);
