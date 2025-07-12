@@ -4,7 +4,9 @@ import { Socket } from "socket.io";
 
 export const registerUserSocket = (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>) => {
     socket.on("subscribe:users:watchList", () => {
+        console.log("SOCKET SUBSCRIBE" + socket.id);
         if (socket.routeGroups.includes(UserManagementRouteGroups.USER_MANAGEMENT_READ.groupName)) {
+            console.log("SOCKET LISTEN" + socket.id);
             socket.join("listen:users:watchList");
         }
     });
