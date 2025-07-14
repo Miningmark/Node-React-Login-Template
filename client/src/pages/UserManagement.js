@@ -58,7 +58,7 @@ const UserManagement = () => {
       socket.off("users:create", handleUserAdd);
       socket.off("users:update", handleUserUpdate);
     };
-  }, [socket]);
+  }, [socket, users]);
 
   useEffect(() => {
     const controller = new AbortController();
