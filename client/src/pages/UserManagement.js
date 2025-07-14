@@ -39,6 +39,7 @@ const UserManagement = () => {
 
     const handleUserUpdate = (updatedUser) => {
       const oldUser = users.find((user) => user.id === updatedUser.id);
+      console.log("oldUser:", oldUser);
       if (!oldUser) {
         console.warn("User not found for update:", updatedUser);
         return;
