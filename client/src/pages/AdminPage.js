@@ -317,11 +317,16 @@ function AdminPage() {
                       )}
                     </div>
 
-                    <div
-                      className="border"
-                      style={{ maxHeight: "calc(100vh - 250px)", overflowY: "auto" }}
-                    >
-                      <ResizableTable columns={["ID", "Zeitstempel", "Type", "Nachricht"]}>
+                    <div style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
+                      <ResizableTable
+                        columns={[
+                          { title: "ID", width: 50 },
+                          { title: "Zeitstempel", width: 180 },
+                          { title: "Type", width: 60 },
+                          { title: "Nachricht" },
+                        ]}
+                        tableHeight="calc(100vh - 302px)"
+                      >
                         <tbody>
                           {(activeFilters ? filteredServerLog : serverLog)?.map((log) => (
                             <tr
@@ -339,27 +344,27 @@ function AdminPage() {
                           ))}
                         </tbody>
                       </ResizableTable>
-                      <div className="text-center my-3">
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => {
-                            if (activeFilters) {
-                              fetchFilteredLogs(activeFilters, filteredServerlogOffset);
-                            } else {
-                              console.log("Lade mehr Server-Logs", serverlogOffset);
-                              fetchServerLogs(serverlogOffset);
-                            }
-                          }}
-                          disabled={
-                            loadingServerLogPart ||
-                            (activeFilters
-                              ? filteredServerlogOffset >= filteredServerLogMaxEntries
-                              : serverlogOffset >= serverLogMaxEntries)
+                    </div>
+                    <div className="text-center my-3">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                          if (activeFilters) {
+                            fetchFilteredLogs(activeFilters, filteredServerlogOffset);
+                          } else {
+                            console.log("Lade mehr Server-Logs", serverlogOffset);
+                            fetchServerLogs(serverlogOffset);
                           }
-                        >
-                          {loadingServerLogPart ? "Lade mehr..." : "Mehr laden"}
-                        </button>
-                      </div>
+                        }}
+                        disabled={
+                          loadingServerLogPart ||
+                          (activeFilters
+                            ? filteredServerlogOffset >= filteredServerLogMaxEntries
+                            : serverlogOffset >= serverLogMaxEntries)
+                        }
+                      >
+                        {loadingServerLogPart ? "Lade mehr..." : "Mehr laden"}
+                      </button>
                     </div>
                   </>
                 ) : (

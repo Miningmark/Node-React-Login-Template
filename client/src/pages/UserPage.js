@@ -457,7 +457,13 @@ const UserPage = () => {
               ) : (
                 <>
                   <ResizableTable
-                    columns={["Zeitpunkt", "IPv4-Adresse", "Region / Land", "Erfolgreich"]}
+                    columns={[
+                      { title: "Zeitpunkt", width: 140 },
+                      { title: "IPv4-Adresse", width: 150 },
+                      { title: "Region / Land", width: 200 },
+                      { title: "Erfolgreich", width: 50 },
+                    ]}
+                    tableHeight="auto"
                   >
                     <tbody>
                       {logins.map((entry, idx) => (

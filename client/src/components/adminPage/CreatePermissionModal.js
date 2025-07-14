@@ -162,7 +162,7 @@ const CreatePermissionModal = ({
           <div className="form-floating mb-3">
             <input
               type="text"
-              className={`form-control ${touched.description && !description ? "is-invalid" : ""}`}
+              className={`form-control `}
               id="floatingDescription"
               placeholder="Beschreibung"
               value={description}
@@ -210,7 +210,7 @@ const CreatePermissionModal = ({
             <Button
               variant="success"
               onClick={handleSave}
-              disabled={isSaving || !name || !description}
+              disabled={isSaving || !name}
               style={{ width: "100px" }}
             >
               {isSaving ? (

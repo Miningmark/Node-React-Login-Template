@@ -34,7 +34,6 @@ const UserManagement = () => {
     socket.emit("subscribe:users:watchList");
 
     const handleUserAdd = (data) => {
-      console.log("New user added:", data);
       setUsers((prevUsers) => [...prevUsers, data]);
     };
 
