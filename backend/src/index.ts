@@ -5,7 +5,7 @@ import { sequelize } from "@/config/sequelize.js";
 import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
-import { SocketService } from "@/sockets/socket.service.js";
+import { SocketService } from "@/socketIO/socket.service.js";
 import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
 import http from "http";
 import { Server } from "socket.io";

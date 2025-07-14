@@ -3,11 +3,17 @@ import { databaseLogger } from "@/config/logger.js";
 import { ForbiddenError } from "@/errors/errorClasses.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
-import { ClientToServerEvents, ServerToClientEvents } from "@/sockets/types.js";
+import { ClientToServerEvents, ServerToClientEvents } from "@/socketIO/types.js";
 import { ValidationError } from "@sequelize/core";
+import fs from "fs/promises";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { Server } from "socket.io";
-import { registerUserManagementSocket } from "@/sockets/user.socket.js";
+import path from "path";
+import { Server, Socket } from "socket.io";
+import { fileURLToPath, pathToFileURL } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const socketDir = path.join(__dirname, "sockets");
 
 export class SocketService {
     private static instance: SocketService;
@@ -73,12 +79,25 @@ export class SocketService {
                 });
             });
 
-            registerUserManagementSocket(socket);
+            await this.loadSockets(socket);
         });
 
         await databaseLogger(ServerLogTypes.INFO, "SocketIO erfolgreich gestartet", {
             source: "socket.io"
         });
+    }
+
+    private async loadSockets(socket: Socket<ClientToServerEvents, ServerToClientEvents, any>) {
+        const files = await fs.readdir(socketDir);
+
+        for (const file of files) {
+            if (!(file.endsWith(".socket.ts") || file.endsWith(".socket.js"))) continue;
+
+            const fullPath = path.join(socketDir, file);
+            const moduleUrl = pathToFileURL(fullPath).toString();
+
+            (await import(moduleUrl)).default(socket);
+        }
     }
 
     public getIO(): Server<ClientToServerEvents, ServerToClientEvents> {

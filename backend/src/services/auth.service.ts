@@ -8,7 +8,7 @@ import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserActivityService } from "@/services/userActivity.service.js";
-import { SocketService } from "@/sockets/socket.service.js";
+import { SocketService } from "@/socketIO/socket.service.js";
 import { getCompleteUserRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
 import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
