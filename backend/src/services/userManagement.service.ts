@@ -5,7 +5,7 @@ import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { TokenService } from "@/services/token.service.js";
-import { SocketService } from "@/sockets/socket.service.js";
+import { SocketService } from "@/socketIO/socket.service.js";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
 import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
@@ -50,26 +50,10 @@ export class UserManagementService {
         return jsonResponse;
     }
 
-    async updateUserPermissions(userId: number, permissionIds: number[]) {
-        //TODO: SocketIO inform all who seeing users over change
-        let jsonResponse: Record<string, any> = { message: "Rechte erfolgreich bearbeitet" };
-
-        const databaseUser = await User.findOne({ where: { id: userId } });
-        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
-
-        if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ForbiddenError("SuperAdmin kann nicht bearbeitet werden");
-
-        const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
-        await databaseUser.setPermissions(databasePermissions);
-
-        return jsonResponse;
-    }
-
     async updateUser(userId: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissionIds?: number[]) {
-        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich bearbeitet" };
 
-        const databaseUser = await User.findOne({ where: { id: userId } });
+        const databaseUser = await User.findOne({ where: { id: userId }, include: { model: Permission } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
         const databaseUserTokens = await UserToken.findAll({
@@ -121,6 +105,8 @@ export class UserManagementService {
 
         await databaseUser.save();
 
+        //TODO: SocketIO inform edited user over changes
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUser));
         return jsonResponse;
     }
 

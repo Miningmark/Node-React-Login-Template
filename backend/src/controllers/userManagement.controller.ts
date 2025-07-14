@@ -22,14 +22,6 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    updateUserPermissions = (req: Request, res: Response, next: NextFunction): void => {
-        this.handleRequest(req, res, next, async () => {
-            const { id, permissionIds } = req.body;
-
-            return await this.userManagementService.updateUserPermissions(id, permissionIds);
-        });
-    };
-
     updateUser = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { id, username, email, isActive, isDisabled, permissionIds } = req.body;
