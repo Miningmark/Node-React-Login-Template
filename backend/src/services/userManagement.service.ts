@@ -101,6 +101,7 @@ export class UserManagementService {
             this.tokenService.removeJWT(databaseUser, UserTokenType.ACCESS_TOKEN);
             const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
             await databaseUser.setPermissions(databasePermissions);
+            databaseUser.permissions = await databaseUser.getPermissions();
         }
 
         await databaseUser.save();
