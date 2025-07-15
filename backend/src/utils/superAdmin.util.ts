@@ -44,7 +44,7 @@ export async function generateDevUser() {
     let databaseUser = await User.findOne({ where: { username: "devUser" } });
 
     if (databaseUser === null) {
-        databaseUser = await User.create({ username: "devUser", email: "", password: hashedPassword, isActive: true });
+        databaseUser = await User.create({ username: "devUser", email: "devUser@devUser.com", password: hashedPassword, isActive: true });
     }
 
     let databasePermission = await Permission.findOne({ where: { name: "DevUser Berechtigung" } });
