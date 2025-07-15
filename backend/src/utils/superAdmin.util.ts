@@ -1,6 +1,5 @@
 import { ENV } from "@/config/env.js";
 import { databaseLogger } from "@/config/logger.js";
-import { ValidationError } from "@/errors/validationError.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";

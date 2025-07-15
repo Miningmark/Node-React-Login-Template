@@ -105,7 +105,7 @@ export class UserManagementService {
 
             databaseUser.permissions = await databaseUser.getPermissions();
 
-            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
+            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: await this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
         }
 
         await databaseUser.save();

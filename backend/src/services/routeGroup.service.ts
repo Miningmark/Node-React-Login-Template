@@ -11,7 +11,9 @@ export class RouteGroupService {
         userPermissions.map((userPermission) => {
             userPermission.routeGroups
                 ? userPermission.routeGroups.map((routeGroup) => {
-                      routeGroupsArray.push(routeGroup.name);
+                      if (!routeGroupsArray.includes(routeGroup.name)) {
+                          routeGroupsArray.push(routeGroup.name);
+                      }
                   })
                 : [];
         });
