@@ -5,7 +5,7 @@ import Permission from "@/models/permission.model";
 import User from "@/models/user.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
-import { SocketService } from "@/socketIO/socket.service";
+import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import bcrypt from "bcrypt";
 import { Response } from "express";
