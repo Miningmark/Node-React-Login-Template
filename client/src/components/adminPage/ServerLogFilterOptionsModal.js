@@ -19,8 +19,6 @@ const ServerLogFilterOptionsModal = ({
     }
   );
 
-  console.log("filterOptions", filterOptions);
-
   function handleChange(e) {
     const { name, options, type } = e.target;
 

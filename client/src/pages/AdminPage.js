@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
@@ -10,6 +10,7 @@ import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
 import ResizableTable from "components/util/ResizableTable";
+import { SocketContext } from "contexts/SocketProvider";
 
 import "components/adminPage/adminPage.css";
 
@@ -39,7 +40,7 @@ function clearFilters(filters) {
 }
 
 function AdminPage() {
-  const [serverLog, setServerLog] = useState(null);
+  const [serverLog, setServerLog] = useState([]);
   const [filteredServerLog, setFilteredServerLog] = useState(null);
   const [loadingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
@@ -67,6 +68,72 @@ function AdminPage() {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
+  const { socket } = useContext(SocketContext);
+
+  const serverLogQueueRef = useRef([]);
+  const intervalRef = useRef(null);
+
+  console.log("selectedServerLog ID", selectedServerLog);
+  console.log(
+    "selectedServerLog",
+    serverLog.find((log) => log.id === selectedServerLog)
+  );
+
+  useEffect(() => {
+    if (socket) {
+      function handleNewServerLog(data) {
+        serverLogQueueRef.current.push(data);
+        console.log("Neuer Server-Log-Eintrag empfangen:", data);
+      }
+
+      intervalRef.current = setInterval(() => {
+        const queue = serverLogQueueRef.current;
+        if (queue.length === 0) return;
+
+        // Leere Queue frühzeitig, damit spätere Logs nicht verloren gehen
+        serverLogQueueRef.current = [];
+
+        // Neue Logs oben anhängen
+        setServerLog((prev) => [...[...queue].reverse(), ...(prev || [])]);
+        setFilteredServerLogMaxEntries((prev) => prev + queue.length);
+        setServerlogOffset((prev) => prev + queue.length);
+
+        // Filter anwenden (optional)
+        const matchingLogs = queue.filter((log) => {
+          if (!activeFilters || Object.keys(activeFilters).length === 0) return true;
+
+          return (
+            (!activeFilters.types?.length || activeFilters.types.includes(log.type)) &&
+            (!activeFilters.userIds?.length ||
+              activeFilters.userIds.map(Number).includes(log.userId)) &&
+            (!activeFilters.createdAtFrom ||
+              new Date(log.createdAt) >= new Date(activeFilters.createdAtFrom)) &&
+            (!activeFilters.createdAtTo ||
+              new Date(log.createdAt) <= new Date(activeFilters.createdAtTo)) &&
+            (!activeFilters.ipv4Address ||
+              log.ipv4Address?.toLowerCase().includes(activeFilters.ipv4Address.toLowerCase())) &&
+            (!activeFilters.message ||
+              log.message?.toLowerCase().includes(activeFilters.message.toLowerCase()))
+          );
+        });
+
+        if (matchingLogs.length > 0) {
+          setFilteredServerLog((prev) => [...matchingLogs.reverse(), ...(prev || [])]);
+          setFilteredServerLogMaxEntries((prev) => prev + matchingLogs.length);
+          setFilteredServerlogOffset((prev) => prev + matchingLogs.length);
+        }
+      }, 100); // alle 100ms prüfen
+
+      socket.emit("subscribe:serverLogs:watchList");
+
+      socket.on("serverLogs:create", handleNewServerLog);
+
+      return () => {
+        socket.off("serverLogs:create", handleNewServerLog);
+        clearInterval(intervalRef.current);
+      };
+    }
+  }, [socket, activeFilters, setFilteredServerLog, setServerLog]);
 
   const filteredPermission = useMemo(() => {
     if (!allPermissions) return [];
@@ -91,37 +158,6 @@ function AdminPage() {
     return sortingAlgorithm(filtered, "name", "asc");
   }, [allPermissions, searchTerm]);
 
-  const refreshFilteredServerLog = async () => {
-    if (!activeFilters) return;
-    setLoadingServerLogPart(true);
-    try {
-      const response = await axiosProtected.post(
-        `/adminPage/getFilteredServerLogs/50-0`,
-        clearFilters(activeFilters)
-      );
-      const newLogs = response.data.serverLogs || [];
-
-      if (!filteredServerLog?.length) {
-        setFilteredServerLog(newLogs);
-      } else {
-        // IDs der bisherigen Logs
-        const existingIds = new Set(filteredServerLog.map((log) => log.id));
-        // Nur neue Logs, die noch nicht existieren
-        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
-
-        if (onlyNewLogs.length) {
-          setFilteredServerLog((prev) => [...onlyNewLogs, ...prev]);
-        }
-      }
-
-      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || 0);
-    } catch {
-      addToast("Fehler beim Aktualisieren der gefilterten Logs", "danger");
-    } finally {
-      setLoadingServerLogPart(false);
-    }
-  };
-
   const mergeNewLogs = (existingLogs, newLogs) => {
     const existingIds = new Set(existingLogs.map((log) => log.id));
     return [...existingLogs, ...newLogs.filter((log) => !existingIds.has(log.id))];
@@ -133,34 +169,12 @@ function AdminPage() {
       const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-${offset}`);
       const logs = data?.serverLogs || [];
 
-      setServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
+      setServerLog((prev) => mergeNewLogs(prev || [], logs));
       setServerlogOffset((prev) => prev + 50);
       setServerLogMaxEntries(Number(data?.serverLogCount) || null);
     } catch (error) {
       if (error.name !== "CanceledError") {
         addToast("Fehler beim Laden des ServerLogs", "danger");
-      }
-    } finally {
-      setLoadingServerLogPart(false);
-    }
-  };
-
-  const refreshServerLogs = async () => {
-    setLoadingServerLogPart(true);
-    try {
-      const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-0`);
-      const newLogs = data?.serverLogs || [];
-
-      setServerLog((prev = []) => {
-        const existingIds = new Set(prev.map((log) => log.id));
-        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
-        return onlyNewLogs.length ? [...onlyNewLogs, ...prev] : prev;
-      });
-
-      setServerLogMaxEntries(Number(data?.serverLogCount) || null);
-    } catch (error) {
-      if (error.name !== "CanceledError") {
-        addToast("Fehler beim Aktualisieren der ServerLogs", "danger");
       }
     } finally {
       setLoadingServerLogPart(false);
@@ -177,7 +191,7 @@ function AdminPage() {
       );
       const logs = data?.serverLogs || [];
 
-      setFilteredServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
+      setFilteredServerLog((prev) => mergeNewLogs(prev || [], logs));
       setFilteredServerlogOffset(offset + 50);
       setFilteredServerLogMaxEntries(Number(data?.serverLogCount) || 0);
     } catch (error) {
@@ -231,11 +245,6 @@ function AdminPage() {
     setFilteredServerlogOffset(0);
     setFilteredServerLog(null);
     fetchFilteredLogs(filters, 0);
-  }
-
-  function handleRefreshLogs() {
-    console.log("activeFilters", activeFilters);
-    activeFilters ? fetchFilteredLogs(activeFilters, 0) : refreshServerLogs();
   }
 
   function handleNewPermission(permission) {
@@ -298,23 +307,8 @@ function AdminPage() {
                           >
                             Such/Filter löschen
                           </button>
-                          <button
-                            className="btn btn-outline-primary"
-                            type="button"
-                            onClick={refreshFilteredServerLog}
-                          >
-                            Gefilterte aktualisieren
-                          </button>
                         </>
-                      ) : (
-                        <button
-                          className="btn btn-outline-primary"
-                          type="button"
-                          onClick={handleRefreshLogs}
-                        >
-                          Aktualisieren
-                        </button>
-                      )}
+                      ) : null}
                     </div>
 
                     <div style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
