@@ -1,6 +1,7 @@
 import { ConflictError } from "@/errors/conflictError.js";
 import { ValidationError } from "@/errors/validationError.js";
 import LastLogin from "@/models/lastLogin.model.js";
+import Permission from "@/models/permission.model";
 import User from "@/models/user.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
@@ -123,17 +124,21 @@ export class UserService {
         return jsonResponse;
     }
 
-    generateJSONUserResponse(databaseUser: User): Record<string, any> {
+    generateJSONUserResponseWithUser(databaseUser: User): Record<string, any> {
+        return this.generateJSONUserResponse(databaseUser.id, databaseUser.username, databaseUser.email, databaseUser.isActive, databaseUser.isDisabled, databaseUser.permissions);
+    }
+
+    generateJSONUserResponse(id: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissions?: Permission[]): Record<string, any> {
         return {
-            id: databaseUser.id,
-            username: databaseUser.username,
-            email: databaseUser.email,
-            isActive: databaseUser.isActive,
-            isDisabled: databaseUser.isDisabled,
-            permissions: databaseUser.permissions
-                ? databaseUser.permissions.map((databasePermission) => ({
-                      id: databasePermission.id,
-                      name: databasePermission.name
+            id: id,
+            username: username,
+            email: email,
+            isActive: isActive,
+            isDisabled: isDisabled,
+            permissions: permissions
+                ? permissions.map((permission) => ({
+                      id: permission.id,
+                      name: permission.name
                   }))
                 : []
         };

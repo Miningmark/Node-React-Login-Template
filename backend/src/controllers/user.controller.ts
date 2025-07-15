@@ -1,5 +1,4 @@
 import { BaseController } from "@/controllers/base.controller.js";
-import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { UserService } from "@/services/user.service.js";
 import { NextFunction, Request, Response } from "express";
 

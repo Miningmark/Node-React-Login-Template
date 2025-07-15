@@ -4,18 +4,22 @@ import User from "@/models/user.model.js";
 import { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { SocketService } from "@/socketIO/socket.service";
 import { getAccountLockedEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
 import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX } from "@/utils/misc.util.js";
 import { CreationAttributes } from "@sequelize/core";
 import { Request } from "express";
+import { UserService } from "@/services/user.service.js";
 
 export class UserActivityService {
     private emailService: EmailService;
     private tokenService: TokenService;
+    private userService: UserService;
 
     constructor() {
         this.emailService = EmailService.getInstance();
         this.tokenService = new TokenService();
+        this.userService = new UserService();
     }
 
     async checkHasLocationChanged(databaseUser: User) {
@@ -54,6 +58,8 @@ export class UserActivityService {
         if (unsuccefullyLogins === 5) {
             databaseUser.isActive = false;
             await databaseUser.save();
+
+            SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUser.id, undefined, undefined, false));
 
             const token = await this.tokenService.generateHexUserToken(databaseUser.id, UserTokenType.ACCOUNT_REACTIVATION_TOKEN, null);
 

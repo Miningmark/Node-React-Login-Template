@@ -4,20 +4,23 @@ import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
+import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { UserService } from "@/services/user.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
 import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
-import { UserService } from "@/services/user.service.js";
 
 export class UserManagementService {
     private emailService: EmailService;
+    private routeGroupService: RouteGroupService;
     private tokenService: TokenService;
     private userService: UserService;
 
     constructor() {
         this.emailService = EmailService.getInstance();
+        this.routeGroupService = new RouteGroupService();
         this.tokenService = new TokenService();
         this.userService = new UserService();
     }
@@ -28,7 +31,7 @@ export class UserManagementService {
         const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.users = databaseUsers.map((databaseUser) => {
-            return this.userService.generateJSONUserResponse(databaseUser);
+            return this.userService.generateJSONUserResponseWithUser(databaseUser);
         });
 
         return jsonResponse;
@@ -74,40 +77,40 @@ export class UserManagementService {
             throw new ForbiddenError("Es können nur Rechte editiert und der Benutzer gesperrt werden solange der Registrierungsprozess nicht abgeschlossen ist");
 
         if (username !== undefined) {
-            //TODO: SocketIO inform single user over his new username
             databaseUser.username = username;
+            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { username: databaseUser.username });
         }
 
         if (email !== undefined) {
-            //TODO: SocketIO inform single user over his new email ? is it anywhere visible ?
             databaseUser.email = email;
+            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { email: databaseUser.email });
         }
 
         if (isActive !== undefined) {
-            //TODO: SocketIO should loggout edited user, it happens automatic if user request anything new from backend
             this.tokenService.removeJWTs(databaseUser);
             databaseUser.isActive = isActive;
+            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { isActive: databaseUser.isActive });
         }
 
         if (isDisabled !== undefined) {
-            //TODO: SocketIO should loggout edited user, it happens automatic if user request anything new from backend
             this.tokenService.removeJWTs(databaseUser);
             databaseUser.isDisabled = isDisabled;
+            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { isDisabled: databaseUser.isDisabled });
         }
 
         if (permissionIds !== undefined) {
-            //TODO: SocketIO inform single user over his new routeGroups which comes with permissions, also deleting accessToken so frontend is requesting a new one which has new routeGroups after then
-
             this.tokenService.removeJWT(databaseUser, UserTokenType.ACCESS_TOKEN);
             const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
             await databaseUser.setPermissions(databasePermissions);
+
             databaseUser.permissions = await databaseUser.getPermissions();
+
+            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
         }
 
         await databaseUser.save();
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions));
 
-        //TODO: SocketIO inform edited user over changes
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUser));
         return jsonResponse;
     }
 
@@ -132,7 +135,7 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponse(databaseUser));
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponseWithUser(databaseUser));
         return jsonResponse;
     }
 }

@@ -7,6 +7,7 @@ import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { UserService } from "@/services/user.service.js";
 import { UserActivityService } from "@/services/userActivity.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { getCompleteUserRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
@@ -20,18 +21,19 @@ import ms from "ms";
 export class AuthService {
     private emailService: EmailService;
     private tokenService: TokenService;
+    private userService: UserService;
     private userActivityService: UserActivityService;
     private routeGroupService: RouteGroupService;
 
     constructor() {
         this.emailService = EmailService.getInstance();
         this.tokenService = new TokenService();
+        this.userService = new UserService();
         this.userActivityService = new UserActivityService();
         this.routeGroupService = new RouteGroupService();
     }
 
     async register(username: string, email: string, password: string) {
-        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert", statusCode: 201 };
 
         let databaseUser = await User.findOne({ where: { [Op.or]: [{ username: username }, { email: email }] } });
@@ -47,11 +49,11 @@ export class AuthService {
             getCompleteUserRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}account-activation?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_USER_EXPIRY)))
         );
 
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponseWithUser(databaseUser));
         return jsonResponse;
     }
 
     async login(username: string, password: string, req: Request, res: Response) {
-        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich angemeldet" };
 
         const databaseUser = await User.findOne({ where: { username: username } });
@@ -100,7 +102,6 @@ export class AuthService {
     }
 
     async accountActivation(token: string) {
-        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich freigeschaltet" };
 
         const databaseUserToken = await UserToken.findOne({ where: { type: UserTokenType.USER_REGISTRATION_TOKEN, token: token }, include: { model: User } });
@@ -112,10 +113,11 @@ export class AuthService {
         }
 
         databaseUserToken.user.isActive = true;
-        await databaseUserToken.user.save();
 
+        await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUserToken.user.id, undefined, undefined, true));
         return jsonResponse;
     }
 
@@ -181,7 +183,6 @@ export class AuthService {
     }
 
     async handlePasswordRecovery(token: string, password: string) {
-        //TODO: SocketIO inform all who seeing users over change
         let jsonResponse: Record<string, any> = { message: "Passwort erfolgreich gespeichert" };
 
         const databaseUserToken = await UserToken.findOne({
@@ -212,6 +213,7 @@ export class AuthService {
         await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUserToken.user.id, undefined, undefined, true));
         return jsonResponse;
     }
 }
