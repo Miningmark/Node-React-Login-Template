@@ -59,7 +59,7 @@ export class UserActivityService {
             databaseUser.isActive = false;
             await databaseUser.save();
 
-            SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUser.id, undefined, undefined, false));
+            SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONUserResponse(databaseUser.id, undefined, undefined, false));
 
             const token = await this.tokenService.generateHexUserToken(databaseUser.id, UserTokenType.ACCOUNT_REACTIVATION_TOKEN, null);
 

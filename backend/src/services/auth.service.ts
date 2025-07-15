@@ -49,7 +49,7 @@ export class AuthService {
             getCompleteUserRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}account-activation?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_USER_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponseWithUser(databaseUser));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONUserResponseWithUser(databaseUser));
         return jsonResponse;
     }
 
@@ -117,7 +117,7 @@ export class AuthService {
         await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUserToken.user.id, undefined, undefined, true));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONUserResponse(databaseUserToken.user.id, undefined, undefined, true));
         return jsonResponse;
     }
 
@@ -213,7 +213,7 @@ export class AuthService {
         await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUserToken.user.id, undefined, undefined, true));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONUserResponse(databaseUserToken.user.id, undefined, undefined, true));
         return jsonResponse;
     }
 }

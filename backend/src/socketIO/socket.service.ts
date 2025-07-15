@@ -69,12 +69,14 @@ export class SocketService {
         });
 
         this.getIO().on("connection", async (socket) => {
-            await databaseLogger(ServerLogTypes.INFO, `Socket verbunden: \"${socket.id}\"`, {
+            await databaseLogger(ServerLogTypes.INFO, `Socket verbunden: \"${socket.id}\" für Benutzer ID: \"${socket.userId}\"`, {
+                userId: socket.userId,
                 source: "socket.io"
             });
 
             socket.on("disconnecting", async (reason) => {
-                await databaseLogger(ServerLogTypes.INFO, `Socket getrennt \"${socket.id}\ mit der Begründung: \"${reason}\"`, {
+                await databaseLogger(ServerLogTypes.INFO, `Socket getrennt \"${socket.id}\ mit der Begründung: \"${reason}\" für Benutzer ID: \"${socket.userId}\"`, {
+                    userId: socket.userId,
                     source: "socket.io"
                 });
             });

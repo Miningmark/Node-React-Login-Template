@@ -15,7 +15,7 @@ export default async () => {
 
     smartRouter.get("/getUsers{/:limit-:offset}", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(getUsersSchema), userManagementController.getUsers);
 
-    smartRouter.get("/getPermissions", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(onlyAuthorizationHeader), userManagementController.getPermissions);
+    smartRouter.get("/getPermissions", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), userManagementController.getPermissions);
 
     smartRouter.post("/updateUser", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
     smartRouter.post("/createUser", UserManagementRouteGroups.USER_MANAGEMENT_CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.createUser);
