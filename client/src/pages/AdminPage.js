@@ -95,6 +95,7 @@ function AdminPage() {
 
         // Neue Logs oben anhängen
         setServerLog((prev) => [...[...queue].reverse(), ...(prev || [])]);
+        setFilteredServerLogMaxEntries((prev) => prev + queue.length);
 
         // Filter anwenden (optional)
         const matchingLogs = queue.filter((log) => {
@@ -117,6 +118,7 @@ function AdminPage() {
 
         if (matchingLogs.length > 0) {
           setFilteredServerLog((prev) => [...matchingLogs.reverse(), ...(prev || [])]);
+          setFilteredServerLogMaxEntries((prev) => prev + matchingLogs.length);
         }
       }, 100); // alle 100ms prüfen
 
@@ -165,34 +167,12 @@ function AdminPage() {
       const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-${offset}`);
       const logs = data?.serverLogs || [];
 
-      setServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
+      setServerLog((prev) => mergeNewLogs(prev || [], logs));
       setServerlogOffset((prev) => prev + 50);
       setServerLogMaxEntries(Number(data?.serverLogCount) || null);
     } catch (error) {
       if (error.name !== "CanceledError") {
         addToast("Fehler beim Laden des ServerLogs", "danger");
-      }
-    } finally {
-      setLoadingServerLogPart(false);
-    }
-  };
-
-  const refreshServerLogs = async () => {
-    setLoadingServerLogPart(true);
-    try {
-      const { data } = await axiosProtected.get(`/adminPage/getServerLogs/50-0`);
-      const newLogs = data?.serverLogs || [];
-
-      setServerLog((prev = []) => {
-        const existingIds = new Set(prev.map((log) => log.id));
-        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
-        return onlyNewLogs.length ? [...onlyNewLogs, ...prev] : prev;
-      });
-
-      setServerLogMaxEntries(Number(data?.serverLogCount) || null);
-    } catch (error) {
-      if (error.name !== "CanceledError") {
-        addToast("Fehler beim Aktualisieren der ServerLogs", "danger");
       }
     } finally {
       setLoadingServerLogPart(false);
@@ -209,7 +189,7 @@ function AdminPage() {
       );
       const logs = data?.serverLogs || [];
 
-      setFilteredServerLog((prev) => (offset === 0 ? logs : mergeNewLogs(prev || [], logs)));
+      setFilteredServerLog((prev) => mergeNewLogs(prev || [], logs));
       setFilteredServerlogOffset(offset + 50);
       setFilteredServerLogMaxEntries(Number(data?.serverLogCount) || 0);
     } catch (error) {
