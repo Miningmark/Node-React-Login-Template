@@ -96,6 +96,7 @@ function AdminPage() {
         // Neue Logs oben anhängen
         setServerLog((prev) => [...[...queue].reverse(), ...(prev || [])]);
         setFilteredServerLogMaxEntries((prev) => prev + queue.length);
+        setServerlogOffset((prev) => prev + queue.length);
 
         // Filter anwenden (optional)
         const matchingLogs = queue.filter((log) => {
@@ -119,6 +120,7 @@ function AdminPage() {
         if (matchingLogs.length > 0) {
           setFilteredServerLog((prev) => [...matchingLogs.reverse(), ...(prev || [])]);
           setFilteredServerLogMaxEntries((prev) => prev + matchingLogs.length);
+          setFilteredServerlogOffset((prev) => prev + matchingLogs.length);
         }
       }, 100); // alle 100ms prüfen
 
