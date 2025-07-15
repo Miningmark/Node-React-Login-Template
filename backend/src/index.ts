@@ -6,7 +6,7 @@ import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
-import { generateSuperAdmin, generateSuperAdminPermission } from "@/utils/superAdmin.util.js";
+import { generateDevUser, generateSuperAdmin } from "@/utils/superAdmin.util.js";
 import http from "http";
 import { Server } from "socket.io";
 
@@ -35,7 +35,7 @@ httpServer.listen(ENV.BACKEND_PORT, async () => {
         await RouteGroupService.removeUnusedRouteGroups();
 
         await generateSuperAdmin();
-        await generateSuperAdminPermission();
+        await generateDevUser();
 
         await scheduleAllCronJobs();
 

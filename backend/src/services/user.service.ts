@@ -5,6 +5,7 @@ import Permission from "@/models/permission.model";
 import User from "@/models/user.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { SocketService } from "@/socketIO/socket.service";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import bcrypt from "bcrypt";
 import { Response } from "express";
@@ -19,8 +20,6 @@ export class UserService {
     }
 
     async updateUsername(userId: number, newUsername: string, res: Response) {
-        //TODO: SocketIO inform all who seeing users over change
-        //TODO: SocketIO inform single user over his new username
         let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -37,12 +36,11 @@ export class UserService {
         databaseUser.username = newUsername;
         await databaseUser.save();
 
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.generateJSONUserResponse(databaseUser.id, databaseUser.username));
         return jsonResponse;
     }
 
     async updateEmail(userId: number, newEmail: string, res: Response) {
-        //TODO: SocketIO inform all who seeing users over change
-        //TODO: SocketIO inform single user over his new email ? is it anywhere visible ?
         let jsonResponse: Record<string, any> = { message: "Email erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -58,6 +56,7 @@ export class UserService {
         databaseUser.email = newEmail;
         await databaseUser.save();
 
+        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.generateJSONUserResponse(databaseUser.id, undefined, databaseUser.email));
         return jsonResponse;
     }
 

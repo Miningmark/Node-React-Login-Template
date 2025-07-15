@@ -11,6 +11,7 @@ export async function generateSuperAdmin() {
     try {
         const hashedPassword = await bcrypt.hash(ENV.SUPER_ADMIN_PASSWORD, 10);
         let databaseUser = await User.findOne({ where: { username: "SuperAdmin" } });
+        let databasePermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
 
         if (databaseUser === null) {
             databaseUser = await User.create({ username: "SuperAdmin", email: "", password: hashedPassword, isActive: true });
@@ -21,18 +22,6 @@ export async function generateSuperAdmin() {
                 await databaseUser.save();
             }
         }
-        await databaseLogger(ServerLogTypes.INFO, "SuperAdmin erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
-    } catch (error) {
-        await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
-    }
-}
-
-export async function generateSuperAdminPermission() {
-    try {
-        const databaseUser = await User.findOne({ where: { username: "SuperAdmin" } });
-        let databasePermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
-
-        if (databaseUser === null) throw new ValidationError("SuperAdmin existiert nicht");
 
         if (databasePermission === null) {
             databasePermission = await Permission.create({ name: "SuperAdmin Berechtigung", description: "Hat sämtlich Berechtigungen für den SuperAdmin" });
@@ -43,8 +32,31 @@ export async function generateSuperAdminPermission() {
         await databaseUser.setPermissions([databasePermission]);
         await databasePermission.setRouteGroups(databaseRouteGroups);
 
-        await databaseLogger(ServerLogTypes.INFO, "SuperAdmin Berechtigung erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
+        await databaseLogger(ServerLogTypes.INFO, "SuperAdmin und Berechtigungen erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
     } catch (error) {
         await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
     }
+}
+
+//TODO: remove
+export async function generateDevUser() {
+    const hashedPassword = await bcrypt.hash("Test123!", 10);
+    let databaseUser = await User.findOne({ where: { username: "devUser" } });
+
+    if (databaseUser === null) {
+        databaseUser = await User.create({ username: "devUser", email: "", password: hashedPassword, isActive: true });
+    }
+
+    let databasePermission = await Permission.findOne({ where: { name: "DevUser Berechtigung" } });
+
+    if (databaseUser === null) return;
+
+    if (databasePermission === null) {
+        databasePermission = await Permission.create({ name: "DevUser Berechtigung", description: "Hat sämtlich Berechtigungen für den DevUser" });
+    }
+
+    const databaseRouteGroups = await RouteGroup.findAll();
+
+    await databaseUser.setPermissions([databasePermission]);
+    await databasePermission.setRouteGroups(databaseRouteGroups);
 }
