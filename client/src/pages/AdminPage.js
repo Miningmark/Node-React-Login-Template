@@ -73,6 +73,12 @@ function AdminPage() {
   const serverLogQueueRef = useRef([]);
   const intervalRef = useRef(null);
 
+  console.log("selectedServerLog ID", selectedServerLog);
+  console.log(
+    "selectedServerLog",
+    serverLog.find((log) => log.id === selectedServerLog)
+  );
+
   useEffect(() => {
     if (socket) {
       function handleNewServerLog(data) {
