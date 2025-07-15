@@ -1,6 +1,6 @@
 import { ENV } from "@/config/env.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
-import { SocketService } from "@/socketIO/socket.service";
+import { SocketService } from "@/socketIO/socket.service.js";
 import winston from "winston";
 
 export interface DatabaseLoggerOptions {
