@@ -39,6 +39,7 @@ const UserManagement = () => {
 
     const handleUserUpdate = (updatedUser) => {
       const oldUser = users.find((user) => user.id === updatedUser.id);
+      console.log("oldUser:", oldUser);
       if (!oldUser) {
         console.warn("User not found for update:", updatedUser);
         return;
@@ -57,7 +58,7 @@ const UserManagement = () => {
       socket.off("users:create", handleUserAdd);
       socket.off("users:update", handleUserUpdate);
     };
-  }, [socket]);
+  }, [socket, users]);
 
   useEffect(() => {
     const controller = new AbortController();
