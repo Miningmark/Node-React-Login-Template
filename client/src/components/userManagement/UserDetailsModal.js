@@ -16,8 +16,6 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions 
 
   if (!user) return null;
 
-  console.log("User", user);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedUser({ ...editedUser, [name]: value });

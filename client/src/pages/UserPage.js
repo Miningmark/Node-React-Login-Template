@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { convertToLocalDate } from "../util/timeConverting";
 import { AuthContext } from "../contexts/AuthContext";
 import { ThemeContext } from "contexts/ThemeContext";
-import Table from "react-bootstrap/Table";
 import ResizableTable from "components/util/ResizableTable";
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import "components/util/css/ResizableTable.css";
@@ -30,7 +29,7 @@ const UserPage = () => {
   const [showPassword3, setShowPassword3] = useState(false);
 
   const { addToast } = useToast();
-  const { setAccessToken } = useContext(AuthContext);
+  const { setAccessToken, setUsername } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
@@ -153,8 +152,9 @@ const UserPage = () => {
       await axiosProtected.post("/user/updateUsername", { newUsername });
 
       addToast("Benutzername erfolgreich aktualisiert.", "success");
-      setAccessToken("");
-      navigate("/login");
+      setUsername(newUsername);
+      setNewUsername("");
+      setTouched({ ...touched, username: false });
     } catch (error) {
       addToast(error.response?.data?.message || "Benutzername-Änderung fehlgeschlagen", "danger");
     } finally {
