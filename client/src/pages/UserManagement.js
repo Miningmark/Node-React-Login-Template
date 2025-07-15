@@ -39,13 +39,11 @@ const UserManagement = () => {
 
     const handleUserUpdate = (updatedUser) => {
       const oldUser = users.find((user) => user.id === updatedUser.id);
-      console.log("oldUser:", oldUser);
       if (!oldUser) {
-        console.warn("User not found for update:", updatedUser);
+        console.warn("User not found for update");
         return;
       }
       const newUser = { ...oldUser, ...updatedUser };
-      console.log("Updating user:", newUser);
       setUsers((prevUsers) =>
         prevUsers.map((user) => (user.id === updatedUser.id ? newUser : user))
       );
@@ -71,7 +69,7 @@ const UserManagement = () => {
         setUsers(response.data.users);
       } catch (error) {
         if (error.name === "CanceledError") {
-          console.log("User-Fetch abgebrochen");
+          console.warn("User-Fetch abgebrochen");
         } else {
           addToast("Fehler beim Laden der Userliste", "danger");
         }
@@ -88,7 +86,7 @@ const UserManagement = () => {
         setAllPermissions(response.data.permissions);
       } catch (error) {
         if (error.name === "CanceledError") {
-          console.log("Permissions-Fetch abgebrochen");
+          console.warn("Permissions-Fetch abgebrochen");
         } else {
           addToast("Fehler beim Laden der Berechtigungen", "danger");
         }

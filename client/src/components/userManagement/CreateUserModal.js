@@ -3,7 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 
-const CreateUserModal = ({ show, handleClose, allPermissions /*  onUserCreated */ }) => {
+const CreateUserModal = ({ show, handleClose, allPermissions }) => {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",

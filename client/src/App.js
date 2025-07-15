@@ -18,6 +18,7 @@ import { useContext, useEffect } from "react";
 import UserManagement from "./pages/UserManagement";
 import useAxiosProtected from "./hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
+import { useNavigate } from "react-router-dom";
 
 function AppWrapper() {
   return (
@@ -48,28 +49,36 @@ function App() {
   const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
   const hideNavBar = publicPaths.includes(location.pathname);
 
-  const { setUsername, setRouteGroups, username, routeGroups, accessToken } =
+  const { setUsername, setRouteGroups, username, routeGroups, accessToken, logout } =
     useContext(AuthContext);
 
   const { socket } = useContext(SocketContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (socket) {
-      setTimeout(() => {
-        console.log("EMIT");
-        socket.emit("user:watchList");
+      function handleUserUpdate(data) {
+        if (Object.hasOwn(data, "username")) {
+          setUsername(data.username);
+        } else if (Object.hasOwn(data, "routeGroups")) {
+          setRouteGroups(data.routeGroups);
+        } else if (Object.hasOwn(data, "isActive") || Object.hasOwn(data, "isDisabled")) {
+          logout();
+          navigate("/login");
+        } else {
+          console.log("Kein Releventen Daten enthalten.");
+        }
+      }
 
-        socket.on("user:update", (data) => {
-          console.log(data);
-        });
-      }, 1000);
+      socket.on("user:update", handleUserUpdate);
+
+      return () => {
+        socket.off("user:update", handleUserUpdate);
+      };
     }
   }, [socket]);
 
   const axiosProtected = useAxiosProtected();
-
-  console.log("Username:", username);
-  console.log("RouteGroups:", useContext(AuthContext).routeGroups);
 
   useEffect(() => {
     if (!accessToken) return;
