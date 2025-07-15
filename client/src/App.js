@@ -89,7 +89,6 @@ function App() {
     let isMounted = true;
 
     const fetchUser = async () => {
-      console.log("Fetching user data...");
       try {
         const [userRes, routesRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
@@ -97,13 +96,11 @@ function App() {
         ]);
 
         if (isMounted) {
-          console.log("User data fetched successfully:");
           if (userRes.data?.username) setUsername(userRes.data.username);
           if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
-          console.log("Anfrage abgebrochen");
         } else {
           console.warn("Kein gültiger Login gefunden.");
         }

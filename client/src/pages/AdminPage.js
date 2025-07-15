@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, use } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
@@ -10,6 +10,7 @@ import { convertToLocalTimeStamp } from "util/timeConverting";
 import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 import CreatePermissionModal from "components/adminPage/CreatePermissionModal";
 import ResizableTable from "components/util/ResizableTable";
+import { SocketContext } from "contexts/SocketProvider";
 
 import "components/adminPage/adminPage.css";
 
@@ -39,7 +40,7 @@ function clearFilters(filters) {
 }
 
 function AdminPage() {
-  const [serverLog, setServerLog] = useState(null);
+  const [serverLog, setServerLog] = useState([]);
   const [filteredServerLog, setFilteredServerLog] = useState(null);
   const [loadingServerLog, setLoadingServerLog] = useState(false);
   const [serverlogOffset, setServerlogOffset] = useState(0);
@@ -67,6 +68,64 @@ function AdminPage() {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
+  const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      function handleNewServerLog(data) {
+        console.log("Neuer ServerLog-Eintrag empfangen:", data);
+        setServerLog((prev) => (prev ? [data, ...prev] : data));
+
+        if (activeFilters) {
+          if (activeFilters.types.length > 0 && activeFilters.types.includes(data.type)) {
+            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
+            return;
+          }
+          if (activeFilters.userIds.length > 0 && activeFilters.userIds.includes(data.userId)) {
+            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
+            return;
+          }
+          if (
+            activeFilters.createdAtFrom &&
+            new Date(data.createdAt) < new Date(activeFilters.createdAtFrom)
+          ) {
+            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
+            return;
+          }
+          if (
+            activeFilters.createdAtTo &&
+            new Date(data.createdAt) > new Date(activeFilters.createdAtTo)
+          ) {
+            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
+            return;
+          }
+          if (
+            activeFilters.ipv4Address &&
+            data.ipv4Address.toLowerCase().includes(activeFilters.ipv4Address.toLowerCase())
+          ) {
+            console.log("IPv4-Adresse passt:", data.ipv4Address, activeFilters.ipv4Address);
+            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
+            return;
+          }
+          if (
+            activeFilters.message &&
+            data.message.toLowerCase().includes(activeFilters.message.toLowerCase())
+          ) {
+            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
+            return;
+          }
+        }
+      }
+
+      socket.emit("subscribe:serverLogs:watchList");
+
+      socket.on("serverLogs:create", handleNewServerLog);
+
+      return () => {
+        socket.off("serverLogs:create", handleNewServerLog);
+      };
+    }
+  }, [socket, activeFilters, setFilteredServerLog, setServerLog]);
 
   const filteredPermission = useMemo(() => {
     if (!allPermissions) return [];
