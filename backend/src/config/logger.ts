@@ -1,7 +1,10 @@
 import { ENV } from "@/config/env.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
+import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import winston from "winston";
+
+const serverLogService = new ServerLogService();
 
 export interface DatabaseLoggerOptions {
     userId?: number;
@@ -55,7 +58,7 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
             }
         }
 
-        const serverLog = {
+        const databaseServerLog = await ServerLog.create({
             type: type,
             message: message,
             userId: userId,
@@ -69,11 +72,10 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
             response: JSON.stringify(response),
             source: source,
             errorStack: error?.stack?.split("\n").slice(1).join("\n")
-        };
+        });
 
-        await ServerLog.create(serverLog);
         try {
-            SocketService.getInstance().emitToRoom("listen:serverLogs:watchList", "serverLogs:create", serverLog);
+            SocketService.getInstance().emitToRoom("listen:serverLogs:watchList", "serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
         } catch (error) {}
     } catch (error) {
         consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", { error: error instanceof Error ? error.stack : "" });

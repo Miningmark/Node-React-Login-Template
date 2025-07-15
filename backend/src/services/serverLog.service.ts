@@ -2,7 +2,7 @@ import ServerLog from "@/models/serverLog.model.js";
 import { Op, WhereOptions } from "@sequelize/core";
 
 export class ServerLogService {
-    async generateJSONResponse(databaseServerLogs: ServerLog[]): Promise<Record<string, any>> {
+    generateJSONResponse(databaseServerLogs: ServerLog[]): Record<string, any> {
         return databaseServerLogs.map((databaseServerLog) => {
             return {
                 id: databaseServerLog.id,
