@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo, use } from "react";
+import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
@@ -70,52 +70,49 @@ function AdminPage() {
   const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
 
+  const serverLogQueueRef = useRef([]);
+  const intervalRef = useRef(null);
+
   useEffect(() => {
     if (socket) {
       function handleNewServerLog(data) {
-        console.log("Neuer ServerLog-Eintrag empfangen:", data);
-        setServerLog((prev) => (prev ? [data, ...prev] : data));
-
-        if (activeFilters) {
-          if (activeFilters.types.length > 0 && activeFilters.types.includes(data.type)) {
-            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
-            return;
-          }
-          if (activeFilters.userIds.length > 0 && activeFilters.userIds.includes(data.userId)) {
-            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
-            return;
-          }
-          if (
-            activeFilters.createdAtFrom &&
-            new Date(data.createdAt) < new Date(activeFilters.createdAtFrom)
-          ) {
-            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
-            return;
-          }
-          if (
-            activeFilters.createdAtTo &&
-            new Date(data.createdAt) > new Date(activeFilters.createdAtTo)
-          ) {
-            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
-            return;
-          }
-          if (
-            activeFilters.ipv4Address &&
-            data.ipv4Address.toLowerCase().includes(activeFilters.ipv4Address.toLowerCase())
-          ) {
-            console.log("IPv4-Adresse passt:", data.ipv4Address, activeFilters.ipv4Address);
-            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
-            return;
-          }
-          if (
-            activeFilters.message &&
-            data.message.toLowerCase().includes(activeFilters.message.toLowerCase())
-          ) {
-            setFilteredServerLog((prev) => (prev ? [data, ...prev] : [data]));
-            return;
-          }
-        }
+        serverLogQueueRef.current.push(data);
+        console.log("Neuer Server-Log-Eintrag empfangen:", data);
       }
+
+      intervalRef.current = setInterval(() => {
+        const queue = serverLogQueueRef.current;
+        if (queue.length === 0) return;
+
+        // Leere Queue frühzeitig, damit spätere Logs nicht verloren gehen
+        serverLogQueueRef.current = [];
+
+        // Neue Logs oben anhängen
+        setServerLog((prev) => [...[...queue].reverse(), ...(prev || [])]);
+
+        // Filter anwenden (optional)
+        const matchingLogs = queue.filter((log) => {
+          if (!activeFilters || Object.keys(activeFilters).length === 0) return true;
+
+          return (
+            (!activeFilters.types?.length || activeFilters.types.includes(log.type)) &&
+            (!activeFilters.userIds?.length ||
+              activeFilters.userIds.map(Number).includes(log.userId)) &&
+            (!activeFilters.createdAtFrom ||
+              new Date(log.createdAt) >= new Date(activeFilters.createdAtFrom)) &&
+            (!activeFilters.createdAtTo ||
+              new Date(log.createdAt) <= new Date(activeFilters.createdAtTo)) &&
+            (!activeFilters.ipv4Address ||
+              log.ipv4Address?.toLowerCase().includes(activeFilters.ipv4Address.toLowerCase())) &&
+            (!activeFilters.message ||
+              log.message?.toLowerCase().includes(activeFilters.message.toLowerCase()))
+          );
+        });
+
+        if (matchingLogs.length > 0) {
+          setFilteredServerLog((prev) => [...matchingLogs.reverse(), ...(prev || [])]);
+        }
+      }, 100); // alle 100ms prüfen
 
       socket.emit("subscribe:serverLogs:watchList");
 
@@ -123,6 +120,7 @@ function AdminPage() {
 
       return () => {
         socket.off("serverLogs:create", handleNewServerLog);
+        clearInterval(intervalRef.current);
       };
     }
   }, [socket, activeFilters, setFilteredServerLog, setServerLog]);
@@ -149,37 +147,6 @@ function AdminPage() {
 
     return sortingAlgorithm(filtered, "name", "asc");
   }, [allPermissions, searchTerm]);
-
-  const refreshFilteredServerLog = async () => {
-    if (!activeFilters) return;
-    setLoadingServerLogPart(true);
-    try {
-      const response = await axiosProtected.post(
-        `/adminPage/getFilteredServerLogs/50-0`,
-        clearFilters(activeFilters)
-      );
-      const newLogs = response.data.serverLogs || [];
-
-      if (!filteredServerLog?.length) {
-        setFilteredServerLog(newLogs);
-      } else {
-        // IDs der bisherigen Logs
-        const existingIds = new Set(filteredServerLog.map((log) => log.id));
-        // Nur neue Logs, die noch nicht existieren
-        const onlyNewLogs = newLogs.filter((log) => !existingIds.has(log.id));
-
-        if (onlyNewLogs.length) {
-          setFilteredServerLog((prev) => [...onlyNewLogs, ...prev]);
-        }
-      }
-
-      setFilteredServerLogMaxEntries(Number(response?.data?.serverLogCount) || 0);
-    } catch {
-      addToast("Fehler beim Aktualisieren der gefilterten Logs", "danger");
-    } finally {
-      setLoadingServerLogPart(false);
-    }
-  };
 
   const mergeNewLogs = (existingLogs, newLogs) => {
     const existingIds = new Set(existingLogs.map((log) => log.id));
@@ -292,11 +259,6 @@ function AdminPage() {
     fetchFilteredLogs(filters, 0);
   }
 
-  function handleRefreshLogs() {
-    console.log("activeFilters", activeFilters);
-    activeFilters ? fetchFilteredLogs(activeFilters, 0) : refreshServerLogs();
-  }
-
   function handleNewPermission(permission) {
     setAllPermissions((prev) => [...prev, permission]);
     setShowCreatePermissionModal(false);
@@ -357,23 +319,8 @@ function AdminPage() {
                           >
                             Such/Filter löschen
                           </button>
-                          <button
-                            className="btn btn-outline-primary"
-                            type="button"
-                            onClick={refreshFilteredServerLog}
-                          >
-                            Gefilterte aktualisieren
-                          </button>
                         </>
-                      ) : (
-                        <button
-                          className="btn btn-outline-primary"
-                          type="button"
-                          onClick={handleRefreshLogs}
-                        >
-                          Aktualisieren
-                        </button>
-                      )}
+                      ) : null}
                     </div>
 
                     <div style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
