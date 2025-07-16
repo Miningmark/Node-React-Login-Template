@@ -94,10 +94,7 @@ const UserManagement = () => {
     };
 
     fetchUsers();
-
-    if (routeGroups?.includes("userManagementWrite")) {
-      fetchAllPermissions();
-    }
+    fetchAllPermissions();
 
     return () => {
       controller.abort();
@@ -146,12 +143,6 @@ const UserManagement = () => {
       prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
     );
   };
-
-  /* 
-  const handleNewUser = (newUser) => {
-    setUsers((prevUsers) => [...prevUsers, newUser]);
-  };
-  */
 
   return (
     <>
@@ -289,7 +280,6 @@ const UserManagement = () => {
             setCreateUser(false);
           }}
           allPermissions={allPermissions}
-          //onUserCreated={handleNewUser}
         />
       ) : null}
     </>

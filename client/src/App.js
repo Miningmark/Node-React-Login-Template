@@ -195,7 +195,7 @@ function App() {
         <Route
           path="/usermanagement"
           element={
-            <RequireAuth allowedRouteGroups={["userManagementRead"]}>
+            <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
               <UserManagement />
             </RequireAuth>
           }
