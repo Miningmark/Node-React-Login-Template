@@ -36,7 +36,7 @@ export class UserService {
         databaseUser.username = newUsername;
         await databaseUser.save();
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.generateJSONUserResponse(databaseUser.id, databaseUser.username));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONUserResponse(databaseUser.id, databaseUser.username));
         return jsonResponse;
     }
 
@@ -56,7 +56,7 @@ export class UserService {
         databaseUser.email = newEmail;
         await databaseUser.save();
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.generateJSONUserResponse(databaseUser.id, undefined, databaseUser.email));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONUserResponse(databaseUser.id, undefined, databaseUser.email));
         return jsonResponse;
     }
 

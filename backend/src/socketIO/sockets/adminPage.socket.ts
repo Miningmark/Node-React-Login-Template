@@ -1,11 +1,18 @@
 import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
+import { UserManagementRouteGroups } from "@/routeGroups/userManagement.routeGroup";
 import { ClientToServerEvents, ServerToClientEvents } from "@/socketIO/types.js";
 import { Socket } from "socket.io";
 
 export default (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>) => {
-    socket.on("subscribe:serverLogs:watchList", () => {
+    socket.on("subscribe:adminPage:serverLogs:watchList", () => {
+        if (socket.routeGroups.some((routeGroup) => [AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ.groupName].includes(routeGroup))) {
+            socket.join("listen:adminPage:serverLogs:watchList");
+        }
+    });
+
+    socket.on("subscribe:adminPage:permissions:watchList", () => {
         if (socket.routeGroups.some((routeGroup) => [AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ.groupName, AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE.groupName].includes(routeGroup))) {
-            socket.join("listen:serverLogs:watchList");
+            socket.join("listen:adminPage:permissions:watchList");
         }
     });
 };

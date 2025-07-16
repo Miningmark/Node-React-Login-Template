@@ -75,7 +75,7 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
         });
 
         try {
-            SocketService.getInstance().emitToRoom("listen:serverLogs:watchList", "serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
+            SocketService.getInstance().emitToRoom("listen:adminPage:serverLogs:watchList", "adminPage:serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
         } catch (error) {}
     } catch (error) {
         consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", { error: error instanceof Error ? error.stack : "" });

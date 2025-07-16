@@ -109,7 +109,11 @@ export class UserManagementService {
         }
 
         await databaseUser.save();
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:update", this.userService.generateJSONUserResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions));
+        SocketService.getInstance().emitToRoom(
+            "listen:userManagement:users:watchList",
+            "userManagement:users:update",
+            this.userService.generateJSONUserResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions)
+        );
 
         return jsonResponse;
     }
@@ -135,7 +139,7 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:users:watchList", "users:create", this.userService.generateJSONUserResponseWithUser(databaseUser));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:create", this.userService.generateJSONUserResponseWithUser(databaseUser));
         return jsonResponse;
     }
 }
