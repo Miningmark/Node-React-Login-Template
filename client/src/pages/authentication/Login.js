@@ -12,7 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-import "../../components/css/login.css";
+import "components/css/login.css";
 
 function Login() {
   const [name, setName] = useState("");

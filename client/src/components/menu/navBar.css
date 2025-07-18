@@ -6,9 +6,18 @@
   transform: translateY(0);
   transition: transform 0.3s ease-in-out;
 }
+.mobile-hide {
+  display: none !important;
+}
 @media (min-width: 768px) {
   .navbar-mobile-hide-show {
     transform: none !important;
     transition: none !important;
+  }
+  .mobile-hide {
+    display: block !important;
+  }
+  .hamburger-icon {
+    display: none !important;
   }
 }
