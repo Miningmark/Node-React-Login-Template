@@ -36,7 +36,7 @@ export class UserService {
         databaseUser.username = newUsername;
         await databaseUser.save();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONUserResponse(databaseUser.id, databaseUser.username));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, databaseUser.username));
         return jsonResponse;
     }
 
@@ -56,7 +56,7 @@ export class UserService {
         databaseUser.email = newEmail;
         await databaseUser.save();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONUserResponse(databaseUser.id, undefined, databaseUser.email));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, undefined, databaseUser.email));
         return jsonResponse;
     }
 
@@ -123,11 +123,11 @@ export class UserService {
         return jsonResponse;
     }
 
-    generateJSONUserResponseWithUser(databaseUser: User): Record<string, any> {
-        return this.generateJSONUserResponse(databaseUser.id, databaseUser.username, databaseUser.email, databaseUser.isActive, databaseUser.isDisabled, databaseUser.permissions);
+    generateJSONResponseWithModel(databaseUser: User): Record<string, any> {
+        return this.generateJSONResponse(databaseUser.id, databaseUser.username, databaseUser.email, databaseUser.isActive, databaseUser.isDisabled, databaseUser.permissions);
     }
 
-    generateJSONUserResponse(id: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissions?: Permission[]): Record<string, any> {
+    generateJSONResponse(id: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissions?: Permission[]): Record<string, any> {
         return {
             id: id,
             username: username,

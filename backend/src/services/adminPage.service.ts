@@ -3,13 +3,21 @@ import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import User from "@/models/user.model.js";
+import { PermissionService } from "@/services/permission.service.js";
+import { RouteGroupService } from "@/services/routeGroup.service.js";
+import { ServerLogService } from "@/services/serverLog.service.js";
+import { SocketService } from "@/socketIO/socket.service.js";
 import { Op } from "@sequelize/core";
-import { ServerLogService } from "./serverLog.service.js";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
+    private routeGroupService: RouteGroupService;
+    private permissionService: PermissionService;
+
     constructor() {
         this.serverLogService = new ServerLogService();
+        this.routeGroupService = new RouteGroupService();
+        this.permissionService = new PermissionService();
     }
 
     async getServerLogs(limit?: number, offset?: number) {
@@ -18,7 +26,7 @@ export class AdminPageService {
         const databaseServerLogs = await ServerLog.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.serverLogCount = await ServerLog.count();
-        jsonResponse.serverLogs = await this.serverLogService.generateJSONResponse(databaseServerLogs);
+        jsonResponse.serverLogs = this.serverLogService.generateJSONResponse(databaseServerLogs);
 
         return jsonResponse;
     }
@@ -35,7 +43,7 @@ export class AdminPageService {
         });
 
         jsonResponse.serverLogCount = await ServerLog.count({ where: buildServerLogQueryConditions });
-        jsonResponse.serverLogs = await this.serverLogService.generateJSONResponse(databaseServerLogs);
+        jsonResponse.serverLogs = this.serverLogService.generateJSONResponse(databaseServerLogs);
 
         return jsonResponse;
     }
@@ -63,20 +71,7 @@ export class AdminPageService {
 
         const databasePermissions = await Permission.findAll({ include: { model: RouteGroup } });
 
-        jsonResponse.permissions = databasePermissions.map((databasePermission) => {
-            return {
-                id: databasePermission.id,
-                name: databasePermission.name,
-                description: databasePermission.description,
-                routeGroups: databasePermission.routeGroups
-                    ? databasePermission.routeGroups.map((databaseRouteGroup) => ({
-                          id: databaseRouteGroup.id,
-                          name: databaseRouteGroup.name,
-                          description: databaseRouteGroup.description
-                      }))
-                    : []
-            };
-        });
+        jsonResponse.permissions = this.permissionService.generateMultipleJSONResponseWithModel(databasePermissions);
 
         return jsonResponse;
     }
@@ -86,13 +81,7 @@ export class AdminPageService {
 
         const databaseRouteGroups = await RouteGroup.findAll();
 
-        jsonResponse.routeGroups = databaseRouteGroups.map((databaseRouteGroup) => {
-            return {
-                id: databaseRouteGroup.id,
-                name: databaseRouteGroup.name,
-                description: databaseRouteGroup.description
-            };
-        });
+        jsonResponse.routeGroups = this.routeGroupService.generateMultipleJSONResponseWithModel(databaseRouteGroups);
 
         return jsonResponse;
     }
@@ -107,8 +96,10 @@ export class AdminPageService {
         const databaseRouteGroups = await RouteGroup.findAll({ where: { id: { [Op.in]: routeGroupIds } } });
 
         await databasePermission.setRouteGroups(databaseRouteGroups);
+        databasePermission.routeGroups = await databasePermission.getRouteGroups();
 
-        jsonResponse.permissionId = databasePermission.id;
+        SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:create", { id: databasePermission.id, name: name, description: description });
+        SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:create", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
 
         return jsonResponse;
     }
@@ -138,6 +129,9 @@ export class AdminPageService {
 
         await databasePermission.save();
 
+        SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:update", { id: id, name: name, description: description });
+        SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:update", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
+
         return jsonResponse;
     }
 
@@ -149,6 +143,9 @@ export class AdminPageService {
         if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht gelöscht werden");
 
         await databasePermission.destroy();
+
+        SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:delete", { id: id });
+        SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:delete", { id: id });
 
         return jsonResponse;
     }

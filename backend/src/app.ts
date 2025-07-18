@@ -32,6 +32,5 @@ export async function initApp() {
     app.use("/api/" + ENV.API_VERSION + "/adminPage", await adminPageRoutes());
 
     app.use(notFoundMiddleware);
-
     app.use(errorHandlerMiddleware);
 }
