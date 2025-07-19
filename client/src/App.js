@@ -12,7 +12,7 @@ import { ToastProvider } from "./components/ToastContext";
 import ResetPassword from "./pages/authentication/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, ThemeContext } from "./contexts/ThemeContext";
 import RequireAuth from "./components/RequireAuth";
 import PublicRoute from "./components/PublicRoute";
 import { useContext, useEffect } from "react";
@@ -48,10 +48,9 @@ function InnerProviders() {
 function App() {
   const location = useLocation();
   const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
-  const hideNavBar = publicPaths.includes(location.pathname);
 
-  const { setUsername, setRouteGroups, username, routeGroups, accessToken, logout } =
-    useContext(AuthContext);
+  const { setUsername, setRouteGroups, username, accessToken, logout } = useContext(AuthContext);
+  const { setTheme } = useContext(ThemeContext);
 
   const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
@@ -83,13 +82,13 @@ function App() {
 
   useEffect(() => {
     if (!accessToken) return;
-    if (username && routeGroups) return;
+    //if (username && routeGroups) return;
 
     const controller = new AbortController();
     const signal = controller.signal;
     let isMounted = true;
 
-    const fetchUser = async () => {
+    async function fetchUser() {
       try {
         const [userRes, routesRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
@@ -106,11 +105,23 @@ function App() {
           console.warn("Kein gültiger Login gefunden.");
         }
       }
-    };
+    }
+
+    async function fetchSettings() {
+      try {
+        const responseSettings = await axiosProtected.get("/user/getSettings");
+        console.log("Settings:", responseSettings.data.settings.theme);
+        setTheme(
+          responseSettings.data.settings.theme === "dark_theme" ? "dark" : "light" || "light"
+        );
+      } catch (error) {}
+    }
 
     if (!username) {
       fetchUser();
     }
+
+    fetchSettings();
 
     return () => {
       isMounted = false;
@@ -167,6 +178,7 @@ function App() {
               }
             />
           ) : null}
+
           {/* Authentifizierte Routen */}
           <Route
             path="/dashboard"

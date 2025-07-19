@@ -13,7 +13,7 @@ const Settings = () => {
   async function handleThemeChange() {
     try {
       await axiosProtected.post(`/user/updateSettings`, {
-        theme: theme === "light" ? "dark_theme" : "light_theme",
+        theme: theme === "light" ? "light_theme" : "dark_theme",
       });
     } catch (error) {
       addToast(error.response?.data?.message || "Bearbeitung fehlgeschlagen", "danger");
