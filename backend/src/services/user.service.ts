@@ -1,4 +1,5 @@
 import { ConflictError } from "@/errors/conflictError.js";
+import { InternalServerError } from "@/errors/internalServerError";
 import { ValidationError } from "@/errors/validationError.js";
 import LastLogin from "@/models/lastLogin.model.js";
 import Permission from "@/models/permission.model";
@@ -88,7 +89,9 @@ export class UserService {
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
-        if (databaseUser.userSettings === undefined) {
+        if (databaseUser.userSettings === undefined) throw new InternalServerError("Einstellungen nicht geladen");
+
+        if (databaseUser.userSettings === null) {
             await databaseUser.createUserSettings({ userId: userId, theme: theme });
         } else {
             databaseUser.userSettings.theme = theme;
@@ -144,9 +147,10 @@ export class UserService {
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+        if (databaseUser.userSettings === undefined) throw new InternalServerError("Einstellungen nicht geladen");
 
         jsonResponse.settings = {
-            theme: databaseUser.userSettings?.theme
+            theme: databaseUser.userSettings.theme
         };
 
         return jsonResponse;
