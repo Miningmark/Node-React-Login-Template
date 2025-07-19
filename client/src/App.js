@@ -1,25 +1,24 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import Login from "./pages/authentication/Login";
-import Register from "./pages/authentication/Register";
-import AccountActivating from "./pages/authentication/AccountActivating";
-import Dashboard from "./pages/Dashboard";
-import AdminPage from "./pages/AdminPage";
-import UserPage from "./pages/user/Page";
-import UserSettings from "./pages/user/Settings";
-import NavBar from "./components/menu/NavBar";
-import { AuthProvider, AuthContext } from "./contexts/AuthContext";
-import { ToastProvider } from "./components/ToastContext";
-import ResetPassword from "./pages/authentication/ResetPassword";
-import NotFound from "./pages/NotFound";
-import Unauthorized from "./pages/Unauthorized";
-import { ThemeProvider, ThemeContext } from "./contexts/ThemeContext";
-import RequireAuth from "./components/RequireAuth";
-import PublicRoute from "./components/PublicRoute";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import Login from "pages/authentication/Login";
+import Register from "pages/authentication/Register";
+import AccountActivating from "pages/authentication/AccountActivating";
+import Dashboard from "pages/Dashboard";
+import AdminPage from "pages/AdminPage";
+import UserPage from "pages/user/Page";
+import UserSettings from "pages/user/Settings";
+import NavBar from "components/menu/NavBar";
+import { AuthProvider, AuthContext } from "contexts/AuthContext";
+import { ToastProvider } from "components/ToastContext";
+import ResetPassword from "pages/authentication/ResetPassword";
+import NotFound from "pages/NotFound";
+import Unauthorized from "pages/Unauthorized";
+import { ThemeProvider, ThemeContext } from "contexts/ThemeContext";
+import RequireAuth from "components/RequireAuth";
+import PublicRoute from "components/PublicRoute";
 import { useContext, useEffect } from "react";
-import UserManagement from "./pages/UserManagement";
-import useAxiosProtected from "./hook/useAxiosProtected";
+import UserManagement from "pages/UserManagement";
+import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
-import { useNavigate } from "react-router-dom";
 
 function AppWrapper() {
   return (
@@ -46,9 +45,6 @@ function InnerProviders() {
 }
 
 function App() {
-  const location = useLocation();
-  const publicPaths = ["/", "/login", "/register", "/password-reset", "/account-activation"];
-
   const { setUsername, setRouteGroups, username, accessToken, logout } = useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
 
@@ -58,11 +54,14 @@ function App() {
   useEffect(() => {
     if (socket) {
       function handleUserUpdate(data) {
-        if (Object.hasOwn(data, "username")) {
+        if (Object.prototype.hasOwnProperty.call(data, "username")) {
           setUsername(data.username);
-        } else if (Object.hasOwn(data, "routeGroups")) {
+        } else if (Object.prototype.hasOwnProperty.call(data, "routeGroups")) {
           setRouteGroups(data.routeGroups);
-        } else if (Object.hasOwn(data, "isActive") || Object.hasOwn(data, "isDisabled")) {
+        } else if (
+          Object.prototype.hasOwnProperty.call(data, "isActive") ||
+          Object.prototype.hasOwnProperty.call(data, "isDisabled")
+        ) {
           logout();
           navigate("/login");
         } else {
@@ -76,7 +75,7 @@ function App() {
         socket.off("user:update", handleUserUpdate);
       };
     }
-  }, [socket]);
+  }, [socket, setUsername, setRouteGroups, logout, navigate]);
 
   const axiosProtected = useAxiosProtected();
 
@@ -111,10 +110,10 @@ function App() {
       try {
         const responseSettings = await axiosProtected.get("/user/getSettings");
         console.log("Settings:", responseSettings.data.settings.theme);
-        setTheme(
-          responseSettings.data.settings.theme === "dark_theme" ? "dark" : "light" || "light"
-        );
-      } catch (error) {}
+        setTheme(responseSettings.data.settings.theme === "dark_theme" ? "dark" : "light");
+      } catch (error) {
+        console.warn("Fehler beim Laden der Einstellungen:", error);
+      }
     }
 
     if (!username) {

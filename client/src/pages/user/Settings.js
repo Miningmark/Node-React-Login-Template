@@ -1,8 +1,6 @@
-import { useState, useRef, useEffect, useContext } from "react";
+import { useContext } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "contexts/AuthContext";
 import { ThemeContext } from "contexts/ThemeContext";
 
 const Settings = () => {
@@ -13,7 +11,7 @@ const Settings = () => {
   async function handleThemeChange() {
     try {
       await axiosProtected.post(`/user/updateSettings`, {
-        theme: theme === "light" ? "light_theme" : "dark_theme",
+        theme: theme === "light" ? "dark_theme" : "light_theme",
       });
     } catch (error) {
       addToast(error.response?.data?.message || "Bearbeitung fehlgeschlagen", "danger");

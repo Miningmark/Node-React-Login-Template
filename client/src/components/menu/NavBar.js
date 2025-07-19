@@ -48,14 +48,6 @@ export default function NavBar({ children }) {
     };
   }, [lastScrollY]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
   async function handleLogout() {
     try {
       await axiosProtected.post("/auth/logout");
@@ -168,7 +160,11 @@ export default function NavBar({ children }) {
                   </button>
                 </li>
                 <li>
-                  <button className="dropdown-item text-danger" onClick={handleLogout}>
+                  <button
+                    className="dropdown-item text-danger"
+                    onClick={handleLogout}
+                    aria-label="Logout"
+                  >
                     Logout
                   </button>
                 </li>

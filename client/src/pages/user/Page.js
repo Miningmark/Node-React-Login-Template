@@ -18,7 +18,12 @@ const UserPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newUsername, setNewUsername] = useState("");
-  const [touched, setTouched] = useState({ password: false });
+  const [touched, setTouched] = useState({
+    password: false,
+    email: false,
+    username: false,
+    repeat: false,
+  });
   const [logins, setLogins] = useState([]);
   const [loadingPassword, setLoadingPassword] = useState(false);
   const [loadingEmail, setLoadingEmail] = useState(false);
@@ -51,7 +56,7 @@ const UserPage = () => {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 
   //E-Mail regeln
-  const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(newEmail.trim());
+  const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(newEmail.trim());
 
   //Benutzername regeln
   const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(newUsername.trim());
@@ -161,9 +166,6 @@ const UserPage = () => {
       setLoadingUsername(false);
     }
   }
-
-  console.log("Theme:", theme);
-  console.log("Logins:", logins);
 
   return (
     <div className="container mt-4">
@@ -403,7 +405,7 @@ const UserPage = () => {
           </div>
 
           {/* Benutzername ändern */}
-          {process.env.REACT_APP_CHANGE_USERNAME_ACTIVE ? (
+          {process.env.REACT_APP_CHANGE_USERNAME_ACTIVE === "true" ? (
             <div className="card  mt-4">
               <div className="card-header fw-bold">Benutzername ändern</div>
               <div className="card-body">
@@ -455,32 +457,30 @@ const UserPage = () => {
               {loadingLogins ? (
                 <TableLoadingAnimation />
               ) : (
-                <>
-                  <ResizableTable
-                    columns={[
-                      { title: "Zeitpunkt", width: 140 },
-                      { title: "IPv4-Adresse", width: 150 },
-                      { title: "Region / Land", width: 200 },
-                      { title: "Erfolgreich", width: 50 },
-                    ]}
-                    tableHeight="auto"
-                  >
-                    <tbody>
-                      {logins.map((entry, idx) => (
-                        <tr key={idx}>
-                          <td>{convertToLocalDate(entry.loginTime)}</td>
-                          <td>{entry.ipv4Address}</td>
-                          <td>
-                            {entry.regionName === "IP Lookup nicht erfolgreich"
-                              ? entry.regionName
-                              : `${entry.regionName} / ${entry.country}`}
-                          </td>
-                          <td className="text-center">{entry.successfully ? "✅" : "❌"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </ResizableTable>
-                </>
+                <ResizableTable
+                  columns={[
+                    { title: "Zeitpunkt", width: 140 },
+                    { title: "IPv4-Adresse", width: 150 },
+                    { title: "Region / Land", width: 200 },
+                    { title: "Erfolgreich", width: 50 },
+                  ]}
+                  tableHeight="auto"
+                >
+                  <tbody>
+                    {logins.map((entry, idx) => (
+                      <tr key={idx}>
+                        <td>{convertToLocalDate(entry.loginTime)}</td>
+                        <td>{entry.ipv4Address}</td>
+                        <td>
+                          {entry.regionName === "IP Lookup nicht erfolgreich"
+                            ? entry.regionName
+                            : `${entry.regionName} / ${entry.country}`}
+                        </td>
+                        <td className="text-center">{entry.successfully ? "✅" : "❌"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </ResizableTable>
               )}
             </div>
           </div>
