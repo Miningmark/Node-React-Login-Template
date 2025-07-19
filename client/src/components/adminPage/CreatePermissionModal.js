@@ -8,9 +8,6 @@ import { AuthContext } from "contexts/AuthContext";
 const CreatePermissionModal = ({
   show,
   handleClose,
-  handleNewPermission,
-  handleEditPermission,
-  handleDeletePermission,
   allPermissions,
   allRouteGroups,
   permission,
@@ -67,12 +64,6 @@ const CreatePermissionModal = ({
         await axiosProtected.post("/adminPage/updatePermission", changedData);
         addToast("Permission erfolgreich aktualisiert", "success");
 
-        handleEditPermission({
-          id: permission.id,
-          name: name,
-          description: description,
-          routeGroups: selectedRouteGroups,
-        });
         handleClose();
       } catch (error) {
         addToast(error.response?.data?.message || "Bearbeitung fehlgeschlagen", "danger");
@@ -81,19 +72,13 @@ const CreatePermissionModal = ({
       }
     } else {
       try {
-        const response = await axiosProtected.post("/adminPage/createPermission", {
+        await axiosProtected.post("/adminPage/createPermission", {
           name: name,
           description: description,
           routeGroupIds: routeGroupIds,
         });
         addToast("Permission erfolgreich erstellt", "success");
 
-        handleNewPermission({
-          id: response.data.permissionId,
-          name: name,
-          description: description,
-          routeGroups: selectedRouteGroups,
-        });
         handleClose();
       } catch (error) {
         addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
@@ -126,7 +111,6 @@ const CreatePermissionModal = ({
     try {
       await axiosProtected.post("/adminPage/deletePermission", { id: permission.id });
       addToast("Berechtigung erfolgreich gelöscht", "success");
-      handleDeletePermission(permission.id);
       handleClose();
     } catch (error) {
       addToast(error.response?.data?.message || "Löschen fehlgeschlagen", "danger");
