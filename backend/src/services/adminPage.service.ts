@@ -138,9 +138,11 @@ export class AdminPageService {
     async deletePermission(id: number) {
         let jsonResponse: Record<string, any> = { message: "Recht erfolgreich gelöscht" };
 
-        const databasePermission = await Permission.findOne({ where: { id: id } });
+        const databasePermission = await Permission.findOne({ where: { id: id }, include: { model: User } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser ID");
         if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht gelöscht werden");
+
+        if (databasePermission.users === undefined || databasePermission.users.length !== 0) throw new ForbiddenError("Die Berechtigung kann nicht gelöscht werden da diese noch Benutzern zugewiesen ist");
 
         await databasePermission.destroy();
 
