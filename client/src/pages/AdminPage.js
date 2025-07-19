@@ -124,12 +124,12 @@ function AdminPage() {
         }
       }, 100); // alle 100ms prüfen
 
-      socket.emit("subscribe:serverLogs:watchList");
+      socket.emit("subscribe:adminPage:serverLogs:watchList");
 
-      socket.on("serverLogs:create", handleNewServerLog);
+      socket.on("adminPage:serverLogs:create", handleNewServerLog);
 
       return () => {
-        socket.off("serverLogs:create", handleNewServerLog);
+        socket.off("adminPage:serverLogs:create", handleNewServerLog);
         clearInterval(intervalRef.current);
       };
     }
