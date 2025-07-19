@@ -21,6 +21,26 @@ export class RouteGroupService {
         return routeGroupsArray;
     }
 
+    generateMultipleJSONResponseWithModel(databaseRouteGroups?: RouteGroup[]): Record<string, any> {
+        return databaseRouteGroups
+            ? databaseRouteGroups.map((databaseRouteGroup) => {
+                  return this.generateSingleJSONResponseWithModel(databaseRouteGroup);
+              })
+            : [];
+    }
+
+    generateSingleJSONResponseWithModel(databaseRouteGroup: RouteGroup): Record<string, any> {
+        return this.generateSingleJSONResponse(databaseRouteGroup.id, databaseRouteGroup.name, databaseRouteGroup.description === null ? undefined : databaseRouteGroup.description);
+    }
+
+    generateSingleJSONResponse(id: number, name: string, description?: string): Record<string, any> {
+        return {
+            id: id,
+            name: name,
+            description: description
+        };
+    }
+
     static async removeUnusedRouteGroups() {
         let lastUpdatedAt = new Date(0);
 

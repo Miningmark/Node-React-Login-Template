@@ -31,7 +31,7 @@ export class UserManagementService {
         const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.users = databaseUsers.map((databaseUser) => {
-            return this.userService.generateJSONUserResponseWithUser(databaseUser);
+            return this.userService.generateJSONResponseWithModel(databaseUser);
         });
 
         return jsonResponse;
@@ -112,7 +112,7 @@ export class UserManagementService {
         SocketService.getInstance().emitToRoom(
             "listen:userManagement:users:watchList",
             "userManagement:users:update",
-            this.userService.generateJSONUserResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions)
+            this.userService.generateJSONResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions)
         );
 
         return jsonResponse;
@@ -139,7 +139,7 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:create", this.userService.generateJSONUserResponseWithUser(databaseUser));
+        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:create", this.userService.generateJSONResponseWithModel(databaseUser));
         return jsonResponse;
     }
 }
