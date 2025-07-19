@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useContext } from "react";
-import { useToast } from "../components/ToastContext";
-import useAxiosProtected from "../hook/useAxiosProtected";
+import { useToast } from "components/ToastContext";
+import useAxiosProtected from "hook/useAxiosProtected";
 import { useNavigate } from "react-router-dom";
-import { convertToLocalDate } from "../util/timeConverting";
-import { AuthContext } from "../contexts/AuthContext";
+import { convertToLocalDate } from "util/timeConverting";
+import { AuthContext } from "contexts/AuthContext";
 import { ThemeContext } from "contexts/ThemeContext";
 import ResizableTable from "components/util/ResizableTable";
 import TableLoadingAnimation from "components/TableLoadingAnimation";

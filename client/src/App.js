@@ -4,7 +4,8 @@ import Register from "./pages/authentication/Register";
 import AccountActivating from "./pages/authentication/AccountActivating";
 import Dashboard from "./pages/Dashboard";
 import AdminPage from "./pages/AdminPage";
-import UserPage from "./pages/UserPage";
+import UserPage from "./pages/user/Page";
+import UserSettings from "./pages/user/Settings";
 import NavBar from "./components/menu/NavBar";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ToastContext";
@@ -119,106 +120,110 @@ function App() {
 
   return (
     <>
-      {!hideNavBar && (
-        <NavBar>
-          <Routes>
-            {/* Authentifizierte Routen */}
-            <Route
-              path="/dashboard"
-              element={
-                <RequireAuth allowedRouteGroups={[]}>
-                  <Dashboard />
-                </RequireAuth>
-              }
-            />
-
-            <Route
-              path="/admin"
-              element={
-                <RequireAuth
-                  allowedRouteGroups={[
-                    "adminPageServerLogRead",
-                    "adminPagePermissionsRead",
-                    "adminPagePermissionsWrite",
-                  ]}
-                >
-                  <AdminPage />
-                </RequireAuth>
-              }
-            />
-
-            <Route
-              path="/usermanagement"
-              element={
-                <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
-                  <UserManagement />
-                </RequireAuth>
-              }
-            />
-
-            <Route
-              path="/userpage"
-              element={
-                <RequireAuth allowedRouteGroups={[]}>
-                  <UserPage />
-                </RequireAuth>
-              }
-            />
-
-            <Route path="/unauthorized" element={<Unauthorized />} />
-
-            {/* Catch-all route for 404 Not Found */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </NavBar>
-      )}
-      <Routes>
-        {/* Öffentlich, aber geschützt wenn bereits eingeloggt */}
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/password-reset"
-          element={
-            <PublicRoute>
-              <ResetPassword />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/account-activation"
-          element={
-            <PublicRoute>
-              <AccountActivating />
-            </PublicRoute>
-          }
-        />
-
-        {/* Nur anzeigen, wenn Registrierung aktiv ist */}
-        {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+      <NavBar>
+        <Routes>
+          {/* Öffentlich, aber geschützt wenn bereits eingeloggt */}
           <Route
-            path="/register"
+            path="/"
             element={
               <PublicRoute>
-                <Register />
+                <Login />
               </PublicRoute>
             }
           />
-        ) : null}
-      </Routes>
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/password-reset"
+            element={
+              <PublicRoute>
+                <ResetPassword />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/account-activation"
+            element={
+              <PublicRoute>
+                <AccountActivating />
+              </PublicRoute>
+            }
+          />
+
+          {/* Nur anzeigen, wenn Registrierung aktiv ist */}
+          {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              }
+            />
+          ) : null}
+          {/* Authentifizierte Routen */}
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <Dashboard />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth
+                allowedRouteGroups={[
+                  "adminPageServerLogRead",
+                  "adminPagePermissionsRead",
+                  "adminPagePermissionsWrite",
+                ]}
+              >
+                <AdminPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/usermanagement"
+            element={
+              <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
+                <UserManagement />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/user/page"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <UserPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/user/settings"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <UserSettings />
+              </RequireAuth>
+            }
+          />
+
+          <Route path="/unauthorized" element={<Unauthorized />} />
+
+          {/* Catch-all route for 404 Not Found */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </NavBar>
     </>
   );
 }
