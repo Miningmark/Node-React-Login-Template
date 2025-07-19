@@ -1,8 +1,6 @@
-import { ConflictError } from "@/errors/conflictError.js";
-import { InternalServerError } from "@/errors/internalServerError";
-import { ValidationError } from "@/errors/validationError.js";
+import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import LastLogin from "@/models/lastLogin.model.js";
-import Permission from "@/models/permission.model";
+import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
 import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
