@@ -1,14 +1,5 @@
 import User from "@/models/user.model.js";
-import {
-    BelongsToGetAssociationMixin,
-    BelongsToSetAssociationMixin,
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-    NonAttribute
-} from "@sequelize/core";
+import { BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "@sequelize/core";
 import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
 export enum ServerLogTypes {
@@ -18,7 +9,7 @@ export enum ServerLogTypes {
 }
 
 @Table({
-    tableName: "server_log",
+    tableName: "server_logs",
     timestamps: false
 })
 class ServerLog extends Model<InferAttributes<ServerLog>, InferCreationAttributes<ServerLog>> {

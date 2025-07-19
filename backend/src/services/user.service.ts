@@ -3,6 +3,7 @@ import { ValidationError } from "@/errors/validationError.js";
 import LastLogin from "@/models/lastLogin.model.js";
 import Permission from "@/models/permission.model";
 import User from "@/models/user.model.js";
+import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
@@ -44,7 +45,7 @@ export class UserService {
         let jsonResponse: Record<string, any> = { message: "Email erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
-        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit dieser Benutzernamen gefunden");
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
         if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ValidationError("Du kannst die Email vom SuperAdmin nicht ändern");
 
@@ -78,6 +79,21 @@ export class UserService {
 
         this.tokenService.removeJWTs(databaseUser);
         this.tokenService.clearRefreshTokenCookie(res);
+
+        return jsonResponse;
+    }
+
+    async updateSettings(userId: number, theme: UserSettingsTheme) {
+        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich geändert" };
+
+        const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+        if (databaseUser.userSettings === undefined) {
+            await databaseUser.createUserSettings({ userId: userId, theme: theme });
+        } else {
+            databaseUser.userSettings.theme = theme;
+            await databaseUser.userSettings.save();
+        }
 
         return jsonResponse;
     }
@@ -119,6 +135,19 @@ export class UserService {
                   successfully: lastLogin.successfully
               }))
             : [];
+
+        return jsonResponse;
+    }
+
+    async getSettings(userId: number) {
+        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolreich zurückgegeben" };
+
+        const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
+        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
+
+        jsonResponse.settings = {
+            theme: databaseUser.userSettings?.theme
+        };
 
         return jsonResponse;
     }

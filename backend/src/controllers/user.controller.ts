@@ -34,6 +34,15 @@ export class UserController extends BaseController {
         });
     };
 
+    updateSettings = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+            const { theme } = req.body;
+
+            return await this.userService.updateSettings(userId, theme);
+        });
+    };
+
     getUsername = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
@@ -55,6 +64,14 @@ export class UserController extends BaseController {
             const { userId } = req as { userId: number };
 
             return await this.userService.getLastLogins(userId);
+        });
+    };
+
+    getSettings = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+
+            return await this.userService.getSettings(userId);
         });
     };
 }

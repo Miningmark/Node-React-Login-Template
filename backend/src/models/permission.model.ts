@@ -53,7 +53,7 @@ class Permission extends Model<InferAttributes<Permission>, InferCreationAttribu
     declare countUsers: BelongsToManyCountAssociationsMixin<User>;
 
     @BelongsToMany(() => RouteGroup, {
-        through: { model: "permission_route_group", timestamps: false },
+        through: { model: "permission_route_groups", timestamps: false },
         foreignKey: "permissionId",
         otherKey: "routeGroupId",
         inverse: { as: "permissions" }

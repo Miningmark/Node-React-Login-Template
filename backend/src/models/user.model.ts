@@ -1,6 +1,7 @@
+import LastLogin from "@/models/lastLogin.model.js";
 import Permission from "@/models/permission.model.js";
 import ServerLog from "@/models/serverLog.model.js";
-import LastLogin from "@/models/lastLogin.model.js";
+import UserSettings from "@/models/userSettings.model.js";
 import UserToken from "@/models/userToken.model.js";
 import {
     BelongsToManyAddAssociationMixin,
@@ -25,12 +26,15 @@ import {
     HasManyRemoveAssociationMixin,
     HasManyRemoveAssociationsMixin,
     HasManySetAssociationsMixin,
+    HasOneCreateAssociationMixin,
+    HasOneGetAssociationMixin,
+    HasOneSetAssociationMixin,
     InferAttributes,
     InferCreationAttributes,
     Model,
     NonAttribute
 } from "@sequelize/core";
-import { Attribute, AutoIncrement, BelongsToMany, Default, HasMany, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
+import { Attribute, AutoIncrement, BelongsToMany, Default, HasMany, HasOne, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "users",
@@ -66,6 +70,13 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     @Default(false)
     @NotNull
     declare isDisabled: CreationOptional<boolean>;
+
+    @HasOne(() => UserSettings, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    declare userSettings?: NonAttribute<UserSettings>;
+
+    declare getUserSettings: HasOneGetAssociationMixin<UserSettings>;
+    declare setUserSettings: HasOneSetAssociationMixin<UserSettings, number>;
+    declare createUserSettings: HasOneCreateAssociationMixin<UserSettings>;
 
     @HasMany(() => UserToken, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
     declare userTokens?: NonAttribute<UserToken[]>;
@@ -109,7 +120,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasServerLogs: HasManyHasAssociationsMixin<ServerLog, number>;
     declare countServerLogs: HasManyCountAssociationsMixin<ServerLog>;
 
-    @BelongsToMany(() => Permission, { through: { model: "user_permission", timestamps: false }, foreignKey: "userId", otherKey: "permissionId", inverse: { as: "users" } })
+    @BelongsToMany(() => Permission, { through: { model: "user_permissions", timestamps: false }, foreignKey: "userId", otherKey: "permissionId", inverse: { as: "users" } })
     declare permissions?: NonAttribute<Permission[]>;
 
     declare getPermissions: BelongsToManyGetAssociationsMixin<Permission>;
