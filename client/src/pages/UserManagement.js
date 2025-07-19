@@ -49,12 +49,38 @@ const UserManagement = () => {
       );
     };
 
+    const handlePermissionCreate = (newPermission) => {
+      setAllPermissions((prevPermissions) => [...prevPermissions, newPermission]);
+    };
+
+    const handlePermissionUpdate = (updatedPermission) => {
+      setAllPermissions((prevPermissions) =>
+        prevPermissions.map((permission) =>
+          permission.id === updatedPermission.id ? updatedPermission : permission
+        )
+      );
+    };
+
+    const handlePermissionDelete = (deletedPermission) => {
+      setAllPermissions((prevPermissions) =>
+        prevPermissions.filter((permission) => permission.id !== deletedPermission.id)
+      );
+    };
+
     socket.on("userManagement:users:create", handleUserAdd);
     socket.on("userManagement:users:update", handleUserUpdate);
+
+    socket.on("userManagement:permissions:create", handlePermissionCreate);
+    socket.on("userManagement:permissions:update", handlePermissionUpdate);
+    socket.on("userManagement:permissions:delete", handlePermissionDelete);
 
     return () => {
       socket.off("userManagement:users:create", handleUserAdd);
       socket.off("userManagement:users:update", handleUserUpdate);
+
+      socket.off("userManagement:permissions:create", handlePermissionCreate);
+      socket.off("userManagement:permissions:update", handlePermissionUpdate);
+      socket.off("userManagement:permissions:delete", handlePermissionDelete);
     };
   }, [socket, users]);
 
