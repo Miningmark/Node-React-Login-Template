@@ -18,7 +18,6 @@ class UserSettings extends Model<InferAttributes<UserSettings>, InferCreationAtt
     declare userId: number;
 
     @Attribute(DataTypes.ENUM(...Object.values(UserSettingsTheme)))
-    @PrimaryKey
     @NotNull
     @Default(UserSettingsTheme.LIGHT_THEME)
     declare theme: CreationOptional<UserSettingsTheme>;
