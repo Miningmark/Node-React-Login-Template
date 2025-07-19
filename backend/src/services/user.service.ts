@@ -147,6 +147,10 @@ export class UserService {
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
         if (databaseUser.userSettings === undefined) throw new InternalServerError("Einstellungen nicht geladen");
 
+        if (databaseUser.userSettings === null) {
+            databaseUser.userSettings = await databaseUser.createUserSettings();
+        }
+
         jsonResponse.settings = {
             theme: databaseUser.userSettings.theme
         };
