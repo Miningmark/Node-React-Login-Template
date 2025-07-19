@@ -20,10 +20,8 @@ export default function NavBar({ children }) {
 
   const { accessToken, username, logout } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
-
-  console.log("showSideMenu:", showMobileSideMenu);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,7 +38,6 @@ export default function NavBar({ children }) {
           setShowNavbar(true);
         }
       }
-
       setLastScrollY(currentScrollY);
     };
 
@@ -75,6 +72,10 @@ export default function NavBar({ children }) {
     setShowMobileSideMenu(false);
   }
 
+  if (!accessToken) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <nav
@@ -86,7 +87,6 @@ export default function NavBar({ children }) {
           <Link className="navbar-brand mobile-hide" to="/dashboard">
             App
           </Link>
-
           <div
             className="hamburger-icon"
             style={{
@@ -105,84 +105,85 @@ export default function NavBar({ children }) {
             />
           </div>
 
-          <button onClick={toggleTheme} className="btn btn-outline-secondary ms-auto me-2">
-            {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
-          </button>
+          <div></div>
 
-          {accessToken && (
-            <div
-              className="dropdown"
-              onMouseEnter={() => setDropdownOpen(true)}
-              onMouseLeave={() => setDropdownOpen(false)}
-              style={{ position: "relative" }}
+          <div
+            className="dropdown"
+            onMouseEnter={() => setDropdownOpen(true)}
+            onMouseLeave={() => setDropdownOpen(false)}
+            style={{ position: "relative" }}
+          >
+            <button
+              className="btn btn-outline-primary rounded-circle border-0"
+              id="userDropdown"
+              style={{
+                width: "40px",
+                height: "40px",
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "20px",
+              }}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              aria-expanded={dropdownOpen}
             >
-              <button
-                className="btn btn-outline-primary rounded-circle border-0"
-                id="userDropdown"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  padding: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "20px",
-                }}
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                aria-expanded={dropdownOpen}
-              >
-                <span role="img" aria-label="user">
-                  👤
-                </span>
-              </button>
+              <span role="img" aria-label="user">
+                👤
+              </span>
+            </button>
 
-              <ul
-                className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+            <ul
+              className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+              style={{
+                right: 0,
+                left: "auto",
+                position: "absolute",
+                marginTop: "0",
+                paddingTop: "10px",
+                backgroundColor: "transparent",
+                border: "none",
+                boxShadow: "none",
+                zIndex: 1000,
+              }}
+              aria-labelledby="userDropdown"
+            >
+              <div
                 style={{
-                  right: 0,
-                  left: "auto",
-                  position: "absolute",
-                  marginTop: "0",
-                  paddingTop: "10px",
-                  backgroundColor: "transparent",
-                  border: "none",
-                  boxShadow: "none",
-                  zIndex: 1000,
+                  backgroundColor: "var(--bs-dropdown-bg)",
+                  border: "1px solid var(--bs-border-color)",
+                  borderRadius: "0.375rem",
+                  boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.1)",
+                  overflow: "hidden",
                 }}
-                aria-labelledby="userDropdown"
               >
-                <div
-                  style={{
-                    backgroundColor: "var(--bs-dropdown-bg)",
-                    border: "1px solid var(--bs-border-color)",
-                    borderRadius: "0.375rem",
-                    boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.1)",
-                    overflow: "hidden",
-                  }}
-                >
-                  <li>
-                    <button className="dropdown-item" onClick={() => navigate("/userpage")}>
-                      {username ? username : "Benutzer"}
-                    </button>
-                  </li>
-                  <li>
-                    <button className="dropdown-item text-danger" onClick={handleLogout}>
-                      Logout
-                    </button>
-                  </li>
-                </div>
-              </ul>
-            </div>
-          )}
+                <li>
+                  <button className="dropdown-item" onClick={() => navigate("/user/page")}>
+                    {username ? username : "Benutzer"}
+                  </button>
+                </li>
+                <li>
+                  <button className="dropdown-item" onClick={() => navigate("/user/settings")}>
+                    Einstellungen
+                  </button>
+                </li>
+                <li>
+                  <button className="dropdown-item text-danger" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </div>
+            </ul>
+          </div>
         </div>
       </nav>
 
-      <div class="menu-content-wrapper">
-        <div class="column column-left bg-body-tertiary">
+      <div className="menu-content-wrapper">
+        <div className="column column-left bg-body-tertiary">
           <p>Linke Spalte</p>
           <p>Mehr Inhalt...</p>
         </div>
-        <div class="column column-right">{children}</div>
+        <div className="column column-right">{children}</div>
       </div>
 
       {showMobileSideMenu ? (

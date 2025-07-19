@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "../../components/ToastContext";
 import { axiosPublic } from "../../util/axios";
 import { ThemeContext } from "contexts/ThemeContext";
+import useAxiosProtected from "hook/useAxiosProtected";
 
 import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
 import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
@@ -22,7 +23,8 @@ function Login() {
 
   const { addToast } = useToast();
   const { login } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
+  const { theme, setTheme } = useContext(ThemeContext);
+  const axiosProtected = useAxiosProtected();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -47,10 +49,15 @@ function Login() {
           withCredentials: true,
         }
       );
-      console.log("AccessToken:", res.data.accessToken);
-      console.log("Username:", res.data.username);
-      console.log("RouteGroups:", res.data.routeGroups);
+
+      //console.log("AccessToken:", res.data.accessToken);
+      //console.log("Username:", res.data.username);
+      //console.log("RouteGroups:", res.data.routeGroups);
       login(res.data.accessToken, res.data.username, res.data.routeGroups);
+
+      const responseSettings = await axiosProtected.get("/user/getSettings");
+      setTheme(responseSettings.data.theme === "dark_theme" ? "dark" : "light" || "dark");
+
       addToast("Login erfolgreich", "success");
 
       navigate("/dashboard");
