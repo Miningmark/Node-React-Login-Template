@@ -25,13 +25,13 @@ const UserManagement = () => {
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { routeGroups, checkAccess } = useContext(AuthContext);
+  const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit("subscribe:users:watchList");
+    socket.emit("subscribe:userManagement:users:watchList");
 
     const handleUserAdd = (data) => {
       setUsers((prevUsers) => [...prevUsers, data]);
@@ -49,12 +49,38 @@ const UserManagement = () => {
       );
     };
 
-    socket.on("users:create", handleUserAdd);
-    socket.on("users:update", handleUserUpdate);
+    const handlePermissionCreate = (newPermission) => {
+      setAllPermissions((prevPermissions) => [...prevPermissions, newPermission]);
+    };
+
+    const handlePermissionUpdate = (updatedPermission) => {
+      setAllPermissions((prevPermissions) =>
+        prevPermissions.map((permission) =>
+          permission.id === updatedPermission.id ? updatedPermission : permission
+        )
+      );
+    };
+
+    const handlePermissionDelete = (deletedPermission) => {
+      setAllPermissions((prevPermissions) =>
+        prevPermissions.filter((permission) => permission.id !== deletedPermission.id)
+      );
+    };
+
+    socket.on("userManagement:users:create", handleUserAdd);
+    socket.on("userManagement:users:update", handleUserUpdate);
+
+    socket.on("userManagement:permissions:create", handlePermissionCreate);
+    socket.on("userManagement:permissions:update", handlePermissionUpdate);
+    socket.on("userManagement:permissions:delete", handlePermissionDelete);
 
     return () => {
-      socket.off("users:create", handleUserAdd);
-      socket.off("users:update", handleUserUpdate);
+      socket.off("userManagement:users:create", handleUserAdd);
+      socket.off("userManagement:users:update", handleUserUpdate);
+
+      socket.off("userManagement:permissions:create", handlePermissionCreate);
+      socket.off("userManagement:permissions:update", handlePermissionUpdate);
+      socket.off("userManagement:permissions:delete", handlePermissionDelete);
     };
   }, [socket, users]);
 

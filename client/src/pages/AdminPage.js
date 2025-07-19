@@ -124,12 +124,39 @@ function AdminPage() {
         }
       }, 100); // alle 100ms prüfen
 
-      socket.emit("subscribe:serverLogs:watchList");
+      const handlePermissionCreate = (newPermission) => {
+        setAllPermissions((prevPermissions) => [...prevPermissions, newPermission]);
+      };
 
-      socket.on("serverLogs:create", handleNewServerLog);
+      const handlePermissionUpdate = (updatedPermission) => {
+        setAllPermissions((prevPermissions) =>
+          prevPermissions.map((permission) =>
+            permission.id === updatedPermission.id ? updatedPermission : permission
+          )
+        );
+      };
+
+      const handlePermissionDelete = (deletedPermission) => {
+        setAllPermissions((prevPermissions) =>
+          prevPermissions.filter((permission) => permission.id !== deletedPermission.id)
+        );
+      };
+
+      socket.emit("subscribe:adminPage:serverLogs:watchList");
+
+      socket.on("adminPage:serverLogs:create", handleNewServerLog);
+
+      socket.on("adminPage:permissions:create", handlePermissionCreate);
+      socket.on("adminPage:permissions:update", handlePermissionUpdate);
+      socket.on("adminPage:permissions:delete", handlePermissionDelete);
 
       return () => {
-        socket.off("serverLogs:create", handleNewServerLog);
+        socket.off("adminPage:serverLogs:create", handleNewServerLog);
+
+        socket.off("adminPage:permissions:create", handlePermissionCreate);
+        socket.off("adminPage:permissions:update", handlePermissionUpdate);
+        socket.off("adminPage:permissions:delete", handlePermissionDelete);
+
         clearInterval(intervalRef.current);
       };
     }
@@ -245,21 +272,6 @@ function AdminPage() {
     setFilteredServerlogOffset(0);
     setFilteredServerLog(null);
     fetchFilteredLogs(filters, 0);
-  }
-
-  function handleNewPermission(permission) {
-    setAllPermissions((prev) => [...prev, permission]);
-    setShowCreatePermissionModal(false);
-  }
-
-  function handleEditPermission(permission) {
-    setAllPermissions((prev) => prev.map((p) => (p.id === permission.id ? permission : p)));
-    setSelectedPermission(null);
-  }
-
-  function handleDeletePermission(permissionId) {
-    setAllPermissions((prev) => prev.filter((p) => p.id !== permissionId));
-    setSelectedPermission(null);
   }
 
   console.log("filteredServerLogMaxEntries", filteredServerLogMaxEntries);
@@ -581,8 +593,6 @@ function AdminPage() {
           handleClose={() => setShowCreatePermissionModal(false)}
           allPermissions={allPermissions}
           allRouteGroups={allRouteGroups}
-          handleNewPermission={handleNewPermission}
-          handleEditPermission={null}
           permission={null}
         />
       ) : null}
@@ -593,9 +603,6 @@ function AdminPage() {
           handleClose={() => setSelectedPermission(false)}
           allPermissions={allPermissions}
           allRouteGroups={allRouteGroups}
-          handleNewPermission={null}
-          handleEditPermission={handleEditPermission}
-          handleDeletePermission={handleDeletePermission}
           permission={allPermissions.find((p) => p.id === selectedPermission?.id) || null}
         />
       ) : null}

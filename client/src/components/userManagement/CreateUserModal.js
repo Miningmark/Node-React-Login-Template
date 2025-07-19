@@ -45,13 +45,9 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
         permissionIds: newUser.permissions.map((p) => p.id),
       };
 
-      /*const response = */ await axiosProtected.post("/userManagement/createUser", payload);
+      await axiosProtected.post("/userManagement/createUser", payload);
       addToast("User erfolgreich erstellt", "success");
 
-      /* 
-      if (onUserCreated)
-        onUserCreated({ ...payload, id: response.data.userId, permissions: newUser.permissions });
-      */
       handleClose();
     } catch (error) {
       addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
