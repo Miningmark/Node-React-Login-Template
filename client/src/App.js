@@ -119,7 +119,59 @@ function App() {
 
   return (
     <>
-      {!hideNavBar && <NavBar />}
+      {!hideNavBar && (
+        <NavBar>
+          <Routes>
+            {/* Authentifizierte Routen */}
+            <Route
+              path="/dashboard"
+              element={
+                <RequireAuth allowedRouteGroups={[]}>
+                  <Dashboard />
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <RequireAuth
+                  allowedRouteGroups={[
+                    "adminPageServerLogRead",
+                    "adminPagePermissionsRead",
+                    "adminPagePermissionsWrite",
+                  ]}
+                >
+                  <AdminPage />
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/usermanagement"
+              element={
+                <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
+                  <UserManagement />
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/userpage"
+              element={
+                <RequireAuth allowedRouteGroups={[]}>
+                  <UserPage />
+                </RequireAuth>
+              }
+            />
+
+            <Route path="/unauthorized" element={<Unauthorized />} />
+
+            {/* Catch-all route for 404 Not Found */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </NavBar>
+      )}
       <Routes>
         {/* Öffentlich, aber geschützt wenn bereits eingeloggt */}
         <Route
@@ -166,54 +218,6 @@ function App() {
             }
           />
         ) : null}
-
-        {/* Authentifizierte Routen */}
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth allowedRouteGroups={[]}>
-              <Dashboard />
-            </RequireAuth>
-          }
-        />
-
-        <Route
-          path="/admin"
-          element={
-            <RequireAuth
-              allowedRouteGroups={[
-                "adminPageServerLogRead",
-                "adminPagePermissionsRead",
-                "adminPagePermissionsWrite",
-              ]}
-            >
-              <AdminPage />
-            </RequireAuth>
-          }
-        />
-
-        <Route
-          path="/usermanagement"
-          element={
-            <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
-              <UserManagement />
-            </RequireAuth>
-          }
-        />
-
-        <Route
-          path="/userpage"
-          element={
-            <RequireAuth allowedRouteGroups={[]}>
-              <UserPage />
-            </RequireAuth>
-          }
-        />
-
-        <Route path="/unauthorized" element={<Unauthorized />} />
-
-        {/* Catch-all route for 404 Not Found */}
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

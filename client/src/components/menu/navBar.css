@@ -21,3 +21,26 @@
     display: none !important;
   }
 }
+
+.menu-content-wrapper {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+.column {
+  min-height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.column-left {
+  width: 60px;
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block !important;
+  }
+}
+
+.column-right {
+  flex: 1;
+}

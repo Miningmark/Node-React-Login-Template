@@ -26,7 +26,8 @@ export const AuthProvider = ({ children }) => {
       return true;
     }
 
-    if (!allowedGroupNames || allowedGroupNames.length === 0) return false;
+    if (!allowedGroupNames) return false;
+    if (allowedGroupNames.length === 0) return true;
 
     return allowedGroupNames.some((group) => routeGroups.includes(group));
   }

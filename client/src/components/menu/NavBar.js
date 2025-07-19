@@ -3,25 +3,27 @@ import { AuthContext } from "contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
 import useAxiosProtected from "hook/useAxiosProtected";
+import menuItems from "./menuStruckture";
+
 import "./navBar.css";
 
-import SideMenu from "./SideMenu";
+import SideMenuMobile from "./SideMenuMobile";
 
 import { ReactComponent as MenuIcon } from "assets/icons/menu.svg";
 
-export default function NavBar() {
+export default function NavBar({ children }) {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const [showSideMenu, setShowSideMenu] = useState(false);
+  const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
 
   const { accessToken, username, logout } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
-  console.log("showSideMenu:", showSideMenu);
+  console.log("showSideMenu:", showMobileSideMenu);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,15 +71,15 @@ export default function NavBar() {
     }
   }
 
-  function handleSideMenuClose() {
-    setShowSideMenu(false);
+  function handleMobileSideMenuClose() {
+    setShowMobileSideMenu(false);
   }
 
   return (
     <>
       <nav
         className={`navbar navbar-expand-lg bg-body-tertiary px-3 sticky-top navbar-mobile-hide-show ${
-          showSideMenu ? "navbar-hidden" : showNavbar ? "navbar-visible" : "navbar-hidden"
+          showMobileSideMenu ? "navbar-hidden" : showNavbar ? "navbar-visible" : "navbar-hidden"
         }`}
       >
         <div className="container-fluid">
@@ -93,7 +95,7 @@ export default function NavBar() {
               top: "50%",
               transform: "translateY(-50%)",
             }}
-            onClick={() => setShowSideMenu(!showSideMenu)}
+            onClick={() => setShowMobileSideMenu(!showMobileSideMenu)}
           >
             <MenuIcon
               fill={theme === "light" ? "black" : "var(--bs-body-color)"}
@@ -175,7 +177,17 @@ export default function NavBar() {
         </div>
       </nav>
 
-      {showSideMenu ? <SideMenu handleSideMenuClose={handleSideMenuClose} /> : null}
+      <div class="menu-content-wrapper">
+        <div class="column column-left bg-body-tertiary">
+          <p>Linke Spalte</p>
+          <p>Mehr Inhalt...</p>
+        </div>
+        <div class="column column-right">{children}</div>
+      </div>
+
+      {showMobileSideMenu ? (
+        <SideMenuMobile handleMobileSideMenuClose={handleMobileSideMenuClose} />
+      ) : null}
     </>
   );
 }
