@@ -4,6 +4,7 @@ import Register from "pages/authentication/Register";
 import AccountActivating from "pages/authentication/AccountActivating";
 import Dashboard from "pages/Dashboard";
 import ServerLogPage from "pages/admin/Serverlog";
+import PermissionMatrixPage from "pages/admin/PermissionMatrix";
 import UserPage from "pages/user/Page";
 import UserSettings from "pages/user/Settings";
 import NavBar from "components/menu/NavBar";
@@ -203,7 +204,7 @@ function App() {
               <RequireAuth
                 allowedRouteGroups={["adminPagePermissionsRead", "adminPagePermissionsWrite"]}
               >
-                <ServerLogPage />
+                <PermissionMatrixPage />
               </RequireAuth>
             }
           />

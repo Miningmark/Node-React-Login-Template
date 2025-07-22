@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
-import { AuthContext } from "contexts/AuthContext";
 import { Container } from "react-bootstrap";
 import sortingAlgorithm from "util/sortingAlgorithm";
 import ServerLogFilterOptionsModal from "components/adminPage/ServerLogFilterOptionsModal";
@@ -11,12 +10,9 @@ import ShowServerlogEntry from "components/adminPage/ShowServerlogEntry";
 import ResizableTable from "components/util/ResizableTable";
 import { SocketContext } from "contexts/SocketProvider";
 
-import "components/adminPage/adminPage.css";
-
 function clearFilters(filters) {
   const clearedFilters = { ...filters };
   Object.keys(clearedFilters).forEach((key, index) => {
-    console.log("test", index, key, clearedFilters[key]);
     if (
       clearedFilters[key] === "" ||
       clearedFilters[key] === null ||
@@ -34,7 +30,6 @@ function clearFilters(filters) {
     }
   });
 
-  console.log("Cleared Filters:", clearedFilters);
   return clearedFilters;
 }
 
@@ -51,6 +46,7 @@ function ServerLogPage() {
   const [filterOptions, setFilterOptions] = useState(null);
   const [showFilterOptionsModal, setShowFilterOptionsModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
+  const [heightOffset, setHeightOffset] = useState(160);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -60,10 +56,20 @@ function ServerLogPage() {
   const intervalRef = useRef(null);
 
   useEffect(() => {
+    const updateOffset = () => {
+      setHeightOffset(window.innerWidth > 768 ? 80 : 0);
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+
+    return () => window.removeEventListener("resize", updateOffset);
+  }, []);
+
+  useEffect(() => {
     if (socket) {
       function handleNewServerLog(data) {
         serverLogQueueRef.current.push(data);
-        console.log("Neuer Server-Log-Eintrag empfangen:", data);
       }
 
       intervalRef.current = setInterval(() => {
@@ -200,8 +206,11 @@ function ServerLogPage() {
 
   return (
     <>
-      <Container className="page-wrapper mt-4">
-        <h2>AdminPage</h2>
+      <Container
+        className="page-wrapper mt-4"
+        style={{ height: `calc(100dvh - ${heightOffset}px)` }}
+      >
+        <h2>Serverlog</h2>
 
         <div>
           {!loadingServerLog && serverLog?.length > 0 ? (
@@ -232,7 +241,9 @@ function ServerLogPage() {
                 ) : null}
               </div>
 
-              <div style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
+              <div
+                style={{ maxHeight: `calc(100dvh - ${heightOffset + 160}px)`, overflowY: "auto" }}
+              >
                 <ResizableTable
                   columns={[
                     { title: "ID", width: 50 },
@@ -240,7 +251,7 @@ function ServerLogPage() {
                     { title: "Type", width: 60 },
                     { title: "Nachricht" },
                   ]}
-                  tableHeight="calc(100vh - 302px)"
+                  tableHeight={`calc(100dvh - ${heightOffset + 162}px)`}
                 >
                   <tbody>
                     {sortedServerLog.map((log) => (
