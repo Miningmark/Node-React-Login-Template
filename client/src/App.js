@@ -3,7 +3,7 @@ import Login from "pages/authentication/Login";
 import Register from "pages/authentication/Register";
 import AccountActivating from "pages/authentication/AccountActivating";
 import Dashboard from "pages/Dashboard";
-import AdminPage from "pages/AdminPage";
+import ServerLogPage from "pages/admin/Serverlog";
 import UserPage from "pages/user/Page";
 import UserSettings from "pages/user/Settings";
 import NavBar from "components/menu/NavBar";
@@ -126,7 +126,7 @@ function App() {
       isMounted = false;
       controller.abort();
     };
-  }, [accessToken]);
+  }, [accessToken, username, setUsername, setRouteGroups, axiosProtected, setTheme]);
 
   return (
     <>
@@ -189,16 +189,21 @@ function App() {
           />
 
           <Route
-            path="/admin"
+            path="/admin/server-log"
+            element={
+              <RequireAuth allowedRouteGroups={["adminPageServerLogRead"]}>
+                <ServerLogPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/admin/permissionmatrix"
             element={
               <RequireAuth
-                allowedRouteGroups={[
-                  "adminPageServerLogRead",
-                  "adminPagePermissionsRead",
-                  "adminPagePermissionsWrite",
-                ]}
+                allowedRouteGroups={["adminPagePermissionsRead", "adminPagePermissionsWrite"]}
               >
-                <AdminPage />
+                <ServerLogPage />
               </RequireAuth>
             }
           />

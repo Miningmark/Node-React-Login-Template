@@ -14,12 +14,12 @@ const menuItems = [
     subItems: [
       {
         name: "Serverlog",
-        path: "/admin",
+        path: "/admin/server-log",
         allowedRouteGroups: ["adminPageServerLogRead"],
       },
       {
         name: "Berechtigungsmatrix",
-        path: "/",
+        path: "/admin/permissionmatrix",
         allowedRouteGroups: ["adminPagePermissionsRead", "adminPagePermissionsWrite"],
       },
       {
