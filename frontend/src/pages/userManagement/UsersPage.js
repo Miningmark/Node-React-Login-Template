@@ -10,8 +10,6 @@ import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { SocketContext } from "contexts/SocketProvider";
 import ResizableTable from "components/util/ResizableTable";
 
-import "components/userManagement/userManagement.css";
-
 const UsersPage = () => {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [users, setUsers] = useState([]);
@@ -44,8 +42,6 @@ const UsersPage = () => {
 
   useEffect(() => {
     if (!socket) return;
-
-    socket.emit("subscribe:userManagement:users:watchList");
 
     const handleUserAdd = (data) => {
       setUsers((prevUsers) => [...prevUsers, data]);
@@ -80,6 +76,9 @@ const UsersPage = () => {
         prevPermissions.filter((permission) => permission.id !== deletedPermission.id)
       );
     };
+
+    socket.emit("subscribe:userManagement:users:watchList");
+    socket.emit("subscribe:userManagement:permissions:watchList");
 
     socket.on("userManagement:users:create", handleUserAdd);
     socket.on("userManagement:users:update", handleUserUpdate);
@@ -139,7 +138,7 @@ const UsersPage = () => {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [addToast, axiosProtected]);
 
   const filteredUsers = useMemo(() => {
     if (!users) return [];
@@ -244,7 +243,7 @@ const UsersPage = () => {
                           >
                             {user.username}
                           </td>
-                          <td className="">{user.email}</td>
+                          <td>{user.email}</td>
                           <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
                           <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
                         </tr>

@@ -7,6 +7,7 @@ import ServerLogPage from "pages/admin/Serverlog";
 import PermissionMatrixPage from "pages/admin/PermissionMatrix";
 import UserNotificationsPage from "pages/admin/UserNotifications";
 import UsersPage from "pages/userManagement/UsersPage";
+import PermissionsPage from "pages/userManagement/Permissions";
 import UserPage from "pages/user/Page";
 import UserSettings from "pages/user/Settings";
 import NavBar from "components/menu/NavBar";
@@ -224,6 +225,15 @@ function App() {
             element={
               <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
                 <UsersPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/usermanagement/permissions"
+            element={
+              <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
+                <PermissionsPage />
               </RequireAuth>
             }
           />

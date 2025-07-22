@@ -34,7 +34,7 @@ const menuItems = [
     icon: <TauntIcon />,
     subItems: [
       { name: "Benutzer Verwaltung", path: "/usermanagement/users", allowedRouteGroups: [] },
-      { name: "Rechte Übersicht", path: "/" },
+      { name: "Rechte Übersicht", path: "/usermanagement/permissions" },
     ],
   },
   { name: "Test1", path: "/", icon: <KanbanlIcon /> },
