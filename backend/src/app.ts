@@ -33,5 +33,4 @@ export async function initApp() {
 
     app.use(notFoundMiddleware);
     app.use(errorHandlerMiddleware);
-    console.log(5);
 }
