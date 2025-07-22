@@ -4,6 +4,8 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend
+    env_file:
+      - "./frontend/.env"
     expose:
       - "80"
 
