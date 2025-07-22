@@ -24,7 +24,7 @@ const menuItems = [
       },
       {
         name: "User Benachrichtigungen",
-        path: "/",
+        path: "/admin/user-notifications",
         allowedRouteGroups: [],
       },
     ],

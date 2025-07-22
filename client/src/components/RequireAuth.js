@@ -13,8 +13,6 @@ const RequireAuth = ({ children, allowedRouteGroups }) => {
   async function loadAccessToken() {
     try {
       await refreshAccessToken();
-
-      throw new Error("No access token received");
     } catch (error) {
       console.error("Error refreshing access token:", error);
       throw error;
@@ -39,7 +37,7 @@ const RequireAuth = ({ children, allowedRouteGroups }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  console.log("RouteGroups:", routeGroups);
+  //console.log("RouteGroups:", routeGroups);
   if (!routeGroups) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center vh-100">
@@ -56,7 +54,7 @@ const RequireAuth = ({ children, allowedRouteGroups }) => {
 
   const hasRequiredRouteGroups = checkAccess(allowedRouteGroups);
 
-  console.log("Allowed RouteGroups:", allowedRouteGroups);
+  //console.log("Allowed RouteGroups:", allowedRouteGroups);
   if (!hasRequiredRouteGroups && allowedRouteGroups.length > 0) {
     return <Navigate to="/unauthorized" replace />;
   }

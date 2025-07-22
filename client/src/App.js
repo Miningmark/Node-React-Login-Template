@@ -5,6 +5,7 @@ import AccountActivating from "pages/authentication/AccountActivating";
 import Dashboard from "pages/Dashboard";
 import ServerLogPage from "pages/admin/Serverlog";
 import PermissionMatrixPage from "pages/admin/PermissionMatrix";
+import UserNotificationsPage from "pages/admin/UserNotifications";
 import UserPage from "pages/user/Page";
 import UserSettings from "pages/user/Settings";
 import NavBar from "components/menu/NavBar";
@@ -110,7 +111,6 @@ function App() {
     async function fetchSettings() {
       try {
         const responseSettings = await axiosProtected.get("/user/getSettings");
-        console.log("Settings:", responseSettings.data.settings.theme);
         setTheme(responseSettings.data.settings.theme === "dark_theme" ? "dark" : "light");
       } catch (error) {
         console.warn("Fehler beim Laden der Einstellungen:", error);
@@ -205,6 +205,15 @@ function App() {
                 allowedRouteGroups={["adminPagePermissionsRead", "adminPagePermissionsWrite"]}
               >
                 <PermissionMatrixPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/admin/user-notifications"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <UserNotificationsPage />
               </RequireAuth>
             }
           />
