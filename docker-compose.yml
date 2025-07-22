@@ -5,7 +5,7 @@ services:
     build: ./frontend
     container_name: frontend
     expose:
-      - "3000"
+      - "80"
 
   backend:
     build: ./backend
