@@ -6,6 +6,7 @@ import Dashboard from "pages/Dashboard";
 import ServerLogPage from "pages/admin/Serverlog";
 import PermissionMatrixPage from "pages/admin/PermissionMatrix";
 import UserNotificationsPage from "pages/admin/UserNotifications";
+import UsersPage from "pages/userManagement/UsersPage";
 import UserPage from "pages/user/Page";
 import UserSettings from "pages/user/Settings";
 import NavBar from "components/menu/NavBar";
@@ -18,7 +19,7 @@ import { ThemeProvider, ThemeContext } from "contexts/ThemeContext";
 import RequireAuth from "components/RequireAuth";
 import PublicRoute from "components/PublicRoute";
 import { useContext, useEffect } from "react";
-import UserManagement from "pages/UserManagement";
+
 import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
 
@@ -219,10 +220,10 @@ function App() {
           />
 
           <Route
-            path="/usermanagement"
+            path="/usermanagement/users"
             element={
               <RequireAuth allowedRouteGroups={["userManagementRead", "userManagementWrite"]}>
-                <UserManagement />
+                <UsersPage />
               </RequireAuth>
             }
           />

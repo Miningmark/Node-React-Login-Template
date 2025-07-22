@@ -33,7 +33,7 @@ const menuItems = [
     name: "User Management",
     icon: <TauntIcon />,
     subItems: [
-      { name: "Users", path: "/usermanagement", allowedRouteGroups: [] },
+      { name: "Benutzer Verwaltung", path: "/usermanagement/users", allowedRouteGroups: [] },
       { name: "Rechte Übersicht", path: "/" },
     ],
   },

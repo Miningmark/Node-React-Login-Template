@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import "./css/ResizableTable.css";
 import Table from "react-bootstrap/Table";
 
-const ResizableTable = ({ columns, tableHeight = 300, children }) => {
+const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, children }) => {
   const tableRef = useRef();
 
   useEffect(() => {
@@ -45,7 +45,12 @@ const ResizableTable = ({ columns, tableHeight = 300, children }) => {
   return (
     <div
       className="resizable-table-wrapper"
-      style={{ height: `${tableHeight}`, overflow: "auto", position: "relative" }}
+      style={{
+        height: `${tableHeight}`,
+        overflow: "auto",
+        position: "relative",
+        border: "1px solid #dee2e6",
+      }}
     >
       <Table striped bordered hover ref={tableRef} className=" resizable-table mb-0">
         <thead
@@ -64,7 +69,9 @@ const ResizableTable = ({ columns, tableHeight = 300, children }) => {
                 style={{
                   minWidth: "50px",
                   width: col.width ? `${col.width}px` : undefined,
+                  cursor: `${handleSort ? "pointer" : "default"}`,
                 }}
+                onClick={() => (handleSort ? handleSort(col.id || null) : () => {})}
               >
                 {col.title}
               </th>
