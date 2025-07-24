@@ -76,7 +76,7 @@ services:
     container_name: nginx
     restart: always
     environment:
-      - DOMAIN=node.miningmark.de
+      - DOMAIN=${DOMAIN}
     depends_on:
       - frontend
       - backend
