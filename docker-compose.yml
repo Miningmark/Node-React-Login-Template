@@ -41,16 +41,14 @@ services:
     networks:
       - app-network
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: default-phpmyadmin
+  adminer:
+    image: adminer
+    container_name: adminer
     restart: always
-    environment:
-      - PMA_HOST=default-database
     depends_on:
       - default-database
     expose:
-      - "80"
+      - "8080"
     networks:
       - app-network
 
