@@ -64,6 +64,7 @@ export default function NavBar({ children }) {
     setShowMobileSideMenu(false);
   }
 
+  console.log("accessToken", accessToken);
   if (!accessToken) {
     return <>{children}</>;
   }
