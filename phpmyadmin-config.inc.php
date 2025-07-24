@@ -1,1 +1,0 @@
-$cfg['PmaAbsoluteUri'] = 'https://node.miningmark.de/phpmyadmin/';

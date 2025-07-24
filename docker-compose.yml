@@ -47,14 +47,13 @@ services:
     restart: always
     environment:
       - PMA_HOST=default-database
+      - PMA_ABSOLUTE_URI=https://node.miningmark.de/phpmyadmin/
     depends_on:
       - default-database
     expose:
       - "80"
     networks:
       - app-network
-    volumes:
-      - ./phpmyadmin-config.inc.php:/etc/phpmyadmin/config.inc.php:ro
 
   #default-s3:
   #  image: minio/minio
