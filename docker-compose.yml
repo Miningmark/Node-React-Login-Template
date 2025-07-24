@@ -48,13 +48,17 @@ services:
     environment:
       - PMA_HOST=default-database
       - PMA_ABSOLUTE_URI=https://node.miningmark.de/phpmyadmin/
+      - PMA_CONTROLHOST=default-database
+      - PMA_CONTROLUSER=root
+      - PMA_CONTROLPASS=rootpass
+      - PMA_PMADB=phpmyadmin
     depends_on:
       - default-database
     expose:
       - "80"
     networks:
       - app-network
-      
+
 
   #default-s3:
   #  image: minio/minio
