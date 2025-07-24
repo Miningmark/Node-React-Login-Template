@@ -32,10 +32,10 @@ services:
     container_name: default-database
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD: rootpass
-      - MYSQL_DATABASE: meine_datenbank
-      - MYSQL_USER: benutzer
-      - MYSQL_PASSWORD: passwort
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=meine_datenbank
+      - MYSQL_USER=benutzer
+      - MYSQL_PASSWORD=passwort
     volumes:
       - default-database-data:/var/lib/mysql
     networks:
