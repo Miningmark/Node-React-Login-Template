@@ -1,8 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "contexts/AuthContext";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
-import useAxiosProtected from "hook/useAxiosProtected";
 import menuItems from "./menuStruckture";
 
 import "./sideMenuMobile.css";
