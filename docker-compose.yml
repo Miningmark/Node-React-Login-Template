@@ -44,14 +44,10 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: default-phpmyadmin
-    restart: always
+    restart: no
     environment:
       - PMA_HOST=default-database
-      - PMA_ABSOLUTE_URI=https://node.miningmark.de/phpmyadmin/
-      - PMA_CONTROLHOST=default-database
-      - PMA_CONTROLUSER=root
-      - PMA_CONTROLPASS=rootpass
-      - PMA_PMADB=phpmyadmin
+      - PMA_ABSOLUTE_URI=${DOMAIN}/phpmyadmin/
     depends_on:
       - default-database
     expose:
