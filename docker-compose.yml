@@ -28,14 +28,14 @@ services:
       - app-network
 
   default-database:
-    image: mysql:8
+    image: mariadb:latest
     container_name: default-database
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - DATABASE_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
+      - DATABASE_DATABASE=${DATABASE_DATABASE}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
     volumes:
       - default-database-data:/var/lib/mysql
     networks:
