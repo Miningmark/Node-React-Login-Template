@@ -19,7 +19,7 @@ services:
     container_name: backend
     restart: always
     depends_on:
-      - default-db
+      - default-database
     env_file:
       - ./backend/.env
     expose:
@@ -27,31 +27,47 @@ services:
     networks:
       - app-network
 
-  default-db:
+  default-database:
     image: mysql:8
-    container_name: default-db
+    container_name: default-database
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=example
-      - MYSQL_DATABASE=appdb
+      - MYSQL_ROOT_PASSWORD: rootpass
+      - MYSQL_DATABASE: meine_datenbank
+      - MYSQL_USER: benutzer
+      - MYSQL_PASSWORD: passwort
     volumes:
-      - default-db-data:/var/lib/mysql
+      - default-database-data:/var/lib/mysql
     networks:
       - app-network
 
-  default-s3:
-    image: minio/minio
-    command: server /data --console-address ":9001"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: default-phpmyadmin
+    restart: always
     environment:
-      - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio123
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - default-s3-data:/data
+      - PMA_HOST=default-database
+    depends_on:
+      - default-database
+    expose:
+      - "80"
     networks:
       - app-network
+
+  #default-s3:
+  #  image: minio/minio
+  # container_name: default-s3
+  #  command: server /data --console-address ":9001"
+  #  environment:
+  #   - MINIO_ROOT_USER=minio
+  #    - MINIO_ROOT_PASSWORD=minio123
+  #  ports:
+  #    - "9000:9000"
+  #    - "9001:9001"
+  #  volumes:
+  #    - default-s3-data:/data
+  #  networks:
+  #    - app-network
 
   nginx:
     image: nginx:stable-alpine
@@ -60,11 +76,12 @@ services:
     depends_on:
       - frontend
       - backend
-      - default-db
-      - default-s3
+      - default-database
+      #- default-s3
     ports:
       - "80:80"
       - "443:443"
+      - "8081:8081"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./certbot/www:/var/www/certbot
@@ -86,8 +103,8 @@ services:
       - app-network
 
 volumes:
-  default-db-data:
-  default-s3-data:
+  default-database-data:
+  #default-s3-data:
 
 networks:
   app-network:
