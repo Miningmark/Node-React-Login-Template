@@ -54,6 +54,7 @@ services:
       - "80"
     networks:
       - app-network
+      
 
   #default-s3:
   #  image: minio/minio
