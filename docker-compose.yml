@@ -54,6 +54,7 @@ services:
     environment:
       - PMA_HOST=default-database
       - PMA_ABSOLUTE_URI=https://${DOMAIN}/phpmyadmin/
+    command: /bin/sh -c "sleep 120 && kill 1"
     depends_on:
       - default-database
     expose:
