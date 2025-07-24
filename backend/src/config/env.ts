@@ -35,7 +35,7 @@ const envSchema = z.object({
         .refine((arr) => arr.every((origin) => /^https?:\/\/.+$/.test(origin))),
 
     DEFAULT_DATABASE_HOST: z.string(),
-    DEFAULT_DATABASE_PORT: z.string().transform(Number).optional(),
+    DEFAULT_DATABASE_PORT: z.string().transform(Number),
     DEFAULT_DATABASE_USERNAME: z.string(),
     DEFAULT_DATABASE_PASSWORD: z.string(),
     DEFAULT_DATABASE_NAME: z.string(),
