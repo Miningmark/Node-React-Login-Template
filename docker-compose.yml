@@ -14,7 +14,7 @@ services:
     networks:
       - app-network
     profiles:
-      - ["default"]
+      - "default"
 
   backend:
     build: ./backend
@@ -29,7 +29,7 @@ services:
     networks:
       - app-network
     profiles:
-      - ["default"]
+      - "default"
 
   default-database:
     image: mariadb:latest
@@ -45,7 +45,7 @@ services:
     networks:
       - app-network
     profiles:
-      - ["default"]
+      - "default"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -61,7 +61,7 @@ services:
     networks:
       - app-network
     profiles:
-      - ["phpmyadmin"]
+      - "phpmyadmin"
 
 
   #default-s3:
@@ -100,7 +100,7 @@ services:
     networks:
       - app-network
     profiles:
-      - ["default"]
+      - "default"
 
   certbot:
     image: certbot/certbot
@@ -115,7 +115,7 @@ services:
     networks:
       - app-network
     profiles:
-      - ["default"]
+      - "default"
 
 volumes:
   default-database-data:
