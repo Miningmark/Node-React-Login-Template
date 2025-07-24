@@ -78,6 +78,8 @@ services:
       - default-s3-data:/data
      networks:
       - app-network
+     profiles:
+      - "default"
 
   nginx:
     image: nginx:stable-alpine
