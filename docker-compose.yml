@@ -47,7 +47,7 @@ services:
     restart: no
     environment:
       - PMA_HOST=default-database
-      - PMA_ABSOLUTE_URI=${DOMAIN}/phpmyadmin/
+      - PMA_ABSOLUTE_URI=https://${DOMAIN}/phpmyadmin/
     depends_on:
       - default-database
     expose:
