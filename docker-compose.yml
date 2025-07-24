@@ -32,10 +32,10 @@ services:
     container_name: default-database
     restart: always
     environment:
-      - DATABASE_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
-      - DATABASE_DATABASE=${DATABASE_DATABASE}
-      - DATABASE_USER=${DATABASE_USER}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DEFAULT_DATABASE_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DEFAULT_DATABASE_NAME}
+      - MYSQL_USER=${DEFAULT_DATABASE_USER}
+      - MYSQL_PASSWORD=${DEFAULT_DATABASE_PASSWORD}
     volumes:
       - default-database-data:/var/lib/mysql
     networks:
