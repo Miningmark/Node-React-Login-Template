@@ -27,13 +27,18 @@
   min-height: calc(100vh - 56px);
 }
 
+@media (hover: hover) {
+  .desktop-sidebar.expanded + .menu-content-wrapper {
+    padding-left: 220px;
+  }
+}
+
 .column {
   min-height: calc(100vh - 56px);
   overflow-y: auto;
 }
 
 .column-left {
-  width: 60px;
   display: none;
 
   @media (min-width: 768px) {
@@ -43,4 +48,122 @@
 
 .column-right {
   flex: 1;
+  @media (min-width: 768px) {
+    padding-left: 60px;
+  }
+}
+
+.desktop-sidebar {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  height: calc(100vh - 56px);
+  width: 60px;
+  background-color: var(--bs-body-bg);
+  border-right: 1px solid var(--bs-border-color);
+  transition: width 0.2s ease;
+  z-index: 1030;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.desktop-sidebar .icon {
+  width: 28px;
+  height: 28px;
+}
+
+.desktop-sidebar.expanded {
+  width: 290px;
+}
+
+.menu-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  width: 100%;
+}
+
+.menu-parent,
+.menu-link {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--bs-body-color);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.menu-parent.active,
+.menu-link.active {
+  color: green;
+  font-weight: 500;
+}
+
+.menu-parent:hover,
+.menu-link:hover {
+  background-color: var(--bs-tertiary-bg);
+}
+
+.icon-wrapper {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.label {
+  margin-left: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  flex-grow: 1;
+}
+
+.desktop-sidebar.expanded .label {
+  opacity: 1;
+}
+
+.arrow-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  fill: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.desktop-sidebar.expanded .arrow-icon {
+  opacity: 1;
+}
+
+.submenu {
+  padding-left: 24px;
+}
+
+.submenu-link {
+  display: block;
+  padding: 4px 0;
+  color: var(--bs-body-color);
+  text-decoration: none;
+}
+
+.submenu-link:hover {
+  background-color: var(--bs-tertiary-bg);
+}
+
+.submenu-link.active {
+  color: green;
+  font-weight: 500;
 }

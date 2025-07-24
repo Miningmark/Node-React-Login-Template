@@ -3,7 +3,7 @@ import { AuthContext } from "contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
 import useAxiosProtected from "hook/useAxiosProtected";
-import menuItems from "./menuStruckture";
+import SideMenuDesktop from "./SideMenuDesktop";
 
 import "./navBar.css";
 
@@ -176,10 +176,10 @@ export default function NavBar({ children }) {
       </nav>
 
       <div className="menu-content-wrapper">
-        <div className="column column-left bg-body-tertiary">
-          <p>Linke Spalte</p>
-          <p>Mehr Inhalt...</p>
+        <div className="column-left">
+          <SideMenuDesktop />
         </div>
+
         <div className="column column-right">{children}</div>
       </div>
 

@@ -215,7 +215,7 @@ const UsersPage = () => {
               </div>
 
               <div
-                style={{ maxHeight: `calc(100dvh - ${heightOffset + 160}px)`, overflowY: "auto" }}
+                style={{ maxHeight: `calc(100dvh - ${heightOffset + 140}px)`, overflowY: "auto" }}
               >
                 <ResizableTable
                   columns={[
@@ -224,7 +224,7 @@ const UsersPage = () => {
                     { title: "Active", id: "isActive", width: 80 },
                     { title: "Blocked", id: "isDisabled", width: 80 },
                   ]}
-                  tableHeight={`calc(100dvh - ${heightOffset + 162}px)`}
+                  tableHeight={`calc(100dvh - ${heightOffset + 142}px)`}
                   handleSort={handleSort}
                 >
                   <tbody>
