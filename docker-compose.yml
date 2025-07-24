@@ -71,6 +71,7 @@ services:
       - MINIO_ROOT_USER=minio
       - MINIO_ROOT_PASSWORD=minio123
       - MINIO_BROWSER_REDIRECT_URL=https://node.miningmark.de/minio/console
+      - MINIO_SERVER_URL=https://node.miningmark.de/minio
      expose:
       - "9000:9000"
       - "9001:9001"
