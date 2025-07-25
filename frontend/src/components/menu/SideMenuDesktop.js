@@ -31,8 +31,10 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
         }
       }
     });
-    setOpenMenus(initialOpenMenus);
-  }, [currentPath, checkAccess]);
+    if (!menuFixed) {
+      setOpenMenus(initialOpenMenus);
+    }
+  }, [currentPath, checkAccess, menuFixed]);
 
   const toggleSubMenu = (name) => {
     setOpenMenus((prev) => ({
