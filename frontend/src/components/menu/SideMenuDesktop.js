@@ -5,8 +5,10 @@ import { ThemeContext } from "contexts/ThemeContext";
 import menuItems from "./menuStruckture";
 import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
 import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
+import { ReactComponent as KeepIcon } from "assets/icons/keep.svg";
+import { ReactComponent as KeepOffIcon } from "assets/icons/keep_off.svg";
 
-export default function SideMenuDesktop() {
+export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
   const { checkAccess } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const location = useLocation();
@@ -41,10 +43,22 @@ export default function SideMenuDesktop() {
 
   return (
     <div
-      className={`desktop-sidebar ${isHovered ? "expanded" : ""}`}
+      className={`desktop-sidebar ${isHovered || menuFixed ? "expanded" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {isHovered || menuFixed ? (
+        <div className="sidebar-header">
+          <button
+            className="keep-toggle-btn"
+            onClick={() => setMenuFixed(!menuFixed)}
+            title={menuFixed ? "Fixierung aufheben" : "Menü fixieren"}
+          >
+            {menuFixed ? <KeepOffIcon className="keep-icon" /> : <KeepIcon className="keep-icon" />}
+          </button>
+        </div>
+      ) : null}
+
       <ul className="menu-items">
         {menuItems.map((item, idx) => {
           const isActiveMain = item.path === currentPath;
@@ -86,7 +100,7 @@ export default function SideMenuDesktop() {
                     <ArrowDownIcon className="arrow-icon" />
                   )}
                 </div>
-                {isSubmenuOpen && isHovered && (
+                {isSubmenuOpen && (isHovered || menuFixed) && (
                   <ul className="submenu">
                     {accessibleSubItems.map((subItem, subIdx) => {
                       const isActive = subItem.path === currentPath;

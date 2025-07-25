@@ -15,6 +15,7 @@ export default function NavBar({ children }) {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [menuFixed, setMenuFixed] = useState(true);
 
   const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
 
@@ -177,10 +178,10 @@ export default function NavBar({ children }) {
 
       <div className="menu-content-wrapper">
         <div className="column-left">
-          <SideMenuDesktop />
+          <SideMenuDesktop menuFixed={menuFixed} setMenuFixed={setMenuFixed} />
         </div>
 
-        <div className="column column-right">{children}</div>
+        <div className={`column column-right ${menuFixed && "column-right-smale"}`}>{children}</div>
       </div>
 
       {showMobileSideMenu ? (

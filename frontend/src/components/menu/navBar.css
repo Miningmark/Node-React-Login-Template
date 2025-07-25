@@ -52,6 +52,12 @@
     padding-left: 60px;
   }
 }
+.column-right-smale {
+  flex: 1;
+  @media (min-width: 768px) {
+    padding-left: 290px !important;
+  }
+}
 
 .desktop-sidebar {
   position: fixed;
@@ -166,4 +172,29 @@
 .submenu-link.active {
   color: green;
   font-weight: 500;
+}
+
+.desktop-sidebar .sidebar-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 1rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.sidebar-header .keep-toggle-btn:hover {
+  background-color: var(--bs-tertiary-bg);
+  border-radius: 2px;
+}
+
+.keep-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.keep-icon {
+  width: 20px;
+  height: 20px;
+  fill: var(--bs-body-color);
 }
