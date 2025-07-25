@@ -13,8 +13,6 @@ services:
       - "80"
     networks:
       - app-network
-    profiles:
-      - "default"
 
   backend:
     build: ./backend
@@ -28,8 +26,6 @@ services:
       - "4000"
     networks:
       - app-network
-    profiles:
-      - "default"
 
   default-database:
     image: mariadb:latest
@@ -44,8 +40,6 @@ services:
       - default-database-data:/var/lib/mysql
     networks:
       - app-network
-    profiles:
-      - "default"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -60,8 +54,6 @@ services:
       - "80"
     networks:
       - app-network
-    profiles:
-      - "phpmyadmin"
 
   default-s3:
      image: minio/minio
@@ -77,8 +69,6 @@ services:
       - default-s3-data:/data
      networks:
       - app-network
-     profiles:
-      - "default"
 
   nginx:
     image: nginx:stable-alpine
@@ -100,8 +90,6 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - app-network
-    profiles:
-      - "default"
 
   certbot:
     image: certbot/certbot
@@ -115,8 +103,6 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew; done'"
     networks:
       - app-network
-    profiles:
-      - "default"
 
 volumes:
   default-database-data:
