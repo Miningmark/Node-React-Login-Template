@@ -41,7 +41,7 @@ services:
     networks:
       - app-network
 
-  phpmyadmin:
+  default-phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: default-phpmyadmin
     restart: no
