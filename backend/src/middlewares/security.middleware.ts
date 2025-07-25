@@ -6,7 +6,7 @@ import helmet from "helmet";
 export const setupSecurityMiddleware = (app: Express) => {
     app.disable("x-powered-by");
 
-    app.set("trust proxy", "172.18.0.1");
+    app.set("trust proxy", 1);
 
     app.use(
         helmet({
