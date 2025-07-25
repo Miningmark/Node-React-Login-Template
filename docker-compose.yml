@@ -78,13 +78,14 @@ services:
       - backend
       - mariadb
       - s3
-    ports:
-      - "80:80"
-      - "443:443"
+    #ports:
+    #  - "80:80"
+    #  - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/templates/default.conf.template
       - ./certbot/www:/var/www/certbot
       - /etc/letsencrypt:/etc/letsencrypt
+    network-mode: "host"
     networks:
       - app-network
 
