@@ -7,6 +7,11 @@ export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.
 export const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
 
 export const getIpv4Address = (req: Request): string | undefined => {
+    console.log(req.headers["x-real-ip"]);
+    console.log(req.headers["remote-addr"]);
+    console.log(req.headers["x-forwarded-for"]);
+    console.log(req.ip);
+
     const realIp = req.headers["x-real-ip"];
     if (typeof realIp === "string") return realIp;
 
