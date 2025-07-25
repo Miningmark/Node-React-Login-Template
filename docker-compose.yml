@@ -19,7 +19,7 @@ services:
     container_name: backend
     restart: always
     depends_on:
-      - default-database
+      - mariadb
     env_file:
       - ./backend/.env
     expose:
@@ -27,9 +27,9 @@ services:
     networks:
       - app-network
 
-  default-database:
+  mariadb:
     image: mariadb:latest
-    container_name: default-database
+    container_name: mariadb
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${DEFAULT_DATABASE_ROOT_PASSWORD}
@@ -37,33 +37,33 @@ services:
       - MYSQL_USER=${DEFAULT_DATABASE_USER}
       - MYSQL_PASSWORD=${DEFAULT_DATABASE_PASSWORD}
     volumes:
-      - default-database-data:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
     networks:
       - app-network
 
-  default-phpmyadmin:
+  phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: default-phpmyadmin
+    container_name: phpmyadmin
     restart: no
     environment:
-      - PMA_HOST=default-database
+      - PMA_HOST=mariadb
       - PMA_ABSOLUTE_URI=https://${DOMAIN}/phpmyadmin/
     depends_on:
-      - default-database
+      - mariadb
     expose:
       - "80"
     networks:
       - app-network
 
-  default-s3:
+  s3:
      image: minio/minio
-     container_name: default-s3
+     container_name: s3
      command: server /data --console-address ":9001"
      environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio1234
      volumes:
-      - default-s3-data:/data
+      - s3-data:/data
      networks:
       - app-network
 
@@ -76,8 +76,8 @@ services:
     depends_on:
       - frontend
       - backend
-      - default-database
-      - default-s3
+      - mariadb
+      - s3
     ports:
       - "80:80"
       - "443:443"
@@ -102,8 +102,8 @@ services:
       - app-network
 
 volumes:
-  default-database-data:
-  default-s3-data:
+  mariadb-data:
+  s3-data:
 
 networks:
   app-network:
