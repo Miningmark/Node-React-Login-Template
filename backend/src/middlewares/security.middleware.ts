@@ -6,10 +6,7 @@ import helmet from "helmet";
 export const setupSecurityMiddleware = (app: Express) => {
     app.disable("x-powered-by");
 
-    app.set("trust proxy", true);
-    app.set("trust proxy", "loopback"); // wenn Nginx auf localhost läuft
-    app.set("trust proxy", "172.18.0.0/16"); // wenn Nginx im gleichen Docker-Netz ist
-    app.set("trust proxy", 1); // wenn Nginx direkt davor sitzt
+    app.set("trust proxy", "172.18.0.1");
 
     app.use(
         helmet({
