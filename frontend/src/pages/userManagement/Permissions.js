@@ -120,7 +120,7 @@ const PermissionsPage = () => {
                 { title: "Username", id: "name" },
                 { title: "Email", id: "description" },
               ]}
-              tableHeight={`calc(100dvh - ${heightOffset + 52}px)`}
+              tableHeight={`calc(100dvh - ${heightOffset + 62}px)`}
               handleSort={handleSort}
             >
               <tbody>
