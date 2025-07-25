@@ -19,14 +19,6 @@ export async function initApp() {
 
     z.config(z.locales.de());
 
-    app.set("trust proxy", 1);
-    app.use((req, res, next) => {
-        console.log("Client IP:", req.ip);
-        console.log("X-Forwarded-For:", req.get("X-Forwarded-For"));
-        console.log("X-Real-IP:", req.get("X-Real-IP"));
-        next();
-    });
-
     setupSecurityMiddleware(app);
 
     app.use(express.urlencoded({ extended: true }));
