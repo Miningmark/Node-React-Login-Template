@@ -7,7 +7,7 @@ import { TokenService } from "@/services/token.service.js";
 import { UserService } from "@/services/user.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { getAccountLockedEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
-import { formatDate, getIpAddress as getIpv4Address, IPV4_REGEX } from "@/utils/misc.util.js";
+import { formatDate, getIpv4Address, IPV4_REGEX } from "@/utils/misc.util.js";
 import { CreationAttributes } from "@sequelize/core";
 import { Request } from "express";
 

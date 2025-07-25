@@ -6,15 +6,15 @@ export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
 export const IPV4_REGEX = /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$/;
 
-export const getIpAddress = (req: Request): string | undefined => {
-    const forwardedFor = req.headers["x-forwarded-for"];
-    if (typeof forwardedFor === "string") return forwardedFor;
-
+export const getIpv4Address = (req: Request): string | undefined => {
     const realIp = req.headers["x-real-ip"];
     if (typeof realIp === "string") return realIp;
 
     const remoteAddr = req.headers["remote-addr"];
     if (typeof remoteAddr === "string") return remoteAddr;
+
+    const forwardedFor = req.headers["x-forwarded-for"];
+    if (typeof forwardedFor === "string") return forwardedFor;
 
     const ip = req.ip;
     if (typeof ip === "string") return ip;
