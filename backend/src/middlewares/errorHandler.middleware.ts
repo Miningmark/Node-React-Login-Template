@@ -2,7 +2,7 @@ import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
 import { AppError, InternalServerError } from "@/errors/errorClasses.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ApiResponse } from "@/utils/apiResponse.util.js";
-import { getIpAddress } from "@/utils/misc.util.js";
+import { getIpv4Address } from "@/utils/misc.util.js";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -16,7 +16,7 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, 
         url: req.originalUrl,
         method: req.method,
         status: error instanceof AppError ? error.statusCode : 500,
-        ipv4Address: getIpAddress(req),
+        ipv4Address: getIpv4Address(req),
         userAgent: req.headers["user-agent"],
         requestBody: req.body,
         requestHeaders: req.headers,

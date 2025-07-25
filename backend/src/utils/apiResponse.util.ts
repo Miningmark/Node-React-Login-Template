@@ -1,6 +1,6 @@
 import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
-import { getIpAddress } from "@/utils/misc.util.js";
+import { getIpv4Address } from "@/utils/misc.util.js";
 import { Request, Response } from "express";
 
 export class ApiResponse {
@@ -10,7 +10,7 @@ export class ApiResponse {
             url: req.originalUrl,
             method: req.method,
             status: statusCode,
-            ipv4Address: getIpAddress(req),
+            ipv4Address: getIpv4Address(req),
             userAgent: req.headers["user-agent"],
             requestBody: req.body,
             requestHeaders: req.headers,
