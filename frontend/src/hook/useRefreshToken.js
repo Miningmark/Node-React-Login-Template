@@ -24,7 +24,7 @@ const useRefreshToken = () => {
       } else if (err?.response?.status === 403 || err?.response?.status === 401) {
         navigate("/login", { state: { from: location.pathname }, replace: true });
       } else {
-        console.error("Refresh token error:", err);
+        //console.error("Refresh token error:", err);
       }
       return null;
     }
