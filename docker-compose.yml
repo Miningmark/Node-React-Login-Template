@@ -9,8 +9,8 @@ services:
       - backend
     env_file:
       - "./frontend/.env"
-    expose:
-      - "80"
+    ports:
+      - "127.0.0.1:3000:80"
     networks:
       - app-network
 
@@ -22,8 +22,8 @@ services:
       - mariadb
     env_file:
       - ./backend/.env
-    expose:
-      - "4000"
+    ports:
+      - "127.0.0.1:4000:4000"
     networks:
       - app-network
 
@@ -50,21 +50,23 @@ services:
       PMA_ABSOLUTE_URI: https://${DOMAIN}/phpmyadmin/
     depends_on:
       - mariadb
-    expose:
-      - "80"
+    ports:
+      - "127.0.0.1:8080:80"
     networks:
       - app-network
 
   s3:
-     image: minio/minio
-     container_name: s3
-     command: server /data --console-address ":9001"
-     environment:
+    image: minio/minio
+    container_name: s3
+    command: server /data --console-address ":9001"
+    environment:
       MINIO_ROOT_USER: ${S3_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${S3_ROOT_PASSWORD}
-     volumes:
+    volumes:
       - s3-data:/data
-     networks:
+    ports:
+       - "127.0.0.1:9001:9001"
+    networks:
       - app-network
 
   nginx:
@@ -78,15 +80,11 @@ services:
       - backend
       - mariadb
       - s3
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/templates/default.conf.template
       - ./certbot/www:/var/www/certbot
       - /etc/letsencrypt:/etc/letsencrypt
-    networks:
-      - app-network
+    network_mode: host
 
   certbot:
     image: certbot/certbot
