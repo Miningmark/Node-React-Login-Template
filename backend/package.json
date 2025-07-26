@@ -13,7 +13,8 @@
     "author": "Juli051",
     "license": "ISC",
     "dependencies": {
-        "@sequelize/core": "^7.0.0-alpha.42",
+        "@aws-sdk/client-s3": "^3.850.0",
+        "@sequelize/core": "^7.0.0-alpha.46",
         "@sequelize/mariadb": "^7.0.0-alpha.46",
         "bcrypt": "^6.0.0",
         "cookie-parser": "^1.4.7",
@@ -23,6 +24,8 @@
         "express": "^5.1.0",
         "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.2",
+        "multer": "^2.0.2",
+        "multer-s3": "^3.0.1",
         "nodemailer": "^7.0.3",
         "socket.io": "^4.8.1",
         "winston": "^3.17.0",

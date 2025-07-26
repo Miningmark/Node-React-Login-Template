@@ -43,7 +43,11 @@ const envSchema = z.object({
     SMTP_HOST: z.string(),
     SMTP_PORT: z.string().transform(Number),
     SMTP_USER: z.string(),
-    SMTP_PASSWORD: z.string()
+    SMTP_PASSWORD: z.string(),
+
+    S3_BASE_URL: z.string(),
+    S3_USERNAME: z.string(),
+    S3_PASSWORD: z.string()
 });
 
 export const ENV = envSchema.parse({ ...process.env, BACKEND_VERSION: "0.0.5_ts" });
