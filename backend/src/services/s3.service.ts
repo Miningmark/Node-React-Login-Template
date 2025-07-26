@@ -1,4 +1,4 @@
-import { ENV } from "@/config/env";
+import { ENV } from "@/config/env.js";
 import { CreateBucketCommand, DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 
