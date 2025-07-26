@@ -8,7 +8,7 @@ export class S3Service {
 
     private constructor() {
         this.s3Client = new S3Client({
-            region: "EU",
+            region: "us-east-1",
             endpoint: ENV.S3_BASE_URL,
             forcePathStyle: true,
             credentials: {
