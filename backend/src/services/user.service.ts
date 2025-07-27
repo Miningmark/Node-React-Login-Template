@@ -104,7 +104,7 @@ export class UserService {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 
         const bucket = "users";
-        const filename = `${userId}`;
+        const filename = `${userId}-avatar`;
         const key = `avatars/${filename}`;
 
         await S3Service.getInstance().ensureBucketExists(bucket);
