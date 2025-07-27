@@ -1,5 +1,6 @@
 import { ENV } from "@/config/env.js";
-import { CreateBucketCommand, DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { BadRequestError } from "@/errors/badRequestError";
+import { CreateBucketCommand, DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 
 export class S3Service {
@@ -29,21 +30,17 @@ export class S3Service {
         try {
             const headCommand = new HeadBucketCommand({ Bucket: bucket });
             await this.s3Client.send(headCommand);
-            console.log(`Bucket "${bucket}" already exists.`);
-        } catch (err: any) {
-            if (err.$metadata?.httpStatusCode === 404) {
-                console.log(`Bucket "${bucket}" not found. Creating...`);
+        } catch (error: any) {
+            if (error.$metadata?.httpStatusCode === 404) {
                 const createCommand = new CreateBucketCommand({ Bucket: bucket });
                 await this.s3Client.send(createCommand);
-                console.log(`Bucket "${bucket}" created.`);
             } else {
-                console.error(`Error checking bucket: ${err.message}`);
-                throw err;
+                throw error;
             }
         }
     }
 
-    async uploadFile(bucket: string, key: string, body: Buffer | Readable, contentType: string): Promise<string> {
+    async uploadFile(bucket: string, key: string, body: Buffer, contentType: string): Promise<void> {
         const command = new PutObjectCommand({
             Bucket: bucket,
             Key: key,
@@ -52,7 +49,23 @@ export class S3Service {
         });
 
         await this.s3Client.send(command);
-        return `${ENV.S3_BASE_URL}/${bucket}/${key}`;
+    }
+
+    async getFile(bucket: string, key: string): Promise<{ stream: Readable; contentType: string }> {
+        const command = new GetObjectCommand({
+            Bucket: bucket,
+            Key: key
+        });
+
+        const response = await this.s3Client.send(command);
+        if (response.Body === undefined || response.ContentType === undefined || !(response.Body instanceof Readable)) {
+            throw new BadRequestError("Fehler beim Laden der Datei vom S3 Speicher");
+        }
+
+        return {
+            stream: response.Body,
+            contentType: response.ContentType
+        };
     }
 
     async deleteFile(bucket: string, key: string): Promise<void> {
