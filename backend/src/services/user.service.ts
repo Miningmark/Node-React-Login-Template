@@ -1,3 +1,4 @@
+import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import LastLogin from "@/models/lastLogin.model.js";
 import Permission from "@/models/permission.model.js";
@@ -20,7 +21,7 @@ export class UserService {
         this.routeGroupService = new RouteGroupService();
     }
 
-    async updateUsername(userId: number, newUsername: string, res: Response) {
+    async updateUsername(userId: number, newUsername: string, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -38,10 +39,10 @@ export class UserService {
         await databaseUser.save();
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, databaseUser.username));
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateEmail(userId: number, newEmail: string, res: Response) {
+    async updateEmail(userId: number, newEmail: string, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Email erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -58,10 +59,10 @@ export class UserService {
         await databaseUser.save();
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, undefined, databaseUser.email));
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updatePassword(userId: number, currentPassword: string, newPassword: string, res: Response) {
+    async updatePassword(userId: number, currentPassword: string, newPassword: string, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Passwort erfolgreich geändert, bitte neu anmelden" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -80,10 +81,10 @@ export class UserService {
         this.tokenService.removeJWTs(databaseUser);
         this.tokenService.clearRefreshTokenCookie(res);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateSettings(userId: number, theme: UserSettingsTheme) {
+    async updateSettings(userId: number, theme: UserSettingsTheme): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
@@ -97,23 +98,19 @@ export class UserService {
             await databaseUser.userSettings.save();
         }
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateAvatar(userId: number, file: Express.Multer.File) {
+    async updateAvatar(userId: number, file: Express.Multer.File): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 
-        const bucket = "users";
-        const filename = `${userId}-avatar`;
-        const key = `avatars/${filename}`;
+        await S3Service.getInstance().ensureBucketExists("users");
+        await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, file.buffer, file.mimetype);
 
-        await S3Service.getInstance().ensureBucketExists(bucket);
-        await S3Service.getInstance().uploadFile(bucket, key, file.buffer, file.mimetype);
-
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getUsername(userId: number) {
+    async getUsername(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich zurückgegeben" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -121,10 +118,10 @@ export class UserService {
 
         jsonResponse.username = capitalizeFirst(databaseUser.username);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getRouteGroups(userId: number) {
+    async getRouteGroups(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "LastLogins erfolgreich zurückgegeben" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -132,10 +129,10 @@ export class UserService {
 
         jsonResponse.routeGroups = await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getLastLogins(userId: number) {
+    async getLastLogins(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "RouteGroups erfolgreich zurückgegeben" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: LastLogin, limit: 5, order: [["loginTime", "DESC"]] } });
@@ -151,10 +148,10 @@ export class UserService {
               }))
             : [];
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getSettings(userId: number) {
+    async getSettings(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Einstellungen erfolreich zurückgegeben" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
@@ -169,7 +166,15 @@ export class UserService {
             theme: databaseUser.userSettings.theme
         };
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getAvatar(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolreich zurückgegeben" };
+
+        const { stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`);
+
+        return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
     }
 
     generateJSONResponseWithModel(databaseUser: User): Record<string, any> {

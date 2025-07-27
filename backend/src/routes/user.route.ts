@@ -28,4 +28,6 @@ router.get("/getRouteGroups", validateRequest(onlyAuthorizationHeader), verifyAu
 router.get("/getLastLogins", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getLastLogins);
 router.get("/getSettings", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getSettings);
 
+router.get("/getAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getAvatar);
+
 export default router;

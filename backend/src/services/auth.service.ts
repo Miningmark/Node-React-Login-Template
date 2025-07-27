@@ -1,4 +1,5 @@
 import { ENV } from "@/config/env.js";
+import { ControllerResponse } from "@/controllers/base.controller";
 import { ForbiddenError } from "@/errors/forbiddenError.js";
 import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { ValidationError } from "@/errors/validationError.js";
@@ -33,8 +34,8 @@ export class AuthService {
         this.routeGroupService = new RouteGroupService();
     }
 
-    async register(username: string, email: string, password: string) {
-        let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert", statusCode: 201 };
+    async register(username: string, email: string, password: string): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert" };
 
         let databaseUser = await User.findOne({ where: { [Op.or]: [{ username: username }, { email: email }] } });
         if (databaseUser !== null) throw new ValidationError("Benutzername oder Email bereits vergeben");
@@ -50,10 +51,10 @@ export class AuthService {
         );
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponseWithModel(databaseUser));
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse, statusCode: 201 };
     }
 
-    async login(username: string, password: string, req: Request, res: Response) {
+    async login(username: string, password: string, req: Request, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich angemeldet" };
 
         const databaseUser = await User.findOne({ where: { username: username } });
@@ -86,10 +87,10 @@ export class AuthService {
         await this.userActivityService.addUserLastLogin(databaseUser.id, req, true);
         await this.userActivityService.checkHasLocationChanged(databaseUser);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async logout(userId: number, res: Response) {
+    async logout(userId: number, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich abgemeldet" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -98,10 +99,10 @@ export class AuthService {
         await this.tokenService.removeJWTs(databaseUser);
         this.tokenService.clearRefreshTokenCookie(res);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async accountActivation(token: string) {
+    async accountActivation(token: string): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich freigeschaltet" };
 
         const databaseUserToken = await UserToken.findOne({ where: { type: UserTokenType.USER_REGISTRATION_TOKEN, token: token }, include: { model: User } });
@@ -118,10 +119,10 @@ export class AuthService {
         await databaseUserToken.destroy();
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUserToken.user.id, undefined, undefined, true));
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async refreshAccessToken(token: string, res: Response) {
+    async refreshAccessToken(token: string, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Token erfolgreich erneuert" };
 
         const refreshUserToken = await UserToken.findOne({ where: { type: UserTokenType.REFRESH_TOKEN, token: token }, include: { model: User } });
@@ -158,10 +159,10 @@ export class AuthService {
                 }
             });
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async requestPasswordReset(usernameOrEmail: string) {
+    async requestPasswordReset(usernameOrEmail: string): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Email zum Passwort ändern erfolgreich versandt" };
 
         const databaseUser = await User.findOne({ where: { [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }] } });
@@ -179,10 +180,10 @@ export class AuthService {
             getPasswordResetEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.PASSWORD_RESET_EXPIRY)))
         );
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async handlePasswordRecovery(token: string, password: string) {
+    async handlePasswordRecovery(token: string, password: string): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Passwort erfolgreich gespeichert" };
 
         const databaseUserToken = await UserToken.findOne({
@@ -214,6 +215,6 @@ export class AuthService {
         await databaseUserToken.destroy();
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUserToken.user.id, undefined, undefined, true));
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 }

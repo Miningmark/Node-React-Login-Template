@@ -2,10 +2,31 @@ import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { getIpv4Address } from "@/utils/misc.util.js";
 import { Request, Response } from "express";
+import { Readable } from "stream";
 
 export class ApiResponse {
-    static async sendSuccess(res: Response, req: Request, jsonData: Record<string, any>, statusCode: number = 200, logResponse: boolean = true) {
-        const loggerOptions: DatabaseLoggerOptions = {
+    static async sendJSONSuccess(res: Response, req: Request, jsonResponse: Record<string, any>, logResponse: boolean = true, statusCode: number = 200) {
+        const loggerOptions = this.generateLoggerOptions(req, jsonResponse, logResponse, statusCode);
+
+        await databaseLogger(ServerLogTypes.INFO, jsonResponse?.message, loggerOptions);
+        res.status(statusCode).json(jsonResponse);
+    }
+
+    static async sendStreamSuccess(res: Response, req: Request, contentType: string, stream: Readable, jsonResponse: Record<string, any>) {
+        const loggerOptions = this.generateLoggerOptions(req, jsonResponse);
+
+        await databaseLogger(ServerLogTypes.INFO, jsonResponse?.message, loggerOptions);
+
+        res.setHeader("Content-Type", contentType);
+        stream.pipe(res);
+    }
+
+    static sendError(res: Response, errorMessage: string, statusCode: number = 400) {
+        res.status(statusCode).json({ message: errorMessage });
+    }
+
+    private static generateLoggerOptions(req: Request, jsonResponse: Record<string, any>, logResponse: boolean = true, statusCode: number = 200): DatabaseLoggerOptions {
+        return {
             userId: req.userId,
             url: req.originalUrl,
             method: req.method,
@@ -14,15 +35,8 @@ export class ApiResponse {
             userAgent: req.headers["user-agent"],
             requestBody: req.body,
             requestHeaders: req.headers,
-            response: logResponse ? jsonData : { response: "*removed*" },
+            response: logResponse ? jsonResponse : { response: "*removed*" },
             source: "ApiResponse"
         };
-
-        await databaseLogger(ServerLogTypes.INFO, jsonData?.message, loggerOptions);
-        res.status(statusCode).json(jsonData);
-    }
-
-    static sendError(res: Response, errorMessage: string, statusCode: number = 400) {
-        res.status(statusCode).json({ message: errorMessage });
     }
 }

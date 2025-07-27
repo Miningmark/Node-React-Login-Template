@@ -1,5 +1,5 @@
 import { ENV } from "@/config/env.js";
-import { BadRequestError } from "@/errors/badRequestError";
+import { BadRequestError } from "@/errors/badRequestError.js";
 import { CreateBucketCommand, DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 

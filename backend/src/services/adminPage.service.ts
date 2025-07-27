@@ -1,3 +1,4 @@
+import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
@@ -20,19 +21,19 @@ export class AdminPageService {
         this.permissionService = new PermissionService();
     }
 
-    async getServerLogs(limit?: number, offset?: number) {
-        let jsonResponse: Record<string, any> = { message: "Alle angeforderten ServerLogs zurück gegeben", logResponse: false };
+    async getServerLogs(limit?: number, offset?: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Alle angeforderten ServerLogs zurück gegeben" };
 
         const databaseServerLogs = await ServerLog.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.serverLogCount = await ServerLog.count();
         jsonResponse.serverLogs = this.serverLogService.generateJSONResponse(databaseServerLogs);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse, logResponse: false };
     }
 
-    async getFilteredServerLogs(limit?: number, offset?: number, userIds?: number[], types?: string[], ipv4Adress?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string) {
-        let jsonResponse: Record<string, any> = { message: "Alle angeforderten Serverlogs zurück gegeben", logResponse: false };
+    async getFilteredServerLogs(limit?: number, offset?: number, userIds?: number[], types?: string[], ipv4Adress?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Alle angeforderten Serverlogs zurück gegeben" };
 
         const buildServerLogQueryConditions = this.serverLogService.buildServerLogQueryConditions(userIds, types, ipv4Adress, createdAtFrom, createdAtTo, searchString);
 
@@ -45,10 +46,10 @@ export class AdminPageService {
         jsonResponse.serverLogCount = await ServerLog.count({ where: buildServerLogQueryConditions });
         jsonResponse.serverLogs = this.serverLogService.generateJSONResponse(databaseServerLogs);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse, logResponse: false };
     }
 
-    async getFilterOptionsServerLog() {
+    async getFilterOptionsServerLog(): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle Filter Optionen zurück gegeben" };
 
         const databaseUsers = await User.findAll({});
@@ -63,30 +64,30 @@ export class AdminPageService {
 
         jsonResponse.filterOptions.types = Object.values(ServerLogTypes);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getPermissionsWithRouteGroups() {
+    async getPermissionsWithRouteGroups(): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle Rechte mit RouteGroups zurück gegeben" };
 
         const databasePermissions = await Permission.findAll({ include: { model: RouteGroup } });
 
         jsonResponse.permissions = this.permissionService.generateMultipleJSONResponseWithModel(databasePermissions);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getRouteGroups() {
+    async getRouteGroups(): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle RouteGroups zurück gegeben" };
 
         const databaseRouteGroups = await RouteGroup.findAll();
 
         jsonResponse.routeGroups = this.routeGroupService.generateMultipleJSONResponseWithModel(databaseRouteGroups);
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async createPermission(name: string, routeGroupIds: number[], description?: string) {
+    async createPermission(name: string, routeGroupIds: number[], description?: string): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Recht erfolgreich erstellt" };
 
         const databasePermissionNew = await Permission.findOne({ where: { name: name } });
@@ -101,10 +102,10 @@ export class AdminPageService {
         SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:create", { id: databasePermission.id, name: name, description: description });
         SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:create", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updatePermission(id: number, name?: string, description?: string, routeGroupIds?: number[]) {
+    async updatePermission(id: number, name?: string, description?: string, routeGroupIds?: number[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Recht erfolgreich bearbeitet" };
 
         const databasePermission = await Permission.findOne({ where: { id: id } });
@@ -132,10 +133,10 @@ export class AdminPageService {
         SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:update", { id: id, name: name, description: description });
         SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:update", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async deletePermission(id: number) {
+    async deletePermission(id: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Recht erfolgreich gelöscht" };
 
         const databasePermission = await Permission.findOne({ where: { id: id }, include: { model: User } });
@@ -149,6 +150,6 @@ export class AdminPageService {
         SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:delete", { id: id });
         SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:delete", { id: id });
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 }

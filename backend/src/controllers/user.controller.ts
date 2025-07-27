@@ -83,4 +83,12 @@ export class UserController extends BaseController {
             return await this.userService.getSettings(userId);
         });
     };
+
+    getAvatar = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+
+            return await this.userService.getAvatar(userId);
+        });
+    };
 }

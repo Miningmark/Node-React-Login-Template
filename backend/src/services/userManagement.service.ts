@@ -1,4 +1,5 @@
 import { ENV } from "@/config/env.js";
+import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
@@ -25,7 +26,7 @@ export class UserManagementService {
         this.userService = new UserService();
     }
 
-    async getUsers(limit?: number, offset?: number) {
+    async getUsers(limit?: number, offset?: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten Benutzer zurück gegeben" };
 
         const databaseUsers = await User.findAll({ include: { model: Permission }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
@@ -34,10 +35,10 @@ export class UserManagementService {
             return this.userService.generateJSONResponseWithModel(databaseUser);
         });
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getPermissions() {
+    async getPermissions(): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle Permissions zurück gegeben" };
 
         const databasePermissions = await Permission.findAll();
@@ -50,10 +51,10 @@ export class UserManagementService {
             };
         });
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateUser(userId: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissionIds?: number[]) {
+    async updateUser(userId: number, username?: string, email?: string, isActive?: boolean, isDisabled?: boolean, permissionIds?: number[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzer erfolgreich bearbeitet" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: Permission } });
@@ -115,10 +116,10 @@ export class UserManagementService {
             this.userService.generateJSONResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions)
         );
 
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async createUser(username: string, email: string, permissionIds: number[]) {
+    async createUser(username: string, email: string, permissionIds: number[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert" };
 
         const databaseSuperAdminPermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
@@ -140,6 +141,6 @@ export class UserManagementService {
         );
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:create", this.userService.generateJSONResponseWithModel(databaseUser));
-        return jsonResponse;
+        return { type: "json", jsonResponse: jsonResponse };
     }
 }
