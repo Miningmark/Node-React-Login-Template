@@ -4,12 +4,12 @@ import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
 import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
+import { S3Service } from "@/services/s3.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import bcrypt from "bcrypt";
 import { Response } from "express";
-import { S3Service } from "./s3.service";
 
 export class UserService {
     private tokenService: TokenService;
