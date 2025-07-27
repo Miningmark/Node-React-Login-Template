@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { authorizationBaseValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
+import { authorizationBaseValidation, emailBaseValidation, imageFileBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
 import { UserSettingsTheme } from "@/models/userSettings.model.js";
 
 export const updateUsernameSchema = z.object({
@@ -37,4 +37,11 @@ export const updateSettingsSchema = z.object({
     body: z.object({
         theme: z.enum(Object.values(UserSettingsTheme))
     })
+});
+
+export const updateAvatarSchema = z.object({
+    headers: z.object({
+        authorization: authorizationBaseValidation
+    }),
+    file: imageFileBaseValidation(5)
 });

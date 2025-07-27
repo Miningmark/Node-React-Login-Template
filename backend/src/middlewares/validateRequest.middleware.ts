@@ -9,14 +9,13 @@ export const validateRequest = (schema: ZodObject) => {
                 body: req.body,
                 query: req.query,
                 params: req.params,
-                headers: req.headers
+                headers: req.headers,
+                file: req.file
             });
             next();
         } catch (error) {
             if (error instanceof ZodError) {
-                next(
-                    new ValidationError(`{${(error.issues[0]?.path).toString().replace(",", "}:{")}} ${error.issues[0]?.message}` || "Validierung der Anfrage fehlgeschlagen")
-                );
+                next(new ValidationError(`{${(error.issues[0]?.path).toString().replace(",", "}:{")}} ${error.issues[0]?.message}` || "Validierung der Anfrage fehlgeschlagen"));
                 return;
             }
             next(new ValidationError("Validierung der Anfrage fehlgeschlagen"));

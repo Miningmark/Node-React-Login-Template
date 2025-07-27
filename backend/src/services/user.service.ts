@@ -9,6 +9,7 @@ import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import bcrypt from "bcrypt";
 import { Response } from "express";
+import { S3Service } from "./s3.service";
 
 export class UserService {
     private tokenService: TokenService;
@@ -95,6 +96,19 @@ export class UserService {
             databaseUser.userSettings.theme = theme;
             await databaseUser.userSettings.save();
         }
+
+        return jsonResponse;
+    }
+
+    async updateAvatar(userId: number, file: Express.Multer.File) {
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
+
+        const bucket = "users";
+        const filename = `${userId}`;
+        const key = `avatars/${filename}`;
+
+        await S3Service.getInstance().ensureBucketExists(bucket);
+        await S3Service.getInstance().uploadFile(bucket, key, file.buffer, file.mimetype);
 
         return jsonResponse;
     }

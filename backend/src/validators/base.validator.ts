@@ -30,3 +30,16 @@ export const onlyAuthorizationHeader = z.object({
         authorization: authorizationBaseValidation
     })
 });
+
+export const imageFileBaseValidation = (maxFileSizeInMB: number): z.ZodCustom<Express.Multer.File, Express.Multer.File> => {
+    return z
+        .custom<Express.Multer.File>((file): file is Express.Multer.File => !!file && typeof file === "object", {
+            message: "Datei fehlt oder ungültig"
+        })
+        .refine((file) => file.mimetype?.startsWith("image/"), {
+            message: "Nur Bilddateien sind erlaubt"
+        })
+        .refine((file) => file.size <= maxFileSizeInMB * 1024 * 1024, {
+            message: `Bild zu groß (max. ${maxFileSizeInMB}MB)`
+        });
+};

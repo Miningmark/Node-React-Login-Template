@@ -42,8 +42,6 @@ httpServer.listen(ENV.BACKEND_PORT, async () => {
 
         socketService.init(io);
         await socketService.setup();
-
-        S3Service.getInstance().ensureBucketExists("test");
     } catch (error) {
         consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
         process.exit(1);

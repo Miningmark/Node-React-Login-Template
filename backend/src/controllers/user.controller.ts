@@ -43,6 +43,15 @@ export class UserController extends BaseController {
         });
     };
 
+    updateAvatar = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+            const { file } = req as { file: Express.Multer.File };
+
+            return await this.userService.updateAvatar(userId, file);
+        });
+    };
+
     getUsername = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
