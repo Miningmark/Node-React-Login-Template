@@ -211,7 +211,7 @@ const UserPage = () => {
   async function handleUpdateProfileImageSubmit() {
     try {
       const formData = new FormData();
-      formData.append("imageFile", file);
+      formData.append("file", file);
       await axiosProtected.post("/user/updateAvatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
