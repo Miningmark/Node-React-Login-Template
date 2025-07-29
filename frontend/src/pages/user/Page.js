@@ -12,6 +12,9 @@ import "components/util/css/ResizableTable.css";
 import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
 import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off.svg";
 
+const MAX_IMAGE_SIZE_MB = 5;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg", "image/jpe"];
+
 const UserPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -32,6 +35,11 @@ const UserPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const [showPassword3, setShowPassword3] = useState(false);
+
+  const [imagePreview, setImagePreview] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
 
   const { addToast } = useToast();
   const { setAccessToken, setUsername } = useContext(AuthContext);
@@ -164,6 +172,54 @@ const UserPage = () => {
       addToast(error.response?.data?.message || "Benutzername-Änderung fehlgeschlagen", "danger");
     } finally {
       setLoadingUsername(false);
+    }
+  }
+
+  async function handleUpdateProfileImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Dateigröße prüfen
+    if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+      setError("Die Datei darf maximal 5 MB groß sein.");
+      setImagePreview(null);
+      setFileName("");
+      return;
+    }
+
+    // MIME-Typ prüfen
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setError("Nur Bilder im Format JPG, PNG, WebP oder GIF sind erlaubt.");
+      setImagePreview(null);
+      setFileName("");
+      return;
+    }
+
+    // Alles okay
+    setError("");
+    setFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    setFile(file);
+  }
+
+  async function handleUpdateProfileImageSubmit() {
+    try {
+      const formData = new FormData();
+      formData.append("imageFile", file);
+      await axiosProtected.post("/user/updateAvatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      addToast("Profilbild erfolgreich aktualisiert.", "success");
+    } catch (error) {
+      addToast(error.response?.data?.message || "Profilbild-Änderung fehlgeschlagen", "danger");
     }
   }
 
@@ -447,6 +503,72 @@ const UserPage = () => {
               </div>
             </div>
           ) : null}
+        </div>
+
+        <div className="col-12 col-md-6">
+          {/* Profilbild ändern */}
+          <div className="card">
+            <div className="card-header fw-bold">Profilbild ändern</div>
+            <div className="card-body">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: "1rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                <div>
+                  <label
+                    htmlFor="profileImage"
+                    style={{
+                      display: "inline-block",
+                      marginTop: "12px",
+                      padding: "8px 12px",
+                      background: "#007bff",
+                      color: "white",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Bild auswählen
+                  </label>
+                  <input
+                    id="profileImage"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUpdateProfileImage}
+                    style={{ display: "none" }}
+                  />
+                  {fileName && (
+                    <div style={{ fontSize: "0.9rem", marginTop: "0.3rem" }}>{fileName}</div>
+                  )}
+                  {file && (
+                    <button
+                      className="btn btn-primary mt-2"
+                      onClick={handleUpdateProfileImageSubmit}
+                      disabled={!imagePreview || loadingUsername}
+                      style={{ width: "100%" }}
+                    >
+                      Speichern
+                    </button>
+                  )}
+                  {error && <div style={{ color: "red", marginTop: "0.5rem" }}>{error}</div>}
+                </div>
+
+                {imagePreview && (
+                  <div>
+                    <img
+                      src={imagePreview}
+                      alt="Profilvorschau"
+                      style={{ maxWidth: "150px", borderRadius: "50%", border: "2px solid #ccc" }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Letzte Logins */}
