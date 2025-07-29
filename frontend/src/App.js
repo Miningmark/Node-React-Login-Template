@@ -101,9 +101,10 @@ function App() {
         ]);
 
         if (isMounted) {
+          console.log("fetchUserData: ", avatarRes.data);
           if (userRes.data?.username) setUsername(userRes.data.username);
           if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
-          if (avatarRes.data?.avatar) setAvatar(avatarRes.data.avatar);
+          if (avatarRes.data) setAvatar(avatarRes.data);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
