@@ -6,6 +6,9 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [username, setUsername] = useState(null);
   const [routeGroups, setRouteGroups] = useState(null);
+  const [avatar, setAvatar] = useState(null);
+
+  console.log("avatar", avatar);
 
   function login(newAccessToken, username, routeGroups) {
     setAccessToken(newAccessToken);
@@ -38,9 +41,11 @@ export const AuthProvider = ({ children }) => {
         accessToken,
         username,
         routeGroups,
+        avatar,
         setAccessToken,
         setUsername,
         setRouteGroups,
+        setAvatar,
         login,
         logout,
         checkAccess,

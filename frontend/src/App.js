@@ -49,7 +49,8 @@ function InnerProviders() {
 }
 
 function App() {
-  const { setUsername, setRouteGroups, username, accessToken, logout } = useContext(AuthContext);
+  const { setUsername, setRouteGroups, username, accessToken, logout, setAvatar } =
+    useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
 
   const { socket } = useContext(SocketContext);
@@ -93,14 +94,16 @@ function App() {
 
     async function fetchUser() {
       try {
-        const [userRes, routesRes] = await Promise.all([
+        const [userRes, routesRes, avatarRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
           axiosProtected.get("/user/getRouteGroups", { signal }),
+          axiosProtected.get("/user/getAvatar", { signal }),
         ]);
 
         if (isMounted) {
           if (userRes.data?.username) setUsername(userRes.data.username);
           if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
+          if (avatarRes.data?.avatar) setAvatar(avatarRes.data.avatar);
         }
       } catch (err) {
         if (err.name === "CanceledError") {

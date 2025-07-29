@@ -10,6 +10,7 @@ import "./navBar.css";
 import SideMenuMobile from "./SideMenuMobile";
 
 import { ReactComponent as MenuIcon } from "assets/icons/menu.svg";
+import { ReactComponent as UserDefaultIcon } from "assets/icons/account_circle.svg";
 
 export default function NavBar({ children }) {
   const [showNavbar, setShowNavbar] = useState(true);
@@ -19,7 +20,7 @@ export default function NavBar({ children }) {
 
   const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
 
-  const { accessToken, username, logout } = useContext(AuthContext);
+  const { accessToken, username, logout, avatar } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
@@ -121,9 +122,21 @@ export default function NavBar({ children }) {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               aria-expanded={dropdownOpen}
             >
-              <span role="img" aria-label="user">
-                👤
-              </span>
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt="Avatar"
+                  className="rounded-circle"
+                  style={{ width: "32px", height: "32px" }}
+                />
+              ) : (
+                <UserDefaultIcon
+                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                  width={40}
+                  height={40}
+                  style={{ borderRadius: "50%" }}
+                />
+              )}
             </button>
 
             <ul
