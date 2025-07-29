@@ -171,8 +171,13 @@ export class UserService {
 
     async getAvatar(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Einstellungen erfolreich zurückgegeben" };
+        let stream, contentType;
 
-        const { stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`);
+        try {
+            ({ stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`));
+        } catch (error) {
+            return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
+        }
 
         return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
     }

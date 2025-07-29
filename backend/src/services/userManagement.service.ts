@@ -66,6 +66,16 @@ export class UserManagementService {
 
         if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ForbiddenError("SuperAdmin kann nicht bearbeitet werden");
 
+        if (username !== undefined) {
+            const databaseUser = await User.findOne({ where: { username: username } });
+            if (databaseUser !== null) throw new ValidationError("Benutzername oder bereits vergeben");
+        }
+
+        if (email !== undefined) {
+            const databaseUser = await User.findOne({ where: { email: email } });
+            if (databaseUser !== null) throw new ValidationError("Email oder bereits vergeben");
+        }
+
         if (permissionIds !== undefined) {
             const databaseSuperAdminPermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
             if (databaseSuperAdminPermission === null) throw new ValidationError("SuperAdmin Berechtigung nicht gefunden!");
@@ -127,9 +137,12 @@ export class UserManagementService {
 
         if (permissionIds.includes(databaseSuperAdminPermission.id)) throw new ForbiddenError("SuperAdmin Berechtigung kann keinen anderen Benutzern zugewiesen werden");
 
+        let databaseUser = await User.findOne({ where: { [Op.or]: [{ username: username }, { email: email }] } });
+        if (databaseUser !== null) throw new ValidationError("Benutzername oder Email bereits vergeben");
+
         const databasePermissions = await Permission.findAll({ where: { id: { [Op.in]: permissionIds } } });
 
-        const databaseUser = await User.create({ username: username, email: email, password: "" });
+        databaseUser = await User.create({ username: username, email: email, password: "" });
         await databaseUser.setPermissions(databasePermissions);
         databaseUser.permissions = await databaseUser.getPermissions();
 
