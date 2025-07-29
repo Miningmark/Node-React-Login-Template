@@ -1,9 +1,14 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "./css/ResizableTable.css";
 import Table from "react-bootstrap/Table";
 
+import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
+import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
+
 const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, children }) => {
   const tableRef = useRef();
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
 
   useEffect(() => {
     const table = tableRef.current;
@@ -42,6 +47,24 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
     });
   }, []);
 
+  const handleHeaderClick = (e, colId) => {
+    if (e.target.classList.contains("resizer")) return;
+
+    if (!handleSort) return;
+
+    if (sortedColumn === colId) {
+      // Toggle direction
+      const newDirection = sortDirection === "asc" ? "desc" : "asc";
+      setSortDirection(newDirection);
+      handleSort(colId);
+    } else {
+      // Set new column and reset to ascending
+      setSortedColumn(colId);
+      setSortDirection("asc");
+      handleSort(colId);
+    }
+  };
+
   return (
     <div
       className="resizable-table-wrapper"
@@ -71,9 +94,27 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
                   width: col.width ? `${col.width}px` : undefined,
                   cursor: `${handleSort ? "pointer" : "default"}`,
                 }}
-                onClick={() => (handleSort ? handleSort(col.id || null) : () => {})}
+                onClick={(e) => handleHeaderClick(e, col.id || null)}
               >
                 {col.title}
+                {sortedColumn === col.id && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      right: "4px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: "32px",
+                      height: "32px",
+                    }}
+                  >
+                    {sortDirection === "asc" ? (
+                      <ArrowDownIcon style={{ width: "100%", height: "100%" }} />
+                    ) : (
+                      <ArrowUpIcon style={{ width: "100%", height: "100%" }} />
+                    )}
+                  </span>
+                )}
               </th>
             ))}
           </tr>

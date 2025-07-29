@@ -117,8 +117,8 @@ const PermissionsPage = () => {
           {!loadingPermissions && allPermissions?.length > 0 ? (
             <ResizableTable
               columns={[
-                { title: "Username", id: "name" },
-                { title: "Email", id: "description" },
+                { title: "Name", id: "name" },
+                { title: "Beschreibung", id: "description" },
               ]}
               tableHeight={`calc(100dvh - ${heightOffset + 62}px)`}
               handleSort={handleSort}

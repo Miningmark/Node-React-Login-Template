@@ -15,7 +15,7 @@ export default function NavBar({ children }) {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [menuFixed, setMenuFixed] = useState(true);
+  const [menuFixed, setMenuFixed] = useState(false);
 
   const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
 

@@ -220,9 +220,9 @@ const UsersPage = () => {
                 <ResizableTable
                   columns={[
                     { title: "Username", id: "username" },
-                    { title: "Email", id: "email", width: 150 },
-                    { title: "Active", id: "isActive", width: 80 },
-                    { title: "Blocked", id: "isDisabled", width: 80 },
+                    { title: "Email", id: "email" },
+                    { title: "Active", id: "isActive" },
+                    { title: "Blocked", id: "isDisabled" },
                   ]}
                   tableHeight={`calc(100dvh - ${heightOffset + 142}px)`}
                   handleSort={handleSort}
