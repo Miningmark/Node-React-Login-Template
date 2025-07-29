@@ -37,9 +37,9 @@ export class UserController extends BaseController {
     updateSettings = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
-            const { theme } = req.body;
+            const { theme, isSideMenuFixed } = req.body;
 
-            return await this.userService.updateSettings(userId, theme);
+            return await this.userService.updateSettings(userId, theme, isSideMenuFixed);
         });
     };
 

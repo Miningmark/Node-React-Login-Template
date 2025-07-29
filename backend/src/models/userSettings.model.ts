@@ -18,9 +18,14 @@ class UserSettings extends Model<InferAttributes<UserSettings>, InferCreationAtt
     declare userId: number;
 
     @Attribute(DataTypes.ENUM(...Object.values(UserSettingsTheme)))
-    @NotNull
     @Default(UserSettingsTheme.LIGHT_THEME)
+    @NotNull
     declare theme: CreationOptional<UserSettingsTheme>;
+
+    @Attribute(DataTypes.BOOLEAN)
+    @Default(false)
+    @NotNull
+    declare isSideMenuFixed: CreationOptional<boolean>;
 
     declare user?: NonAttribute<User>;
 

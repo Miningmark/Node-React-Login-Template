@@ -84,7 +84,7 @@ export class UserService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateSettings(userId: number, theme: UserSettingsTheme): Promise<ControllerResponse> {
+    async updateSettings(userId: number, theme?: UserSettingsTheme, isSideMenuFixed?: boolean): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
@@ -92,9 +92,16 @@ export class UserService {
         if (databaseUser.userSettings === undefined) throw new InternalServerError("Einstellungen nicht geladen");
 
         if (databaseUser.userSettings === null) {
-            await databaseUser.createUserSettings({ userId: userId, theme: theme });
+            await databaseUser.createUserSettings({ userId: userId, theme: theme, isSideMenuFixed: isSideMenuFixed });
         } else {
-            databaseUser.userSettings.theme = theme;
+            if (theme !== undefined) {
+                databaseUser.userSettings.theme = theme;
+            }
+
+            if (isSideMenuFixed !== undefined) {
+                databaseUser.userSettings.isSideMenuFixed = isSideMenuFixed;
+            }
+
             await databaseUser.userSettings.save();
         }
 
@@ -163,7 +170,8 @@ export class UserService {
         }
 
         jsonResponse.settings = {
-            theme: databaseUser.userSettings.theme
+            theme: databaseUser.userSettings.theme,
+            isSideMenuFixed: databaseUser.userSettings.isSideMenuFixed
         };
 
         return { type: "json", jsonResponse: jsonResponse };

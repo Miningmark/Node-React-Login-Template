@@ -34,9 +34,14 @@ export const updateSettingsSchema = z.object({
     headers: z.object({
         authorization: authorizationBaseValidation
     }),
-    body: z.object({
-        theme: z.enum(Object.values(UserSettingsTheme))
-    })
+    body: z
+        .object({
+            theme: z.enum(Object.values(UserSettingsTheme)).optional(),
+            isSideMenuFixed: z.boolean().optional()
+        })
+        .refine((data) => {
+            return data.theme !== undefined || data.isSideMenuFixed !== undefined;
+        }, "Es muss mindestens ein Wert geändert werden")
 });
 
 export const updateAvatarSchema = z.object({
