@@ -39,10 +39,11 @@ const UserPage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [fileName, setFileName] = useState("");
   const [file, setFile] = useState(null);
+  const [loadingAvatar, setLoadingAvatar] = useState(false);
   const [error, setError] = useState("");
 
   const { addToast } = useToast();
-  const { setAccessToken, setUsername } = useContext(AuthContext);
+  const { setAccessToken, setUsername, setAvatar } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
@@ -209,6 +210,7 @@ const UserPage = () => {
   }
 
   async function handleUpdateProfileImageSubmit() {
+    setLoadingAvatar(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -218,8 +220,14 @@ const UserPage = () => {
         },
       });
       addToast("Profilbild erfolgreich aktualisiert.", "success");
+      setAvatar(file ? URL.createObjectURL(file) : null);
+      setImagePreview(null);
+      setFileName("");
+      setFile(null);
     } catch (error) {
       addToast(error.response?.data?.message || "Profilbild-Änderung fehlgeschlagen", "danger");
+    } finally {
+      setLoadingAvatar(false);
     }
   }
 
@@ -529,7 +537,7 @@ const UserPage = () => {
                       background: "#007bff",
                       color: "white",
                       borderRadius: "4px",
-                      cursor: "pointer",
+                      cursor: `${loadingAvatar ? "not-allowed" : "pointer"}`,
                     }}
                   >
                     Bild auswählen
@@ -539,7 +547,10 @@ const UserPage = () => {
                     type="file"
                     accept="image/*"
                     onChange={handleUpdateProfileImage}
-                    style={{ display: "none" }}
+                    style={{
+                      display: "none",
+                    }}
+                    disabled={loadingAvatar}
                   />
                   {fileName && (
                     <div style={{ fontSize: "0.9rem", marginTop: "0.3rem" }}>{fileName}</div>
@@ -548,10 +559,18 @@ const UserPage = () => {
                     <button
                       className="btn btn-primary mt-2"
                       onClick={handleUpdateProfileImageSubmit}
-                      disabled={!imagePreview || loadingUsername}
+                      disabled={loadingAvatar}
                       style={{ width: "100%" }}
                     >
-                      Speichern
+                      {loadingAvatar ? (
+                        <span
+                          className="spinner-border spinner-border-sm ms-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : (
+                        "Speichern"
+                      )}
                     </button>
                   )}
                   {error && <div style={{ color: "red", marginTop: "0.5rem" }}>{error}</div>}

@@ -127,7 +127,7 @@ export default function NavBar({ children }) {
                   src={avatar}
                   alt="Avatar"
                   className="rounded-circle"
-                  style={{ width: "32px", height: "32px" }}
+                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
                 />
               ) : (
                 <UserDefaultIcon

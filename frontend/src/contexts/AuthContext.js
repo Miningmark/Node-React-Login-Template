@@ -8,8 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [routeGroups, setRouteGroups] = useState(null);
   const [avatar, setAvatar] = useState(null);
 
-  console.log("avatar", avatar);
-
   function login(newAccessToken, username, routeGroups) {
     setAccessToken(newAccessToken);
     setUsername(username);
