@@ -97,14 +97,18 @@ function App() {
         const [userRes, routesRes, avatarRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
           axiosProtected.get("/user/getRouteGroups", { signal }),
-          axiosProtected.get("/user/getAvatar", { signal }),
+          axiosProtected.get("/user/getAvatar", { signal, responseType: "blob" }),
         ]);
 
         if (isMounted) {
           console.log("fetchUserData: ", avatarRes.data);
           if (userRes.data?.username) setUsername(userRes.data.username);
           if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
-          if (avatarRes.data) setAvatar(avatarRes.data);
+          if (avatarRes.data) {
+            // Blob → ObjectURL → img.src
+            const avatarUrl = URL.createObjectURL(avatarRes.data);
+            setAvatar(avatarUrl);
+          }
         }
       } catch (err) {
         if (err.name === "CanceledError") {
