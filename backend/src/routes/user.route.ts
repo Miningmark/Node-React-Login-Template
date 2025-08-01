@@ -28,6 +28,7 @@ router.get("/getRouteGroups", validateRequest(onlyAuthorizationHeader), verifyAu
 router.get("/getLastLogins", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getLastLogins);
 router.get("/getSettings", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getSettings);
 
+router.get("/getPendingNotifications", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getPendingNotifications);
 router.get("/getAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getAvatar);
 
 router.post("/deleteAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.deleteAvatar);

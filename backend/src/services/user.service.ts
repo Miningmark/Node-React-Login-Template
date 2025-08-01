@@ -1,14 +1,18 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import LastLogin from "@/models/lastLogin.model.js";
+import Notification from "@/models/notifications.model.js";
 import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
+import UserNotification from "@/models/userNotifications.model.js";
 import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
+import { NotificationService } from "@/services/notification.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { S3Service } from "@/services/s3.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
+import { Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
 import { Response } from "express";
 import sharp from "sharp";
@@ -16,10 +20,12 @@ import sharp from "sharp";
 export class UserService {
     private tokenService: TokenService;
     private routeGroupService: RouteGroupService;
+    private notificationService: NotificationService;
 
     constructor() {
         this.tokenService = new TokenService();
         this.routeGroupService = new RouteGroupService();
+        this.notificationService = new NotificationService();
     }
 
     async updateUsername(userId: number, newUsername: string, res: Response): Promise<ControllerResponse> {
@@ -177,6 +183,34 @@ export class UserService {
             theme: databaseUser.userSettings.theme,
             isSideMenuFixed: databaseUser.userSettings.isSideMenuFixed
         };
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getPendingNotifications(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Events erfolreich zurückgegeben" };
+
+        const databasePendingNotifications = await UserNotification.findAll({
+            where: {
+                userId: userId,
+                confirmed: false
+            },
+            include: {
+                model: Notification,
+                where: {
+                    notifyFrom: { [Op.lte]: Date.now() },
+                    notifyTo: { [Op.gte]: Date.now() }
+                }
+            }
+        });
+
+        const databaseNotifications = databasePendingNotifications
+            .map((databaseNotification) => {
+                return databaseNotification.notification;
+            })
+            .filter((n): n is Notification => !!n);
+
+        jsonResponse.pendingNotifications = this.notificationService.generateMultipleJSONResponseWithModel(databaseNotifications);
 
         return { type: "json", jsonResponse: jsonResponse };
     }

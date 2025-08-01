@@ -1,5 +1,7 @@
+import Notification from "@/models/notifications.model.js";
+import User from "@/models/user.model.js";
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
-import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
+import { Attribute, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "user_notifications",
@@ -18,6 +20,9 @@ class UserNotification extends Model<InferAttributes<UserNotification>, InferCre
     @NotNull
     @Default(false)
     declare confirmed: CreationOptional<boolean>;
+
+    declare user?: User;
+    declare notification?: Notification;
 }
 
 export default UserNotification;
