@@ -124,10 +124,12 @@ const UsersPage = () => {
         });
         const userdata = response.data.users || [];
 
-        const usersWithAvatars = userdata.map((user) => ({
-          ...user,
-          avatar: loadAvatar(user.id),
-        }));
+        const usersWithAvatars = await Promise.all(
+          userdata.map(async (user) => ({
+            ...user,
+            avatar: await loadAvatar(user.id),
+          }))
+        );
 
         setUsers(usersWithAvatars);
       } catch (error) {
