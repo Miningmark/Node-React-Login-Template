@@ -64,7 +64,7 @@ const UsersPage = () => {
       setUsers((prevUsers) => [...prevUsers, data]);
     };
 
-    const handleUserUpdate = (updatedUser) => {
+    const handleUserUpdate = async (updatedUser) => {
       const oldUser = users.find((user) => user.id === updatedUser.id);
       if (!oldUser) {
         console.warn("User not found for update");
@@ -73,8 +73,9 @@ const UsersPage = () => {
       const newUser = { ...oldUser, ...updatedUser };
 
       if (newUser.avatar === "changed") {
-        newUser.avatar = loadAvatar(newUser.id);
+        newUser.avatar = await loadAvatar(newUser.id);
       }
+
       setUsers((prevUsers) =>
         prevUsers.map((user) => (user.id === updatedUser.id ? newUser : user))
       );
