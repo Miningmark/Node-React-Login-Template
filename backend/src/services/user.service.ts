@@ -115,7 +115,7 @@ export class UserService {
         const webpImageBuffer = await sharp(file.buffer).resize({ width: 512 }).webp({ quality: 80 }).toBuffer();
 
         await S3Service.getInstance().ensureBucketExists("users");
-        await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, webpImageBuffer, file.mimetype);
+        await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, webpImageBuffer, "image/webp");
 
         //TODO: SocketIO
         return { type: "json", jsonResponse: jsonResponse };
