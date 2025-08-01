@@ -11,6 +11,10 @@ export interface ServerToClientEvents {
     "adminPage:permissions:create": (data: Record<string, any>) => void;
     "adminPage:permissions:update": (data: Record<string, any>) => void;
     "adminPage:permissions:delete": (data: Record<string, any>) => void;
+
+    "adminPage:notifications:create": (data: Record<string, any>) => void;
+    "adminPage:notifications:update": (data: Record<string, any>) => void;
+    "adminPage:notifications:delete": (data: Record<string, any>) => void;
 }
 
 export interface ClientToServerEvents {
@@ -19,4 +23,5 @@ export interface ClientToServerEvents {
 
     "subscribe:adminPage:serverLogs:watchList": (data: Record<string, any>) => void;
     "subscribe:adminPage:permissions:watchList": (data: Record<string, any>) => void;
+    "subscribe:adminPage:notifications:watchList": (data: Record<string, any>) => void;
 }

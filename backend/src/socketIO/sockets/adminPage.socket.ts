@@ -15,4 +15,10 @@ export default (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>)
             socket.join("listen:adminPage:permissions:watchList");
         }
     });
+
+    socket.on("subscribe:adminPage:notifications:watchList", () => {
+        if (socket.routeGroups.some((routeGroup) => [AdminPageRouteGroups.ADMIN_PANEL_NOTIFICATIONS_READ.groupName, AdminPageRouteGroups.ADMIN_PANEL_NOTIFICATIONS_WRITE.groupName].includes(routeGroup))) {
+            socket.join("listen:adminPage:notifications:watchList");
+        }
+    });
 };

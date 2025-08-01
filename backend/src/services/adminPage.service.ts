@@ -11,16 +11,19 @@ import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { Op } from "@sequelize/core";
+import { NotificationService } from "@/services/notification.service.js";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
     private routeGroupService: RouteGroupService;
     private permissionService: PermissionService;
+    private notificationService: NotificationService;
 
     constructor() {
         this.serverLogService = new ServerLogService();
         this.routeGroupService = new RouteGroupService();
         this.permissionService = new PermissionService();
+        this.notificationService = new NotificationService();
     }
 
     async getServerLogs(limit?: number, offset?: number): Promise<ControllerResponse> {
@@ -161,15 +164,7 @@ export class AdminPageService {
         const databaseNotifications = await Notification.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.notificationCount = await Notification.count();
-        jsonResponse.notifications = databaseNotifications.map((databaseNotification) => {
-            return {
-                id: databaseNotification.id,
-                type: databaseNotification.name,
-                message: databaseNotification.description,
-                userId: databaseNotification.notifyFrom,
-                url: databaseNotification.notifyTo
-            };
-        });
+        jsonResponse.notifications = this.notificationService.generateMultipleJSONResponseWithModel(databaseNotifications);
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -177,8 +172,9 @@ export class AdminPageService {
     async createNotification(name: string, description: string, notifyFrom: Date, notifyTo: Date): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich erstellt" };
 
-        await Notification.create({ name: name, description: description, notifyFrom: notifyFrom, notifyTo: notifyTo });
-        //TODO: SocketIO
+        const databaseNotification = await Notification.create({ name: name, description: description, notifyFrom: notifyFrom, notifyTo: notifyTo });
+
+        SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -210,7 +206,8 @@ export class AdminPageService {
         }
 
         await databaseNotification.save();
-        //TODO: SocketIO
+
+        SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:update", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -222,7 +219,8 @@ export class AdminPageService {
         if (databaseNotification === null) throw new ValidationError("Es gibt keine Benachrichtigung mit dieser ID");
 
         await databaseNotification.destroy();
-        //TODO: SocketIO
+
+        SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:delete", { id: id });
 
         return { type: "json", jsonResponse: jsonResponse };
     }
