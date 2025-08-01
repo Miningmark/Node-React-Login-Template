@@ -117,7 +117,7 @@ export class UserService {
         await S3Service.getInstance().ensureBucketExists("users");
         await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, webpImageBuffer, "image/webp");
 
-        //TODO: SocketIO
+        //TODO: SocketIO to all who seeing usermanagement
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -199,7 +199,7 @@ export class UserService {
 
         await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
 
-        //TODO: SocketIO
+        //TODO: SocketIO to all who seeing usermanagement
         return { type: "json", jsonResponse: jsonResponse };
     }
 
