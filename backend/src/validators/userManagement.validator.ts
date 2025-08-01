@@ -11,7 +11,7 @@ export const getUsersSchema = z.object({
     })
 });
 
-export const getAvatarSchema = z.object({
+export const avatarSchema = z.object({
     headers: z.object({
         authorization: authorizationBaseValidation
     }),

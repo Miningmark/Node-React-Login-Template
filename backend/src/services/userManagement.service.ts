@@ -52,6 +52,15 @@ export class UserManagementService {
         return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
     }
 
+    async deleteAvatar(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich entfernt" };
+
+        await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
+
+        //TODO: SocketIO for the user self
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
     async getPermissions(): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle Permissions zurück gegeben" };
 

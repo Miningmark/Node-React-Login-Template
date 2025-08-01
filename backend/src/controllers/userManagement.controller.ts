@@ -18,9 +18,17 @@ export class UserManagementController extends BaseController {
 
     getAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const userId = parseInt(req.params.userId);
+            const userId = parseInt(req.params.limit);
 
             return await this.userManagementService.getAvatar(userId);
+        });
+    };
+
+    deleteAvatar = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const userId = parseInt(req.params.limit);
+
+            return await this.userManagementService.deleteAvatar(userId);
         });
     };
 
