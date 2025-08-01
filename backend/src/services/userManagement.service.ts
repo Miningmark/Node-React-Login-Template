@@ -12,6 +12,7 @@ import { SocketService } from "@/socketIO/socket.service.js";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
 import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
+import { S3Service } from "./s3.service";
 
 export class UserManagementService {
     private emailService: EmailService;
@@ -36,6 +37,19 @@ export class UserManagementService {
         });
 
         return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getAvatar(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich zurückgegeben" };
+        let stream, contentType;
+
+        try {
+            ({ stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`));
+        } catch (error) {
+            return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
+        }
+
+        return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
     }
 
     async getPermissions(): Promise<ControllerResponse> {

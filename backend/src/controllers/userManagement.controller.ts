@@ -16,6 +16,14 @@ export class UserManagementController extends BaseController {
         });
     };
 
+    getAvatar = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const userId = parseInt(req.params.userId);
+
+            return await this.userManagementService.getAvatar(userId);
+        });
+    };
+
     getPermissions = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.userManagementService.getPermissions();
