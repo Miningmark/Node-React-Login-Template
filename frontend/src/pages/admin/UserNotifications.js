@@ -44,7 +44,7 @@ const UserNotificationsPage = () => {
   async function fetchUserNotifications(offset = 0) {
     setLoadingUserNotifications(true);
     try {
-      const response = await axiosProtected.get(`/admin/getNotifications/50-${offset}`);
+      const response = await axiosProtected.get(`/adminPage/getNotifications/50-${offset}`);
       const notifications = response?.data?.notifications || [];
       setUserNotifications((prev) => mergeNewNotifications(prev || [], notifications));
       setUserNotificationsOffset((prev) => prev + notifications.length);
