@@ -215,7 +215,7 @@ export class AdminPageService {
     async deleteNotification(id: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich gelöscht" };
 
-        const databaseNotification = await Permission.findOne({ where: { id: id }, include: { model: User } });
+        const databaseNotification = await Notification.findOne({ where: { id: id } });
         if (databaseNotification === null) throw new ValidationError("Es gibt keine Benachrichtigung mit dieser ID");
 
         await databaseNotification.destroy();
