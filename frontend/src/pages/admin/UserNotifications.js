@@ -26,6 +26,8 @@ const UserNotificationsPage = () => {
   const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
 
+  console.log("selectedNotification", selectedNotification);
+
   useEffect(() => {
     const updateOffset = () => {
       setHeightOffset(window.innerWidth > 768 ? 80 : 0);
@@ -120,10 +122,9 @@ const UserNotificationsPage = () => {
                 <ResizableTable
                   columns={[
                     { title: "ID", width: 50 },
-                    { title: "Name", width: 100 },
-                    { title: "Von", width: 100 },
-                    { title: "Bis", width: 100 },
-                    { title: "Nachricht" },
+                    { title: "Name" },
+                    { title: "Von" },
+                    { title: "Bis" },
                   ]}
                   tableHeight={`calc(100dvh - ${heightOffset + 162}px)`}
                 >
@@ -131,18 +132,20 @@ const UserNotificationsPage = () => {
                     {userNotifications.map((notification) => (
                       <tr
                         key={notification.id}
-                        onClick={() => setSelectedNotification(notification.id)}
+                        onClick={() => {
+                          setSelectedNotification(notification.id);
+                          setShowEditNotificationModal(true);
+                        }}
                         style={{ cursor: "pointer" }}
                       >
                         <td>{notification.id}</td>
                         <td className="text-center">{notification.name}</td>
                         <td className="text-center">
-                          {convertToLocalTimeStamp(notification.createdAt)}
+                          {convertToLocalTimeStamp(notification.notifyFrom)}
                         </td>
                         <td className="text-center">
-                          {convertToLocalTimeStamp(notification.createdAt)}
+                          {convertToLocalTimeStamp(notification.notifyTo)}
                         </td>
-                        <td className="text-center">{notification.message}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -174,6 +177,14 @@ const UserNotificationsPage = () => {
           show={showCreateNotificationModal}
           handleClose={() => setShowCreateNotificationModal(false)}
           notification={null}
+        />
+      )}
+
+      {selectedNotification && (
+        <CreateUserNotification
+          show={showEditNotificationModal}
+          handleClose={() => setSelectedNotification(null)}
+          notification={userNotifications.find((n) => n.id === selectedNotification)}
         />
       )}
     </>
