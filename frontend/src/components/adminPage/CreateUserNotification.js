@@ -5,12 +5,18 @@ import useAxiosProtected from "hook/useAxiosProtected";
 import ConfirmModal from "components/util/ConfirmModal";
 import { AuthContext } from "contexts/AuthContext";
 import TextEditor from "components/util/TextEditor";
+import { convertToInputDateTime } from "util/timeConverting";
 
 const CreateUserNotification = ({ show, handleClose, notification }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [notifyFrom, setNotifyFrom] = useState("");
-  const [notifyTo, setNotifyTo] = useState("");
+  const [name, setName] = useState(notification ? notification.name : "");
+  const [description, setDescription] = useState(notification ? notification.description : "");
+  const [notifyFrom, setNotifyFrom] = useState(
+    notification ? convertToInputDateTime(notification.notifyFrom) : ""
+  );
+  const [notifyTo, setNotifyTo] = useState(
+    notification ? convertToInputDateTime(notification.notifyTo) : ""
+  );
+  const [resendNotification, setResendNotification] = useState(false);
 
   const [isSaving, setIsSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -20,6 +26,8 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
+
+  console.log("notification", notification);
 
   const closeModal = () => {
     setName("");
@@ -51,7 +59,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
   async function handleEdit() {
     setIsSaving(true);
     try {
-      await axiosProtected.post("/adminPage/editNotification", {
+      await axiosProtected.post("/adminPage/updateNotification", {
         id: notification.id,
         name,
         description,
@@ -135,8 +143,27 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
             <label htmlFor="floatingEndDate">Anzeige bis</label>
           </div>
 
+          {isEditing && (
+            <div className="form-check mb-2">
+              <input
+                type="datetime-local"
+                id="floatingResendNotification"
+                checked={resendNotification}
+                onChange={(e) => setResendNotification(e.target.value)}
+                name="resendNotification"
+                disabled={!isEditing}
+              />
+              <label htmlFor="floatingResendNotification">Erneute Benachtichtigung</label>
+            </div>
+          )}
+
           <div className="form-floating mb-3">
-            <TextEditor value={description} onChange={setDescription} readOnly={!isEditing} />
+            <TextEditor
+              value={description}
+              onChange={setDescription}
+              readOnly={!isEditing}
+              placeholder={notification ? "" : "Nachricht eingeben..."}
+            />
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -155,7 +182,9 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
           {checkAccess(["adminPageNotificationsWrite"]) && isEditing && (
             <Button
               variant="success"
-              onClick={handleSave}
+              onClick={() => {
+                isEditing ? handleEdit() : handleSave();
+              }}
               disabled={isSaving || !name}
               style={{ width: "100px" }}
             >
@@ -171,7 +200,13 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
             </Button>
           )}
 
-          <Button variant="secondary" onClick={closeModal} disabled={isSaving}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              isEditing ? setIsEditing(false) : closeModal();
+            }}
+            disabled={isSaving}
+          >
             Abbrechen
           </Button>
         </Modal.Footer>
@@ -188,6 +223,8 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
           }}
         />
       )}
+
+      {}
     </>
   );
 };

@@ -4,7 +4,12 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css"; // Theme importieren
 import "./css/quillDarkMode.css";
 
-export default function NachrichtEditor({ value, onChange, readOnly = false }) {
+export default function NachrichtEditor({
+  value,
+  onChange,
+  readOnly = false,
+  placeholder = "Nachricht eingeben...",
+}) {
   const { theme } = useContext(ThemeContext);
   const editorRef = useRef(null);
   const quillRef = useRef(null);
@@ -13,19 +18,16 @@ export default function NachrichtEditor({ value, onChange, readOnly = false }) {
     if (editorRef.current && !quillRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
-        readOnly: readOnly,
-        placeholder: "Nachricht eingeben...",
+        placeholder: placeholder,
         modules: {
-          toolbar: readOnly
-            ? false
-            : [
-                [{ header: [1, 2, false] }],
-                ["bold", "italic", "underline"],
-                [{ color: [] }, { background: [] }],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["link"],
-                ["clean"],
-              ],
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            [{ color: [] }, { background: [] }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link"],
+            ["clean"],
+          ],
         },
       });
 
@@ -43,7 +45,13 @@ export default function NachrichtEditor({ value, onChange, readOnly = false }) {
     if (quillRef.current && value !== quillRef.current.root.innerHTML) {
       quillRef.current.root.innerHTML = value || "";
     }
-  }, [value, readOnly, onChange]);
+  }, [value, onChange, placeholder]);
+
+  useEffect(() => {
+    if (quillRef.current) {
+      quillRef.current.enable(!readOnly);
+    }
+  }, [readOnly]);
 
   return (
     <div className={`mb-3 ${theme === "light" ? "" : "dark"}`}>
