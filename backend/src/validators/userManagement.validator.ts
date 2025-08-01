@@ -15,8 +15,8 @@ export const avatarSchema = z.object({
     headers: z.object({
         authorization: authorizationBaseValidation
     }),
-    params: z.object({
-        userId: numberBaseValidation
+    body: z.object({
+        id: numberBaseValidation
     })
 });
 

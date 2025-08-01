@@ -1,5 +1,6 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
+import Notification from "@/models/notifications.model.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
@@ -149,6 +150,46 @@ export class AdminPageService {
 
         SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:delete", { id: id });
         SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:delete", { id: id });
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getNotifications(limit?: number, offset?: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Alle Benachrichtungen erfolgreich zurückgegeben" };
+
+        const databaseNotifications = await Notification.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
+
+        jsonResponse.notificationCount = await Notification.count();
+        jsonResponse.notifications = databaseNotifications.map((databaseNotification) => {
+            return {
+                id: databaseNotification.id,
+                type: databaseNotification.name,
+                message: databaseNotification.description,
+                userId: databaseNotification.notifyFrom,
+                url: databaseNotification.notifyTo
+            };
+        });
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async createNotification(name: string, description: string, notifyFrom: Date, notifyTo: Date): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benachrichtung erfolgreich erstellt" };
+
+        await Notification.create({ name: name, description: description, notifyFrom: notifyFrom, notifyTo: notifyTo });
+        //TODO: SocketIO
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async updateNotification(id: number, name?: string, description?: string, notifyFrom?: Date, notifyTo?: Date): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benachrichtung erfolgreich geändert" };
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async deleteNotification(id: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benachrichtung erfolgreich gelöscht" };
 
         return { type: "json", jsonResponse: jsonResponse };
     }

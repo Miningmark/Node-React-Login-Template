@@ -64,3 +64,51 @@ export const deletePermissionSchema = z.object({
         id: z.number()
     })
 });
+
+export const getNotificationsSchema = z.object({
+    headers: z.object({
+        authorization: authorizationBaseValidation
+    }),
+    params: z.object({
+        limit: numberBaseValidation.optional(),
+        offset: numberBaseValidation.optional()
+    })
+});
+
+export const createNotificationSchema = z.object({
+    headers: z.object({
+        authorization: authorizationBaseValidation
+    }),
+    body: z.object({
+        name: z.string(),
+        description: z.string(),
+        notifyFrom: z.iso.datetime(),
+        notifyTo: z.iso.datetime()
+    })
+});
+
+export const updateNotificationSchema = z.object({
+    headers: z.object({
+        authorization: authorizationBaseValidation
+    }),
+    body: z
+        .object({
+            id: z.number(),
+            name: z.string().optional(),
+            description: z.string().optional(),
+            notifyFrom: z.iso.datetime().optional(),
+            notifyTo: z.iso.datetime().optional()
+        })
+        .refine((data) => {
+            return data.name !== undefined || data.description !== undefined || data.notifyFrom !== undefined || data.notifyTo !== undefined;
+        }, "Es muss mindestens ein Wert geändert werden")
+});
+
+export const deleteNotificationSchema = z.object({
+    headers: z.object({
+        authorization: authorizationBaseValidation
+    }),
+    body: z.object({
+        id: z.number()
+    })
+});

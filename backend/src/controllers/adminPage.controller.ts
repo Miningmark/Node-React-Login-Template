@@ -68,4 +68,37 @@ export class AdminPageController extends BaseController {
             return await this.adminPanelService.deletePermission(id);
         });
     };
+
+    getNotifications = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const limit = req.params.limit !== undefined ? parseInt(req.params.limit) : undefined;
+            const offset = req.params.offset !== undefined ? parseInt(req.params.offset) : undefined;
+
+            return await this.adminPanelService.getNotifications(limit, offset);
+        });
+    };
+
+    createNotification = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { name, description, notifyFrom, notifyTo } = req.body;
+
+            return await this.adminPanelService.createNotification(name, description, notifyFrom, notifyTo);
+        });
+    };
+
+    updateNotification = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { id, name, description, notifyFrom, notifyTo } = req.body;
+
+            return await this.adminPanelService.updateNotification(id, name, description, notifyFrom, notifyTo);
+        });
+    };
+
+    deleteNotification = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { id } = req.body;
+
+            return await this.adminPanelService.deleteNotification(id);
+        });
+    };
 }

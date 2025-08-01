@@ -21,7 +21,7 @@ export default async () => {
     smartRouter.post("/updateUser", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
     smartRouter.post("/createUser", UserManagementRouteGroups.USER_MANAGEMENT_CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.createUser);
 
-    smartRouter.post("/deleteAvatar{/:userId}", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(avatarSchema), userManagementController.deleteAvatar);
+    smartRouter.post("/deleteAvatar", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(avatarSchema), userManagementController.deleteAvatar);
 
     return smartRouter.getExpressRouter();
 };

@@ -1,6 +1,8 @@
 import LastLogin from "@/models/lastLogin.model.js";
+import Notification from "@/models/notifications.model.js";
 import Permission from "@/models/permission.model.js";
 import ServerLog from "@/models/serverLog.model.js";
+import UserNotifications from "@/models/userNotifications.model.js";
 import UserSettings from "@/models/userSettings.model.js";
 import UserToken from "@/models/userToken.model.js";
 import {
@@ -133,6 +135,20 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasPermission: BelongsToManyHasAssociationMixin<Permission, number>;
     declare hasPermissions: BelongsToManyHasAssociationsMixin<Permission, number>;
     declare countPermissions: BelongsToManyCountAssociationsMixin<Permission>;
+
+    @BelongsToMany(() => Notification, { through: { model: UserNotifications }, foreignKey: "userId", otherKey: "notificationId", inverse: { as: "users" } })
+    declare notifications?: NonAttribute<[Notification]>;
+
+    declare getNotifications: BelongsToManyGetAssociationsMixin<Notification>;
+    declare setNotifications: BelongsToManySetAssociationsMixin<Notification, number>;
+    declare addNotification: BelongsToManyAddAssociationMixin<Notification, number>;
+    declare addNotifications: BelongsToManyAddAssociationsMixin<Notification, number>;
+    declare removeNotification: BelongsToManyRemoveAssociationMixin<Notification, number>;
+    declare removeNotifications: BelongsToManyRemoveAssociationsMixin<Notification, number>;
+    declare createNotification: BelongsToManyCreateAssociationMixin<Notification>;
+    declare hasNotification: BelongsToManyHasAssociationMixin<Notification, number>;
+    declare hasNotifications: BelongsToManyHasAssociationsMixin<Notification, number>;
+    declare countNotifications: BelongsToManyCountAssociationsMixin<Notification>;
 }
 
 export default User;
