@@ -5,7 +5,7 @@ import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { UserManagementRouteGroups } from "@/routeGroups/userManagement.routeGroup.js";
 import { UserManagementService } from "@/services/userManagement.service.js";
 import { onlyAuthorizationHeader } from "@/validators/base.validator.js";
-import { addUserSchema, getUsersSchema, updateUserPermissionsSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
+import { addUserSchema, getUsersSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
 
 export default async () => {
     const smartRouter = new SmartRouter();

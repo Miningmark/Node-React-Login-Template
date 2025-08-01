@@ -11,6 +11,7 @@ import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import bcrypt from "bcrypt";
 import { Response } from "express";
+import sharp from "sharp";
 
 export class UserService {
     private tokenService: TokenService;
@@ -111,8 +112,10 @@ export class UserService {
     async updateAvatar(userId: number, file: Express.Multer.File): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 
+        const webpImageBuffer = await sharp(file.buffer).resize({ width: 512 }).webp({ quality: 80 }).toBuffer();
+
         await S3Service.getInstance().ensureBucketExists("users");
-        await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, file.buffer, file.mimetype);
+        await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, webpImageBuffer, file.mimetype);
 
         return { type: "json", jsonResponse: jsonResponse };
     }

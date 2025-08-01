@@ -3,15 +3,7 @@ import { AuthController } from "@/controllers/auth.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { AuthService } from "@/services/auth.service.js";
-import {
-    accountActivationSchema,
-    handlePasswordRecoverySchema,
-    loginSchema,
-    logoutSchema,
-    refreshTokenSchema,
-    registerSchema,
-    requestPasswordResetSchema
-} from "@/validators/auth.validator.js";
+import { accountActivationSchema, handlePasswordRecoverySchema, loginSchema, logoutSchema, refreshTokenSchema, registerSchema, requestPasswordResetSchema } from "@/validators/auth.validator.js";
 import { Router } from "express";
 
 const router = Router();
