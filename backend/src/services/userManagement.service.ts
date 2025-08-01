@@ -6,6 +6,7 @@ import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
+import { S3Service } from "@/services/s3.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserService } from "@/services/user.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
@@ -36,6 +37,19 @@ export class UserManagementService {
         });
 
         return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getAvatar(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich zurückgegeben" };
+        let stream, contentType;
+
+        try {
+            ({ stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`));
+        } catch (error) {
+            return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
+        }
+
+        return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
     }
 
     async getPermissions(): Promise<ControllerResponse> {

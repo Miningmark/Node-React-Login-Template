@@ -5,7 +5,7 @@ import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { UserManagementRouteGroups } from "@/routeGroups/userManagement.routeGroup.js";
 import { UserManagementService } from "@/services/userManagement.service.js";
 import { onlyAuthorizationHeader } from "@/validators/base.validator.js";
-import { addUserSchema, getUsersSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
+import { addUserSchema, getAvatarSchema, getUsersSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
 
 export default async () => {
     const smartRouter = new SmartRouter();
@@ -14,6 +14,7 @@ export default async () => {
     const userManagementController = new UserManagementController(userManagementService);
 
     smartRouter.get("/getUsers{/:limit-:offset}", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(getUsersSchema), userManagementController.getUsers);
+    smartRouter.get("/getAvatar{/:userId}", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(getAvatarSchema), userManagementController.getAvatar);
 
     smartRouter.get("/getPermissions", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), userManagementController.getPermissions);
 

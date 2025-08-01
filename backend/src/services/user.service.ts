@@ -117,6 +117,7 @@ export class UserService {
         await S3Service.getInstance().ensureBucketExists("users");
         await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, webpImageBuffer, file.mimetype);
 
+        //TODO: SocketIO
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -181,7 +182,7 @@ export class UserService {
     }
 
     async getAvatar(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich zurückgegeben" };
         let stream, contentType;
 
         try {
@@ -191,6 +192,15 @@ export class UserService {
         }
 
         return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
+    }
+
+    async deleteAvatar(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich entfernt" };
+
+        await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
+
+        //TODO: SocketIO
+        return { type: "json", jsonResponse: jsonResponse };
     }
 
     generateJSONResponseWithModel(databaseUser: User): Record<string, any> {
