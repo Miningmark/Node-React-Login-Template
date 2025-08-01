@@ -124,10 +124,14 @@ const UsersPage = () => {
         });
         const userdata = response.data.users || [];
 
-        userdata.map((user) => {
-          return { ...user, avatar: loadAvatar(user.id) };
-        });
-        setUsers(userdata);
+        const usersWithAvatars = await Promise.all(
+          userdata.map(async (user) => ({
+            ...user,
+            avatar: await loadAvatar(user.id),
+          }))
+        );
+
+        setUsers(usersWithAvatars);
       } catch (error) {
         if (error.name === "CanceledError") {
           console.warn("User-Fetch abgebrochen");
