@@ -18,7 +18,7 @@ export class UserManagementController extends BaseController {
 
     getAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const userId = parseInt(req.params.limit);
+            const userId = parseInt(req.params.userId);
 
             return await this.userManagementService.getAvatar(userId);
         });
@@ -26,7 +26,7 @@ export class UserManagementController extends BaseController {
 
     deleteAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const userId = parseInt(req.params.limit);
+            const userId = parseInt(req.params.userId);
 
             return await this.userManagementService.deleteAvatar(userId);
         });
