@@ -5,6 +5,7 @@ import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import User from "@/models/user.model.js";
+import UserNotification from "@/models/userNotifications.model";
 import { PermissionService } from "@/services/permission.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
@@ -69,7 +70,7 @@ export class AdminPageService {
     }
 
     async getPermissionsWithRouteGroups(): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Alle Rechte mit RouteGroups zurück gegeben" };
+        let jsonResponse: Record<string, any> = { message: "Alle Berechtigungen mit RouteGroups zurück gegeben" };
 
         const databasePermissions = await Permission.findAll({ include: { model: RouteGroup } });
 
@@ -89,7 +90,7 @@ export class AdminPageService {
     }
 
     async createPermission(name: string, routeGroupIds: number[], description?: string): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Recht erfolgreich erstellt" };
+        let jsonResponse: Record<string, any> = { message: "Berechtigung erfolgreich erstellt" };
 
         const databasePermissionNew = await Permission.findOne({ where: { name: name } });
         if (databasePermissionNew !== null) throw new ValidationError("Der Name für die Permission ist schon belegt");
@@ -107,7 +108,7 @@ export class AdminPageService {
     }
 
     async updatePermission(id: number, name?: string, description?: string, routeGroupIds?: number[]): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Recht erfolgreich bearbeitet" };
+        let jsonResponse: Record<string, any> = { message: "Berechtigung erfolgreich bearbeitet" };
 
         const databasePermission = await Permission.findOne({ where: { id: id } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser Id");
@@ -138,7 +139,7 @@ export class AdminPageService {
     }
 
     async deletePermission(id: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Recht erfolgreich gelöscht" };
+        let jsonResponse: Record<string, any> = { message: "Berechtigung erfolgreich gelöscht" };
 
         const databasePermission = await Permission.findOne({ where: { id: id }, include: { model: User } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser ID");
@@ -155,7 +156,7 @@ export class AdminPageService {
     }
 
     async getNotifications(limit?: number, offset?: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Alle Benachrichtungen erfolgreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Alle Benachrichtigungen erfolgreich zurückgegeben" };
 
         const databaseNotifications = await Notification.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
@@ -174,7 +175,7 @@ export class AdminPageService {
     }
 
     async createNotification(name: string, description: string, notifyFrom: Date, notifyTo: Date): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Benachrichtung erfolgreich erstellt" };
+        let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich erstellt" };
 
         await Notification.create({ name: name, description: description, notifyFrom: notifyFrom, notifyTo: notifyTo });
         //TODO: SocketIO
@@ -182,14 +183,46 @@ export class AdminPageService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateNotification(id: number, name?: string, description?: string, notifyFrom?: Date, notifyTo?: Date): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Benachrichtung erfolgreich geändert" };
+    async updateNotification(id: number, resendNotification: boolean, name?: string, description?: string, notifyFrom?: Date, notifyTo?: Date): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich geändert" };
+
+        const databaseNotification = await Notification.findOne({ where: { id: id } });
+        if (databaseNotification === null) throw new ValidationError("Es gibt keine Benachrichtigung mit dieser ID");
+
+        if (name !== undefined) {
+            databaseNotification.name = name;
+        }
+
+        if (description !== undefined) {
+            databaseNotification.description = description;
+        }
+
+        if (notifyFrom !== undefined) {
+            databaseNotification.notifyFrom = notifyFrom;
+        }
+
+        if (notifyTo !== undefined) {
+            databaseNotification.notifyTo = notifyTo;
+        }
+
+        if (resendNotification) {
+            await UserNotification.update({ confirmed: false }, { where: { notificationId: id } });
+        }
+
+        await databaseNotification.save();
+        //TODO: SocketIO
 
         return { type: "json", jsonResponse: jsonResponse };
     }
 
     async deleteNotification(id: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Benachrichtung erfolgreich gelöscht" };
+        let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich gelöscht" };
+
+        const databaseNotification = await Permission.findOne({ where: { id: id }, include: { model: User } });
+        if (databaseNotification === null) throw new ValidationError("Es gibt keine Benachrichtigung mit dieser ID");
+
+        await databaseNotification.destroy();
+        //TODO: SocketIO
 
         return { type: "json", jsonResponse: jsonResponse };
     }

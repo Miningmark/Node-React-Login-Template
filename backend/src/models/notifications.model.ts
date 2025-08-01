@@ -62,9 +62,9 @@ class Notification extends Model<InferAttributes<Notification>, InferCreationAtt
 
     @AfterCreate
     static async createUserNotifications(notification: Notification) {
-        const users = await User.findAll();
+        const databaseUsers = await User.findAll();
 
-        const userNotifications = users.map((user) => ({
+        const userNotifications = databaseUsers.map((user) => ({
             userId: user.id,
             notificationId: notification.id,
             confirmed: false

@@ -2,6 +2,7 @@ import LastLogin from "@/models/lastLogin.model.js";
 import Notification from "@/models/notifications.model.js";
 import Permission from "@/models/permission.model.js";
 import ServerLog from "@/models/serverLog.model.js";
+import UserNotification from "@/models/userNotifications.model.js";
 import UserNotifications from "@/models/userNotifications.model.js";
 import UserSettings from "@/models/userSettings.model.js";
 import UserToken from "@/models/userToken.model.js";
@@ -36,7 +37,7 @@ import {
     Model,
     NonAttribute
 } from "@sequelize/core";
-import { Attribute, AutoIncrement, BelongsToMany, Default, HasMany, HasOne, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
+import { AfterCreate, Attribute, AutoIncrement, BelongsToMany, Default, HasMany, HasOne, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "users",
@@ -149,6 +150,24 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasNotification: BelongsToManyHasAssociationMixin<Notification, number>;
     declare hasNotifications: BelongsToManyHasAssociationsMixin<Notification, number>;
     declare countNotifications: BelongsToManyCountAssociationsMixin<Notification>;
+
+    @AfterCreate
+    static async createSettings(user: User) {
+        await UserSettings.create({ userId: user.id });
+    }
+
+    @AfterCreate
+    static async assign(user: User) {
+        const databaseNotifications = await Notification.findAll();
+
+        const userNotifications = databaseNotifications.map((notification) => ({
+            userId: user.id,
+            notificationId: notification.id,
+            confirmed: false
+        }));
+
+        UserNotification.bulkCreate(userNotifications);
+    }
 }
 
 export default User;
