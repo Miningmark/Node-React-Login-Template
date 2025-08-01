@@ -26,8 +26,6 @@ const UserNotificationsPage = () => {
   const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
 
-  console.log("selectedNotification", selectedNotification);
-
   useEffect(() => {
     const updateOffset = () => {
       setHeightOffset(window.innerWidth > 768 ? 80 : 0);

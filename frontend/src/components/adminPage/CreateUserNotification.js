@@ -91,8 +91,6 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
     }
   }
 
-  console.log("message", description);
-
   return (
     <>
       <Modal show={show} onHide={closeModal}>
