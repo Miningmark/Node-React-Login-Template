@@ -1,11 +1,7 @@
 import Notification from "@/models/notifications.model.js";
 
 export class NotificationService {
-    private routeGroupService: NotificationService;
-
-    constructor() {
-        this.routeGroupService = new NotificationService();
-    }
+    constructor() {}
 
     generateMultipleJSONResponseWithModel(databaseNotifications: Notification[]): Record<string, any> {
         return databaseNotifications.map((databaseNotification) => {
