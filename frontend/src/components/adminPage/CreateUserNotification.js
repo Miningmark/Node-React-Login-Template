@@ -28,8 +28,6 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
 
-  console.log("notification", notification);
-
   const closeModal = () => {
     setName("");
     setDescription("");
@@ -154,7 +152,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
                 name="resendNotification"
                 disabled={!isEditing}
               />
-              <label htmlFor="form-check-label">Erneute Benachtichtigung</label>
+              <label htmlFor="form-check-label">Erneute Benachrichtigung</label>
             </div>
           )}
 
