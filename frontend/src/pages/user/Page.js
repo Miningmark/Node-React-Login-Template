@@ -43,7 +43,7 @@ const UserPage = () => {
   const [error, setError] = useState("");
 
   const { addToast } = useToast();
-  const { setAccessToken, setUsername, setAvatar } = useContext(AuthContext);
+  const { setAccessToken, setUsername, setAvatar, avatar } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const axiosProtected = useAxiosProtected();
   const navigate = useNavigate();
@@ -597,15 +597,31 @@ const UserPage = () => {
                       style={{ maxWidth: "150px", borderRadius: "50%", border: "2px solid #ccc" }}
                     />
                   </div>
-                ) : (
+                ) : avatar ? (
                   <button
                     className="btn btn-secondary"
                     onClick={handleDeleteAvatar}
                     disabled={loadingAvatar}
+                    style={{
+                      display: "inline-block",
+                      marginTop: "12px",
+                      padding: "8px 12px",
+                      background: "#007bff",
+                      color: "white",
+                      borderRadius: "4px",
+                    }}
                   >
-                    Avatar Löschen
+                    {loadingAvatar ? (
+                      <span
+                        className="spinner-border spinner-border-sm ms-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      "Avatar Löschen"
+                    )}
                   </button>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

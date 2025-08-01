@@ -9,6 +9,9 @@ import CreateUserModal from "components/userManagement/CreateUserModal";
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { SocketContext } from "contexts/SocketProvider";
 import ResizableTable from "components/util/ResizableTable";
+import { ThemeContext } from "contexts/ThemeContext";
+
+import { ReactComponent as UserDefaultIcon } from "assets/icons/account_circle.svg";
 
 const UsersPage = () => {
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -28,6 +31,7 @@ const UsersPage = () => {
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const updateOffset = () => {
@@ -100,12 +104,28 @@ const UsersPage = () => {
   useEffect(() => {
     const controller = new AbortController();
 
+    async function loadAvatar(userId) {
+      const avatarRes = await axiosProtected.get(`/userManagement/getAvatar/${userId}`, {
+        responseType: "blob",
+      });
+      if (avatarRes.status === 200 && avatarRes.data) {
+        return URL.createObjectURL(avatarRes.data);
+      } else {
+        return null;
+      }
+    }
+
     const fetchUsers = async () => {
       try {
         const response = await axiosProtected.get("/userManagement/getUsers", {
           signal: controller.signal,
         });
-        setUsers(response.data.users);
+        const userdata = response.data.users || [];
+
+        userdata.map((user) => {
+          return { ...user, avatar: loadAvatar(user.id) };
+        });
+        setUsers(userdata);
       } catch (error) {
         if (error.name === "CanceledError") {
           console.warn("User-Fetch abgebrochen");
@@ -241,7 +261,24 @@ const UsersPage = () => {
                               handleUserClick(user.id);
                             }}
                           >
-                            {user.username}
+                            <div className="d-flex align-items-center gap-2">
+                              {user.avatar ? (
+                                <img
+                                  src={user.avatar}
+                                  alt="Avatar"
+                                  className="rounded-circle"
+                                  style={{ width: "32px", height: "32px", borderRadius: "50%" }}
+                                />
+                              ) : (
+                                <UserDefaultIcon
+                                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                                  width={32}
+                                  height={32}
+                                  style={{ borderRadius: "50%" }}
+                                />
+                              )}
+                              <span>{user.username}</span>
+                            </div>
                           </td>
                           <td>{user.email}</td>
                           <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
