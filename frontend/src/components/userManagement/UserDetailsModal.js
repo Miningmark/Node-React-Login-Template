@@ -83,7 +83,7 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
   async function handleDeleteAvatar() {
     setIsSaving(true);
     try {
-      await axiosProtected.post(`/userManagement/deleteAvatar/${user.id}`);
+      await axiosProtected.post(`/userManagement/deleteAvatar`, { id: user.id });
       addToast("Avatar erfolgreich gelöscht", "success");
       setEditedUser((prev) => ({ ...prev, avatar: null }));
     } catch (error) {
