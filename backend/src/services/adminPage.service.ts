@@ -5,7 +5,7 @@ import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import User from "@/models/user.model.js";
-import UserNotification from "@/models/userNotifications.model";
+import UserNotification from "@/models/userNotifications.model.js";
 import { PermissionService } from "@/services/permission.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
