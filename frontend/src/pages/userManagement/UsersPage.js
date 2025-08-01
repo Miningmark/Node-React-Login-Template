@@ -33,6 +33,8 @@ const UsersPage = () => {
   const { socket } = useContext(SocketContext);
   const { theme } = useContext(ThemeContext);
 
+  console.log("Users", users);
+
   useEffect(() => {
     const updateOffset = () => {
       setHeightOffset(window.innerWidth > 768 ? 80 : 0);
