@@ -46,17 +46,17 @@
   }
 }
 
-.column-right {
+.column-right-l {
   flex: 1;
   @media (min-width: 768px) {
     padding-left: 60px;
   }
 }
 
-.column-right-smale {
+.column-right-s {
   flex: 1;
   @media (min-width: 768px) {
-    padding-left: 290px !important;
+    padding-left: 290px;
   }
 }
 
