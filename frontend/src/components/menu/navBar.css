@@ -40,22 +40,26 @@
 
 .column-left {
   display: none;
-
-  @media (min-width: 768px) {
-    display: block !important;
-  }
 }
 
 .column-right-l {
   flex: 1;
-  @media (min-width: 768px) {
-    padding-left: 60px;
-  }
 }
 
 .column-right-s {
   flex: 1;
-  @media (min-width: 768px) {
+}
+
+@media (min-width: 768px) {
+  .column-left {
+    display: block !important;
+  }
+
+  .column-right-l {
+    padding-left: 60px;
+  }
+
+  .column-right-s {
     padding-left: 290px;
   }
 }
