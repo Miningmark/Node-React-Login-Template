@@ -67,7 +67,7 @@ const UserNotificationsPage = () => {
         className="page-wrapper mt-4"
         style={{ height: `calc(100dvh - ${heightOffset}px)` }}
       >
-        <h2>Benutzer Nachrichten</h2>
+        <h2>Benutzer Benachrichtigungen</h2>
         <div>
           {!loadingUserNotifications ? (
             <>
@@ -80,7 +80,7 @@ const UserNotificationsPage = () => {
                       setShowCreateNotificationModal(true);
                     }}
                   >
-                    Neuer Benutzer
+                    Neue Benachrichtigung
                   </button>
                 )}
               </div>

@@ -231,7 +231,9 @@ function App() {
           <Route
             path="/admin/user-notifications"
             element={
-              <RequireAuth allowedRouteGroups={[]}>
+              <RequireAuth
+                allowedRouteGroups={["adminPageNotificationsRead", "adminPageNotificationsWrite"]}
+              >
                 <UserNotificationsPage />
               </RequireAuth>
             }
