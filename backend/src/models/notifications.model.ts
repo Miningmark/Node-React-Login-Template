@@ -35,7 +35,7 @@ class Notification extends Model<InferAttributes<Notification>, InferCreationAtt
     @NotNull
     declare name: string;
 
-    @Attribute(DataTypes.STRING)
+    @Attribute(DataTypes.TEXT)
     @NotNull
     declare description: string;
 
