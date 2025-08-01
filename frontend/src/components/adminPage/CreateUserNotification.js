@@ -6,6 +6,7 @@ import ConfirmModal from "components/util/ConfirmModal";
 import { AuthContext } from "contexts/AuthContext";
 import TextEditor from "components/util/TextEditor";
 import { convertToInputDateTime } from "util/timeConverting";
+import DOMPurify from "dompurify";
 
 const CreateUserNotification = ({ show, handleClose, notification }) => {
   const [name, setName] = useState(notification ? notification.name : "");
@@ -65,6 +66,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
         description,
         notifyFrom: new Date(notifyFrom).toISOString(),
         notifyTo: new Date(notifyTo).toISOString(),
+        resendNotification,
       });
       addToast("Benachrichtigung erfolgreich bearbeitet", "success");
       closeModal();
@@ -143,27 +145,37 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
             <label htmlFor="floatingEndDate">Anzeige bis</label>
           </div>
 
-          {isEditing && (
+          {isEditing && notification && (
             <div className="form-check mb-2">
               <input
-                type="datetime-local"
+                type="checkbox"
+                className="form-check-input"
                 id="floatingResendNotification"
                 checked={resendNotification}
-                onChange={(e) => setResendNotification(e.target.value)}
+                onChange={(e) => setResendNotification(e.target.checked)}
                 name="resendNotification"
                 disabled={!isEditing}
               />
-              <label htmlFor="floatingResendNotification">Erneute Benachtichtigung</label>
+              <label htmlFor="form-check-label">Erneute Benachtichtigung</label>
             </div>
           )}
 
           <div className="form-floating mb-3">
-            <TextEditor
-              value={description}
-              onChange={setDescription}
-              readOnly={!isEditing}
-              placeholder={notification ? "" : "Nachricht eingeben..."}
-            />
+            {isEditing ? (
+              <TextEditor
+                value={description}
+                onChange={setDescription}
+                readOnly={false}
+                placeholder={notification ? "" : "Nachricht eingeben..."}
+              />
+            ) : (
+              <>
+                <p>
+                  <strong>Nachricht</strong>
+                </p>
+                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} />
+              </>
+            )}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -183,7 +195,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
             <Button
               variant="success"
               onClick={() => {
-                isEditing ? handleEdit() : handleSave();
+                notification ? handleEdit() : handleSave();
               }}
               disabled={isSaving || !name}
               style={{ width: "100px" }}
