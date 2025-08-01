@@ -1,15 +1,16 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import ConfirmModal from "components/util/ConfirmModal";
 import { AuthContext } from "contexts/AuthContext";
+import TextEditor from "components/util/TextEditor";
 
 const CreateUserNotification = ({ show, handleClose, notification }) => {
   const [name, setName] = useState("");
-  const [message, setMessage] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [description, setDescription] = useState("");
+  const [notifyFrom, setNotifyFrom] = useState("");
+  const [notifyTo, setNotifyTo] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -22,15 +23,23 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
 
   const closeModal = () => {
     setName("");
-    setMessage("");
-    setStartDate("");
-    setEndDate("");
+    setDescription("");
+    setNotifyFrom("");
+    setNotifyTo("");
     handleClose();
   };
 
   async function handleSave() {
     setIsSaving(true);
     try {
+      await axiosProtected.post("/adminPage/createNotification", {
+        name,
+        description,
+        notifyFrom,
+        notifyTo,
+      });
+      addToast("Benachrichtigung erfolgreich erstellt", "success");
+      closeModal();
     } catch (error) {
       addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
       handleClose();
@@ -42,13 +51,17 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
   async function handleDelete() {
     setIsSaving(true);
     try {
+      await axiosProtected.post(`/adminPage/deleteNotification`, { id: notification.id });
+      addToast("Benachrichtigung erfolgreich gelöscht", "success");
+      handleClose();
     } catch (error) {
       addToast(error.response?.data?.message || "Löschen fehlgeschlagen", "danger");
-      handleClose();
     } finally {
       setIsSaving(false);
     }
   }
+
+  console.log("message", description);
 
   return (
     <>
@@ -77,10 +90,10 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
           <div className="form-floating mb-3">
             <input
               type="date"
-              className={`form-control ${touched.startDate && !startDate ? "is-invalid" : ""}`}
+              className={`form-control ${touched.startDate && !notifyFrom ? "is-invalid" : ""}`}
               id="floatingStartDate"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              value={notifyFrom}
+              onChange={(e) => setNotifyFrom(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, startDate: true }))}
               name="startDate"
               disabled={!isEditing}
@@ -91,10 +104,10 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
           <div className="form-floating mb-3">
             <input
               type="date"
-              className={`form-control ${touched.endDate && !endDate ? "is-invalid" : ""}`}
+              className={`form-control ${touched.endDate && !notifyTo ? "is-invalid" : ""}`}
               id="floatingEndDate"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              value={notifyTo}
+              onChange={(e) => setNotifyTo(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, endDate: true }))}
               name="endDate"
               disabled={!isEditing}
@@ -103,19 +116,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
           </div>
 
           <div className="form-floating mb-3">
-            <textarea
-              type="text"
-              className={`form-control ${touched.message && !message ? "is-invalid" : ""}`}
-              id="floatingMessage"
-              placeholder="Nachricht"
-              value={name}
-              onChange={(e) => setMessage(e.target.value)}
-              onBlur={() => setTouched((prev) => ({ ...prev, message: true }))}
-              name="message"
-              style={{ height: "150px" }}
-              disabled={!isEditing}
-            />
-            <label htmlFor="floatingMessage">nachricht</label>
+            <TextEditor value={description} onChange={setDescription} readOnly={!isEditing} />
           </div>
         </Modal.Body>
         <Modal.Footer>
