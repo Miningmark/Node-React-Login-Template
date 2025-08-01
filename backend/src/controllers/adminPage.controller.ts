@@ -88,9 +88,9 @@ export class AdminPageController extends BaseController {
 
     updateNotification = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { id, name, description, notifyFrom, notifyTo } = req.body;
+            const { id, resendNotification, name, description, notifyFrom, notifyTo } = req.body;
 
-            return await this.adminPanelService.updateNotification(id, name, description, notifyFrom, notifyTo);
+            return await this.adminPanelService.updateNotification(id, resendNotification, name, description, notifyFrom, notifyTo);
         });
     };
 

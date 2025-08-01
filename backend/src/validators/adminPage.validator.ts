@@ -94,6 +94,7 @@ export const updateNotificationSchema = z.object({
     body: z
         .object({
             id: z.number(),
+            resendNotification: z.boolean(),
             name: z.string().optional(),
             description: z.string().optional(),
             notifyFrom: z.iso.datetime().optional(),
