@@ -124,10 +124,12 @@ const UsersPage = () => {
         });
         const userdata = response.data.users || [];
 
-        userdata.map((user) => {
-          return { ...user, avatar: loadAvatar(user.id) };
-        });
-        setUsers(userdata);
+        const usersWithAvatars = userdata.map((user) => ({
+          ...user,
+          avatar: loadAvatar(user.id),
+        }));
+
+        setUsers(usersWithAvatars);
       } catch (error) {
         if (error.name === "CanceledError") {
           console.warn("User-Fetch abgebrochen");
