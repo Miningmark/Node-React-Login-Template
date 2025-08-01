@@ -4,7 +4,7 @@ import { AuthContext } from "contexts/AuthContext";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 
-const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions }) => {
+const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
   const [touched, setTouched] = useState({ email: false });
@@ -66,7 +66,6 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions 
       }
 
       addToast("User erfolgreich Bearbeitet", "success");
-      updateUser(editedUser);
       setEditMode(false);
     } catch (error) {
       addToast(error.response?.data?.message || "Änderung fehlgeschlagen", "danger");
@@ -80,6 +79,19 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions 
     setEditedUser(null);
     handleClose();
   };
+
+  async function handleDeleteAvatar() {
+    setIsSaving(true);
+    try {
+      await axiosProtected.post(`/userManagement/deleteAvatar/${user.id}`);
+      addToast("Avatar erfolgreich gelöscht", "success");
+      setEditedUser((prev) => ({ ...prev, avatar: null }));
+    } catch (error) {
+      addToast(error.response?.data?.message || "Avatar löschen fehlgeschlagen", "danger");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   return (
     <Modal show={show} onHide={closeModal}>
@@ -160,6 +172,42 @@ const UserDetailsModal = ({ show, handleClose, user, updateUser, allPermissions 
                   </label>
                 </div>
               ))}
+            {user.avatar ? (
+              <div className="mb-3 d-flex flex-column align-items-start">
+                <p>
+                  <strong>Avatar</strong>
+                </p>
+                <img
+                  src={user.avatar}
+                  alt="Avatar"
+                  className="rounded-circle"
+                  style={{ width: "128px", height: "128px", borderRadius: "50%" }}
+                />
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleDeleteAvatar}
+                  disabled={isSaving}
+                  style={{
+                    display: "inline-block",
+                    marginTop: "12px",
+                    padding: "8px 12px",
+                    background: "#007bff",
+                    color: "white",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {isSaving ? (
+                    <span
+                      className="spinner-border spinner-border-sm ms-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  ) : (
+                    "Avatar Löschen"
+                  )}
+                </button>
+              </div>
+            ) : null}
           </>
         ) : (
           <>
