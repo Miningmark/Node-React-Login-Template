@@ -231,6 +231,19 @@ const UserPage = () => {
     }
   }
 
+  async function handleDeleteAvatar() {
+    setLoadingAvatar(true);
+    try {
+      await axiosProtected.post("/user/deleteAvatar");
+      addToast("Profilbild erfolgreich gelöscht.", "success");
+      setAvatar(null);
+    } catch (error) {
+      addToast(error.response?.data?.message || "Profilbild-Löschen fehlgeschlagen", "danger");
+    } finally {
+      setLoadingAvatar(false);
+    }
+  }
+
   return (
     <div className="container mt-4">
       <h2>Benutzereinstellungen</h2>
@@ -576,7 +589,7 @@ const UserPage = () => {
                   {error && <div style={{ color: "red", marginTop: "0.5rem" }}>{error}</div>}
                 </div>
 
-                {imagePreview && (
+                {imagePreview ? (
                   <div>
                     <img
                       src={imagePreview}
@@ -584,6 +597,14 @@ const UserPage = () => {
                       style={{ maxWidth: "150px", borderRadius: "50%", border: "2px solid #ccc" }}
                     />
                   </div>
+                ) : (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={handleDeleteAvatar}
+                    disabled={loadingAvatar}
+                  >
+                    Avatar Löschen
+                  </button>
                 )}
               </div>
             </div>

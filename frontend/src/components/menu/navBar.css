@@ -1,38 +1,50 @@
+/* Navbar visibility states */
+.navbar-hidden,
+.navbar-visible {
+  transition: transform 0.3s ease-in-out;
+}
 .navbar-hidden {
   transform: translateY(-100%);
-  transition: transform 0.3s ease-in-out;
 }
 .navbar-visible {
   transform: translateY(0);
-  transition: transform 0.3s ease-in-out;
 }
+
+/* Mobile visibility helpers */
 .mobile-hide {
   display: none !important;
 }
+
+/* Mobile navbar override on desktop */
 @media (min-width: 768px) {
   .navbar-mobile-hide-show {
     transform: none !important;
     transition: none !important;
   }
+
   .mobile-hide {
     display: block !important;
   }
+
   .hamburger-icon {
     display: none !important;
   }
 }
 
+/* Layout wrappers */
 .menu-content-wrapper {
   display: flex;
   min-height: calc(100vh - 56px);
 }
 
+/* Sidebar padding on hover (desktop only) */
 @media (hover: hover) {
   .desktop-sidebar.expanded + .menu-content-wrapper {
     padding-left: 220px;
   }
 }
 
+/* Column layout */
 .column {
   min-height: calc(100vh - 56px);
   overflow-y: auto;
@@ -42,10 +54,7 @@
   display: none;
 }
 
-.column-right-l {
-  flex: 1;
-}
-
+.column-right-l,
 .column-right-s {
   flex: 1;
 }
@@ -64,6 +73,7 @@
   }
 }
 
+/* Sidebar styles */
 .desktop-sidebar {
   position: fixed;
   top: 56px;
@@ -78,16 +88,16 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+.desktop-sidebar.expanded {
+  width: 290px;
+}
 
 .desktop-sidebar .icon {
   width: 28px;
   height: 28px;
 }
 
-.desktop-sidebar.expanded {
-  width: 290px;
-}
-
+/* Menu structure */
 .menu-items {
   list-style: none;
   padding: 0;
@@ -110,16 +120,19 @@
 }
 
 .menu-parent.active,
-.menu-link.active {
+.menu-link.active,
+.submenu-link.active {
   color: green;
   font-weight: 500;
 }
 
 .menu-parent:hover,
-.menu-link:hover {
+.menu-link:hover,
+.submenu-link:hover {
   background-color: var(--bs-tertiary-bg);
 }
 
+/* Icon styling */
 .icon-wrapper {
   width: 28px;
   height: 28px;
@@ -135,6 +148,7 @@
   fill: currentColor;
 }
 
+/* Label transitions */
 .label {
   margin-left: 8px;
   white-space: nowrap;
@@ -147,6 +161,7 @@
   opacity: 1;
 }
 
+/* Arrow icon transitions */
 .arrow-icon {
   width: 24px;
   height: 24px;
@@ -160,6 +175,7 @@
   opacity: 1;
 }
 
+/* Submenu */
 .submenu {
   padding-left: 24px;
 }
@@ -171,15 +187,7 @@
   text-decoration: none;
 }
 
-.submenu-link:hover {
-  background-color: var(--bs-tertiary-bg);
-}
-
-.submenu-link.active {
-  color: green;
-  font-weight: 500;
-}
-
+/* Sidebar header */
 .desktop-sidebar .sidebar-header {
   display: flex;
   justify-content: flex-end;
@@ -188,6 +196,7 @@
   top: 0;
   right: 0;
 }
+
 .sidebar-header .keep-toggle-btn:hover {
   background-color: var(--bs-tertiary-bg);
   border-radius: 2px;
