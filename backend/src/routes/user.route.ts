@@ -30,4 +30,6 @@ router.get("/getSettings", validateRequest(onlyAuthorizationHeader), verifyAuth(
 
 router.get("/getAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getAvatar);
 
+router.post("/deleteAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.deleteAvatar);
+
 export default router;

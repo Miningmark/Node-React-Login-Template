@@ -91,4 +91,12 @@ export class UserController extends BaseController {
             return await this.userService.getAvatar(userId);
         });
     };
+
+    deleteAvatar = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+
+            return await this.userService.deleteAvatar(userId);
+        });
+    };
 }
