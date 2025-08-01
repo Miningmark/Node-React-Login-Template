@@ -30,8 +30,6 @@ export default function NavBar({ children }) {
   const menuFixed = useSettingsStore((state) => state.menuFixed);
   const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
 
-  console.log("menuFixed", menuFixed);
-
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
