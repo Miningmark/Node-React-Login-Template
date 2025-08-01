@@ -193,7 +193,9 @@ export default function NavBar({ children }) {
           <SideMenuDesktop menuFixed={menuFixed} setMenuFixed={setMenuFixed} />
         </div>
 
-        <div className={`column column-right ${menuFixed && "column-right-smale"}`}>{children}</div>
+        <div className={`column  ${menuFixed ? "column-right-smale" : "column-right"}`}>
+          {children}
+        </div>
       </div>
 
       {showMobileSideMenu ? (

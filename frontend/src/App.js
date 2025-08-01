@@ -104,7 +104,7 @@ function App() {
           console.log("fetchUserData: ", avatarRes.data);
           if (userRes.data?.username) setUsername(userRes.data.username);
           if (routesRes.data?.routeGroups) setRouteGroups(routesRes.data.routeGroups);
-          if (avatarRes.data) {
+          if (avatarRes.status === 200 && avatarRes.data) {
             // Blob → ObjectURL → img.src
             const avatarUrl = URL.createObjectURL(avatarRes.data);
             setAvatar(avatarUrl);
