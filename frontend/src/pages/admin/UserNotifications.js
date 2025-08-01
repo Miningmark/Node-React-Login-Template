@@ -38,6 +38,36 @@ const UserNotificationsPage = () => {
   }, []);
 
   useEffect(() => {
+    if (socket) {
+      function handleUserNotificationCreated(data) {
+        setUserNotifications((prev) => [data, ...prev]);
+      }
+
+      function handleUserNotificationUpdated(data) {
+        setUserNotifications((prev) =>
+          prev.map((notification) => (notification.id === data.id ? data : notification))
+        );
+      }
+
+      function handleUserNotificationDeleted(data) {
+        setUserNotifications((prev) => prev.filter((notification) => notification.id !== data.id));
+      }
+
+      socket.emit("subscribe:adminPage:notifications:watchList");
+
+      socket.on("adminPage:notifications:create", handleUserNotificationCreated);
+      socket.on("adminPage:notifications:update", handleUserNotificationUpdated);
+      socket.on("adminPage:notifications:delete", handleUserNotificationDeleted);
+
+      return () => {
+        socket.off("adminPage:notifications:create", handleUserNotificationCreated);
+        socket.off("adminPage:notifications:update", handleUserNotificationUpdated);
+        socket.off("adminPage:notifications:delete", handleUserNotificationDeleted);
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     fetchUserNotifications();
   }, []);
 
@@ -67,7 +97,7 @@ const UserNotificationsPage = () => {
         className="page-wrapper mt-4"
         style={{ height: `calc(100dvh - ${heightOffset}px)` }}
       >
-        <h2>Benutzer Nachrichten</h2>
+        <h2>Benutzer Benachrichtigungen</h2>
         <div>
           {!loadingUserNotifications ? (
             <>
@@ -80,7 +110,7 @@ const UserNotificationsPage = () => {
                       setShowCreateNotificationModal(true);
                     }}
                   >
-                    Neuer Benutzer
+                    Neue Benachrichtigung
                   </button>
                 )}
               </div>

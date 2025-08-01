@@ -35,13 +35,33 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
       await axiosProtected.post("/adminPage/createNotification", {
         name,
         description,
-        notifyFrom,
-        notifyTo,
+        notifyFrom: new Date(notifyFrom).toISOString(),
+        notifyTo: new Date(notifyTo).toISOString(),
       });
       addToast("Benachrichtigung erfolgreich erstellt", "success");
       closeModal();
     } catch (error) {
       addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
+      handleClose();
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleEdit() {
+    setIsSaving(true);
+    try {
+      await axiosProtected.post("/adminPage/editNotification", {
+        id: notification.id,
+        name,
+        description,
+        notifyFrom: new Date(notifyFrom).toISOString(),
+        notifyTo: new Date(notifyTo).toISOString(),
+      });
+      addToast("Benachrichtigung erfolgreich bearbeitet", "success");
+      closeModal();
+    } catch (error) {
+      addToast(error.response?.data?.message || "Bearbeitung fehlgeschlagen", "danger");
       handleClose();
     } finally {
       setIsSaving(false);
@@ -89,7 +109,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
 
           <div className="form-floating mb-3">
             <input
-              type="date"
+              type="datetime-local"
               className={`form-control ${touched.startDate && !notifyFrom ? "is-invalid" : ""}`}
               id="floatingStartDate"
               value={notifyFrom}
@@ -103,7 +123,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
 
           <div className="form-floating mb-3">
             <input
-              type="date"
+              type="datetime-local"
               className={`form-control ${touched.endDate && !notifyTo ? "is-invalid" : ""}`}
               id="floatingEndDate"
               value={notifyTo}
