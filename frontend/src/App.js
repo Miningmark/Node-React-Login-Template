@@ -24,6 +24,9 @@ import { useContext, useEffect } from "react";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
 
+//Zustand Store
+import { useSettingsStore } from "hook/store/settingsStore";
+
 function AppWrapper() {
   return (
     <AuthProvider>
@@ -55,6 +58,8 @@ function App() {
 
   const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
+
+  const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
 
   useEffect(() => {
     if (socket) {
@@ -96,10 +101,11 @@ function App() {
 
     async function fetchUser() {
       try {
-        const [userRes, routesRes, avatarRes] = await Promise.all([
+        const [userRes, routesRes, avatarRes, settingsRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
           axiosProtected.get("/user/getRouteGroups", { signal }),
           axiosProtected.get("/user/getAvatar", { signal, responseType: "blob" }),
+          axiosProtected.get("/user/getSettings", { signal }),
         ]);
 
         if (isMounted) {
@@ -111,6 +117,7 @@ function App() {
             const avatarUrl = URL.createObjectURL(avatarRes.data);
             setAvatar(avatarUrl);
           }
+          if (settingsRes.data) setMenuFixed(settingsRes.data.isSideMenuFixed || false);
         }
       } catch (err) {
         if (err.name === "CanceledError") {

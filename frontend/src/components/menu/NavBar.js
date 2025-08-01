@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, use } from "react";
 import { AuthContext } from "contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
@@ -9,6 +9,9 @@ import "./navBar.css";
 
 import SideMenuMobile from "./SideMenuMobile";
 
+//Zustand Store
+import { useSettingsStore } from "hook/store/settingsStore";
+
 import { ReactComponent as MenuIcon } from "assets/icons/menu.svg";
 import { ReactComponent as UserDefaultIcon } from "assets/icons/account_circle.svg";
 
@@ -16,7 +19,6 @@ export default function NavBar({ children }) {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [menuFixed, setMenuFixed] = useState(false);
 
   const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
 
@@ -24,6 +26,9 @@ export default function NavBar({ children }) {
   const axiosProtected = useAxiosProtected();
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
+
+  const menuFixed = useSettingsStore((state) => state.menuFixed);
+  const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,6 +69,13 @@ export default function NavBar({ children }) {
 
   function handleMobileSideMenuClose() {
     setShowMobileSideMenu(false);
+  }
+
+  async function handleMenuFixedChange() {
+    try {
+      await axiosProtected.post("/user/updateSettings", { isSideMenuFixed: !menuFixed });
+    } catch (error) {}
+    setMenuFixed(!menuFixed);
   }
 
   if (!accessToken) {
@@ -190,7 +202,7 @@ export default function NavBar({ children }) {
 
       <div className="menu-content-wrapper">
         <div className="column-left">
-          <SideMenuDesktop menuFixed={menuFixed} setMenuFixed={setMenuFixed} />
+          <SideMenuDesktop menuFixed={menuFixed} setMenuFixed={handleMenuFixedChange} />
         </div>
 
         <div className={`column  ${menuFixed ? "column-right-s" : "column-right-l"}`}>
