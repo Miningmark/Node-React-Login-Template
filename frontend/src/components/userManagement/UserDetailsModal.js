@@ -224,6 +224,19 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
                 <li>Keine Berechtigungen</li>
               )}
             </ul>
+            {user.avatar ? (
+              <div className="mb-3 d-flex flex-column align-items-start">
+                <p>
+                  <strong>Avatar</strong>
+                </p>
+                <img
+                  src={user.avatar}
+                  alt="Avatar"
+                  className="rounded-circle"
+                  style={{ width: "128px", height: "128px", borderRadius: "50%" }}
+                />
+              </div>
+            ) : null}
           </>
         )}
       </Modal.Body>

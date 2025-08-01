@@ -49,6 +49,17 @@ const UsersPage = () => {
   useEffect(() => {
     if (!socket) return;
 
+    async function loadAvatar(userId) {
+      const avatarRes = await axiosProtected.get(`/userManagement/getAvatar/${userId}`, {
+        responseType: "blob",
+      });
+      if (avatarRes.status === 200 && avatarRes.data) {
+        return URL.createObjectURL(avatarRes.data);
+      } else {
+        return null;
+      }
+    }
+
     const handleUserAdd = (data) => {
       setUsers((prevUsers) => [...prevUsers, data]);
     };
@@ -60,6 +71,10 @@ const UsersPage = () => {
         return;
       }
       const newUser = { ...oldUser, ...updatedUser };
+
+      if (newUser.avatar === "changed") {
+        newUser.avatar = loadAvatar(newUser.id);
+      }
       setUsers((prevUsers) =>
         prevUsers.map((user) => (user.id === updatedUser.id ? newUser : user))
       );

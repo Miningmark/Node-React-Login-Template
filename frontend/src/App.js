@@ -69,6 +69,8 @@ function App() {
         ) {
           logout();
           navigate("/login");
+        } else if (Object.prototype.hasOwnProperty.call(data, "avatar")) {
+          setAvatar(null);
         } else {
           console.log("Kein Releventen Daten enthalten.");
         }
@@ -80,7 +82,7 @@ function App() {
         socket.off("user:update", handleUserUpdate);
       };
     }
-  }, [socket, setUsername, setRouteGroups, logout, navigate]);
+  }, [socket, setUsername, setRouteGroups, logout, navigate, setAvatar]);
 
   const axiosProtected = useAxiosProtected();
 
