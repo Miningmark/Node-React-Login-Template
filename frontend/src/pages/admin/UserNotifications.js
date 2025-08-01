@@ -38,6 +38,36 @@ const UserNotificationsPage = () => {
   }, []);
 
   useEffect(() => {
+    if (socket) {
+      function handleUserNotificationCreated(data) {
+        setUserNotifications((prev) => [data, ...prev]);
+      }
+
+      function handleUserNotificationUpdated(data) {
+        setUserNotifications((prev) =>
+          prev.map((notification) => (notification.id === data.id ? data : notification))
+        );
+      }
+
+      function handleUserNotificationDeleted(data) {
+        setUserNotifications((prev) => prev.filter((notification) => notification.id !== data.id));
+      }
+
+      socket.emit("subscribe:adminPage:notifications:watchList");
+
+      socket.on("adminPage:notifications:create", handleUserNotificationCreated);
+      socket.on("adminPage:notifications:update", handleUserNotificationUpdated);
+      socket.on("adminPage:notifications:delete", handleUserNotificationDeleted);
+
+      return () => {
+        socket.off("adminPage:notifications:create", handleUserNotificationCreated);
+        socket.off("adminPage:notifications:update", handleUserNotificationUpdated);
+        socket.off("adminPage:notifications:delete", handleUserNotificationDeleted);
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     fetchUserNotifications();
   }, []);
 
