@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, use } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
@@ -29,6 +29,8 @@ export default function NavBar({ children }) {
 
   const menuFixed = useSettingsStore((state) => state.menuFixed);
   const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
+
+  console.log("menuFixed", menuFixed);
 
   useEffect(() => {
     const handleScroll = () => {

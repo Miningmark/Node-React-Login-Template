@@ -117,7 +117,7 @@ function App() {
             const avatarUrl = URL.createObjectURL(avatarRes.data);
             setAvatar(avatarUrl);
           }
-          if (settingsRes.data) setMenuFixed(settingsRes.data.isSideMenuFixed || false);
+          if (settingsRes.data) setMenuFixed(settingsRes.data.settings.isSideMenuFixed || false);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
