@@ -57,7 +57,8 @@ export class UserManagementService {
 
         await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
 
-        //TODO: SocketIO for the user self
+        SocketService.getInstance().emitToRoom(`listen:user:${userId}`, "user:update", { avatar: null });
+
         return { type: "json", jsonResponse: jsonResponse };
     }
 
