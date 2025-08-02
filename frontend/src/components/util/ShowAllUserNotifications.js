@@ -121,7 +121,9 @@ export default function ShowAllUserNotifications({ handleClose }) {
             </Button>
 
             {notifications[selectedNotification].confirmed ? (
-              <span className="text-success">Benachrichtigung bereits gelesen</span>
+              <span className="text-success block text-center">
+                Benachrichtigung bereits gelesen
+              </span>
             ) : (
               <Button variant="primary" onClick={handleNotificationRead} disabled={isSaving}>
                 {isSaving ? (

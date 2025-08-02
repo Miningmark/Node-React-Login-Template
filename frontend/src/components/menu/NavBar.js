@@ -182,19 +182,34 @@ export default function NavBar({ children }) {
                 }}
               >
                 <li>
-                  <button className="dropdown-item" onClick={() => navigate("/user/page")}>
+                  <button
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigate("/user/page");
+                      setDropdownOpen(false);
+                    }}
+                  >
                     {username ? username : "Benutzer"}
                   </button>
                 </li>
                 <li>
-                  <button className="dropdown-item" onClick={() => navigate("/user/settings")}>
+                  <button
+                    className="dropdown-item"
+                    onClick={() => {
+                      navigate("/user/settings");
+                      setDropdownOpen(false);
+                    }}
+                  >
                     Einstellungen
                   </button>
                 </li>
                 <li>
                   <button
                     className="dropdown-item"
-                    onClick={() => setShowAllNotificationsModal(true)}
+                    onClick={() => {
+                      setShowAllNotificationsModal(true);
+                      setDropdownOpen(false);
+                    }}
                   >
                     Benachrichtigungen
                   </button>

@@ -139,6 +139,8 @@ const CreatePermissionModal = ({
               onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
               name="name"
               disabled={!isEditing}
+              maxLength={50}
+              minLength={5}
             />
             <label htmlFor="floatingName">Name</label>
           </div>
@@ -154,6 +156,7 @@ const CreatePermissionModal = ({
               onBlur={() => setTouched((prev) => ({ ...prev, description: true }))}
               name="description"
               disabled={!isEditing}
+              maxLength={100}
             />
             <label htmlFor="floatingDescription">Beschreibung</label>
           </div>

@@ -71,7 +71,7 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
   return (
     <Modal show={show} onHide={closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Neuen User erstellen</Modal.Title>
+        <Modal.Title>Neuen Benutzer erstellen</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="form-floating mb-3">
@@ -79,13 +79,15 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
             type="text"
             className={`form-control ${touched.username && !newUser.username ? "is-invalid" : ""}`}
             id="floatingUsername"
-            placeholder="Username"
+            placeholder="Benutzername"
             value={newUser.username}
             onChange={handleChange}
             onBlur={() => setTouched((prev) => ({ ...prev, username: true }))}
             name="username"
+            maxLength={15}
+            minLength={5}
           />
-          <label htmlFor="floatingUsername">Username</label>
+          <label htmlFor="floatingUsername">Benutzername</label>
         </div>
         <div className="form-floating mb-3">
           <input
