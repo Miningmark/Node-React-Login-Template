@@ -11,8 +11,6 @@ export default function UserNotificationModal({ notification, notificationRead }
   const [show, setShow] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  console.log("UserNotificationModal", notification);
-
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
 

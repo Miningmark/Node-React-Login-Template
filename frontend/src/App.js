@@ -64,8 +64,6 @@ function App() {
 
   const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
 
-  console.log("notifications", notifications);
-
   useEffect(() => {
     if (socket) {
       function handleUserUpdate(data) {
