@@ -92,7 +92,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
       <Modal show={show} onHide={closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {isEditing ? "Benachrichtigung Bearbeiten" : "Neue Benachrichtigung erstellen"}
+            {notification ? "Benachrichtigung Bearbeiten" : "Neue Benachrichtigung erstellen"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { initializeSocket, getSocket } from "util/socket";
+import { initializeSocket, getSocket, closeSocket } from "util/socket";
 
 export const SocketContext = createContext(null);
 
@@ -12,6 +12,11 @@ export const SocketProvider = ({ accessToken, children }) => {
         setSocket(getSocket());
       });
     }
+
+    return () => {
+      closeSocket();
+      setSocket(null);
+    };
   }, [accessToken]);
 
   return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
