@@ -1,39 +1,35 @@
 import { z } from "zod/v4";
-import { authorizationBaseValidation, emailBaseValidation, imageFileBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
+import { authorizationHeader, emailValidation, imageFileValidation, passwordValidation, usernameValidation } from "@/validators/base.validator.js";
 import { UserSettingsTheme } from "@/models/userSettings.model.js";
 
+export type UpdateUsernameValidation = z.infer<typeof updateUsernameSchema>;
 export const updateUsernameSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    }),
+    headers: authorizationHeader,
     body: z.object({
-        newUsername: usernameBaseValidation
+        newUsername: usernameValidation
     })
 });
 
+export type UpdateEmailValidation = z.infer<typeof updateEmailSchema>;
 export const updateEmailSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    }),
+    headers: authorizationHeader,
     body: z.object({
-        newEmail: emailBaseValidation
+        newEmail: emailValidation
     })
 });
 
+export type UpdatePasswordValidation = z.infer<typeof updatePasswordSchema>;
 export const updatePasswordSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    }),
+    headers: authorizationHeader,
     body: z.object({
         currentPassword: z.string(),
-        newPassword: passwordBaseValidation
+        newPassword: passwordValidation
     })
 });
 
+export type UpdateSettingsValidation = z.infer<typeof updateSettingsSchema>;
 export const updateSettingsSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    }),
+    headers: authorizationHeader,
     body: z
         .object({
             theme: z.enum(Object.values(UserSettingsTheme)).optional(),
@@ -44,18 +40,16 @@ export const updateSettingsSchema = z.object({
         }, "Es muss mindestens ein Wert geändert werden")
 });
 
+export type ConfirmPendingNotificationValidation = z.infer<typeof confirmPendingNotificationSchema>;
 export const confirmPendingNotificationSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    }),
+    headers: authorizationHeader,
     body: z.object({
-        id: z.number()
+        id: z.int().positive()
     })
 });
 
+export type UpdateAvatarValidation = z.infer<typeof updateAvatarSchema>;
 export const updateAvatarSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    }),
-    file: imageFileBaseValidation(5)
+    headers: authorizationHeader,
+    file: imageFileValidation(5)
 });

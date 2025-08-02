@@ -1,17 +1,21 @@
+import { ValidatedRequest } from "@/@types/validation.js";
 import { ValidationError } from "@/errors/errorClasses.js";
-import { NextFunction, Request, Response } from "express";
-import { ZodError, ZodObject } from "zod/v4";
+import { NextFunction, Response } from "express";
+import { z, ZodError, ZodObject } from "zod/v4";
 
-export const validateRequest = (schema: ZodObject) => {
-    return (req: Request, res: Response, next: NextFunction): void => {
+export const validateRequest = <T extends ZodObject<any>>(schema: T) => {
+    return (req: ValidatedRequest<z.infer<T>>, res: Response, next: NextFunction): void => {
         try {
-            schema.parse({
+            const validatedData = schema.parse({
                 body: req.body,
                 query: req.query,
                 params: req.params,
                 headers: req.headers,
+                cookies: req.cookies,
                 file: req.file
             });
+
+            req.validated = validatedData;
 
             next();
         } catch (error) {

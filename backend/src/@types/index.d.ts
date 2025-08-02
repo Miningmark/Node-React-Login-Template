@@ -6,6 +6,7 @@ declare global {
             userId?: number;
             username?: string;
             routeGroups?: string[];
+            validated: any;
         }
     }
 }

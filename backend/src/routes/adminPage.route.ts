@@ -15,7 +15,7 @@ import {
     updateNotificationSchema,
     updatePermissionSchema
 } from "@/validators/adminPage.validator.js";
-import { onlyAuthorizationHeader } from "@/validators/base.validator.js";
+import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
 
 export default async () => {
     const smartRouter = new SmartRouter();
@@ -24,12 +24,12 @@ export default async () => {
     const adminPageController = new AdminPageController(adminPageService);
 
     smartRouter.get("/getServerLogs{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
-    smartRouter.get("/getFilterOptionsServerLog", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), adminPageController.getFilterOptionsServerLog);
+    smartRouter.get("/getFilterOptionsServerLog", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), adminPageController.getFilterOptionsServerLog);
 
     smartRouter.post("/getFilteredServerLogs{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PANEL_SERVER_LOG_READ, verifyAuth(), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
 
-    smartRouter.get("/getPermissionsWithRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), adminPageController.getPermissionsWithRouteGroups);
-    smartRouter.get("/getRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), adminPageController.getRouteGroups);
+    smartRouter.get("/getPermissionsWithRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), adminPageController.getPermissionsWithRouteGroups);
+    smartRouter.get("/getRouteGroups", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), adminPageController.getRouteGroups);
 
     smartRouter.post("/createPermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(createPermissionSchema), adminPageController.createPermission);
     smartRouter.post("/updatePermission", AdminPageRouteGroups.ADMIN_PANEL_PERMISSIONS_WRITE, verifyAuth(), validateRequest(updatePermissionSchema), adminPageController.updatePermission);

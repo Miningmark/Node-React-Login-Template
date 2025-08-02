@@ -3,7 +3,8 @@ import { AuthController } from "@/controllers/auth.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { AuthService } from "@/services/auth.service.js";
-import { accountActivationSchema, handlePasswordRecoverySchema, loginSchema, logoutSchema, refreshTokenSchema, registerSchema, requestPasswordResetSchema } from "@/validators/auth.validator.js";
+import { accountActivationSchema, handlePasswordRecoverySchema, loginSchema, refreshTokenSchema, registerSchema, requestPasswordResetSchema } from "@/validators/auth.validator.js";
+import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
 import { Router } from "express";
 
 const router = Router();
@@ -17,7 +18,7 @@ if (ENV.ENABLE_REGISTER === true) {
 }
 
 router.post("/login", validateRequest(loginSchema), authController.login);
-router.post("/logout", verifyAuth(), validateRequest(logoutSchema), authController.logout);
+router.post("/logout", verifyAuth(), validateRequest(onlyAuthorizationSchema), authController.logout);
 
 router.post("/requestPasswordReset", validateRequest(requestPasswordResetSchema), authController.requestPasswordReset);
 router.post("/handlePasswordRecovery", validateRequest(handlePasswordRecoverySchema), authController.handlePasswordRecovery);

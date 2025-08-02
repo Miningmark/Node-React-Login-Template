@@ -4,8 +4,8 @@ import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { UserManagementRouteGroups } from "@/routeGroups/userManagement.routeGroup.js";
 import { UserManagementService } from "@/services/userManagement.service.js";
-import { onlyAuthorizationHeader } from "@/validators/base.validator.js";
-import { addUserSchema, deleteAvatarSchema, getAvatarSchema, getUsersSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
+import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
+import { createUserSchema, deleteAvatarSchema, getAvatarSchema, getUsersSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
 
 export default async () => {
     const smartRouter = new SmartRouter();
@@ -16,10 +16,10 @@ export default async () => {
     smartRouter.get("/getUsers{/:limit-:offset}", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(getUsersSchema), userManagementController.getUsers);
     smartRouter.get("/getAvatar{/:id}", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(getAvatarSchema), userManagementController.getAvatar);
 
-    smartRouter.get("/getPermissions", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(onlyAuthorizationHeader), userManagementController.getPermissions);
+    smartRouter.get("/getPermissions", UserManagementRouteGroups.USER_MANAGEMENT_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), userManagementController.getPermissions);
 
     smartRouter.post("/updateUser", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
-    smartRouter.post("/createUser", UserManagementRouteGroups.USER_MANAGEMENT_CREATE, verifyAuth(), validateRequest(addUserSchema), userManagementController.createUser);
+    smartRouter.post("/createUser", UserManagementRouteGroups.USER_MANAGEMENT_CREATE, verifyAuth(), validateRequest(createUserSchema), userManagementController.createUser);
 
     smartRouter.post("/deleteAvatar", UserManagementRouteGroups.USER_MANAGEMENT_WRITE, verifyAuth(), validateRequest(deleteAvatarSchema), userManagementController.deleteAvatar);
 
