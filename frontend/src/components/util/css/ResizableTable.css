@@ -2,6 +2,8 @@
   overflow-x: auto;
   width: 100%;
   position: relative;
+  overscroll-behavior: contain;
+  scrollbar-gutter: none;
 }
 
 .resizable-table {
@@ -81,4 +83,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100px;
+}
+
+.column-title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.column-title-with-icon svg {
+  width: 16px;
+  height: 16px;
 }
