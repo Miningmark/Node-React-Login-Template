@@ -49,7 +49,6 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
       closeModal();
     } catch (error) {
       addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
-      handleClose();
     } finally {
       setIsSaving(false);
     }
@@ -70,7 +69,6 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
       closeModal();
     } catch (error) {
       addToast(error.response?.data?.message || "Bearbeitung fehlgeschlagen", "danger");
-      handleClose();
     } finally {
       setIsSaving(false);
     }
