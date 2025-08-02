@@ -28,11 +28,13 @@ export const limitAndOffsetParams = z.object({
     limit: z
         .string()
         .transform((val) => parseInt(val, 10))
-        .refine((val) => Number.isInteger(val) && val >= 0, "Muss eine positive Ganzzahl sein"),
+        .refine((val) => Number.isInteger(val) && val > 0, "Muss eine positive Ganzzahl sein")
+        .optional(),
     offset: z
         .string()
         .transform((val) => parseInt(val, 10))
-        .refine((val) => Number.isInteger(val) && val >= 0, "Muss eine positive Ganzzahl sein")
+        .refine((val) => Number.isInteger(val) && val > 0, "Muss eine positive Ganzzahl sein")
+        .optional()
 });
 
 export type OnlyAuthorizationValidation = z.infer<typeof onlyAuthorizationSchema>;
