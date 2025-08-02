@@ -216,7 +216,7 @@ export class UserService {
             }
         });
 
-        jsonResponse.activeNotifications = this.userNotificationService.generateMultipleJSONResponseWithModel(databasePendingNotifications, false);
+        jsonResponse.pendingNotifications = this.userNotificationService.generateMultipleJSONResponseWithModel(databasePendingNotifications, false);
 
         return { type: "json", jsonResponse: jsonResponse };
     }
