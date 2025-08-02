@@ -26,16 +26,40 @@
   position: absolute;
   right: 0;
   top: 0;
-  width: 4px;
+  width: 6px;
   height: 100%;
   cursor: col-resize;
   user-select: none;
   background-color: transparent;
   z-index: 2;
+  touch-action: none;
 }
 
 .resizer:hover {
   background-color: #ccc;
+}
+
+.resize-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  color: #888;
+  font-size: 18px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.resize-button:hover {
+  color: #000;
 }
 
 /* Responsive typography and spacing */

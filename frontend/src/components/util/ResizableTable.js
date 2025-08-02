@@ -10,6 +10,8 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
+  const resizeIntervalRef = useRef(null);
+
   useEffect(() => {
     const table = tableRef.current;
     const headers = table.querySelectorAll("th");
@@ -22,20 +24,20 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
 
       let startX, startWidth;
 
+      // Maus
       const onMouseDown = (e) => {
+        e.preventDefault();
         startX = e.clientX;
         startWidth = th.offsetWidth;
-
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onMouseUp);
       };
 
       const onMouseMove = (e) => {
-        const newWidth = startWidth + (e.clientX - startX);
-        th.style.width = newWidth + "px";
-        table.querySelectorAll(`th:nth-child(${index + 1})`).forEach((headerCell) => {
-          headerCell.style.width = newWidth + "px";
-        });
+        const pointerX = e.clientX;
+        const newWidth = startWidth + (pointerX - startX);
+        resizeColumn(index, newWidth);
+        handleAutoScroll(pointerX);
       };
 
       const onMouseUp = () => {
@@ -43,7 +45,48 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
         document.removeEventListener("mouseup", onMouseUp);
       };
 
+      // Touch
+      const onTouchStart = (e) => {
+        startX = e.touches[0].clientX;
+        startWidth = th.offsetWidth;
+        document.addEventListener("touchmove", onTouchMove);
+        document.addEventListener("touchend", onTouchEnd);
+      };
+
+      const onTouchMove = (e) => {
+        const pointerX = e.touches[0].clientX;
+        const newWidth = startWidth + (pointerX - startX);
+        resizeColumn(index, newWidth);
+        handleAutoScroll(pointerX);
+      };
+
+      const onTouchEnd = () => {
+        document.removeEventListener("touchmove", onTouchMove);
+        document.removeEventListener("touchend", onTouchEnd);
+      };
+
+      const resizeColumn = (colIndex, width) => {
+        if (width < 50) return; // optional: minimale Breite
+        th.style.width = width + "px";
+        table.querySelectorAll(`th:nth-child(${colIndex + 1})`).forEach((headerCell) => {
+          headerCell.style.width = width + "px";
+        });
+      };
+
+      const handleAutoScroll = (pointerX) => {
+        const wrapper = table.parentElement;
+        const { left, right } = wrapper.getBoundingClientRect();
+
+        const SCROLL_MARGIN = 30; // wie nah am Rand muss man sein
+        const SCROLL_SPEED = 10; // px pro event
+
+        if (pointerX > right - SCROLL_MARGIN) {
+          wrapper.scrollLeft += SCROLL_SPEED;
+        }
+      };
+
       resizer.addEventListener("mousedown", onMouseDown);
+      resizer.addEventListener("touchstart", onTouchStart, { passive: false });
     });
   }, []);
 
@@ -62,6 +105,33 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
       setSortedColumn(colId);
       setSortDirection("asc");
       handleSort(colId);
+    }
+  };
+
+  const startAutoResize = (index) => {
+    const table = tableRef.current;
+    const wrapper = table.parentElement;
+
+    const resize = () => {
+      const header = table.querySelector(`th:nth-child(${index + 1})`);
+      const currentWidth = header.offsetWidth;
+      const newWidth = currentWidth + 5;
+
+      header.style.width = `${newWidth}px`;
+      table.querySelectorAll(`th:nth-child(${index + 1})`).forEach((th) => {
+        th.style.width = `${newWidth}px`;
+      });
+
+      wrapper.scrollLeft = wrapper.scrollWidth;
+    };
+
+    resizeIntervalRef.current = setInterval(resize, 50); // alle 50ms verbreitern
+  };
+
+  const stopAutoResize = () => {
+    if (resizeIntervalRef.current) {
+      clearInterval(resizeIntervalRef.current);
+      resizeIntervalRef.current = null;
     }
   };
 
@@ -114,6 +184,19 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
                       <ArrowUpIcon style={{ width: "100%", height: "100%" }} />
                     )}
                   </span>
+                )}
+                {index === columns.length - 1 && (
+                  <button
+                    className="resize-button"
+                    onMouseDown={() => startAutoResize(index)}
+                    onMouseUp={stopAutoResize}
+                    onMouseLeave={stopAutoResize}
+                    onTouchStart={() => startAutoResize(index)}
+                    onTouchEnd={stopAutoResize}
+                    onTouchCancel={stopAutoResize}
+                  >
+                    ⇨
+                  </button>
                 )}
               </th>
             ))}
