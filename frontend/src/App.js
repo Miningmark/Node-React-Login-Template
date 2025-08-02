@@ -108,13 +108,11 @@ function App() {
     let isMounted = true;
 
     async function fetchNotifications() {
-      console.log("fetchNotifications");
       try {
         const notificationsRes = await axiosProtected.get("/user/getPendingNotifications", {
           signal,
         });
         if (isMounted) {
-          console.log("fetchNotifications", notificationsRes.data?.pendingNotifications);
           if (notificationsRes.data?.pendingNotifications) {
             setNotifications(notificationsRes.data.pendingNotifications);
           }
@@ -138,7 +136,6 @@ function App() {
 
   useEffect(() => {
     if (!accessToken) return;
-    //if (username && routeGroups) return;
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -190,7 +187,16 @@ function App() {
       isMounted = false;
       controller.abort();
     };
-  }, [accessToken, username, setUsername, setRouteGroups, axiosProtected, setTheme]);
+  }, [
+    accessToken,
+    username,
+    setUsername,
+    setRouteGroups,
+    axiosProtected,
+    setTheme,
+    setAvatar,
+    setMenuFixed,
+  ]);
 
   function notificationRead(notificationId) {
     setNotifications((prev) => prev.filter((item) => item.id !== notificationId));

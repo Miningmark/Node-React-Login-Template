@@ -16,6 +16,9 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
 
   const [isHovered, setIsHovered] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
+  const [initialRender, setInitialRender] = useState(true);
+
+  console.log("initialRender", initialRender);
 
   // Submenus automatisch öffnen, wenn aktives SubItem vorhanden
   useEffect(() => {
@@ -31,10 +34,11 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
         }
       }
     });
-    if (!menuFixed) {
+    if (initialRender || !menuFixed) {
       setOpenMenus(initialOpenMenus);
+      setInitialRender(false);
     }
-  }, [currentPath, checkAccess, menuFixed]);
+  }, [currentPath, checkAccess, menuFixed, location, initialRender]);
 
   const toggleSubMenu = (name) => {
     setOpenMenus((prev) => ({
