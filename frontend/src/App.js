@@ -19,13 +19,14 @@ import Unauthorized from "pages/Unauthorized";
 import { ThemeProvider, ThemeContext } from "contexts/ThemeContext";
 import RequireAuth from "components/RequireAuth";
 import PublicRoute from "components/PublicRoute";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
 
 //Zustand Store
 import { useSettingsStore } from "hook/store/settingsStore";
+import UserNotificationModal from "components/util/UserNotificationModal";
 
 function AppWrapper() {
   return (
@@ -52,12 +53,14 @@ function InnerProviders() {
 }
 
 function App() {
+  const [notifications, setNotifications] = useState([]);
   const { setUsername, setRouteGroups, username, accessToken, logout, setAvatar } =
     useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
 
   const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
+  const axiosProtected = useAxiosProtected();
 
   const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
 
@@ -81,15 +84,57 @@ function App() {
         }
       }
 
+      function handleNewUserNotification(data) {
+        setNotifications((prev) => [data, ...prev]);
+      }
+
       socket.on("user:update", handleUserUpdate);
+      socket.on("global:notifications:create", handleNewUserNotification);
+      socket.on("global:notifications:update", handleNewUserNotification);
 
       return () => {
         socket.off("user:update", handleUserUpdate);
+        socket.off("global:notifications:create", handleNewUserNotification);
+        socket.off("global:notifications:update", handleNewUserNotification);
       };
     }
   }, [socket, setUsername, setRouteGroups, logout, navigate, setAvatar]);
 
-  const axiosProtected = useAxiosProtected();
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let isMounted = true;
+
+    async function fetchNotifications() {
+      console.log("fetchNotifications");
+      try {
+        const notificationsRes = await axiosProtected.get("/user/getPendingNotifications", {
+          signal,
+        });
+        if (isMounted) {
+          console.log("fetchNotifications", notificationsRes.data?.pendingNotifications);
+          if (notificationsRes.data?.pendingNotifications) {
+            setNotifications(notificationsRes.data.pendingNotifications);
+          }
+        }
+      } catch (error) {
+        if (error.name === "CanceledError") {
+        } else {
+          console.warn("Kein gültiger Login gefunden.");
+        }
+      }
+    }
+
+    fetchNotifications();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [accessToken, axiosProtected]);
+  console.log("App notifications", notifications);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -146,6 +191,10 @@ function App() {
       controller.abort();
     };
   }, [accessToken, username, setUsername, setRouteGroups, axiosProtected, setTheme]);
+
+  function notificationRead(notificationId) {
+    setNotifications((prev) => prev.filter((item) => item.id !== notificationId));
+  }
 
   return (
     <>
@@ -279,6 +328,16 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </NavBar>
+
+      {notifications.map((item, index) => (
+        <>
+          <UserNotificationModal
+            notification={item}
+            key={index}
+            notificationRead={notificationRead}
+          />
+        </>
+      ))}
     </>
   );
 }

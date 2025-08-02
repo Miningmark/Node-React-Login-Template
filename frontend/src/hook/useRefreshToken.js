@@ -20,7 +20,7 @@ const useRefreshToken = () => {
       return response;
     } catch (err) {
       if (err?.name === "CanceledError") {
-        console.log("Request was cancelled");
+        //console.log("Request was cancelled");
       } else if (err?.response?.status === 403 || err?.response?.status === 401) {
         navigate("/login", { state: { from: location.pathname }, replace: true });
       } else {
