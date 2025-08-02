@@ -79,12 +79,16 @@ export const createNotificationSchema = z.object({
     headers: z.object({
         authorization: authorizationBaseValidation
     }),
-    body: z.object({
-        name: z.string(),
-        description: z.string(),
-        notifyFrom: z.iso.datetime(),
-        notifyTo: z.iso.datetime()
-    })
+    body: z
+        .object({
+            name: z.string(),
+            description: z.string(),
+            notifyFrom: z.iso.datetime(),
+            notifyTo: z.iso.datetime()
+        })
+        .refine((data) => data.notifyFrom === undefined || data.notifyTo === undefined || data.notifyFrom > data.notifyTo, {
+            message: "notifyFrom muss zeitlich vor notifyTo liegen"
+        })
 });
 
 export const updateNotificationSchema = z.object({
