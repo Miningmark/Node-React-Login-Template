@@ -44,6 +44,15 @@ export const updateSettingsSchema = z.object({
         }, "Es muss mindestens ein Wert geändert werden")
 });
 
+export const confirmPendingNotificationSchema = z.object({
+    headers: z.object({
+        authorization: authorizationBaseValidation
+    }),
+    body: z.object({
+        id: z.number()
+    })
+});
+
 export const updateAvatarSchema = z.object({
     headers: z.object({
         authorization: authorizationBaseValidation

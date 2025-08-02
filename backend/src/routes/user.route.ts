@@ -4,7 +4,7 @@ import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { UserService } from "@/services/user.service.js";
 import { onlyAuthorizationHeader } from "@/validators/base.validator.js";
-import { updateAvatarSchema, updateEmailSchema, updatePasswordSchema, updateSettingsSchema, updateUsernameSchema } from "@/validators/user.validator.js";
+import { confirmPendingNotificationSchema, updateAvatarSchema, updateEmailSchema, updatePasswordSchema, updateSettingsSchema, updateUsernameSchema } from "@/validators/user.validator.js";
 import { Router } from "express";
 import multer from "multer";
 
@@ -21,7 +21,10 @@ router.post("/updateEmail", validateRequest(updateEmailSchema), verifyAuth(), us
 router.post("/updatePassword", validateRequest(updatePasswordSchema), verifyAuth(), userController.updatePassword);
 router.post("/updateSettings", validateRequest(updateSettingsSchema), verifyAuth(), userController.updateSettings);
 
+router.post("/confirmPendingNotification", validateRequest(confirmPendingNotificationSchema), verifyAuth(), userController.confirmPendingNotification);
+
 router.post("/updateAvatar", multerInstance.single("file"), validateRequest(updateAvatarSchema), verifyAuth(), userController.updateAvatar);
+router.post("/deleteAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.deleteAvatar);
 
 router.get("/getUsername", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getUsername);
 router.get("/getRouteGroups", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getRouteGroups);
@@ -29,8 +32,7 @@ router.get("/getLastLogins", validateRequest(onlyAuthorizationHeader), verifyAut
 router.get("/getSettings", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getSettings);
 
 router.get("/getPendingNotifications", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getPendingNotifications);
-router.get("/getAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getAvatar);
 
-router.post("/deleteAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.deleteAvatar);
+router.get("/getAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getAvatar);
 
 export default router;

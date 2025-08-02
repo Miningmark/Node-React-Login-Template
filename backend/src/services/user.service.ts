@@ -115,6 +115,18 @@ export class UserService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
+    async confirmPendingNotification(userId: number, notificationId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich bestätigt" };
+
+        const databaseUserNotification = await UserNotification.findOne({ where: { userId: userId, notificationId: notificationId } });
+        if (databaseUserNotification === null) throw new ValidationError("Keine Benachrichtigung gefunden");
+
+        databaseUserNotification.confirmed = true;
+        await databaseUserNotification.save();
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
     async updateAvatar(userId: number, file: Express.Multer.File): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 

@@ -43,6 +43,15 @@ export class UserController extends BaseController {
         });
     };
 
+    confirmPendingNotification = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+            const { id } = req.body;
+
+            return await this.userService.confirmPendingNotification(userId, id);
+        });
+    };
+
     updateAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
