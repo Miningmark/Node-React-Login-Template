@@ -15,6 +15,9 @@ export interface ServerToClientEvents {
     "adminPage:notifications:create": (data: Record<string, any>) => void;
     "adminPage:notifications:update": (data: Record<string, any>) => void;
     "adminPage:notifications:delete": (data: Record<string, any>) => void;
+
+    "global:notifications:create": (data: Record<string, any>) => void;
+    "global:notifications:update": (data: Record<string, any>) => void;
 }
 
 export interface ClientToServerEvents {

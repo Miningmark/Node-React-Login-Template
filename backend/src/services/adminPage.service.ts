@@ -174,6 +174,7 @@ export class AdminPageService {
 
         const databaseNotification = await Notification.create({ name: name, description: description, notifyFrom: notifyFrom, notifyTo: notifyTo });
 
+        SocketService.getInstance().emitToRoom("listen:global:notifications:watchList", "global:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
         SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
 
         return { type: "json", jsonResponse: jsonResponse };
@@ -203,6 +204,7 @@ export class AdminPageService {
 
         if (resendNotification) {
             await UserNotification.update({ confirmed: false }, { where: { notificationId: id } });
+            SocketService.getInstance().emitToRoom("listen:global:notifications:watchList", "global:notifications:update", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
         }
 
         await databaseNotification.save();
