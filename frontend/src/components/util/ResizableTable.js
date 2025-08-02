@@ -17,7 +17,7 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
   useEffect(() => {
     const table = tableRef.current;
     const headers = table.querySelectorAll("thead th");
-    const totalTableWidth = table.parentElement.clientWidth - 32;
+    const totalTableWidth = table.parentElement.clientWidth - 36;
 
     const MIN_WIDTH = 50;
 
