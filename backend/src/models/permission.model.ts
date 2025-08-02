@@ -31,12 +31,12 @@ class Permission extends Model<InferAttributes<Permission>, InferCreationAttribu
     @NotNull
     declare id: CreationOptional<number>;
 
-    @Attribute(DataTypes.STRING(50))
+    @Attribute(DataTypes.STRING)
     @Unique
     @NotNull
     declare name: string;
 
-    @Attribute(DataTypes.STRING(100))
+    @Attribute(DataTypes.STRING)
     declare description: string | null;
 
     declare users?: NonAttribute<User[]>;

@@ -31,11 +31,11 @@ class Notification extends Model<InferAttributes<Notification>, InferCreationAtt
     @NotNull
     declare id: CreationOptional<number>;
 
-    @Attribute(DataTypes.STRING(25))
+    @Attribute(DataTypes.STRING)
     @NotNull
     declare name: string;
 
-    @Attribute(DataTypes.STRING(16000))
+    @Attribute(DataTypes.TEXT)
     @NotNull
     declare description: string;
 
