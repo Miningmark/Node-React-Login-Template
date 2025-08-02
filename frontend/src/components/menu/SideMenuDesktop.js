@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, use } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "contexts/AuthContext";
 import { ThemeContext } from "contexts/ThemeContext";
@@ -16,9 +16,7 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
 
   const [isHovered, setIsHovered] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
-  const [initialRender, setInitialRender] = useState(true);
-
-  console.log("initialRender", initialRender);
+  const [menuFixedChanged, setMenuFixedChanged] = useState(false);
 
   // Submenus automatisch öffnen, wenn aktives SubItem vorhanden
   useEffect(() => {
@@ -34,11 +32,16 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
         }
       }
     });
-    if (initialRender || !menuFixed) {
+    if (!menuFixed || !menuFixedChanged) {
       setOpenMenus(initialOpenMenus);
-      setInitialRender(false);
     }
-  }, [currentPath, checkAccess, menuFixed, location, initialRender]);
+  }, [currentPath, checkAccess, menuFixed, menuFixedChanged]);
+
+  useEffect(() => {
+    if (menuFixed) {
+      setMenuFixedChanged(true);
+    }
+  }, [menuFixed]);
 
   const toggleSubMenu = (name) => {
     setOpenMenus((prev) => ({

@@ -132,7 +132,6 @@ function App() {
       controller.abort();
     };
   }, [accessToken, axiosProtected]);
-  console.log("App notifications", notifications);
 
   useEffect(() => {
     if (!accessToken) return;
