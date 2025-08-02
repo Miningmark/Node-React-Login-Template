@@ -8,9 +8,9 @@ const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
   const renderJsonIfPossible = (value) => {
     try {
       const parsed = JSON.parse(value);
-      return <pre className="bg-light p-2 rounded border">{JSON.stringify(parsed, null, 2)}</pre>;
+      return <pre className=" p-2 rounded border">{JSON.stringify(parsed, null, 2)}</pre>;
     } catch {
-      return <pre className="bg-light p-2 rounded border">{value}</pre>;
+      return <pre className=" p-2 rounded border">{value}</pre>;
     }
   };
 
