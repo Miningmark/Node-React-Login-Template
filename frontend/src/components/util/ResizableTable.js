@@ -2,8 +2,10 @@ import React, { useRef, useEffect, useState } from "react";
 import "./css/ResizableTable.css";
 import Table from "react-bootstrap/Table";
 
+//Icons
 import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
 import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
+import { ReactComponent as ArrowForwardIcon } from "assets/icons/arrow_forward.svg";
 
 const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, children }) => {
   const tableRef = useRef();
@@ -195,7 +197,7 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
                     onTouchEnd={stopAutoResize}
                     onTouchCancel={stopAutoResize}
                   >
-                    ⇨
+                    <ArrowForwardIcon width="24" height="24" />
                   </button>
                 )}
               </th>
