@@ -101,6 +101,14 @@ export class UserController extends BaseController {
         });
     };
 
+    getActiveNotifications = (req: Request, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+
+            return await this.userService.getActiveNotifications(userId);
+        });
+    };
+
     getAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };

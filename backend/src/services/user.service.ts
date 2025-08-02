@@ -6,10 +6,10 @@ import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
 import UserNotification from "@/models/userNotifications.model.js";
 import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
-import { NotificationService } from "@/services/notification.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { S3Service } from "@/services/s3.service.js";
 import { TokenService } from "@/services/token.service.js";
+import { UserNotificationService } from "@/services/userNotification.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
@@ -20,12 +20,12 @@ import sharp from "sharp";
 export class UserService {
     private tokenService: TokenService;
     private routeGroupService: RouteGroupService;
-    private notificationService: NotificationService;
+    private userNotificationService: UserNotificationService;
 
     constructor() {
         this.tokenService = new TokenService();
         this.routeGroupService = new RouteGroupService();
-        this.notificationService = new NotificationService();
+        this.userNotificationService = new UserNotificationService();
     }
 
     async updateUsername(userId: number, newUsername: string, res: Response): Promise<ControllerResponse> {
@@ -216,13 +216,28 @@ export class UserService {
             }
         });
 
-        const databaseNotifications = databasePendingNotifications
-            .map((databaseNotification) => {
-                return databaseNotification.notification;
-            })
-            .filter((n): n is Notification => !!n);
+        jsonResponse.activeNotifications = this.userNotificationService.generateMultipleJSONResponseWithModel(databasePendingNotifications, false);
 
-        jsonResponse.pendingNotifications = this.notificationService.generateMultipleJSONResponseWithModel(databaseNotifications);
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getActiveNotifications(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Events erfolreich zurückgegeben" };
+
+        const databasePendingNotifications = await UserNotification.findAll({
+            where: {
+                userId: userId
+            },
+            include: {
+                model: Notification,
+                where: {
+                    notifyFrom: { [Op.lte]: Date.now() },
+                    notifyTo: { [Op.gte]: Date.now() }
+                }
+            }
+        });
+
+        jsonResponse.activeNotifications = this.userNotificationService.generateMultipleJSONResponseWithModel(databasePendingNotifications, true);
 
         return { type: "json", jsonResponse: jsonResponse };
     }

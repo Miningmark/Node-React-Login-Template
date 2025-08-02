@@ -32,6 +32,7 @@ router.get("/getLastLogins", validateRequest(onlyAuthorizationHeader), verifyAut
 router.get("/getSettings", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getSettings);
 
 router.get("/getPendingNotifications", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getPendingNotifications);
+router.get("/getActiveNotifications", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getActiveNotifications);
 
 router.get("/getAvatar", validateRequest(onlyAuthorizationHeader), verifyAuth(), userController.getAvatar);
 
