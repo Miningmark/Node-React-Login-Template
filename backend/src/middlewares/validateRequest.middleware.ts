@@ -12,6 +12,7 @@ export const validateRequest = (schema: ZodObject) => {
                 headers: req.headers,
                 file: req.file
             });
+
             next();
         } catch (error) {
             if (error instanceof ZodError) {

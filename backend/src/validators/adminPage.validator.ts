@@ -86,9 +86,9 @@ export const createNotificationSchema = z.object({
             notifyFrom: z.iso.datetime(),
             notifyTo: z.iso.datetime()
         })
-        .refine((data) => data.notifyFrom === undefined || data.notifyTo === undefined || data.notifyFrom > data.notifyTo, {
-            message: "notifyFrom muss zeitlich vor notifyTo liegen"
-        })
+        .refine((data) => {
+            return data.notifyFrom !== undefined || data.notifyTo !== undefined || data.notifyFrom < data.notifyTo;
+        }, "notifyFrom muss zeitlich vor notifyTo liegen")
 });
 
 export const updateNotificationSchema = z.object({
