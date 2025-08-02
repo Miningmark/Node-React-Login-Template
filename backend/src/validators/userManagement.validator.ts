@@ -11,7 +11,10 @@ export type GetAvatarValidation = z.infer<typeof getAvatarSchema>;
 export const getAvatarSchema = z.object({
     headers: authorizationHeader,
     params: z.object({
-        id: z.int().positive()
+        id: z
+            .string()
+            .transform((val) => parseInt(val, 10))
+            .refine((val) => Number.isInteger(val) && val >= 0, "Muss eine positive Ganzzahl sein")
     })
 });
 

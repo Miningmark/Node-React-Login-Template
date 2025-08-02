@@ -25,8 +25,14 @@ export const authorizationHeader = z.object({
 });
 
 export const limitAndOffsetParams = z.object({
-    limit: z.int().positive().optional(),
-    offset: z.int().positive().optional()
+    limit: z
+        .string()
+        .transform((val) => parseInt(val, 10))
+        .refine((val) => Number.isInteger(val) && val >= 0, "Muss eine positive Ganzzahl sein"),
+    offset: z
+        .string()
+        .transform((val) => parseInt(val, 10))
+        .refine((val) => Number.isInteger(val) && val >= 0, "Muss eine positive Ganzzahl sein")
 });
 
 export type OnlyAuthorizationValidation = z.infer<typeof onlyAuthorizationSchema>;
