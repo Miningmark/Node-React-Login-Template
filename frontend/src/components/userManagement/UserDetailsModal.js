@@ -96,7 +96,7 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
   return (
     <Modal show={show} onHide={closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>{editMode ? "Bearbeitungsmodus" : user?.username || "User"}</Modal.Title>
+        <Modal.Title>{editMode ? "Bearbeitungsmodus" : user?.username || "Benutzer"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {editMode ? (
@@ -106,13 +106,15 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
                 type="text"
                 className={`form-control ${touched.username ? "is-valid" : ""}`}
                 id="floatingUsername"
-                placeholder="Username"
+                placeholder="Benutzername"
                 value={editedUser.username}
                 onChange={handleChange}
                 onBlur={() => setTouched({ ...touched, username: true })}
                 name="username"
+                maxLength={15}
+                minLength={5}
               />
-              <label htmlFor="floatingUsername">Username</label>
+              <label htmlFor="floatingUsername">Benutzername</label>
             </div>
             <div className="form-floating mb-3">
               <input

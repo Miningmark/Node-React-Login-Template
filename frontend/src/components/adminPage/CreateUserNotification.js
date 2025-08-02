@@ -107,6 +107,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
               onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
               name="name"
               disabled={!isEditing}
+              maxLength={25}
             />
             <label htmlFor="floatingName">Name</label>
           </div>
@@ -135,6 +136,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
               onBlur={() => setTouched((prev) => ({ ...prev, endDate: true }))}
               name="endDate"
               disabled={!isEditing}
+              min={notifyFrom}
             />
             <label htmlFor="floatingEndDate">Anzeige bis</label>
           </div>
@@ -209,7 +211,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
           <Button
             variant="secondary"
             onClick={() => {
-              isEditing ? setIsEditing(false) : closeModal();
+              isEditing && notification ? setIsEditing(false) : closeModal();
             }}
             disabled={isSaving}
           >

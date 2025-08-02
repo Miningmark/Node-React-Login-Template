@@ -23,14 +23,14 @@ const menuItems = [
         allowedRouteGroups: ["adminPagePermissionsRead", "adminPagePermissionsWrite"],
       },
       {
-        name: "User Benachrichtigungen",
+        name: "Benutzer Benachrichtigungen",
         path: "/admin/user-notifications",
         allowedRouteGroups: [],
       },
     ],
   },
   {
-    name: "User Management",
+    name: "Benutzer Management",
     icon: <TauntIcon />,
     subItems: [
       {

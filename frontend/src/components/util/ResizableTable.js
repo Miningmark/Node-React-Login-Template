@@ -16,17 +16,66 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
 
   useEffect(() => {
     const table = tableRef.current;
-    const headers = table.querySelectorAll("th");
+    const headers = table.querySelectorAll("thead th");
+    const totalTableWidth = table.parentElement.clientWidth - 20;
 
+    const MIN_WIDTH = 50;
+
+    const fixedWidths = columns.map((col) => col.width || null);
+    const totalFixedWidth = fixedWidths.reduce((sum, w) => (w ? sum + w : sum), 0);
+
+    const numDynamic = fixedWidths.filter((w) => !w).length;
+    let remainingWidth = totalTableWidth - totalFixedWidth;
+
+    // Fall: Alle Spalten haben fixe Breite, aber zu wenig → vergrößern
+    if (numDynamic === 0 && totalFixedWidth < totalTableWidth) {
+      const extraPerCol = Math.floor((totalTableWidth - totalFixedWidth) / columns.length);
+      fixedWidths.forEach((w, i) => (fixedWidths[i] = w + extraPerCol));
+    }
+
+    // Fall: Einige Spalten haben keine Breite → verteile verbleibenden Platz
+    if (numDynamic > 0) {
+      const defaultWidth = Math.max(Math.floor(remainingWidth / numDynamic), MIN_WIDTH);
+      fixedWidths.forEach((w, i) => {
+        if (!w) fixedWidths[i] = defaultWidth;
+      });
+    }
+
+    // Wende die berechneten Breiten an und setze Resizer
     headers.forEach((th, index) => {
+      const width = fixedWidths[index];
+      th.style.width = `${width}px`;
+
+      // Zellen im Body setzen
+      table.querySelectorAll(`tbody td:nth-child(${index + 1})`).forEach((td) => {
+        td.style.width = `${width}px`;
+      });
+
+      // Resizer-Element erstellen
       const resizer = document.createElement("div");
       resizer.classList.add("resizer");
       th.appendChild(resizer);
       th.style.position = "relative";
 
+      // Variablen für Resizing
       let startX, startWidth;
 
-      // Maus
+      const resizeColumn = (colIndex, newWidth) => {
+        if (newWidth < MIN_WIDTH) return;
+        const px = `${newWidth}px`;
+
+        // Alle header-Zellen dieser Spalte
+        table.querySelectorAll(`th:nth-child(${colIndex + 1})`).forEach((headerCell) => {
+          headerCell.style.width = px;
+        });
+
+        // Alle body-Zellen dieser Spalte
+        table.querySelectorAll(`tbody td:nth-child(${colIndex + 1})`).forEach((td) => {
+          td.style.width = px;
+        });
+      };
+
+      // Maus-Events
       const onMouseDown = (e) => {
         e.preventDefault();
         startX = e.clientX;
@@ -36,10 +85,9 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
       };
 
       const onMouseMove = (e) => {
-        const pointerX = e.clientX;
-        const newWidth = startWidth + (pointerX - startX);
+        const delta = e.clientX - startX;
+        const newWidth = startWidth + delta;
         resizeColumn(index, newWidth);
-        handleAutoScroll(pointerX);
       };
 
       const onMouseUp = () => {
@@ -47,7 +95,7 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
         document.removeEventListener("mouseup", onMouseUp);
       };
 
-      // Touch
+      // Touch-Events
       const onTouchStart = (e) => {
         startX = e.touches[0].clientX;
         startWidth = th.offsetWidth;
@@ -56,10 +104,9 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
       };
 
       const onTouchMove = (e) => {
-        const pointerX = e.touches[0].clientX;
-        const newWidth = startWidth + (pointerX - startX);
+        const delta = e.touches[0].clientX - startX;
+        const newWidth = startWidth + delta;
         resizeColumn(index, newWidth);
-        handleAutoScroll(pointerX);
       };
 
       const onTouchEnd = () => {
@@ -67,33 +114,16 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
         document.removeEventListener("touchend", onTouchEnd);
       };
 
-      const resizeColumn = (colIndex, width) => {
-        if (width < 50) return; // optional: minimale Breite
-        th.style.width = width + "px";
-        table.querySelectorAll(`th:nth-child(${colIndex + 1})`).forEach((headerCell) => {
-          headerCell.style.width = width + "px";
-        });
-      };
-
-      const handleAutoScroll = (pointerX) => {
-        const wrapper = table.parentElement;
-        const { left, right } = wrapper.getBoundingClientRect();
-
-        const SCROLL_MARGIN = 30; // wie nah am Rand muss man sein
-        const SCROLL_SPEED = 10; // px pro event
-
-        if (pointerX > right - SCROLL_MARGIN) {
-          wrapper.scrollLeft += SCROLL_SPEED;
-        }
-      };
-
+      // Listener anhängen
       resizer.addEventListener("mousedown", onMouseDown);
       resizer.addEventListener("touchstart", onTouchStart, { passive: false });
     });
   }, []);
 
   const handleHeaderClick = (e, colId) => {
-    if (e.target.classList.contains("resizer")) return;
+    if (e.target.classList.contains("resizer") || e.target.closest(".resize-button")) {
+      return;
+    }
 
     if (!handleSort) return;
 
@@ -110,24 +140,35 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
     }
   };
 
-  const startAutoResize = (index) => {
+  const startAutoResize = (index, direction = "right") => {
     const table = tableRef.current;
     const wrapper = table.parentElement;
 
     const resize = () => {
       const header = table.querySelector(`th:nth-child(${index + 1})`);
+      if (!header) return;
+
       const currentWidth = header.offsetWidth;
       const newWidth = currentWidth + 5;
 
-      header.style.width = `${newWidth}px`;
+      // Breite anwenden
       table.querySelectorAll(`th:nth-child(${index + 1})`).forEach((th) => {
         th.style.width = `${newWidth}px`;
       });
 
-      wrapper.scrollLeft = wrapper.scrollWidth;
+      // Scroll anpassen
+      if (direction === "right") {
+        wrapper.scrollLeft = wrapper.scrollWidth;
+      } else if (direction === "left") {
+        const rect = header.getBoundingClientRect();
+        const wrapperRect = wrapper.getBoundingClientRect();
+        if (rect.left < wrapperRect.left) {
+          header.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+        }
+      }
     };
 
-    resizeIntervalRef.current = setInterval(resize, 50); // alle 50ms verbreitern
+    resizeIntervalRef.current = setInterval(resize, 50);
   };
 
   const stopAutoResize = () => {
@@ -163,30 +204,19 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
                 key={index}
                 style={{
                   minWidth: "50px",
-                  width: col.width ? `${col.width}px` : undefined,
                   cursor: `${handleSort ? "pointer" : "default"}`,
                 }}
                 onClick={(e) => handleHeaderClick(e, col.id || null)}
               >
-                {col.title}
-                {sortedColumn === col.id && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: "4px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: "32px",
-                      height: "32px",
-                    }}
-                  >
-                    {sortDirection === "asc" ? (
-                      <ArrowDownIcon style={{ width: "100%", height: "100%" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  {col.title}
+                  {sortedColumn === col.id &&
+                    (sortDirection === "asc" ? (
+                      <ArrowDownIcon style={{ width: "24px", height: "24px" }} />
                     ) : (
-                      <ArrowUpIcon style={{ width: "100%", height: "100%" }} />
-                    )}
-                  </span>
-                )}
+                      <ArrowUpIcon style={{ width: "24px", height: "24px" }} />
+                    ))}
+                </span>
                 {index === columns.length - 1 && (
                   <button
                     className="resize-button"

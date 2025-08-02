@@ -6,7 +6,7 @@
 
 .resizable-table {
   table-layout: fixed;
-  width: max-content;
+  width: max-content !important;
   min-width: 100%;
   position: relative;
   overflow-y: auto;
