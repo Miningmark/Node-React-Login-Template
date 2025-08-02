@@ -182,9 +182,17 @@ export class AdminPageService {
 
     async updateNotification(id: number, resendNotification: boolean, name?: string, description?: string, notifyFrom?: Date, notifyTo?: Date): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benachrichtigung erfolgreich geändert" };
+        let activeNotifyFrom, activeNotifyTo;
 
         const databaseNotification = await Notification.findOne({ where: { id: id } });
         if (databaseNotification === null) throw new ValidationError("Es gibt keine Benachrichtigung mit dieser ID");
+
+        activeNotifyFrom = databaseNotification.notifyFrom;
+        activeNotifyTo = databaseNotification.notifyTo;
+
+        if (notifyFrom !== undefined) activeNotifyFrom = notifyFrom;
+        if (notifyTo !== undefined) activeNotifyTo = notifyTo;
+        if (activeNotifyFrom.getTime() > activeNotifyTo.getTime()) throw new ValidationError("notifyFrom muss zeitlich vor notifyTo liegen");
 
         if (name !== undefined) {
             databaseNotification.name = name;
@@ -195,6 +203,10 @@ export class AdminPageService {
         }
 
         if (notifyFrom !== undefined) {
+            if (databaseNotification.notifyFrom.getTime() > Date.now() && notifyFrom.getTime() < Date.now() && activeNotifyTo.getTime() > Date.now()) {
+                resendNotification = true;
+            }
+
             databaseNotification.notifyFrom = notifyFrom;
         }
 
