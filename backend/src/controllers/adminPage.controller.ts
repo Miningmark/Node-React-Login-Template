@@ -1,102 +1,111 @@
+import { ValidatedRequest } from "@/@types/validation";
 import { BaseController } from "@/controllers/base.controller.js";
 import { AdminPageService } from "@/services/adminPage.service.js";
-import { NextFunction, Request, Response } from "express";
+import {
+    CreateNotificationsValidation,
+    CreatePermissionValidation,
+    DeleteNotificationValidation,
+    DeletePermissionValidation,
+    GetFilteredServerLogValidation,
+    GetNotificationsValidation,
+    GetServerLogValidation,
+    UpdateNotificationValidation,
+    UpdatePermissionValidation
+} from "@/validators/adminPage.validator.js";
+import { OnlyAuthorizationValidation } from "@/validators/base.validator.js";
+import { NextFunction, Response } from "express";
 
 export class AdminPageController extends BaseController {
     constructor(private adminPanelService: AdminPageService) {
         super();
     }
 
-    getServerLogs = (req: Request, res: Response, next: NextFunction): void => {
+    getServerLogs = (req: ValidatedRequest<GetServerLogValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const limit = req.params.limit !== undefined ? parseInt(req.params.limit) : undefined;
-            const offset = req.params.offset !== undefined ? parseInt(req.params.offset) : undefined;
+            const { limit, offset } = req.validated.params;
 
             return await this.adminPanelService.getServerLogs(limit, offset);
         });
     };
 
-    getFilteredServerLogs = (req: Request, res: Response, next: NextFunction): void => {
+    getFilteredServerLogs = (req: ValidatedRequest<GetFilteredServerLogValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const limit = req.params.limit !== undefined ? parseInt(req.params.limit) : undefined;
-            const offset = req.params.offset !== undefined ? parseInt(req.params.offset) : undefined;
-
-            const { userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString } = req.body;
+            const { limit, offset } = req.validated.params;
+            const { userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString } = req.validated.body;
 
             return await this.adminPanelService.getFilteredServerLogs(limit, offset, userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString);
         });
     };
 
-    getFilterOptionsServerLog = (req: Request, res: Response, next: NextFunction): void => {
+    getFilterOptionsServerLog = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPanelService.getFilterOptionsServerLog();
         });
     };
 
-    getPermissionsWithRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
+    getPermissionsWithRouteGroups = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPanelService.getPermissionsWithRouteGroups();
         });
     };
 
-    getRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
+    getRouteGroups = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPanelService.getRouteGroups();
         });
     };
 
-    createPermission = (req: Request, res: Response, next: NextFunction): void => {
+    createPermission = (req: ValidatedRequest<CreatePermissionValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { name, routeGroupIds, description } = req.body;
+            const { name, routeGroupIds, description } = req.validated.body;
 
             return await this.adminPanelService.createPermission(name, routeGroupIds, description);
         });
     };
 
-    updatePermission = (req: Request, res: Response, next: NextFunction): void => {
+    updatePermission = (req: ValidatedRequest<UpdatePermissionValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { id, name, description, routeGroupIds } = req.body;
+            const { id, name, description, routeGroupIds } = req.validated.body;
 
             return await this.adminPanelService.updatePermission(id, name, description, routeGroupIds);
         });
     };
 
-    deletePermission = (req: Request, res: Response, next: NextFunction): void => {
+    deletePermission = (req: ValidatedRequest<DeletePermissionValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { id } = req.body;
+            const { id } = req.validated.body;
 
             return await this.adminPanelService.deletePermission(id);
         });
     };
 
-    getNotifications = (req: Request, res: Response, next: NextFunction): void => {
+    getNotifications = (req: ValidatedRequest<GetNotificationsValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const limit = req.params.limit !== undefined ? parseInt(req.params.limit) : undefined;
-            const offset = req.params.offset !== undefined ? parseInt(req.params.offset) : undefined;
+            const { limit, offset } = req.validated.params;
 
             return await this.adminPanelService.getNotifications(limit, offset);
         });
     };
 
-    createNotification = (req: Request, res: Response, next: NextFunction): void => {
+    createNotification = (req: ValidatedRequest<CreateNotificationsValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { name, description, notifyFrom, notifyTo } = req.body;
+            const { name, description, notifyFrom, notifyTo } = req.validated.body;
 
             return await this.adminPanelService.createNotification(name, description, notifyFrom, notifyTo);
         });
     };
 
-    updateNotification = (req: Request, res: Response, next: NextFunction): void => {
+    updateNotification = (req: ValidatedRequest<UpdateNotificationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { id, resendNotification, name, description, notifyFrom, notifyTo } = req.body;
+            const { id, resendNotification, name, description, notifyFrom, notifyTo } = req.validated.body;
 
-            return await this.adminPanelService.updateNotification(id, resendNotification, name, description, new Date(notifyFrom), new Date(notifyTo));
+            return await this.adminPanelService.updateNotification(id, resendNotification, name, description, notifyFrom, notifyTo);
         });
     };
 
-    deleteNotification = (req: Request, res: Response, next: NextFunction): void => {
+    deleteNotification = (req: ValidatedRequest<DeleteNotificationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { id } = req.body;
+            const { id } = req.validated.body;
 
             return await this.adminPanelService.deleteNotification(id);
         });

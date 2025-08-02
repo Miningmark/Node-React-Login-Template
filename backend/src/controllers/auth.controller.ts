@@ -1,5 +1,8 @@
+import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { AuthService } from "@/services/auth.service.js";
+import { AccountActivationValidation, HandlePasswordRecoveryValidation, LoginValidation, RefreshTokenValidation, RegisterValidation, RequestPasswordResetValidation } from "@/validators/auth.validator.js";
+import { OnlyAuthorizationValidation } from "@/validators/base.validator";
 import { NextFunction, Request, Response } from "express";
 
 export class AuthController extends BaseController {
@@ -7,23 +10,23 @@ export class AuthController extends BaseController {
         super();
     }
 
-    register = (req: Request, res: Response, next: NextFunction): void => {
+    register = (req: ValidatedRequest<RegisterValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { username, email, password } = req.body;
+            const { username, email, password } = req.validated.body;
 
             return await this.authService.register(username, email, password);
         });
     };
 
-    login = (req: Request, res: Response, next: NextFunction): void => {
+    login = (req: ValidatedRequest<LoginValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { username, password } = req.body;
+            const { username, password } = req.validated.body;
 
             return await this.authService.login(username, password, req, res);
         });
     };
 
-    logout = (req: Request, res: Response, next: NextFunction): void => {
+    logout = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -31,33 +34,33 @@ export class AuthController extends BaseController {
         });
     };
 
-    accountActivation = (req: Request, res: Response, next: NextFunction): void => {
+    accountActivation = (req: ValidatedRequest<AccountActivationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { token } = req.body;
+            const { token } = req.validated.body;
 
             return await this.authService.accountActivation(token);
         });
     };
 
-    refreshAccessToken = (req: Request, res: Response, next: NextFunction): void => {
+    refreshAccessToken = (req: ValidatedRequest<RefreshTokenValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { refreshToken } = req.cookies;
+            const { refreshToken } = req.validated.cookies;
 
             return await this.authService.refreshAccessToken(refreshToken, res);
         });
     };
 
-    requestPasswordReset = (req: Request, res: Response, next: NextFunction): void => {
+    requestPasswordReset = (req: ValidatedRequest<RequestPasswordResetValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { usernameOrEmail } = req.body;
+            const { usernameOrEmail } = req.validated.body;
 
             return await this.authService.requestPasswordReset(usernameOrEmail);
         });
     };
 
-    handlePasswordRecovery = (req: Request, res: Response, next: NextFunction): void => {
+    handlePasswordRecovery = (req: ValidatedRequest<HandlePasswordRecoveryValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            const { token, password } = req.body;
+            const { token, password } = req.validated.body;
 
             return await this.authService.handlePasswordRecovery(token, password);
         });

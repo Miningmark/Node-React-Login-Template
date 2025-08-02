@@ -1,14 +1,16 @@
 import { z } from "zod/v4";
-import { authorizationBaseValidation, emailBaseValidation, passwordBaseValidation, usernameBaseValidation } from "@/validators/base.validator.js";
+import { authorizationHeader, emailValidation, passwordValidation, usernameValidation } from "@/validators/base.validator.js";
 
+export type RegisterValidation = z.infer<typeof registerSchema>;
 export const registerSchema = z.object({
     body: z.object({
-        username: usernameBaseValidation,
-        email: emailBaseValidation,
-        password: passwordBaseValidation
+        username: usernameValidation,
+        email: emailValidation,
+        password: passwordValidation
     })
 });
 
+export type LoginValidation = z.infer<typeof loginSchema>;
 export const loginSchema = z.object({
     body: z.object({
         username: z.string(),
@@ -16,38 +18,31 @@ export const loginSchema = z.object({
     })
 });
 
-export const logoutSchema = z.object({
-    headers: z.object({
-        authorization: authorizationBaseValidation
-    })
-});
-
+export type AccountActivationValidation = z.infer<typeof accountActivationSchema>;
 export const accountActivationSchema = z.object({
     body: z.object({
         token: z.string().length(64)
     })
 });
 
+export type RefreshTokenValidation = z.infer<typeof refreshTokenSchema>;
 export const refreshTokenSchema = z.object({
-    headers: z.object({
-        cookie: z
-            .string()
-            .min(1, "Kein RefreshToken vorhanden")
-            .refine((val) => val.includes("refreshToken="), { message: "Kein RefreshToken vorhanden" })
+    cookies: z.object({
+        refreshToken: z.string().min(1, "Kein RefreshToken vorhanden")
     })
 });
 
+export type RequestPasswordResetValidation = z.infer<typeof requestPasswordResetSchema>;
 export const requestPasswordResetSchema = z.object({
     body: z.object({
-        usernameOrEmail: z
-            .string()
-            .refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!")
+        usernameOrEmail: z.string().refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!")
     })
 });
 
+export type HandlePasswordRecoveryValidation = z.infer<typeof handlePasswordRecoverySchema>;
 export const handlePasswordRecoverySchema = z.object({
     body: z.object({
         token: z.string().length(64),
-        password: passwordBaseValidation
+        password: passwordValidation
     })
 });
