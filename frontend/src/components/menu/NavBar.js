@@ -5,6 +5,7 @@ import { ThemeContext } from "contexts/ThemeContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import SideMenuDesktop from "./SideMenuDesktop";
 import { closeSocket } from "util/socket";
+import ShowAllUserNotifications from "components/util/ShowAllUserNotifications";
 
 import "./navBar.css";
 
@@ -13,6 +14,7 @@ import SideMenuMobile from "./SideMenuMobile";
 //Zustand Store
 import { useSettingsStore } from "hook/store/settingsStore";
 
+//Icons
 import { ReactComponent as MenuIcon } from "assets/icons/menu.svg";
 import { ReactComponent as UserDefaultIcon } from "assets/icons/account_circle.svg";
 
@@ -22,6 +24,8 @@ export default function NavBar({ children }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
+
+  const [showAllNotificationsModal, setShowAllNotificationsModal] = useState(false);
 
   const { accessToken, username, logout, avatar } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
@@ -189,6 +193,14 @@ export default function NavBar({ children }) {
                 </li>
                 <li>
                   <button
+                    className="dropdown-item"
+                    onClick={() => setShowAllNotificationsModal(true)}
+                  >
+                    Benachrichtigungen
+                  </button>
+                </li>
+                <li>
+                  <button
                     className="dropdown-item text-danger"
                     onClick={handleLogout}
                     aria-label="Logout"
@@ -214,6 +226,10 @@ export default function NavBar({ children }) {
 
       {showMobileSideMenu ? (
         <SideMenuMobile handleMobileSideMenuClose={handleMobileSideMenuClose} />
+      ) : null}
+
+      {showAllNotificationsModal ? (
+        <ShowAllUserNotifications handleClose={() => setShowAllNotificationsModal(false)} />
       ) : null}
     </>
   );
