@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import SideMenuDesktop from "./SideMenuDesktop";
+import { closeSocket } from "util/socket";
 
 import "./navBar.css";
 
@@ -58,6 +59,7 @@ export default function NavBar({ children }) {
   async function handleLogout() {
     try {
       await axiosProtected.post("/auth/logout");
+      closeSocket();
       await logout();
       setTimeout(() => {
         navigate("/login");

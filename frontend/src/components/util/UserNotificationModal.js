@@ -68,7 +68,7 @@ export default function UserNotificationModal({ notification, notificationRead }
             {loading ? (
               <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
             ) : (
-              "Schliesen"
+              "Schließen"
             )}
           </Button>
           <Button variant="primary" onClick={handleNotificationRead} disabled={loading}>

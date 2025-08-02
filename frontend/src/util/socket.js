@@ -43,3 +43,11 @@ export function getSocket() {
   }
   return socket;
 }
+
+export function closeSocket() {
+  if (socket) {
+    console.log("Closing socket:", socket.id);
+    socket.disconnect();
+    socket = null;
+  }
+}
