@@ -19,7 +19,7 @@ import Unauthorized from "pages/Unauthorized";
 import { ThemeProvider, ThemeContext } from "contexts/ThemeContext";
 import RequireAuth from "components/RequireAuth";
 import PublicRoute from "components/PublicRoute";
-import { use, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
@@ -78,7 +78,7 @@ function App() {
         setServerSettingsLoaded(1);
       } catch (error) {
         console.error("Fehler beim Laden der Servereinstellungen:", error);
-        setServerSettingsLoaded(-1);
+        setServerSettingsLoaded(1); //TODO: -1
       }
     }
     fetchServerSettings();
@@ -238,7 +238,7 @@ function App() {
             path="/"
             element={
               <PublicRoute>
-                <Login />
+                <Login maintenanceMode={true} registration={true} />
               </PublicRoute>
             }
           />
@@ -246,38 +246,42 @@ function App() {
             path="/login"
             element={
               <PublicRoute>
-                <Login />
+                <Login maintenanceMode={true} registration={true} />
               </PublicRoute>
             }
           />
-          <Route
-            path="/password-reset"
-            element={
-              <PublicRoute>
-                <ResetPassword />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/account-activation"
-            element={
-              <PublicRoute>
-                <AccountActivating />
-              </PublicRoute>
-            }
-          />
+          {serverSettings?.maintenanceMode ? null : (
+            <>
+              <Route
+                path="/password-reset"
+                element={
+                  <PublicRoute>
+                    <ResetPassword />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/account-activation"
+                element={
+                  <PublicRoute>
+                    <AccountActivating />
+                  </PublicRoute>
+                }
+              />
 
-          {/* Nur anzeigen, wenn Registrierung aktiv ist */}
-          {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
-            <Route
-              path="/register"
-              element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              }
-            />
-          ) : null}
+              {/* Nur anzeigen, wenn Registrierung aktiv ist */}
+              {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+                <Route
+                  path="/register"
+                  element={
+                    <PublicRoute>
+                      <Register />
+                    </PublicRoute>
+                  }
+                />
+              ) : null}
+            </>
+          )}
 
           {/* Authentifizierte Routen */}
           <Route

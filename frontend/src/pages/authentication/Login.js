@@ -14,7 +14,7 @@ import Form from "react-bootstrap/Form";
 
 import "components/css/login.css";
 
-function Login() {
+function Login({ maintenanceMode, registration }) {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
@@ -48,9 +48,6 @@ function Login() {
         }
       );
 
-      //console.log("AccessToken:", res.data.accessToken);
-      //console.log("Username:", res.data.username);
-      //console.log("RouteGroups:", res.data.routeGroups);
       login(res.data.accessToken, res.data.username, res.data.routeGroups);
 
       addToast("Login erfolgreich", "success");
@@ -87,7 +84,10 @@ function Login() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className={`flip-container ${isFlipped ? "flipped" : ""}`}>
+      <div
+        className={`flip-container ${isFlipped ? "flipped" : ""}`}
+        style={{ height: `${maintenanceMode ? "390px" : "350px"}` }}
+      >
         <div className="flipper">
           {/* Vorderseite - Login */}
           <div
@@ -98,6 +98,11 @@ function Login() {
               WebkitBackdropFilter: "blur(8px)",
             }}
           >
+            {maintenanceMode && (
+              <div className="alert alert-warning text-center" role="alert">
+                Wartungsmodus aktiv – Nur Admins können sich einloggen.
+              </div>
+            )}
             <h2 className="text-center mb-4">Login</h2>
             <Form onSubmit={handleSubmitLogin}>
               <div className="form-floating mb-3">
@@ -144,26 +149,29 @@ function Login() {
                 </span>
               </div>
 
-              <div className="d-flex mb-3">
-                {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+              {maintenanceMode ? null : (
+                <div className="d-flex mb-3">
+                  {registration ? (
+                    <span
+                      role="button"
+                      className="text-primary text-decoration-underline me-auto"
+                      onClick={() => navigate("/register")}
+                    >
+                      Registrieren
+                    </span>
+                  ) : (
+                    <div className="me-auto" />
+                  )}
                   <span
                     role="button"
-                    className="text-primary text-decoration-underline me-auto"
-                    onClick={() => navigate("/register")}
+                    className="text-primary text-decoration-underline"
+                    onClick={() => setIsFlipped(true)}
                   >
-                    Registrieren
+                    Passwort vergessen
                   </span>
-                ) : (
-                  <div className="me-auto" />
-                )}
-                <span
-                  role="button"
-                  className="text-primary text-decoration-underline"
-                  onClick={() => setIsFlipped(true)}
-                >
-                  Passwort vergessen
-                </span>
-              </div>
+                </div>
+              )}
+
               <div className="d-flex justify-content-center">
                 <Button variant="primary" type="submit">
                   Login
@@ -224,7 +232,7 @@ function Login() {
           textShadow: "1px 1px 2px black",
         }}
       >
-        ABCDEFGHIJKLMN
+        ABCDEFGHIJKLMNOPQRST
       </div>
     </div>
   );
