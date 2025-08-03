@@ -1,5 +1,5 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
-import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
+import { ForbiddenError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import Notification from "@/models/notifications.model.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
@@ -12,6 +12,7 @@ import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { Op } from "@sequelize/core";
 import { NotificationService } from "@/services/notification.service.js";
+import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
@@ -235,6 +236,21 @@ export class AdminPageService {
         await databaseNotification.destroy();
 
         SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:delete", { id: id });
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async updateMaintenanceMode(active: boolean): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Wartungsmodus erfolgreich geändert" };
+
+        const databaseServerSetting = await ServerSettings.findOne({ where: { key: ServerSettingKey.MAINTENANCE_MODE } });
+        if (databaseServerSetting === null) throw new InternalServerError("Server Setting nicht vorhanden");
+
+        databaseServerSetting.value = active;
+        databaseServerSetting.save();
+
+        //TODO: remove accessToken and refreshToken for all Users who has not right routeGroup
+        //TODO: broadcast
 
         return { type: "json", jsonResponse: jsonResponse };
     }

@@ -3,7 +3,7 @@ import { InternalServerError } from "@/errors/errorClasses.js";
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
 import { AfterSync, Attribute, AutoIncrement, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
 
-export enum SettingKey {
+export enum ServerSettingKey {
     MAINTENANCE_MODE = "maintenance_mode",
     ENABLE_REGISTER = "enable_register",
     ENABLE_USERNAME_CHANGE = "enable_username_change"
@@ -20,10 +20,10 @@ class ServerSettings extends Model<InferAttributes<ServerSettings>, InferCreatio
     @NotNull
     declare id: CreationOptional<number>;
 
-    @Attribute(DataTypes.ENUM(...Object.values(SettingKey)))
+    @Attribute(DataTypes.ENUM(...Object.values(ServerSettingKey)))
     @Unique
     @NotNull
-    declare key: SettingKey;
+    declare key: ServerSettingKey;
 
     @Attribute(DataTypes.BOOLEAN)
     @NotNull
@@ -31,7 +31,7 @@ class ServerSettings extends Model<InferAttributes<ServerSettings>, InferCreatio
 
     @AfterSync
     static async ensureGenerateDefaults() {
-        for (const key of Object.values(SettingKey)) {
+        for (const key of Object.values(ServerSettingKey)) {
             const databaseServerSetting = await ServerSettings.findOne({
                 where: { key: key }
             });

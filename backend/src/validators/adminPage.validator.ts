@@ -99,3 +99,11 @@ export const deleteNotificationSchema = z.object({
         id: z.int().positive()
     })
 });
+
+export type UpdateMaintenanceModeValidation = z.infer<typeof updateMaintenanceModeSchema>;
+export const updateMaintenanceModeSchema = z.object({
+    headers: authorizationHeader,
+    body: z.object({
+        active: z.boolean()
+    })
+});
