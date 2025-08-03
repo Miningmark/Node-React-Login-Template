@@ -2,16 +2,12 @@ import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import useRefreshToken from "../hook/useRefreshToken";
-//import useAxiosProtected from "../hook/useAxiosProtected";
-//import { axiosPublic } from "../util/axios";
 
-export default function PublicRoute({ children }) {
+export default function PublicRoute({ children, skipRedirectIfAuthenticated = false }) {
   const { accessToken, setAccessToken } = useContext(AuthContext);
   const refreshAccessToken = useRefreshToken();
-  //const axiosProtected = useAxiosProtected();
 
   async function loadAccessToken() {
-    console.log("loadAccessToken called");
     try {
       const res = await refreshAccessToken();
       if (!res?.data?.accessToken) {
@@ -25,7 +21,7 @@ export default function PublicRoute({ children }) {
     loadAccessToken();
   }
 
-  if (accessToken) {
+  if (accessToken && !skipRedirectIfAuthenticated) {
     // Benutzer ist eingeloggt → Weiterleitung zum Dashboard
     return <Navigate to="/dashboard" replace />;
   }
