@@ -75,7 +75,7 @@ function App() {
     async function fetchServerSettings() {
       try {
         const response = await axiosPublic.get("/server/getSettings");
-        setServerSettings(response.data.serverSettings);
+        setServerSettings(response.data);
         setServerSettingsLoaded(1);
       } catch (error) {
         console.error("Fehler beim Laden der Servereinstellungen:", error);

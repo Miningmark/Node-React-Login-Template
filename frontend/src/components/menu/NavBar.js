@@ -31,7 +31,7 @@ export default function NavBar({ children }) {
 
   const { accessToken, username, logout, avatar } = useContext(AuthContext);
   const axiosProtected = useAxiosProtected();
-  const { theme } = useContext(ThemeContext);
+  const { theme, setTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
   const menuFixed = useSettingsStore((state) => state.menuFixed);
@@ -67,6 +67,7 @@ export default function NavBar({ children }) {
       await axiosProtected.post("/auth/logout");
       closeSocket();
       await logout();
+      setTheme("light");
       setTimeout(() => {
         navigate("/login");
       }, 200);
