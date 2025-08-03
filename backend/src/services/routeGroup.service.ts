@@ -41,6 +41,14 @@ export class RouteGroupService {
         };
     }
 
+    static async generateMaintenanceModeRouteGroup() {
+        let databaseRouteGroup = await RouteGroup.findOne({ where: { name: "maintenanceModeAccess" } });
+
+        if (databaseRouteGroup === null) {
+            databaseRouteGroup = await RouteGroup.create({ name: "maintenanceModeAccess", description: "Hat Zugang wärend sich der Server im Wartungsmodus befindet, bitte mit Vorsicht vergeben" });
+        }
+    }
+
     static async removeUnusedRouteGroups() {
         let lastUpdatedAt = new Date(0);
 
