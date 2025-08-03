@@ -1,8 +1,8 @@
 import { useState, useContext, useEffect } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
+import { AuthContext } from "contexts/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useToast } from "../../components/ToastContext";
-import { axiosPublic } from "../../util/axios";
+import { useToast } from "components/ToastContext";
+import { axiosPublic } from "util/axios";
 import { ThemeContext } from "contexts/ThemeContext";
 
 import { ReactComponent as VisibilityIcon } from "assets/icons/visibility.svg";
