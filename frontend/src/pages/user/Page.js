@@ -15,7 +15,7 @@ import { ReactComponent as VisibilityOffIcon } from "assets/icons/visibility_off
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg", "image/jpe"];
 
-const UserPage = () => {
+const UserPage = ({ usernameChange }) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -482,7 +482,7 @@ const UserPage = () => {
           </div>
 
           {/* Benutzername ändern */}
-          {process.env.REACT_APP_CHANGE_USERNAME_ACTIVE === "true" ? (
+          {usernameChange ? (
             <div className="card  mt-4">
               <div className="card-header fw-bold">Benutzername ändern</div>
               <div className="card-body">

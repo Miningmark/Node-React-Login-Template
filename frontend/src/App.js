@@ -30,6 +30,7 @@ import UserNotificationModal from "components/util/UserNotificationModal";
 import { axiosPublic } from "util/axios";
 import StartLoading from "pages/StartLoading";
 import StartError from "pages/StartError";
+import ChangelogPage from "pages/helpingPages/ChangelogPage";
 
 function AppWrapper() {
   return (
@@ -74,11 +75,11 @@ function App() {
     async function fetchServerSettings() {
       try {
         const response = await axiosPublic.get("/server/getSettings");
-        setServerSettings(response.data.settings);
+        setServerSettings(response.data.serverSettings);
         setServerSettingsLoaded(1);
       } catch (error) {
         console.error("Fehler beim Laden der Servereinstellungen:", error);
-        setServerSettingsLoaded(1); //TODO: -1
+        setServerSettingsLoaded(-1);
       }
     }
     fetchServerSettings();
@@ -238,7 +239,10 @@ function App() {
             path="/"
             element={
               <PublicRoute>
-                <Login maintenanceMode={true} registration={true} />
+                <Login
+                  maintenanceMode={serverSettings.maintenance_mode}
+                  registration={serverSettings.enable_register}
+                />
               </PublicRoute>
             }
           />
@@ -246,7 +250,10 @@ function App() {
             path="/login"
             element={
               <PublicRoute>
-                <Login maintenanceMode={true} registration={true} />
+                <Login
+                  maintenanceMode={serverSettings.maintenance_mode}
+                  registration={serverSettings.enable_register}
+                />
               </PublicRoute>
             }
           />
@@ -270,7 +277,7 @@ function App() {
               />
 
               {/* Nur anzeigen, wenn Registrierung aktiv ist */}
-              {process.env.REACT_APP_REGISTER_ACTIVE === "true" ? (
+              {serverSettings.enable_register ? (
                 <Route
                   path="/register"
                   element={
@@ -289,6 +296,14 @@ function App() {
             element={
               <RequireAuth allowedRouteGroups={[]}>
                 <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/changelog"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <ChangelogPage />
               </RequireAuth>
             }
           />
@@ -346,7 +361,7 @@ function App() {
             path="/user/page"
             element={
               <RequireAuth allowedRouteGroups={[]}>
-                <UserPage />
+                <UserPage usernameChange={serverSettings.enable_username_change} />
               </RequireAuth>
             }
           />

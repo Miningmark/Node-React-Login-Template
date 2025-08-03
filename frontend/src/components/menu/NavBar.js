@@ -17,11 +17,13 @@ import { useSettingsStore } from "hook/store/settingsStore";
 //Icons
 import { ReactComponent as MenuIcon } from "assets/icons/menu.svg";
 import { ReactComponent as UserDefaultIcon } from "assets/icons/account_circle.svg";
+import { ReactComponent as HelpIcon } from "assets/icons/help.svg";
 
 export default function NavBar({ children }) {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
 
   const [showMobileSideMenu, setShowMobileSideMenu] = useState(false);
 
@@ -119,112 +121,204 @@ export default function NavBar({ children }) {
 
           <div></div>
 
-          <div
-            className="dropdown"
-            onMouseEnter={() => setDropdownOpen(true)}
-            onMouseLeave={() => setDropdownOpen(false)}
-            style={{ position: "relative" }}
-          >
-            <button
-              className="btn btn-outline-primary rounded-circle border-0"
-              id="userDropdown"
-              style={{
-                width: "40px",
-                height: "40px",
-                padding: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "20px",
-              }}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              aria-expanded={dropdownOpen}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div
+              className="dropdown"
+              onMouseEnter={() => setHelpDropdownOpen(true)}
+              onMouseLeave={() => setHelpDropdownOpen(false)}
+              style={{ position: "relative" }}
             >
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt="Avatar"
-                  className="rounded-circle"
-                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-                />
-              ) : (
-                <UserDefaultIcon
+              <button
+                className="btn btn-outline-primary rounded-circle border-0"
+                id="userDropdown"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  padding: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "20px",
+                }}
+                onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                aria-expanded={helpDropdownOpen}
+              >
+                <HelpIcon
                   fill={theme === "light" ? "black" : "var(--bs-body-color)"}
                   width={40}
                   height={40}
                   style={{ borderRadius: "50%" }}
                 />
-              )}
-            </button>
+              </button>
 
-            <ul
-              className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
-              style={{
-                right: 0,
-                left: "auto",
-                position: "absolute",
-                marginTop: "0",
-                paddingTop: "10px",
-                backgroundColor: "transparent",
-                border: "none",
-                boxShadow: "none",
-                zIndex: 1000,
-              }}
-              aria-labelledby="userDropdown"
-            >
-              <div
+              <ul
+                className={`dropdown-menu ${helpDropdownOpen ? "show" : ""}`}
                 style={{
-                  backgroundColor: "var(--bs-dropdown-bg)",
-                  border: "1px solid var(--bs-border-color)",
-                  borderRadius: "0.375rem",
-                  boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.1)",
-                  overflow: "hidden",
+                  right: 0,
+                  left: "auto",
+                  position: "absolute",
+                  marginTop: "0",
+                  paddingTop: "10px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  boxShadow: "none",
+                  zIndex: 1000,
                 }}
+                aria-labelledby="userDropdown"
               >
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigate("/user/page");
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    {username ? username : "Benutzer"}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigate("/user/settings");
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    Einstellungen
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      setShowAllNotificationsModal(true);
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    Benachrichtigungen
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item text-danger"
-                    onClick={handleLogout}
-                    aria-label="Logout"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </div>
-            </ul>
+                <div
+                  style={{
+                    backgroundColor: "var(--bs-dropdown-bg)",
+                    border: "1px solid var(--bs-border-color)",
+                    borderRadius: "0.375rem",
+                    boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.1)",
+                    overflow: "hidden",
+                  }}
+                >
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate("/changelog");
+                        setHelpDropdownOpen(false);
+                      }}
+                    >
+                      Changelog
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate("/user/settings");
+                        setHelpDropdownOpen(false);
+                      }}
+                    >
+                      Coming Soon
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setShowAllNotificationsModal(true);
+                        setHelpDropdownOpen(false);
+                      }}
+                    >
+                      Bug Report
+                    </button>
+                  </li>
+                </div>
+              </ul>
+            </div>
+
+            <div
+              className="dropdown"
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+              style={{ position: "relative" }}
+            >
+              <button
+                className="btn btn-outline-primary rounded-circle border-0"
+                id="userDropdown"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  padding: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "20px",
+                }}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                aria-expanded={dropdownOpen}
+              >
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt="Avatar"
+                    className="rounded-circle"
+                    style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+                  />
+                ) : (
+                  <UserDefaultIcon
+                    fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                    width={40}
+                    height={40}
+                    style={{ borderRadius: "50%" }}
+                  />
+                )}
+              </button>
+
+              <ul
+                className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+                style={{
+                  right: 0,
+                  left: "auto",
+                  position: "absolute",
+                  marginTop: "0",
+                  paddingTop: "10px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  boxShadow: "none",
+                  zIndex: 1000,
+                }}
+                aria-labelledby="userDropdown"
+              >
+                <div
+                  style={{
+                    backgroundColor: "var(--bs-dropdown-bg)",
+                    border: "1px solid var(--bs-border-color)",
+                    borderRadius: "0.375rem",
+                    boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.1)",
+                    overflow: "hidden",
+                  }}
+                >
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate("/user/page");
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      {username ? username : "Benutzer"}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate("/user/settings");
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      Einstellungen
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setShowAllNotificationsModal(true);
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      Benachrichtigungen
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item text-danger"
+                      onClick={handleLogout}
+                      aria-label="Logout"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </div>
+              </ul>
+            </div>
           </div>
         </div>
       </nav>
