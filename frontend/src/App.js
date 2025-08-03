@@ -399,7 +399,7 @@ function App() {
           <Route
             path="/admin/maintenance"
             element={
-              <RequireAuth allowedRouteGroups={["adminPageMaintenanceWrite"]}>
+              <RequireAuth allowedRouteGroups={["adminPageMaintenanceModeWrite"]}>
                 <MaintenancePage
                   maintenanceMode={serverSettings.maintenance_mode}
                   toggleMaintenanceMode={toggleMaintenanceMode}

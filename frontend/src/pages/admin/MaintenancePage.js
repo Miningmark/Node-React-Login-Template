@@ -13,8 +13,8 @@ const MaintenancePage = ({ maintenanceMode, toggleMaintenanceMode }) => {
 
   async function handleMaintenanceChange() {
     try {
-      await axiosProtected.post("/admin/maintenance/toggle", {
-        maintenance_mode: !maintenanceMode,
+      await axiosProtected.post("adminPage/updateMaintenanceMode", {
+        active: !maintenanceMode,
       });
       addToast(`Wartungsmodus ${!maintenanceMode ? "aktiviert" : "deaktiviert"}`, "success");
       toggleMaintenanceMode();

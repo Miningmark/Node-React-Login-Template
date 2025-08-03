@@ -30,7 +30,7 @@ const menuItems = [
       {
         name: "Wartung",
         path: "/admin/maintenance",
-        allowedRouteGroups: ["adminPageMaintenanceWrite"],
+        allowedRouteGroups: ["adminPageMaintenanceModeWrite"],
       },
     ],
   },
