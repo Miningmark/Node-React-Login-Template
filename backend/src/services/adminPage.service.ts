@@ -12,7 +12,7 @@ import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { Op } from "@sequelize/core";
 import { NotificationService } from "@/services/notification.service.js";
-import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model";
+import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.js";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;

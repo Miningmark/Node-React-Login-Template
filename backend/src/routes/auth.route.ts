@@ -1,6 +1,6 @@
 import { ENV } from "@/config/env.js";
 import { AuthController } from "@/controllers/auth.controller.js";
-import { checkMaintenanceMode } from "@/middlewares/checkMaintenanceMode.middleware";
+import { checkMaintenanceMode } from "@/middlewares/checkMaintenanceMode.middleware.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { AuthService } from "@/services/auth.service.js";
