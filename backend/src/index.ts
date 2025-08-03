@@ -21,7 +21,7 @@ const io = new Server(httpServer, {
     }
 });
 
-httpServer.listen(ENV.BACKEND_PORT, async () => {
+const init = async () => {
     try {
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
@@ -33,11 +33,14 @@ httpServer.listen(ENV.BACKEND_PORT, async () => {
         await initApp();
 
         await RouteGroupService.removeUnusedRouteGroups();
+        await RouteGroupService.generateMaintenanceModeRouteGroup();
 
         await generateSuperAdmin();
         await generateDevUser();
 
         await scheduleAllCronJobs();
+
+        httpServer.listen(ENV.BACKEND_PORT);
 
         socketService.init(io);
         await socketService.setup();
@@ -45,12 +48,10 @@ httpServer.listen(ENV.BACKEND_PORT, async () => {
         consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
         process.exit(1);
     }
-});
+};
 
 const shutdown = async () => {
     await databaseLogger(ServerLogTypes.WARN, "Server fährt runter", { source: "shutdown" });
-
-    app.disable("connection");
 
     SocketService.getInstance()
         .getIO()
@@ -78,3 +79,5 @@ const shutdown = async () => {
 
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
+
+await init();

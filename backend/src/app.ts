@@ -4,6 +4,7 @@ import { notFoundMiddleware } from "@/middlewares/notFound.middleware.js";
 import { setupSecurityMiddleware } from "@/middlewares/security.middleware.js";
 import adminPageRoutes from "@/routes/adminPage.route.js";
 import authRoutes from "@/routes/auth.route.js";
+import serverRoutes from "@/routes/server.route.js";
 import userRoutes from "@/routes/user.route.js";
 import userManagementRoutes from "@/routes/userManagement.route.js";
 import { ErrorMonitoringService } from "@/services/serverErrorMonitoring.service.js";
@@ -25,6 +26,7 @@ export async function initApp() {
     app.use(express.json());
     app.use(cookieParser());
 
+    app.use("/api/" + ENV.API_VERSION + "/server", serverRoutes);
     app.use("/api/" + ENV.API_VERSION + "/auth", authRoutes);
     app.use("/api/" + ENV.API_VERSION + "/user", userRoutes);
 
