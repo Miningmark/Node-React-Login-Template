@@ -19,7 +19,7 @@ import Unauthorized from "pages/Unauthorized";
 import { ThemeProvider, ThemeContext } from "contexts/ThemeContext";
 import RequireAuth from "components/RequireAuth";
 import PublicRoute from "components/PublicRoute";
-import { useContext, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 
 import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
@@ -27,6 +27,9 @@ import { SocketProvider, SocketContext } from "contexts/SocketProvider";
 //Zustand Store
 import { useSettingsStore } from "hook/store/settingsStore";
 import UserNotificationModal from "components/util/UserNotificationModal";
+import { axiosPublic } from "util/axios";
+import StartLoading from "pages/StartLoading";
+import StartError from "pages/StartError";
 
 function AppWrapper() {
   return (
@@ -54,6 +57,9 @@ function InnerProviders() {
 
 function App() {
   const [notifications, setNotifications] = useState([]);
+  const [serverSettings, setServerSettings] = useState(null);
+  const [serverSettingsLoaded, setServerSettingsLoaded] = useState(0);
+
   const { setUsername, setRouteGroups, username, accessToken, logout, setAvatar } =
     useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
@@ -63,6 +69,20 @@ function App() {
   const axiosProtected = useAxiosProtected();
 
   const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
+
+  useState(() => {
+    async function fetchServerSettings() {
+      try {
+        const response = await axiosPublic.get("/server/getSettings");
+        setServerSettings(response.data.settings);
+        setServerSettingsLoaded(1);
+      } catch (error) {
+        console.error("Fehler beim Laden der Servereinstellungen:", error);
+        setServerSettingsLoaded(-1);
+      }
+    }
+    fetchServerSettings();
+  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -199,6 +219,14 @@ function App() {
 
   function notificationRead(notificationId) {
     setNotifications((prev) => prev.filter((item) => item.id !== notificationId));
+  }
+
+  if (!serverSettings && serverSettingsLoaded === 0) {
+    return <StartLoading />;
+  }
+
+  if (serverSettingsLoaded === -1) {
+    return <StartError />;
   }
 
   return (
