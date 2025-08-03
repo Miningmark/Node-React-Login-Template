@@ -220,6 +220,17 @@ export default function NavBar({ children }) {
                       Impressum
                     </button>
                   </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate("/datenschutz");
+                        setHelpDropdownOpen(false);
+                      }}
+                    >
+                      Datenschutz
+                    </button>
+                  </li>
                 </div>
               </ul>
             </div>

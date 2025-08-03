@@ -35,6 +35,7 @@ import ComingSoonPage from "pages/helpingPages/ComingSoonPage";
 import BugReportPage from "pages/helpingPages/BugReport";
 import Impressum from "pages/helpingPages/Impressum";
 import Datenschutz from "pages/helpingPages/Datenschutz";
+import MaintenancePage from "pages/admin/MaintenancePage";
 
 function AppWrapper() {
   return (
@@ -69,7 +70,7 @@ function App() {
     useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
 
-  const { socket } = useContext(SocketContext);
+  const { socket, closeSocket } = useContext(SocketContext);
   const navigate = useNavigate();
   const axiosProtected = useAxiosProtected();
 
@@ -91,6 +92,14 @@ function App() {
 
   useEffect(() => {
     if (socket) {
+      async function handleLogout() {
+        closeSocket();
+        await logout();
+        setTheme("light");
+        setTimeout(() => {
+          navigate("/login");
+        }, 200);
+      }
       function handleUserUpdate(data) {
         if (Object.prototype.hasOwnProperty.call(data, "username")) {
           setUsername(data.username);
@@ -100,8 +109,7 @@ function App() {
           Object.prototype.hasOwnProperty.call(data, "isActive") ||
           Object.prototype.hasOwnProperty.call(data, "isDisabled")
         ) {
-          logout();
-          navigate("/login");
+          handleLogout();
         } else if (Object.prototype.hasOwnProperty.call(data, "avatar")) {
           setAvatar(null);
         } else {
@@ -224,6 +232,13 @@ function App() {
 
   function notificationRead(notificationId) {
     setNotifications((prev) => prev.filter((item) => item.id !== notificationId));
+  }
+
+  function toggleMaintenanceMode() {
+    setServerSettings((prev) => ({
+      ...prev,
+      maintenance_mode: !prev.maintenance_mode,
+    }));
   }
 
   if (!serverSettings && serverSettingsLoaded === 0) {
@@ -377,6 +392,18 @@ function App() {
                 allowedRouteGroups={["adminPageNotificationsRead", "adminPageNotificationsWrite"]}
               >
                 <UserNotificationsPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/admin/maintenance"
+            element={
+              <RequireAuth allowedRouteGroups={["adminPageMaintenanceModeWrite"]}>
+                <MaintenancePage
+                  maintenanceMode={serverSettings.maintenance_mode}
+                  toggleMaintenanceMode={toggleMaintenanceMode}
+                />
               </RequireAuth>
             }
           />

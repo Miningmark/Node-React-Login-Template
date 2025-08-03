@@ -27,6 +27,11 @@ const menuItems = [
         path: "/admin/user-notifications",
         allowedRouteGroups: [],
       },
+      {
+        name: "Wartung",
+        path: "/admin/maintenance",
+        allowedRouteGroups: ["adminPageMaintenanceModeWrite"],
+      },
     ],
   },
   {
