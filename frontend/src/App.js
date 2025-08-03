@@ -31,6 +31,9 @@ import { axiosPublic } from "util/axios";
 import StartLoading from "pages/StartLoading";
 import StartError from "pages/StartError";
 import ChangelogPage from "pages/helpingPages/ChangelogPage";
+import ComingSoonPage from "pages/helpingPages/ComingSoonPage";
+import BugReportPage from "pages/helpingPages/BugReport";
+import Impressum from "pages/helpingPages/Impressum";
 
 function AppWrapper() {
   return (
@@ -257,6 +260,16 @@ function App() {
               </PublicRoute>
             }
           />
+
+          <Route
+            path="/impressum"
+            element={
+              <PublicRoute skipRedirectIfAuthenticated>
+                <Impressum />
+              </PublicRoute>
+            }
+          />
+
           {serverSettings?.maintenanceMode ? null : (
             <>
               <Route
@@ -299,11 +312,30 @@ function App() {
               </RequireAuth>
             }
           />
+
           <Route
             path="/changelog"
             element={
               <RequireAuth allowedRouteGroups={[]}>
                 <ChangelogPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/coming-soon"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <ComingSoonPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/bug-report"
+            element={
+              <RequireAuth allowedRouteGroups={[]}>
+                <BugReportPage />
               </RequireAuth>
             }
           />

@@ -191,7 +191,7 @@ export default function NavBar({ children }) {
                     <button
                       className="dropdown-item"
                       onClick={() => {
-                        navigate("/user/settings");
+                        navigate("/coming-soon");
                         setHelpDropdownOpen(false);
                       }}
                     >
@@ -202,11 +202,22 @@ export default function NavBar({ children }) {
                     <button
                       className="dropdown-item"
                       onClick={() => {
-                        setShowAllNotificationsModal(true);
+                        navigate("/bug-report");
                         setHelpDropdownOpen(false);
                       }}
                     >
                       Bug Report
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        navigate("/impressum");
+                        setHelpDropdownOpen(false);
+                      }}
+                    >
+                      Impressum
                     </button>
                   </li>
                 </div>
