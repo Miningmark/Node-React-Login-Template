@@ -1,8 +1,11 @@
 import { ENV } from "@/config/env.js";
 import { ControllerResponse } from "@/controllers/base.controller";
 import { ForbiddenError } from "@/errors/forbiddenError.js";
+import { InternalServerError } from "@/errors/internalServerError";
 import { UnauthorizedError } from "@/errors/unauthorizedError.js";
 import { ValidationError } from "@/errors/validationError.js";
+import RouteGroup from "@/models/routeGroup.model";
+import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
@@ -59,6 +62,17 @@ export class AuthService {
 
         const databaseUser = await User.findOne({ where: { username: username } });
         if (databaseUser === null) throw new ValidationError("Benutzername nicht vorhanden");
+
+        const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
+        const databaseServerSetting = await ServerSettings.findOne({ where: { key: ServerSettingKey.MAINTENANCE_MODE } });
+        if (databaseServerSetting === null) throw new InternalServerError("Server Setting nicht vorhanden");
+
+        if (databaseServerSetting.value === true) {
+            console.log(routeGroupsArray);
+            if (!routeGroupsArray.includes("adminPageMaintenanceModeWrite")) {
+                throw new ForbiddenError("Server befindet sich momentan im Wartungsmodus bitte später nochmal versuchen.");
+            }
+        }
         if (databaseUser.isDisabled === true) throw new ForbiddenError("Benutzer ist gesperrt");
         if (databaseUser.isActive === false) throw new ForbiddenError("Benutzer ist noch nicht aktiviert oder vorübergehen deaktiviert");
 
@@ -75,7 +89,6 @@ export class AuthService {
 
         await this.tokenService.removeJWTs(databaseUser);
 
-        const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
         const resultJWTs = await this.tokenService.generateJWTs(databaseUser, routeGroupsArray);
 
         this.tokenService.setRefreshTokenCookie(res, resultJWTs.refreshToken);

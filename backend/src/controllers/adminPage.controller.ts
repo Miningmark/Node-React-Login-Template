@@ -9,6 +9,7 @@ import {
     GetFilteredServerLogValidation,
     GetNotificationsValidation,
     GetServerLogValidation,
+    UpdateMaintenanceModeValidation,
     UpdateNotificationValidation,
     UpdatePermissionValidation
 } from "@/validators/adminPage.validator.js";
@@ -108,6 +109,14 @@ export class AdminPageController extends BaseController {
             const { id } = req.validated.body;
 
             return await this.adminPanelService.deleteNotification(id);
+        });
+    };
+
+    updateMaintenanceMode = (req: ValidatedRequest<UpdateMaintenanceModeValidation>, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { active } = req.validated.body;
+
+            return await this.adminPanelService.updateMaintenanceMode(active);
         });
     };
 }
