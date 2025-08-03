@@ -34,6 +34,7 @@ import ChangelogPage from "pages/helpingPages/ChangelogPage";
 import ComingSoonPage from "pages/helpingPages/ComingSoonPage";
 import BugReportPage from "pages/helpingPages/BugReport";
 import Impressum from "pages/helpingPages/Impressum";
+import Datenschutz from "pages/helpingPages/Datenschutz";
 
 function AppWrapper() {
   return (
@@ -266,6 +267,15 @@ function App() {
             element={
               <PublicRoute skipRedirectIfAuthenticated>
                 <Impressum />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/datenschutz"
+            element={
+              <PublicRoute skipRedirectIfAuthenticated>
+                <Datenschutz />
               </PublicRoute>
             }
           />

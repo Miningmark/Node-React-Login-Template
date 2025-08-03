@@ -226,13 +226,29 @@ function Login({ maintenanceMode, registration }) {
         style={{
           position: "absolute",
           bottom: "20px",
-          left: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
           color: "white",
-          fontWeight: "bold",
+          fontWeight: "500",
           textShadow: "1px 1px 2px black",
+          display: "flex",
+          gap: "1rem",
         }}
       >
-        ABCDEFGHIJKLMNOPQRST
+        <span
+          role="button"
+          className="text-white text-decoration-underline"
+          onClick={() => navigate("/impressum")}
+        >
+          Impressum
+        </span>
+        <span
+          role="button"
+          className="text-white text-decoration-underline"
+          onClick={() => navigate("/datenschutz")}
+        >
+          Datenschutz
+        </span>
       </div>
     </div>
   );

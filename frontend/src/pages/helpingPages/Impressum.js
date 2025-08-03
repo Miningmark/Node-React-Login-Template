@@ -1,7 +1,7 @@
 function Impressum() {
   return (
     <div className="container mt-5 mb-5">
-      <h1 className="text-center">Impressum</h1>
+      <h1 className="text-center mb-5">Impressum</h1>
       <p>Firma/Verein</p>
       <p>Anschrift</p>
       <p>Name</p>

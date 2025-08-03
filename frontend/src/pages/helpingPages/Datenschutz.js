@@ -1,7 +1,7 @@
-function Impressum() {
+function Datenschutz() {
   return (
     <div className="container mt-5 mb-5">
-      <h1 className="text-center">Datenschutzerklärung</h1>
+      <h1 className="text-center mb-5">Datenschutzerklärung</h1>
 
       <h2>Allgemeiner Hinweis und Pflichtinformationen</h2>
       <p>Hier einfügen</p>
@@ -119,4 +119,4 @@ function Impressum() {
   );
 }
 
-export default Impressum;
+export default Datenschutz;

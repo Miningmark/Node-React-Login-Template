@@ -87,6 +87,35 @@ function AccountActivating() {
         {status === "success" && <h4>Account wurde erfolgreich aktiviert! Weiterleitung...</h4>}
         {status === "error" && <h4>Aktivierung fehlgeschlagen</h4>}
       </div>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          color: "white",
+          fontWeight: "500",
+          textShadow: "1px 1px 2px black",
+          display: "flex",
+          gap: "1rem",
+        }}
+      >
+        <span
+          role="button"
+          className="text-white text-decoration-underline"
+          onClick={() => navigate("/impressum")}
+        >
+          Impressum
+        </span>
+        <span
+          role="button"
+          className="text-white text-decoration-underline"
+          onClick={() => navigate("/datenschutz")}
+        >
+          Datenschutz
+        </span>
+      </div>
     </div>
   );
 }
