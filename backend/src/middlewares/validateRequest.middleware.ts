@@ -12,7 +12,8 @@ export const validateRequest = <T extends ZodObject<any>>(schema: T) => {
                 params: req.params,
                 headers: req.headers,
                 cookies: req.cookies,
-                file: req.file
+                file: req.file,
+                files: req.files
             });
 
             req.validated = validatedData;

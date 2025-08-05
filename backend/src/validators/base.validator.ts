@@ -42,15 +42,22 @@ export const onlyAuthorizationSchema = z.object({
     headers: authorizationHeader
 });
 
-export const imageFileValidation = (maxFileSizeInMB: number): z.ZodCustom<Express.Multer.File, Express.Multer.File> => {
+export const singleImageFileValidation = (maxFileSizeInMB: number): z.ZodType<Express.Multer.File> => {
+    return singleFileValidation(maxFileSizeInMB).refine((file) => file.mimetype?.startsWith("image/jpeg") || file.mimetype?.startsWith("image/png") || file.mimetype?.startsWith("image/webp"), {
+        message: "Nur Bilddateien sind erlaubt (.png, .jpeg, .jpg, .jpe, .webp)"
+    });
+};
+
+export const singleFileValidation = (maxFileSizeInMB: number): z.ZodType<Express.Multer.File> => {
     return z
         .custom<Express.Multer.File>((file): file is Express.Multer.File => !!file && typeof file === "object", {
             message: "Datei fehlt oder ungültig"
         })
-        .refine((file) => file.mimetype?.startsWith("image/jpeg") || file.mimetype?.startsWith("image/png") || file.mimetype?.startsWith("image/webp"), {
-            message: "Nur Bilddateien sind erlaubt (.png, .jpeg, .jpg, .jpe, .webp)"
-        })
         .refine((file) => file.size <= maxFileSizeInMB * 1024 * 1024, {
             message: `Bild zu groß (max. ${maxFileSizeInMB}MB)`
         });
+};
+
+export const multipleFilesValidation = (maxFileSizeInMB: number, maxFileCount: number): z.ZodType<Express.Multer.File[]> => {
+    return z.array(singleFileValidation(maxFileSizeInMB)).max(maxFileCount, { message: `Maximal ${maxFileCount} Dateien erlaubt` });
 };

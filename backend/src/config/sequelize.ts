@@ -36,6 +36,8 @@ export const sequelize = new Sequelize({
     port: ENV.DEFAULT_DATABASE_PORT,
     user: ENV.DEFAULT_DATABASE_USERNAME,
     password: ENV.DEFAULT_DATABASE_PASSWORD,
+    charset: "UTF8MB4",
+    collation: "utf8mb4_uca1400_ai_ci",
     pool: {
         max: 5,
         min: 0,
