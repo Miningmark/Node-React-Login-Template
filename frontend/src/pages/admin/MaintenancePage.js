@@ -1,23 +1,36 @@
-import { useState, useEffect, useContext, useMemo, useRef } from "react";
+import { useEffect, useContext } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { Container } from "react-bootstrap";
 import { SocketContext } from "contexts/SocketProvider";
-import { AuthContext } from "contexts/AuthContext";
 
 const MaintenancePage = ({ maintenanceMode, toggleMaintenanceMode }) => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      function handleMaintenanceChange(data) {
+        addToast(`Wartungsmodus ${data.active ? "aktiviert" : "deaktiviert"}`, "success");
+        toggleMaintenanceMode();
+      }
+
+      socket.emit("subscribe:adminPage:maintenanceMode:watchList");
+
+      socket.on("adminPage:maintenanceMode:update", handleMaintenanceChange);
+
+      return () => {
+        socket.off("adminPage:maintenanceMode:update", handleMaintenanceChange);
+      };
+    }
+  }, [socket]);
 
   async function handleMaintenanceChange() {
     try {
       await axiosProtected.post("adminPage/updateMaintenanceMode", {
         active: !maintenanceMode,
       });
-      addToast(`Wartungsmodus ${!maintenanceMode ? "aktiviert" : "deaktiviert"}`, "success");
-      toggleMaintenanceMode();
     } catch (error) {
       addToast(
         error.response?.data?.message || "Fehler beim Speichern der Wartungseinstellungen",
