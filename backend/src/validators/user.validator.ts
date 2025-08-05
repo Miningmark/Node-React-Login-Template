@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { authorizationHeader, emailValidation, imageFileValidation, passwordValidation, usernameValidation } from "@/validators/base.validator.js";
+import { authorizationHeader, emailValidation, singleImageFileValidation, passwordValidation, usernameValidation } from "@/validators/base.validator.js";
 import { UserSettingsTheme } from "@/models/userSettings.model.js";
 
 export type UpdateUsernameValidation = z.infer<typeof updateUsernameSchema>;
@@ -51,5 +51,5 @@ export const confirmPendingNotificationSchema = z.object({
 export type UpdateAvatarValidation = z.infer<typeof updateAvatarSchema>;
 export const updateAvatarSchema = z.object({
     headers: authorizationHeader,
-    file: imageFileValidation(5)
+    file: singleImageFileValidation(5)
 });

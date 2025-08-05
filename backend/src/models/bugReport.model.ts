@@ -2,7 +2,7 @@ import User from "@/models/user.model.js";
 import { BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "@sequelize/core";
 import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
-export enum StatusType {
+export enum BugReportStatusType {
     NEW = "new",
     CONFIRMED = "confirmed",
     IN_PROGRESS = "in_progress",
@@ -26,10 +26,10 @@ class BugReport extends Model<InferAttributes<BugReport>, InferCreationAttribute
     @NotNull
     declare userId: number;
 
-    @Attribute(DataTypes.ENUM(...Object.values(StatusType)))
+    @Attribute(DataTypes.ENUM(...Object.values(BugReportStatusType)))
     @PrimaryKey
     @NotNull
-    declare status: StatusType;
+    declare status: BugReportStatusType;
 
     @Attribute(DataTypes.STRING)
     @NotNull
@@ -38,6 +38,11 @@ class BugReport extends Model<InferAttributes<BugReport>, InferCreationAttribute
     @Attribute(DataTypes.TEXT)
     @NotNull
     declare description: string;
+
+    @Attribute(DataTypes.DATE)
+    @Default(DataTypes.NOW)
+    @NotNull
+    declare createdAt: CreationOptional<Date>;
 
     declare user?: NonAttribute<User>;
 
