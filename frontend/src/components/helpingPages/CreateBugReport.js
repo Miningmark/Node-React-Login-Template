@@ -138,7 +138,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
 
           {!bugReport ? (
             <div className="card">
-              <div className="card-header fw-bold">Bilder hochladen (max. 3)</div>
+              <div className="card-header fw-bold">Dateien hochladen (max. 3)</div>
               <div className="card-body">
                 <label
                   htmlFor="multiUpload"
@@ -152,7 +152,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                     marginBottom: "1rem",
                   }}
                 >
-                  Bilder auswählen
+                  Dateien auswählen
                 </label>
                 <input
                   id="multiUpload"
