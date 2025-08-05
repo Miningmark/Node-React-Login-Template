@@ -51,9 +51,6 @@ const UserPage = ({ usernameChange }) => {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
-  console.log("UserPage rendered");
-  console.log("showCropModal:", showCropModal);
-
   const { addToast } = useToast();
   const { setAccessToken, setUsername, setAvatar, avatar } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
@@ -212,6 +209,7 @@ const UserPage = ({ usernameChange }) => {
       img.onload = () => {
         if (img.width !== img.height) {
           // Bild ist nicht quadratisch – Zuschneide-Modal öffnen
+          setFile(file);
           setImagePreview(reader.result);
           setShowCropModal(true);
         } else {
@@ -231,9 +229,19 @@ const UserPage = ({ usernameChange }) => {
   }
 
   async function handleCropConfirm() {
+    if (!file) {
+      console.error("Kein Originalbild gefunden.");
+      addToast("Fehler: Kein Originalbild vorhanden", "danger");
+      return;
+    }
+
     try {
-      const croppedImage = await getCroppedImg(imagePreview, croppedAreaPixels);
-      const croppedFile = new File([croppedImage], fileName, { type: "image/jpeg" });
+      const croppedBlob = await getCroppedImg(
+        imagePreview,
+        croppedAreaPixels,
+        file.type || "image/png"
+      );
+      const croppedFile = new File([croppedBlob], file.name, { type: file.type });
       setFile(croppedFile);
       setImagePreview(URL.createObjectURL(croppedFile));
       setShowCropModal(false);

@@ -1,4 +1,4 @@
-export default function getCroppedImg(imageSrc, pixelCrop) {
+export default function getCroppedImg(imageSrc, pixelCrop, fileType = "image/png") {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.src = imageSrc;
@@ -26,7 +26,7 @@ export default function getCroppedImg(imageSrc, pixelCrop) {
           return;
         }
         resolve(blob);
-      }, "image/jpeg");
+      }, fileType); // ← hier dynamisch
     };
     image.onerror = () => reject(new Error("Bild konnte nicht geladen werden"));
   });
