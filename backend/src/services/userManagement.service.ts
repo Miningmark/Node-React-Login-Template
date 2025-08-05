@@ -40,7 +40,7 @@ export class UserManagementService {
     }
 
     async getAvatar(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich zurückgegeben" };
         let stream, contentType;
 
         try {
@@ -53,7 +53,7 @@ export class UserManagementService {
     }
 
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich entfernt" };
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich entfernt" };
 
         await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
 

@@ -1,9 +1,8 @@
 import { initApp } from "@/app";
-import { ENV } from "@/config/env.js";
-import { models } from "@/models/index.js";
+import { models } from "@/config/sequelize.js";
 import Sequelize from "@sequelize/core";
 import { SqliteDialect } from "@sequelize/sqlite3";
-import { afterAll, afterEach, beforeAll, beforeEach } from "vitest";
+import { afterAll, beforeAll, beforeEach } from "vitest";
 
 const sequelize = new Sequelize({
     dialect: SqliteDialect,

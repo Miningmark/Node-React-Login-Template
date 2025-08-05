@@ -1,4 +1,4 @@
-import Notification from "@/models/notifications.model.js";
+import Notification from "@/models/notification.model.js";
 
 export class NotificationService {
     constructor() {}
