@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Login from "pages/authentication/Login";
 import Register from "pages/authentication/Register";
 import AccountActivating from "pages/authentication/AccountActivating";
@@ -20,6 +20,7 @@ import { ThemeProvider, ThemeContext } from "contexts/ThemeContext";
 import RequireAuth from "components/RequireAuth";
 import PublicRoute from "components/PublicRoute";
 import { useContext, useEffect, useState } from "react";
+import { closeSocket } from "util/socket";
 
 import useAxiosProtected from "hook/useAxiosProtected";
 import { SocketProvider, SocketContext } from "contexts/SocketProvider";
@@ -70,7 +71,7 @@ function App() {
     useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
 
-  const { socket, closeSocket } = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
   const axiosProtected = useAxiosProtected();
 
@@ -135,7 +136,7 @@ function App() {
         socket.off("global:notifications:update", handleNewUserNotification);
       };
     }
-  }, [socket, setUsername, setRouteGroups, logout, navigate, setAvatar, setTheme, closeSocket]);
+  }, [socket, setUsername, setRouteGroups, logout, navigate, setAvatar, setTheme]);
 
   useEffect(() => {
     if (!accessToken) return;
