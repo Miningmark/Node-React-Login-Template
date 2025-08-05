@@ -1,13 +1,10 @@
 import { ENV } from "@/config/env.js";
 import { ControllerResponse } from "@/controllers/base.controller";
-import { ForbiddenError } from "@/errors/forbiddenError.js";
-import { InternalServerError } from "@/errors/internalServerError";
-import { UnauthorizedError } from "@/errors/unauthorizedError.js";
-import { ValidationError } from "@/errors/validationError.js";
-import RouteGroup from "@/models/routeGroup.model";
-import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model";
+import { ForbiddenError, InternalServerError, UnauthorizedError, ValidationError } from "@/errors/errorClasses.js";
+import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.js";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
+import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
 import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
@@ -69,7 +66,7 @@ export class AuthService {
 
         if (databaseServerSetting.value === true) {
             console.log(routeGroupsArray);
-            if (!routeGroupsArray.includes("adminPageMaintenanceModeWrite")) {
+            if (!routeGroupsArray.includes(AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName)) {
                 throw new ForbiddenError("Server befindet sich momentan im Wartungsmodus bitte später nochmal versuchen.");
             }
         }
