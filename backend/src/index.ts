@@ -9,7 +9,6 @@ import { SocketService } from "@/socketIO/socket.service.js";
 import { generateDevUser, generateSuperAdmin } from "@/utils/superAdmin.util.js";
 import http from "http";
 import { Server } from "socket.io";
-import ServerSettings, { ServerSettingKey } from "./models/serverSettings.model";
 
 const httpServer = http.createServer(app);
 

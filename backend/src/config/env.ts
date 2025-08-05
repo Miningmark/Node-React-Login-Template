@@ -50,4 +50,4 @@ const envSchema = z.object({
     S3_PASSWORD: z.string()
 });
 
-export const ENV = envSchema.parse({ ...process.env, BACKEND_VERSION: "0.0.5_ts" });
+export const ENV = envSchema.parse({ ...process.env, BACKEND_VERSION: "pre-0.1.0_ts" });

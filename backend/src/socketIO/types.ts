@@ -1,5 +1,6 @@
 export interface ServerToClientEvents {
     "user:update": (data: Record<string, any>) => void;
+    "user:logout": (data: Record<string, any>) => void;
 
     "userManagement:users:create": (data: Record<string, any>) => void;
     "userManagement:users:update": (data: Record<string, any>) => void;

@@ -4,15 +4,17 @@ import Notification from "@/models/notifications.model.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
+import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.js";
 import User from "@/models/user.model.js";
 import UserNotification from "@/models/userNotifications.model.js";
+import UserToken, { UserTokenType } from "@/models/userToken.model.js";
+import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
+import { NotificationService } from "@/services/notification.service.js";
 import { PermissionService } from "@/services/permission.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import { Op } from "@sequelize/core";
-import { NotificationService } from "@/services/notification.service.js";
-import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.js";
 
 export class AdminPageService {
     private serverLogService: ServerLogService;
@@ -249,8 +251,31 @@ export class AdminPageService {
         databaseServerSetting.value = active;
         databaseServerSetting.save();
 
-        //TODO: remove accessToken and refreshToken for all Users who has not right routeGroup
-        //TODO: broadcast
+        const databaseUsers = await User.findAll({
+            include: [
+                { model: UserToken, where: { type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN] } } },
+                { model: Permission, include: { model: RouteGroup } }
+            ]
+        });
+
+        databaseUsers.map((databaseUser) => {
+            let shouldLoggout = true;
+            databaseUser.permissions?.map((databaseUserPermissions) => {
+                databaseUserPermissions.routeGroups?.map((databaseUserRouteGroups) => {
+                    if (databaseUserRouteGroups.name === AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName) {
+                        shouldLoggout = false;
+                    }
+                });
+            });
+
+            if (shouldLoggout === true) {
+                SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:logout", {});
+
+                databaseUser.userTokens?.map((databaseUserToken) => {
+                    databaseUserToken.destroy();
+                });
+            }
+        });
 
         return { type: "json", jsonResponse: jsonResponse };
     }
