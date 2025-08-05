@@ -1,15 +1,30 @@
-import { useState, useEffect, useContext, useMemo, useRef } from "react";
+import { useEffect, useContext } from "react";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { Container } from "react-bootstrap";
 import { SocketContext } from "contexts/SocketProvider";
-import { AuthContext } from "contexts/AuthContext";
 
 const MaintenancePage = ({ maintenanceMode, toggleMaintenanceMode }) => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { checkAccess } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      function handleMaintenanceChange(data) {
+        addToast(`Wartungsmodus ${data.active ? "aktiviert" : "deaktiviert"}`, "success");
+        toggleMaintenanceMode(data.active);
+      }
+
+      socket.emit("subscribe:adminPage:maintenanceMode:watchList");
+
+      socket.on("adminPage:maintenanceMode:update", handleMaintenanceChange);
+
+      return () => {
+        socket.off("adminPage:maintenanceMode:update", handleMaintenanceChange);
+      };
+    }
+  }, [socket, maintenanceMode, toggleMaintenanceMode, addToast]);
 
   async function handleMaintenanceChange() {
     try {
