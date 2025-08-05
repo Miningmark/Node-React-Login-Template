@@ -31,8 +31,6 @@ const MaintenancePage = ({ maintenanceMode, toggleMaintenanceMode }) => {
       await axiosProtected.post("adminPage/updateMaintenanceMode", {
         active: !maintenanceMode,
       });
-      //addToast(`Wartungsmodus ${!maintenanceMode ? "aktiviert" : "deaktiviert"}`, "success");
-      //toggleMaintenanceMode();
     } catch (error) {
       addToast(
         error.response?.data?.message || "Fehler beim Speichern der Wartungseinstellungen",

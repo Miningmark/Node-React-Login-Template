@@ -42,7 +42,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
         formData.append("files", file);
       });
 
-      await axiosProtected.post("/adminPage/createNotification", formData, {
+      await axiosProtected.post("/bugReport/createBugReport", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -226,10 +226,13 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                 </div>
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div>{checkAccess(["adminPagePermissionsWrite"]) ? <>Hallo</> : null}</div>
+          )}
 
           {bugReport ? (
             <>
+              <p>{bugReport.status}</p>
               <p>{convertToInputDateTime(bugReport.createdAt)}</p>
             </>
           ) : null}
