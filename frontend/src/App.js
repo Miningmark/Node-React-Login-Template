@@ -93,6 +93,7 @@ function App() {
   useEffect(() => {
     if (socket) {
       async function handleLogout() {
+        console.log("Socket: User logged out, closing socket connection.");
         closeSocket();
         await logout();
         setTheme("light");
@@ -134,7 +135,7 @@ function App() {
         socket.off("global:notifications:update", handleNewUserNotification);
       };
     }
-  }, [socket, setUsername, setRouteGroups, logout, navigate, setAvatar]);
+  }, [socket, setUsername, setRouteGroups, logout, navigate, setAvatar, setTheme, closeSocket]);
 
   useEffect(() => {
     if (!accessToken) return;
