@@ -17,6 +17,8 @@ export interface ServerToClientEvents {
     "adminPage:notifications:update": (data: Record<string, any>) => void;
     "adminPage:notifications:delete": (data: Record<string, any>) => void;
 
+    "adminPage:maintenanceMode:update": (data: Record<string, any>) => void;
+
     "global:notifications:create": (data: Record<string, any>) => void;
     "global:notifications:update": (data: Record<string, any>) => void;
 }
@@ -28,4 +30,5 @@ export interface ClientToServerEvents {
     "subscribe:adminPage:serverLogs:watchList": (data: Record<string, any>) => void;
     "subscribe:adminPage:permissions:watchList": (data: Record<string, any>) => void;
     "subscribe:adminPage:notifications:watchList": (data: Record<string, any>) => void;
+    "subscribe:adminPage:maintenanceMode:watchList": (data: Record<string, any>) => void;
 }

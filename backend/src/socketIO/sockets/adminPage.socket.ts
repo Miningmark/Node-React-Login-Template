@@ -21,4 +21,10 @@ export default (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>)
             socket.join("listen:adminPage:notifications:watchList");
         }
     });
+
+    socket.on("subscribe:adminPage:maintenanceMode:watchList", () => {
+        if (socket.routeGroups.some((routeGroup) => [AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName].includes(routeGroup))) {
+            socket.join("listen:adminPage:maintenanceMode:watchList");
+        }
+    });
 };
