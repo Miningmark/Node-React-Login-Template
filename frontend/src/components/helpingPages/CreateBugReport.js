@@ -11,7 +11,7 @@ const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
 
 const CreateBugReport = ({ show, handleClose, bugReport }) => {
-  const [title, setTitle] = useState(bugReport ? bugReport.title : "");
+  const [name, setName] = useState(bugReport ? bugReport.name : "");
   const [description, setDescription] = useState(bugReport ? bugReport.description : "");
 
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -27,7 +27,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const { checkAccess } = useContext(AuthContext);
 
   const closeModal = () => {
-    setTitle("");
+    setName("");
     setDescription("");
     handleClose();
   };
@@ -36,7 +36,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
     setIsSaving(true);
     try {
       const formData = new FormData();
-      formData.append("title", title);
+      formData.append("name", name);
       formData.append("description", description);
       selectedFiles.forEach((file, index) => {
         formData.append("files", file);
@@ -105,11 +105,11 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
           <div className="form-floating mb-3">
             <input
               type="text"
-              className={`form-control ${touched.title && !title ? "is-invalid" : ""}`}
+              className={`form-control ${touched.title && !name ? "is-invalid" : ""}`}
               id="floatingTitle"
               placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               onBlur={() => setTouched((prev) => ({ ...prev, title: true }))}
               name="title"
               disabled={!isEditing}
