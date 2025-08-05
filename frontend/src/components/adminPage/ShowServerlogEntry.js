@@ -86,7 +86,7 @@ const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
             <p>
               <strong>Error Stack:</strong>
             </p>
-            <pre className="bg-light p-2 rounded border">{serverLogEntry.errorStack}</pre>
+            {renderJsonIfPossible(serverLogEntry.errorStack)}
           </>
         )}
       </Modal.Body>

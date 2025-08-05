@@ -100,6 +100,7 @@ function App() {
           navigate("/login");
         }, 200);
       }
+
       function handleUserUpdate(data) {
         if (Object.prototype.hasOwnProperty.call(data, "username")) {
           setUsername(data.username);
@@ -122,11 +123,13 @@ function App() {
       }
 
       socket.on("user:update", handleUserUpdate);
+      socket.on("user:logout", handleLogout);
       socket.on("global:notifications:create", handleNewUserNotification);
       socket.on("global:notifications:update", handleNewUserNotification);
 
       return () => {
         socket.off("user:update", handleUserUpdate);
+        socket.off("user:logout", handleLogout);
         socket.off("global:notifications:create", handleNewUserNotification);
         socket.off("global:notifications:update", handleNewUserNotification);
       };
