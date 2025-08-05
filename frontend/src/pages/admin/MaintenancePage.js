@@ -13,7 +13,7 @@ const MaintenancePage = ({ maintenanceMode, toggleMaintenanceMode }) => {
     if (socket) {
       function handleMaintenanceChange(data) {
         addToast(`Wartungsmodus ${data.active ? "aktiviert" : "deaktiviert"}`, "success");
-        toggleMaintenanceMode(data.active);
+        toggleMaintenanceMode();
       }
 
       socket.emit("subscribe:adminPage:maintenanceMode:watchList");
@@ -24,15 +24,15 @@ const MaintenancePage = ({ maintenanceMode, toggleMaintenanceMode }) => {
         socket.off("adminPage:maintenanceMode:update", handleMaintenanceChange);
       };
     }
-  }, [socket, maintenanceMode, toggleMaintenanceMode, addToast]);
+  }, [socket]);
 
   async function handleMaintenanceChange() {
     try {
       await axiosProtected.post("adminPage/updateMaintenanceMode", {
         active: !maintenanceMode,
       });
-      addToast(`Wartungsmodus ${!maintenanceMode ? "aktiviert" : "deaktiviert"}`, "success");
-      toggleMaintenanceMode();
+      //addToast(`Wartungsmodus ${!maintenanceMode ? "aktiviert" : "deaktiviert"}`, "success");
+      //toggleMaintenanceMode();
     } catch (error) {
       addToast(
         error.response?.data?.message || "Fehler beim Speichern der Wartungseinstellungen",
