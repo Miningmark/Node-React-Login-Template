@@ -251,31 +251,35 @@ export class AdminPageService {
         databaseServerSetting.value = active;
         databaseServerSetting.save();
 
-        const databaseUsers = await User.findAll({
-            include: [
-                { model: UserToken, where: { type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN] } } },
-                { model: Permission, include: { model: RouteGroup } }
-            ]
-        });
+        SocketService.getInstance().emitToRoom("listen:adminPage:maintenanceMode:watchList", "adminPage:maintenanceMode:update", { active: active });
 
-        databaseUsers.map((databaseUser) => {
-            let shouldLoggout = true;
-            databaseUser.permissions?.map((databaseUserPermissions) => {
-                databaseUserPermissions.routeGroups?.map((databaseUserRouteGroups) => {
-                    if (databaseUserRouteGroups.name === AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName) {
-                        shouldLoggout = false;
-                    }
-                });
+        if (active === true) {
+            const databaseUsers = await User.findAll({
+                include: [
+                    { model: UserToken, where: { type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN] } } },
+                    { model: Permission, include: { model: RouteGroup } }
+                ]
             });
 
-            if (shouldLoggout === true) {
-                SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:logout", {});
-
-                databaseUser.userTokens?.map((databaseUserToken) => {
-                    databaseUserToken.destroy();
+            databaseUsers.map((databaseUser) => {
+                let shouldLoggout = true;
+                databaseUser.permissions?.map((databaseUserPermissions) => {
+                    databaseUserPermissions.routeGroups?.map((databaseUserRouteGroups) => {
+                        if (databaseUserRouteGroups.name === AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName) {
+                            shouldLoggout = false;
+                        }
+                    });
                 });
-            }
-        });
+
+                if (shouldLoggout === true) {
+                    SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:logout", {});
+
+                    databaseUser.userTokens?.map((databaseUserToken) => {
+                        databaseUserToken.destroy();
+                    });
+                }
+            });
+        }
 
         return { type: "json", jsonResponse: jsonResponse };
     }
