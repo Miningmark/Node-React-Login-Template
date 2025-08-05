@@ -1,7 +1,33 @@
 import { ENV } from "@/config/env.js";
-import { models } from "@/models/index.js";
 import Sequelize from "@sequelize/core";
 import { MariaDbDialect } from "@sequelize/mariadb";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const modelsDir = path.join(__dirname, "../models");
+
+async function loadModels() {
+    const modelFiles = await fs.readdir(modelsDir);
+    const models = [];
+
+    for (const file of modelFiles) {
+        if (!(file.endsWith(".model.ts") || file.endsWith(".model.js"))) continue;
+
+        const modelPath = pathToFileURL(path.join(modelsDir, file)).href;
+        const modelModule = await import(modelPath);
+
+        if (modelModule.default) {
+            models.push(modelModule.default);
+        }
+    }
+
+    return models;
+}
+
+export const models = await loadModels();
 
 export const sequelize = new Sequelize({
     dialect: MariaDbDialect,

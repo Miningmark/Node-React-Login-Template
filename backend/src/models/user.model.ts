@@ -1,9 +1,10 @@
+import BugReport from "@/models/bugReport.model.js";
 import LastLogin from "@/models/lastLogin.model.js";
-import Notification from "@/models/notifications.model.js";
+import Notification from "@/models/notification.model.js";
 import Permission from "@/models/permission.model.js";
 import ServerLog from "@/models/serverLog.model.js";
-import UserNotification from "@/models/userNotifications.model.js";
-import UserNotifications from "@/models/userNotifications.model.js";
+import { default as UserNotification, default as UserNotifications } from "@/models/userNotifications.model.js";
+import UserPermission from "@/models/userPermission.model.js";
 import UserSettings from "@/models/userSettings.model.js";
 import UserToken from "@/models/userToken.model.js";
 import {
@@ -123,7 +124,21 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasServerLogs: HasManyHasAssociationsMixin<ServerLog, number>;
     declare countServerLogs: HasManyCountAssociationsMixin<ServerLog>;
 
-    @BelongsToMany(() => Permission, { through: { model: "user_permissions", timestamps: false }, foreignKey: "userId", otherKey: "permissionId", inverse: { as: "users" } })
+    @HasMany(() => BugReport, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    declare bugReports?: NonAttribute<BugReport[]>;
+
+    declare getBugReports: HasManyGetAssociationsMixin<BugReport>;
+    declare setBugReports: HasManySetAssociationsMixin<BugReport, number>;
+    declare addUBugReport: HasManyAddAssociationMixin<BugReport, number>;
+    declare addBugReports: HasManyAddAssociationsMixin<BugReport, number>;
+    declare removeBugReport: HasManyRemoveAssociationMixin<BugReport, number>;
+    declare removeBugReports: HasManyRemoveAssociationsMixin<BugReport, number>;
+    declare createBugReport: HasManyCreateAssociationMixin<BugReport>;
+    declare hasBugReport: HasManyHasAssociationMixin<BugReport, number>;
+    declare hasBugReports: HasManyHasAssociationsMixin<BugReport, number>;
+    declare countBugReports: HasManyCountAssociationsMixin<BugReport>;
+
+    @BelongsToMany(() => Permission, { through: { model: UserPermission }, foreignKey: "userId", otherKey: "permissionId", inverse: { as: "users" } })
     declare permissions?: NonAttribute<Permission[]>;
 
     declare getPermissions: BelongsToManyGetAssociationsMixin<Permission>;

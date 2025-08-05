@@ -17,7 +17,7 @@ import { OnlyAuthorizationValidation } from "@/validators/base.validator.js";
 import { NextFunction, Response } from "express";
 
 export class AdminPageController extends BaseController {
-    constructor(private adminPanelService: AdminPageService) {
+    constructor(private adminPageService: AdminPageService) {
         super();
     }
 
@@ -25,7 +25,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
-            return await this.adminPanelService.getServerLogs(limit, offset);
+            return await this.adminPageService.getServerLogs(limit, offset);
         });
     };
 
@@ -34,25 +34,25 @@ export class AdminPageController extends BaseController {
             const { limit, offset } = req.validated.params;
             const { userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString } = req.validated.body;
 
-            return await this.adminPanelService.getFilteredServerLogs(limit, offset, userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString);
+            return await this.adminPageService.getFilteredServerLogs(limit, offset, userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString);
         });
     };
 
     getFilterOptionsServerLog = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.adminPanelService.getFilterOptionsServerLog();
+            return await this.adminPageService.getFilterOptionsServerLog();
         });
     };
 
     getPermissionsWithRouteGroups = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.adminPanelService.getPermissionsWithRouteGroups();
+            return await this.adminPageService.getPermissionsWithRouteGroups();
         });
     };
 
     getRouteGroups = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
-            return await this.adminPanelService.getRouteGroups();
+            return await this.adminPageService.getRouteGroups();
         });
     };
 
@@ -60,7 +60,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { name, routeGroupIds, description } = req.validated.body;
 
-            return await this.adminPanelService.createPermission(name, routeGroupIds, description);
+            return await this.adminPageService.createPermission(name, routeGroupIds, description);
         });
     };
 
@@ -68,7 +68,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { id, name, description, routeGroupIds } = req.validated.body;
 
-            return await this.adminPanelService.updatePermission(id, name, description, routeGroupIds);
+            return await this.adminPageService.updatePermission(id, name, description, routeGroupIds);
         });
     };
 
@@ -76,7 +76,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { id } = req.validated.body;
 
-            return await this.adminPanelService.deletePermission(id);
+            return await this.adminPageService.deletePermission(id);
         });
     };
 
@@ -84,7 +84,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
-            return await this.adminPanelService.getNotifications(limit, offset);
+            return await this.adminPageService.getNotifications(limit, offset);
         });
     };
 
@@ -92,7 +92,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { name, description, notifyFrom, notifyTo } = req.validated.body;
 
-            return await this.adminPanelService.createNotification(name, description, notifyFrom, notifyTo);
+            return await this.adminPageService.createNotification(name, description, notifyFrom, notifyTo);
         });
     };
 
@@ -100,7 +100,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { id, resendNotification, name, description, notifyFrom, notifyTo } = req.validated.body;
 
-            return await this.adminPanelService.updateNotification(id, resendNotification, name, description, notifyFrom, notifyTo);
+            return await this.adminPageService.updateNotification(id, resendNotification, name, description, notifyFrom, notifyTo);
         });
     };
 
@@ -108,7 +108,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { id } = req.validated.body;
 
-            return await this.adminPanelService.deleteNotification(id);
+            return await this.adminPageService.deleteNotification(id);
         });
     };
 
@@ -116,7 +116,7 @@ export class AdminPageController extends BaseController {
         this.handleRequest(req, res, next, async () => {
             const { active } = req.validated.body;
 
-            return await this.adminPanelService.updateMaintenanceMode(active);
+            return await this.adminPageService.updateMaintenanceMode(active);
         });
     };
 }

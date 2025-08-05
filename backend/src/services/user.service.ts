@@ -1,7 +1,7 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import LastLogin from "@/models/lastLogin.model.js";
-import Notification from "@/models/notifications.model.js";
+import Notification from "@/models/notification.model.js";
 import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
 import UserNotification from "@/models/userNotifications.model.js";
@@ -181,7 +181,7 @@ export class UserService {
     }
 
     async getSettings(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich zurückgegeben" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
@@ -200,7 +200,7 @@ export class UserService {
     }
 
     async getPendingNotifications(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Events erfolreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Events erfolgreich zurückgegeben" };
 
         const databasePendingNotifications = await UserNotification.findAll({
             where: {
@@ -222,7 +222,7 @@ export class UserService {
     }
 
     async getActiveNotifications(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Events erfolreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Events erfolgreich zurückgegeben" };
 
         const databasePendingNotifications = await UserNotification.findAll({
             where: {
@@ -243,7 +243,7 @@ export class UserService {
     }
 
     async getAvatar(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich zurückgegeben" };
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich zurückgegeben" };
         let stream, contentType;
 
         try {
@@ -256,7 +256,7 @@ export class UserService {
     }
 
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Profilbild erfolreich entfernt" };
+        let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich entfernt" };
 
         await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
 

@@ -1,6 +1,6 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
-import Notification from "@/models/notifications.model.js";
+import Notification from "@/models/notification.model.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";

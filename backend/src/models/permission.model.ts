@@ -1,3 +1,5 @@
+import PermissionRouteGroup from "@/models/permissionRouteGroup.model.js";
+import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
 import {
     BelongsToManyAddAssociationMixin,
@@ -18,7 +20,6 @@ import {
     NonAttribute
 } from "@sequelize/core";
 import { Attribute, AutoIncrement, BelongsToMany, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
-import RouteGroup from "./routeGroup.model.js";
 
 @Table({
     tableName: "permissions",
@@ -53,7 +54,7 @@ class Permission extends Model<InferAttributes<Permission>, InferCreationAttribu
     declare countUsers: BelongsToManyCountAssociationsMixin<User>;
 
     @BelongsToMany(() => RouteGroup, {
-        through: { model: "permission_route_groups", timestamps: false },
+        through: { model: PermissionRouteGroup },
         foreignKey: "permissionId",
         otherKey: "routeGroupId",
         inverse: { as: "permissions" }
