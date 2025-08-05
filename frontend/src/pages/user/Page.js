@@ -89,9 +89,7 @@ const UserPage = ({ usernameChange }) => {
         });
         setLogins(response.data.lastLogins);
       } catch (error) {
-        if (error.name === "CanceledError") {
-          console.log("Login-Fetch abgebrochen");
-        } else {
+        if (error.name !== "CanceledError") {
           addToast("Fehler beim Laden der letzten Logins", "danger");
         }
       } finally {
@@ -230,8 +228,7 @@ const UserPage = ({ usernameChange }) => {
 
   async function handleCropConfirm() {
     if (!file) {
-      console.error("Kein Originalbild gefunden.");
-      addToast("Fehler: Kein Originalbild vorhanden", "danger");
+      addToast("Fehler bitte versuche es erneut.", "danger");
       return;
     }
 
@@ -245,8 +242,7 @@ const UserPage = ({ usernameChange }) => {
       setFile(croppedFile);
       setImagePreview(URL.createObjectURL(croppedFile));
       setShowCropModal(false);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
       addToast("Fehler beim Zuschneiden des Bildes", "danger");
     }
   }
@@ -266,6 +262,9 @@ const UserPage = ({ usernameChange }) => {
       setImagePreview(null);
       setFileName("");
       setFile(null);
+      setCroppedAreaPixels(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
     } catch (error) {
       addToast(error.response?.data?.message || "Profilbild-Änderung fehlgeschlagen", "danger");
     } finally {
@@ -284,6 +283,16 @@ const UserPage = ({ usernameChange }) => {
     } finally {
       setLoadingAvatar(false);
     }
+  }
+
+  function handleCloseCropModal() {
+    setShowCropModal(false);
+    setImagePreview(null);
+    setFileName("");
+    setFile(null);
+    setCroppedAreaPixels(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
   }
 
   return (
@@ -715,7 +724,14 @@ const UserPage = ({ usernameChange }) => {
         </div>
       </div>
 
-      <Modal show={showCropModal} onHide={() => setShowCropModal(false)} size="lg" centered>
+      <Modal
+        show={showCropModal}
+        backdrop="static"
+        keyboard={false}
+        onHide={handleCloseCropModal}
+        size="lg"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Profilbild zuschneiden</Modal.Title>
         </Modal.Header>
@@ -731,7 +747,7 @@ const UserPage = ({ usernameChange }) => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-secondary" onClick={() => setShowCropModal(false)}>
+          <button className="btn btn-secondary" onClick={handleCloseCropModal}>
             Abbrechen
           </button>
           <button className="btn btn-primary" onClick={handleCropConfirm}>

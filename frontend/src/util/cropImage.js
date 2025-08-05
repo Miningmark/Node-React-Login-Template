@@ -26,7 +26,7 @@ export default function getCroppedImg(imageSrc, pixelCrop, fileType = "image/png
           return;
         }
         resolve(blob);
-      }, fileType); // ← hier dynamisch
+      }, fileType);
     };
     image.onerror = () => reject(new Error("Bild konnte nicht geladen werden"));
   });
