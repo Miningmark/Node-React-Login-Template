@@ -1,6 +1,6 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
-import BugReport, { BugReportStatusType } from "@/models/bugReport.model";
-import { S3Service } from "./s3.service";
+import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
+import { S3Service } from "@/services/s3.service.js";
 
 export class BugReportService {
     constructor() {}
