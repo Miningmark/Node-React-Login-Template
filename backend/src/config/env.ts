@@ -1,16 +1,17 @@
 import "dotenv/config";
 import { z } from "zod";
 
-const duration = z.string().regex(/^\d+(s|m|h|d)$/, "Use format like '15m', '7d'");
+const durationSchema = z.string().regex(/^\d+(s|m|h|d)$/, "Use format like '15m', '7d'");
+const booleanSchema = z.string().transform((val) => val === "true");
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "production"]).default("development"),
 
-    CONSOLE_LOG_DATABASE_QUERRIES: z.coerce.boolean().default(false),
-    CONSOLE_LOG_ERRORS: z.coerce.boolean().default(true),
+    CONSOLE_LOG_DATABASE_QUERRIES: booleanSchema.default("false"),
+    CONSOLE_LOG_ERRORS: booleanSchema.default("true"),
 
-    ENABLE_REGISTER: z.coerce.boolean().default(false),
-    ENABLE_USERNAME_CHANGE: z.coerce.boolean().default(false),
+    ENABLE_REGISTER: booleanSchema.default("false"),
+    ENABLE_USERNAME_CHANGE: booleanSchema.default("false"),
 
     BACKEND_PORT: z.coerce.number().int().positive().default(3000),
     BACKEND_VERSION: z.string(),
@@ -21,15 +22,15 @@ const envSchema = z.object({
     FRONTEND_NAME: z.string(),
     FRONTEND_URL: z.string().url(),
 
-    ACCOUNT_ACTIVATION_USER_EXPIRY: duration.default("1h"),
-    ACCOUNT_ACTIVATION_ADMIN_EXPIRY: duration.default("5d"),
-    PASSWORD_RESET_EXPIRY: duration.default("1h"),
+    ACCOUNT_ACTIVATION_USER_EXPIRY: durationSchema.default("1h"),
+    ACCOUNT_ACTIVATION_ADMIN_EXPIRY: durationSchema.default("5d"),
+    PASSWORD_RESET_EXPIRY: durationSchema.default("1h"),
 
     ACCESS_TOKEN_SECRET: z.string().min(32, "JWT_ACCESS_SECRET must be at least 32 chars"),
-    ACCESS_TOKEN_EXPIRY: duration.default("15m"),
+    ACCESS_TOKEN_EXPIRY: durationSchema.default("15m"),
 
     REFRESH_TOKEN_SECRET: z.string().min(32, "JWT_REFRESH_SECRET must be at least 32 chars"),
-    REFRESH_TOKEN_EXPIRY: duration.default("1d"),
+    REFRESH_TOKEN_EXPIRY: durationSchema.default("1d"),
 
     CORS_ALLOWED_ORIGINS: z
         .string()
