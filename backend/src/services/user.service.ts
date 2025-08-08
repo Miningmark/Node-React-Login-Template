@@ -34,7 +34,6 @@ export class UserService {
         const databaseUser = await User.findOne({ where: { id: userId } });
         if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        console.log(databaseUser.username);
         if (databaseUser.username.toLowerCase() === "SuperAdmin".toLowerCase()) throw new ValidationError("Du kannst den Benutzernamen vom SuperAdmin nicht ändern");
 
         if (databaseUser.username.toLowerCase() === newUsername.toLowerCase()) throw new ConflictError("Die Benutzername ist der selbe wie momentan verwendet");
