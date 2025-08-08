@@ -4,6 +4,9 @@ import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/socketIO/socket.service.js";
 import winston from "winston";
 
+const REDACT_KEYS = [/authorization/i, /cookie/i, /password/i, /newPassword/i, /currentPassword/i, /email/i, /newEmail/i, /usernameOrEmail/i, /token/i, /secret/i];
+const MAX_LENGTH = 2000;
+
 const serverLogService = new ServerLogService();
 
 export interface DatabaseLoggerOptions {
@@ -38,16 +41,6 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
     try {
         const { userId, url, method, status, ipv4Address, userAgent, requestBody, requestHeaders, response, source, error } = options;
 
-        if (requestBody !== undefined) {
-            let { password, newPassword, currentPassword, email, newEmail, usernameOrEmail } = requestBody;
-            if (password !== undefined) requestBody.password = "*hidden*";
-            if (newPassword !== undefined) requestBody.newPassword = "*hidden*";
-            if (currentPassword !== undefined) requestBody.currentPassword = "*hidden*";
-            if (email !== undefined) requestBody.email = "*hidden*";
-            if (newEmail !== undefined) requestBody.newEmail = "*hidden*";
-            if (usernameOrEmail !== undefined) requestBody.usernameOrEmail = "*hidden*";
-        }
-
         if (ENV.CONSOLE_LOG_ERRORS) {
             if (type === ServerLogTypes.INFO) {
                 consoleLogger.info(message);
@@ -67,9 +60,9 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
             status: status,
             ipv4Address: ipv4Address,
             userAgent: userAgent,
-            requestBody: JSON.stringify(requestBody),
-            requestHeaders: JSON.stringify(requestHeaders),
-            response: JSON.stringify(response),
+            requestBody: JSON.stringify(redactObject(requestBody)),
+            requestHeaders: JSON.stringify(redactObject(requestHeaders)),
+            response: JSON.stringify(redactObject(response)),
             source: source,
             errorStack: error?.stack?.split("\n").slice(1).join("\n")
         });
@@ -78,6 +71,29 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
             SocketService.getInstance().emitToRoom("listen:adminPage:serverLogs:watchList", "adminPage:serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
         } catch (error) {}
     } catch (error) {
-        consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", { error: error instanceof Error ? error.stack : "" });
+        consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", {
+            error: error instanceof Error ? error.stack : ""
+        });
     }
+}
+
+function redactValue(key: string, val: unknown) {
+    if (REDACT_KEYS.some((rx) => rx.test(key))) return "[REDACTED]";
+    if (typeof val === "string" && val.length > MAX_LENGTH) {
+        return val.slice(0, MAX_LENGTH) + "...[truncated]";
+    }
+    return val;
+}
+
+function redactObject(obj?: Record<string, any>) {
+    if (obj === undefined || typeof obj !== "object") return obj;
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(obj)) {
+        if (v && typeof v === "object" && !Array.isArray(v)) {
+            out[k] = redactObject(v as Record<string, any>);
+        } else {
+            out[k] = redactValue(k, v);
+        }
+    }
+    return out;
 }

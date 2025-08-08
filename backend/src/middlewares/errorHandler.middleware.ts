@@ -1,13 +1,17 @@
 import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
-import { AppError, InternalServerError } from "@/errors/errorClasses.js";
+import { AppError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ApiResponse } from "@/utils/apiResponse.util.js";
 import { getIpv4Address } from "@/utils/misc.util.js";
+import { formatZodError } from "@/utils/zod.util.js";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import { ZodError } from "zod/v4";
 
-export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, req: Request, res: Response, next: NextFunction): Promise<void> => {
-    if (!(error instanceof AppError)) {
-        console.log(error);
+export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown, req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (error instanceof ZodError) {
+        error = new ValidationError(formatZodError(error));
+    } else if (!(error instanceof AppError)) {
+        console.error(error);
         error = new InternalServerError();
     }
 
@@ -20,11 +24,14 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: Error, 
         userAgent: req.headers["user-agent"],
         requestBody: req.body,
         requestHeaders: req.headers,
-        response: { message: error.message },
+        response: { message: (error as AppError).message },
         source: "errorHandlerMiddleware",
-        error: error
+        error: error as Error
     };
 
-    await databaseLogger(ServerLogTypes.ERROR, error.message, loggerOptions);
-    ApiResponse.sendError(res, error.message, error instanceof AppError ? error.statusCode : 500);
+    let jsonResponse: Record<string, any> = {};
+    jsonResponse.message = error instanceof ZodError ? formatZodError(error) : (error as AppError).message;
+
+    await databaseLogger(ServerLogTypes.ERROR, jsonResponse.message, loggerOptions);
+    ApiResponse.sendError(res, req, jsonResponse, error instanceof AppError ? error.statusCode : 500);
 };

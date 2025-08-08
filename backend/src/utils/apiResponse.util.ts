@@ -9,20 +9,24 @@ export class ApiResponse {
         const loggerOptions = this.generateLoggerOptions(req, jsonResponse, logResponse, statusCode);
 
         await databaseLogger(ServerLogTypes.INFO, jsonResponse?.message, loggerOptions);
-        res.status(statusCode).json(jsonResponse);
+        return res.status(statusCode).json(jsonResponse);
     }
 
-    static async sendStreamSuccess(res: Response, req: Request, contentType: string, stream: Readable, jsonResponse: Record<string, any>) {
+    static async sendStreamSuccess(res: Response, req: Request, contentType: string, stream: Readable, jsonResponse: Record<string, any> = {}) {
         const loggerOptions = this.generateLoggerOptions(req, jsonResponse);
-
         await databaseLogger(ServerLogTypes.INFO, jsonResponse?.message, loggerOptions);
 
         res.setHeader("Content-Type", contentType);
         stream.pipe(res);
     }
 
-    static sendError(res: Response, errorMessage: string, statusCode: number = 400) {
-        res.status(statusCode).json({ message: errorMessage });
+    static async sendError(res: Response, req: Request, jsonResponse: Record<string, any>, statusCode: number = 500, logResponse: boolean = false) {
+        const loggerOptions = this.generateLoggerOptions(req, jsonResponse, logResponse, statusCode);
+        const level = statusCode >= 500 ? ServerLogTypes.ERROR : statusCode >= 400 ? ServerLogTypes.WARN : ServerLogTypes.INFO;
+
+        await databaseLogger(level, jsonResponse?.message, loggerOptions);
+
+        return res.status(statusCode).json(jsonResponse);
     }
 
     private static generateLoggerOptions(req: Request, jsonResponse: Record<string, any>, logResponse: boolean = true, statusCode: number = 200): DatabaseLoggerOptions {
