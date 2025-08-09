@@ -12,6 +12,8 @@ import { ErrorMonitoringService } from "@/services/serverErrorMonitoring.service
 import cookieParser from "cookie-parser";
 import express from "express";
 import z from "zod/v4";
+import compression from "compression";
+import { compressionMiddleware } from "./middlewares/compression.middleware";
 
 const app = express();
 export default app;
@@ -26,6 +28,8 @@ export async function initApp() {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
     app.use(cookieParser());
+
+    app.use(compressionMiddleware());
 
     app.use("/api/" + ENV.API_VERSION + "/server", serverRoutes);
     app.use("/api/" + ENV.API_VERSION + "/auth", authRoutes);

@@ -33,5 +33,5 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown
     jsonResponse.message = error instanceof ZodError ? formatZodError(error) : (error as AppError).message;
 
     await databaseLogger(ServerLogTypes.ERROR, jsonResponse.message, loggerOptions);
-    ApiResponse.sendError(res, req, jsonResponse, error instanceof AppError ? error.statusCode : 500);
+    ApiResponse.sendError(res, jsonResponse, error instanceof AppError ? error.statusCode : 500);
 };

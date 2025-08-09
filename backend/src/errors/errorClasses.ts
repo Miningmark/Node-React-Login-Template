@@ -6,3 +6,4 @@ export { NotFoundError } from "@/errors/notFoundError.js";
 export { ConflictError } from "@/errors/conflictError.js";
 export { ValidationError } from "@/errors/validationError.js";
 export { InternalServerError } from "@/errors/internalServerError.js";
+export { TooManyRequestsError } from "@/errors/tooManyRequestsError.js";

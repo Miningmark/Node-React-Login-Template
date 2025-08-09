@@ -1,5 +1,6 @@
 import { ENV } from "@/config/env.js";
 import { ForbiddenError } from "@/errors/errorClasses.js";
+import { protectedRateLimiter } from "@/middlewares/rateLimiter.middleware.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -21,10 +22,10 @@ export const verifyAuth = () => {
 
                 next();
             } catch (error) {
-                next(new ForbiddenError("AccessToken konnte nicht verifiziert werden"));
+                throw new ForbiddenError("AccessToken konnte nicht verifiziert werden");
             }
         } catch (error) {
-            next(error);
+            await protectedRateLimiter.consumeOnFail(req, res, next, error);
         }
     };
 };

@@ -17,6 +17,7 @@
         "@sequelize/core": "^7.0.0-alpha.46",
         "@sequelize/mariadb": "^7.0.0-alpha.46",
         "bcrypt": "^6.0.0",
+        "compression": "^1.8.1",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "croner": "^9.1.0",
@@ -26,6 +27,7 @@
         "jsonwebtoken": "^9.0.2",
         "multer": "^2.0.2",
         "nodemailer": "^7.0.3",
+        "rate-limiter-flexible": "^7.2.0",
         "sharp": "^0.34.3",
         "socket.io": "^4.8.1",
         "winston": "^3.17.0",
@@ -34,6 +36,7 @@
     "devDependencies": {
         "@sequelize/sqlite3": "^7.0.0-alpha.46",
         "@types/bcrypt": "^5.0.2",
+        "@types/compression": "^1.8.1",
         "@types/cookie-parser": "^1.4.9",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",

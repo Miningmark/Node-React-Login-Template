@@ -20,12 +20,7 @@ export class ApiResponse {
         stream.pipe(res);
     }
 
-    static async sendError(res: Response, req: Request, jsonResponse: Record<string, any>, statusCode: number = 500, logResponse: boolean = false) {
-        const loggerOptions = this.generateLoggerOptions(req, jsonResponse, logResponse, statusCode);
-        const level = statusCode >= 500 ? ServerLogTypes.ERROR : statusCode >= 400 ? ServerLogTypes.WARN : ServerLogTypes.INFO;
-
-        await databaseLogger(level, jsonResponse?.message, loggerOptions);
-
+    static async sendError(res: Response, jsonResponse: Record<string, any>, statusCode: number = 500) {
         return res.status(statusCode).json(jsonResponse);
     }
 
