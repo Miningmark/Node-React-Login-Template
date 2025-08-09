@@ -19,12 +19,14 @@ export class UserManagementService {
     private routeGroupService: RouteGroupService;
     private tokenService: TokenService;
     private userService: UserService;
+    private s3Service: S3Service;
 
     constructor() {
         this.emailService = EmailService.getInstance();
         this.routeGroupService = new RouteGroupService();
         this.tokenService = new TokenService();
         this.userService = new UserService();
+        this.s3Service = S3Service.getInstance();
     }
 
     async getUsers(limit?: number, offset?: number): Promise<ControllerResponse> {
@@ -44,7 +46,7 @@ export class UserManagementService {
         let stream, contentType;
 
         try {
-            ({ stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`));
+            ({ stream, contentType } = await this.s3Service.getFile("users", `avatars/${userId}-avatar`));
         } catch (error) {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
@@ -55,7 +57,7 @@ export class UserManagementService {
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich entfernt" };
 
-        await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
+        await this.s3Service.deleteFile("users", `avatars/${userId}-avatar`);
 
         SocketService.getInstance().emitToRoom(`listen:user:${userId}`, "user:update", { avatar: null });
 

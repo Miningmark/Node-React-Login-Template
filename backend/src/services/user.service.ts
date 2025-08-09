@@ -21,11 +21,13 @@ export class UserService {
     private tokenService: TokenService;
     private routeGroupService: RouteGroupService;
     private userNotificationService: UserNotificationService;
+    private s3Service: S3Service;
 
     constructor() {
         this.tokenService = new TokenService();
         this.routeGroupService = new RouteGroupService();
         this.userNotificationService = new UserNotificationService();
+        this.s3Service = S3Service.getInstance();
     }
 
     async updateUsername(userId: number, newUsername: string, res: Response): Promise<ControllerResponse> {
@@ -130,9 +132,7 @@ export class UserService {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 
         const webpImageBuffer = await sharp(file.buffer).resize({ width: 512 }).webp({ quality: 80 }).toBuffer();
-
-        await S3Service.getInstance().ensureBucketExists("users");
-        await S3Service.getInstance().uploadFile("users", `avatars/${userId}-avatar`, webpImageBuffer, "image/webp");
+        await this.s3Service.uploadFile("users", `${userId}/avatar/filename`, webpImageBuffer, "image/webp");
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: "changed" });
         return { type: "json", jsonResponse: jsonResponse };
@@ -246,7 +246,7 @@ export class UserService {
         let stream, contentType;
 
         try {
-            ({ stream, contentType } = await S3Service.getInstance().getFile("users", `avatars/${userId}-avatar`));
+            ({ stream, contentType } = await this.s3Service.getFile("users", `${userId}/avatar/filename`));
         } catch (error) {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
@@ -257,7 +257,7 @@ export class UserService {
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich entfernt" };
 
-        await S3Service.getInstance().deleteFile("users", `avatars/${userId}-avatar`);
+        await this.s3Service.deleteFile("users", `${userId}/avatar/filename`);
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: null });
         return { type: "json", jsonResponse: jsonResponse };

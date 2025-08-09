@@ -26,7 +26,7 @@ export class S3Service {
         return S3Service.instance;
     }
 
-    async ensureBucketExists(bucket: string): Promise<void> {
+    private async ensureBucketExists(bucket: string): Promise<void> {
         try {
             const headCommand = new HeadBucketCommand({ Bucket: bucket });
             await this.s3Client.send(headCommand);
@@ -48,6 +48,7 @@ export class S3Service {
             ContentType: contentType
         });
 
+        await this.ensureBucketExists(bucket);
         await this.s3Client.send(command);
     }
 

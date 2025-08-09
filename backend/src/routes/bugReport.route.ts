@@ -15,6 +15,8 @@ export default async () => {
     const bugReportService = new BugReportService();
     const bugReportController = new BugReportController(bugReportService);
 
+    //router.get("/getBugReports{/:limit-:offset}", verifyAuth(), validateRequest(getBugReportsSchema), bugReportController.getBugReports);
+
     router.post("/createBugReport", multerInstance.array("files"), verifyAuth(), validateRequest(createBugReportSchema), bugReportController.createBugReport);
 
     return smartRouter.getExpressRouter();
