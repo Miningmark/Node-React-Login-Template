@@ -1,5 +1,3 @@
-import "@/config/container.js";
-
 import app, { initApp } from "@/app.js";
 import { ENV } from "@/config/env.js";
 import { consoleLogger, databaseLogger } from "@/config/logger.js";
