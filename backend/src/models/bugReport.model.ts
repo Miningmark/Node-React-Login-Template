@@ -3,12 +3,12 @@ import { BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, CreationOpt
 import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
 export enum BugReportStatusType {
-    NEW = "new",
-    CONFIRMED = "confirmed",
-    IN_PROGRESS = "in_progress",
-    RESOLVED = "resolved",
-    CLOSED = "closed",
-    REJECTED = "rejected"
+    NEW = "NEW",
+    CONFIRMED = "CONFIRMED",
+    IN_PROGRESS = "IN_PROGRESS",
+    RESOLVED = "RESOLVED",
+    CLOSED = "CLOSED",
+    REJECTED = "REJECTED"
 }
 
 @Table({
