@@ -1,3 +1,4 @@
+import { BugReportStatusType } from "@/models/bugReport.model.js";
 import { authorizationHeader, limitAndOffsetParams, multipleFilesValidation } from "@/validators/base.validator.js";
 import { z } from "zod/v4";
 
@@ -18,7 +19,7 @@ export const getBugReportFileSchema = z.object({
     headers: authorizationHeader,
     body: z.object({
         id: z.int().positive(),
-        fileIndex: z.int().positive().min(1).max(3)
+        fileIndex: z.int().min(1).max(3)
     })
 });
 
@@ -45,4 +46,13 @@ export const createBugReportSchema = z.object({
         "application/vnd.oasis.opendocument.presentation",
         "text/plain"
     ])
+});
+
+export type UpdateBugReportStatusValidation = z.infer<typeof updateBugReportStatusSchema>;
+export const updateBugReportStatusSchema = z.object({
+    headers: authorizationHeader,
+    body: z.object({
+        id: z.int().positive(),
+        status: z.enum(BugReportStatusType)
+    })
 });

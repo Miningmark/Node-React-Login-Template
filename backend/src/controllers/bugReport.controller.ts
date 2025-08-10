@@ -1,7 +1,7 @@
 import { ValidatedRequest } from "@/@types/validation";
 import { BaseController } from "@/controllers/base.controller.js";
 import { BugReportService } from "@/services/bugReport.service.js";
-import { CreateBugReportValidation, GetBugReportFileValidation, GetBugReportsValidation, GetOwnBugReportsValidation } from "@/validators/bugReport.validator.js";
+import { CreateBugReportValidation, GetBugReportFileValidation, GetBugReportsValidation, GetOwnBugReportsValidation, UpdateBugReportStatusValidation } from "@/validators/bugReport.validator.js";
 import { NextFunction, Response } from "express";
 
 export class BugReportController extends BaseController {
@@ -42,6 +42,15 @@ export class BugReportController extends BaseController {
             const files = req.validated.files;
 
             return await this.bugReportService.createBugReport(userId, name, description, files);
+        });
+    };
+
+    updateBugReportStatus = (req: ValidatedRequest<UpdateBugReportStatusValidation>, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId, routeGroups } = req as { userId: number; routeGroups: string[] };
+            const { id, status } = req.validated.body;
+
+            return await this.bugReportService.updateBugReportStatus(userId, routeGroups, id, status);
         });
     };
 }

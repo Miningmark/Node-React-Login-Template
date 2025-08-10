@@ -39,7 +39,7 @@ export class BugReportService {
         const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
-        if (!(databaseBugReport.userId === userId || routeGroups.includes(BugReportRouteGroups.BUG_REPORT_READ.groupName))) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports bearbeiten");
+        if (databaseBugReport.userId !== userId && routeGroups.includes(BugReportRouteGroups.BUG_REPORT_READ.groupName) === false) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports ansehen");
         if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
 
         try {
@@ -71,6 +71,23 @@ export class BugReportService {
         );
 
         databaseBugReport.fileNames = fileNames;
+        await databaseBugReport.save();
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async updateBugReportStatus(userId: number, routeGroups: string[], id: number, status: BugReportStatusType): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Den Status vom BugReport erfolgreich geändert" };
+
+        const databaseBugReport = await BugReport.findOne({ where: { id: id } });
+
+        if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
+        if (databaseBugReport.userId !== userId && routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false)
+            throw new ForbiddenError("Du kannst nur den Status von deinen eigenen BugReports bearbeiten");
+        if (routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false && status !== BugReportStatusType.CLOSED)
+            throw new ForbiddenError("Du kannst deine eigenen BugReports nur auf geschlossen setzen! ");
+
+        databaseBugReport.status = status;
         await databaseBugReport.save();
 
         return { type: "json", jsonResponse: jsonResponse };

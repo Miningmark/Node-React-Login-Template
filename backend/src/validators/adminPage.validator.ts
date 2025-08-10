@@ -1,3 +1,4 @@
+import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { authorizationHeader, isoDateTimeValidation, limitAndOffsetParams } from "@/validators/base.validator.js";
 import { z } from "zod/v4";
 
@@ -13,7 +14,7 @@ export const getFilteredServerLogSchema = z.object({
     params: limitAndOffsetParams,
     body: z.object({
         userIds: z.array(z.int()).optional(),
-        types: z.array(z.string()).optional(),
+        types: z.array(z.enum(ServerLogTypes)).optional(),
         ipv4Address: z.string().optional(),
         createdAtFrom: isoDateTimeValidation.optional(),
         createdAtTo: isoDateTimeValidation.optional(),

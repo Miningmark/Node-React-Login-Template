@@ -1,5 +1,6 @@
 import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
+import { GroupEntry } from "@/routeGroups";
 
 export class RouteGroupService {
     async generateUserRouteGroupArray(databaseUser: User): Promise<string[]> {
@@ -39,6 +40,22 @@ export class RouteGroupService {
             name: name,
             description: description
         };
+    }
+
+    static async registerRouteGroup(groupEntry: GroupEntry) {
+        const [routeGroup, isRouteGroupCreated] = await RouteGroup.findOrCreate({
+            where: { name: groupEntry.groupName },
+            defaults: { name: groupEntry.groupName, description: groupEntry.groupDescription }
+        });
+
+        if (isRouteGroupCreated === false) {
+            if (routeGroup.description !== groupEntry.groupDescription) {
+                routeGroup.description = groupEntry.groupDescription;
+            }
+
+            routeGroup.updatedAt = new Date(Date.now());
+            await routeGroup.save();
+        }
     }
 
     static async removeUnusedRouteGroups() {

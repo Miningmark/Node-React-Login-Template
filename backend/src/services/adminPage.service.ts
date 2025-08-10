@@ -40,7 +40,16 @@ export class AdminPageService {
         return { type: "json", jsonResponse: jsonResponse, logResponse: false };
     }
 
-    async getFilteredServerLogs(limit?: number, offset?: number, userIds?: number[], types?: string[], ipv4Adress?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string): Promise<ControllerResponse> {
+    async getFilteredServerLogs(
+        limit?: number,
+        offset?: number,
+        userIds?: number[],
+        types?: ServerLogTypes[],
+        ipv4Adress?: string,
+        createdAtFrom?: Date,
+        createdAtTo?: Date,
+        searchString?: string
+    ): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten Serverlogs zurück gegeben" };
 
         const buildServerLogQueryConditions = this.serverLogService.buildServerLogQueryConditions(userIds, types, ipv4Adress, createdAtFrom, createdAtTo, searchString);

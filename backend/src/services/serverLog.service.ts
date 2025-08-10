@@ -1,4 +1,4 @@
-import ServerLog from "@/models/serverLog.model.js";
+import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { Op, WhereOptions } from "@sequelize/core";
 
 export class ServerLogService {
@@ -24,7 +24,7 @@ export class ServerLogService {
         });
     }
 
-    buildServerLogQueryConditions(userIds?: number[], types?: string[], ipv4Address?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string) {
+    buildServerLogQueryConditions(userIds?: number[], types?: ServerLogTypes[], ipv4Address?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string) {
         const conditions: WhereOptions[] = [];
 
         if (userIds !== undefined && userIds.length > 0) {
