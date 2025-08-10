@@ -59,14 +59,16 @@ export class BugReportService {
 
         await Promise.all(
             files.map(async (file) => {
-                if (file.mimetype.startsWith("image/")) {
+                /*if (file.mimetype.startsWith("image/")) {
                     const webpImageBuffer = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
                     await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, webpImageBuffer, "image/webp");
                     fileNames.push(path.parse(file.originalname).name);
                 } else {
                     await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
                     fileNames.push(path.parse(file.originalname).name);
-                }
+                }*/
+                await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
+                fileNames.push(path.parse(file.originalname).name);
             })
         );
 

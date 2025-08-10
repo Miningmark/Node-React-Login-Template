@@ -132,6 +132,7 @@ export class UserService {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 
         const webpImageBuffer = await sharp(file.buffer).resize({ width: 512 }).webp({ quality: 80 }).toBuffer();
+        await this.s3Service.ensureBucketExists("users1");
         await this.s3Service.uploadFile("users", `${userId}/avatar`, webpImageBuffer, "image/webp");
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: "changed" });
