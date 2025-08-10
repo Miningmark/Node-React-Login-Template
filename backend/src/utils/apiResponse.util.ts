@@ -12,11 +12,12 @@ export class ApiResponse {
         return res.status(statusCode).json(jsonResponse);
     }
 
-    static async sendStreamSuccess(res: Response, req: Request, contentType: string, stream: Readable, jsonResponse: Record<string, any> = {}) {
+    static async sendStreamSuccess(res: Response, req: Request, contentType: string, stream: Readable, filename: string, jsonResponse: Record<string, any> = {}) {
         const loggerOptions = this.generateLoggerOptions(req, jsonResponse);
         await databaseLogger(ServerLogTypes.INFO, jsonResponse?.message, loggerOptions);
 
         res.setHeader("Content-Type", contentType);
+        res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
         stream.pipe(res);
     }
 

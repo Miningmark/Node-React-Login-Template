@@ -48,7 +48,7 @@ export class BugReportService {
             return { type: "json", jsonResponse: { message: "Es ist keine Datei mit diesen Index vorhanden" }, statusCode: 204 };
         }
 
-        return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
+        return { type: "stream", stream: stream, contentType: contentType, filename: databaseBugReport.fileNames[fileIndex - 1], jsonResponse: jsonResponse };
     }
 
     async createBugReport(userId: number, name: string, description: string, files: Express.Multer.File[]): Promise<ControllerResponse> {

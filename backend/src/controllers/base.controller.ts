@@ -3,7 +3,9 @@ import { ApiResponse } from "@/utils/apiResponse.util.js";
 import { NextFunction, Request, Response } from "express";
 import { Readable } from "stream";
 
-export type ControllerResponse = { type: "json"; jsonResponse: Record<string, any>; statusCode?: number; logResponse?: boolean } | { type: "stream"; stream: Readable; contentType: string; jsonResponse: Record<string, any> };
+export type ControllerResponse =
+    | { type: "json"; jsonResponse: Record<string, any>; statusCode?: number; logResponse?: boolean }
+    | { type: "stream"; stream: Readable; contentType: string; filename: string; jsonResponse: Record<string, any> };
 
 export abstract class BaseController {
     protected async handleRequest(req: Request, res: Response, next: NextFunction, serviceFunction: () => Promise<ControllerResponse>): Promise<void> {
@@ -16,7 +18,7 @@ export abstract class BaseController {
                     break;
 
                 case "stream":
-                    ApiResponse.sendStreamSuccess(res, req, controllerResponse.contentType, controllerResponse.stream, controllerResponse.jsonResponse);
+                    ApiResponse.sendStreamSuccess(res, req, controllerResponse.contentType, controllerResponse.stream, controllerResponse.filename, controllerResponse.jsonResponse);
                     break;
 
                 default:
