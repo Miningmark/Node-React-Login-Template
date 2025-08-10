@@ -26,7 +26,7 @@ export class BugReportService {
         let jsonResponse: Record<string, any> = { message: "BugReports erfolgreich zurückgegeben" };
         const databaseBugReports = await BugReport.findAll({ where: { userId: userId }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
-        jsonResponse.bugReportCount = await BugReport.count();
+        jsonResponse.bugReportCount = await BugReport.count({ where: { userId: userId } });
         jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
 
         return { type: "json", jsonResponse: jsonResponse };
@@ -39,7 +39,7 @@ export class BugReportService {
         const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
-        if (databaseBugReport.userId !== userId || routeGroups.includes(BugReportRouteGroups.BUG_REPORT_READ.groupName) === false) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports bearbeiten");
+        if (!(databaseBugReport.userId === userId || routeGroups.includes(BugReportRouteGroups.BUG_REPORT_READ.groupName))) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports bearbeiten");
         if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
 
         try {
