@@ -28,9 +28,10 @@ export class BugReportController extends BaseController {
 
     getBugReportFile = (req: ValidatedRequest<GetBugReportFileValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
+            const { userId, routeGroups } = req as { userId: number; routeGroups: string[] };
             const { id, fileIndex } = req.validated.body;
 
-            return await this.bugReportService.getBugReportFile(id, fileIndex);
+            return await this.bugReportService.getBugReportFile(userId, routeGroups, id, fileIndex);
         });
     };
 

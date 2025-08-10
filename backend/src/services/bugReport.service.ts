@@ -1,6 +1,7 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
-import { ValidationError } from "@/errors/errorClasses.js";
+import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
+import { BugReportRouteGroups } from "@/routeGroups/bugReport.routeGroup";
 import { S3Service } from "@/services/s3.service.js";
 import path from "path";
 import sharp from "sharp";
@@ -31,13 +32,14 @@ export class BugReportService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async getBugReportFile(id: number, fileIndex: number): Promise<ControllerResponse> {
+    async getBugReportFile(userId: number, routeGroups: string[], id: number, fileIndex: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Datei für BugReport erfolgreich zurückgegeben" };
         let stream, contentType;
 
         const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
+        if (databaseBugReport.userId !== userId || routeGroups.includes(BugReportRouteGroups.BUG_REPORT_READ.groupName) === false) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports bearbeiten");
         if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
 
         try {
