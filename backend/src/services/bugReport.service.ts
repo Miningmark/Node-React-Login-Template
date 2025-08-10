@@ -1,7 +1,7 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
-import { BugReportRouteGroups } from "@/routeGroups/bugReport.routeGroup";
+import { BugReportRouteGroups } from "@/routeGroups/bugReport.routeGroup.js";
 import { S3Service } from "@/services/s3.service.js";
 import path from "path";
 import sharp from "sharp";
