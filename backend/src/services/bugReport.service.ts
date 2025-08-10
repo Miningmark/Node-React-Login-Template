@@ -60,7 +60,7 @@ export class BugReportService {
         await Promise.all(
             files.map(async (file) => {
                 if (file.mimetype.startsWith("image/")) {
-                    const webpImageBuffer = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
+                    const webpImageBuffer = await sharp(file.buffer).resize({ width: 1920, height: 1080, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
                     await this.s3Service.uploadFile("bug-reports", `${databaseBugReport.id}/${path.parse(file.originalname).name}.webp`, webpImageBuffer, "image/webp");
                     fileNames.push(`${path.parse(file.originalname).name}.webp`);
                 } else {
