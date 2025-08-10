@@ -1,5 +1,26 @@
-import { authorizationHeader, multipleFilesValidation } from "@/validators/base.validator.js";
+import { authorizationHeader, limitAndOffsetParams, multipleFilesValidation } from "@/validators/base.validator.js";
 import { z } from "zod/v4";
+
+export type GetBugReportsValidation = z.infer<typeof getBugReportsSchema>;
+export const getBugReportsSchema = z.object({
+    headers: authorizationHeader,
+    params: limitAndOffsetParams
+});
+
+export type GetOwnBugReportsValidation = z.infer<typeof getOwnBugReportsSchema>;
+export const getOwnBugReportsSchema = z.object({
+    headers: authorizationHeader,
+    params: limitAndOffsetParams
+});
+
+export type GetBugReportFileValidation = z.infer<typeof getBugReportFileSchema>;
+export const getBugReportFileSchema = z.object({
+    headers: authorizationHeader,
+    body: z.object({
+        id: z.int().positive(),
+        fileIndex: z.int().positive().min(1).max(3)
+    })
+});
 
 export type CreateBugReportValidation = z.infer<typeof createBugReportSchema>;
 export const createBugReportSchema = z.object({

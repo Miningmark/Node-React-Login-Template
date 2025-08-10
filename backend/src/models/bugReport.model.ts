@@ -39,6 +39,10 @@ class BugReport extends Model<InferAttributes<BugReport>, InferCreationAttribute
     @NotNull
     declare description: string;
 
+    @Attribute(DataTypes.JSON)
+    @Default([])
+    declare fileNames: CreationOptional<string[]>;
+
     @Attribute(DataTypes.DATE)
     @Default(DataTypes.NOW)
     @NotNull

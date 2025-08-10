@@ -132,7 +132,7 @@ export class UserService {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich geändert" };
 
         const webpImageBuffer = await sharp(file.buffer).resize({ width: 512 }).webp({ quality: 80 }).toBuffer();
-        await this.s3Service.uploadFile("users", `${userId}/avatar/filename`, webpImageBuffer, "image/webp");
+        await this.s3Service.uploadFile("users", `${userId}/avatar`, webpImageBuffer, "image/webp");
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: "changed" });
         return { type: "json", jsonResponse: jsonResponse };
@@ -246,7 +246,7 @@ export class UserService {
         let stream, contentType;
 
         try {
-            ({ stream, contentType } = await this.s3Service.getFile("users", `${userId}/avatar/filename`));
+            ({ stream, contentType } = await this.s3Service.getFile("users", `${userId}/avatar`));
         } catch (error) {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
@@ -257,7 +257,7 @@ export class UserService {
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich entfernt" };
 
-        await this.s3Service.deleteFile("users", `${userId}/avatar/filename`);
+        await this.s3Service.deleteFile("users", `${userId}/avatar`);
 
         SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: null });
         return { type: "json", jsonResponse: jsonResponse };

@@ -1,6 +1,9 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
+import { ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
 import { S3Service } from "@/services/s3.service.js";
+import path from "path";
+import sharp from "sharp";
 
 export class BugReportService {
     private s3Service: S3Service;
@@ -8,15 +11,81 @@ export class BugReportService {
         this.s3Service = S3Service.getInstance();
     }
 
+    async getBugReports(limit?: number, offset?: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "BugReports erfolgreich zurückgegeben" };
+        const databaseBugReports = await BugReport.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
+
+        jsonResponse.bugReportCount = await BugReport.count();
+        jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getOwnBugReports(userId: number, limit?: number, offset?: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "BugReports erfolgreich zurückgegeben" };
+        const databaseBugReports = await BugReport.findAll({ where: { userId: userId }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
+
+        jsonResponse.bugReportCount = await BugReport.count();
+        jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getBugReportFile(id: number, fileIndex: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Datei für BugReport erfolgreich zurückgegeben" };
+        let stream, contentType;
+
+        const databaseBugReport = await BugReport.findOne({ where: { userId: id } });
+
+        if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
+        if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
+
+        try {
+            ({ stream, contentType } = await this.s3Service.getFile("bugReports", `${databaseBugReport.id}/${databaseBugReport.fileNames[fileIndex]}`));
+        } catch (error) {
+            return { type: "json", jsonResponse: { message: "Es ist keine Datei mit diesen Index vorhanden" }, statusCode: 204 };
+        }
+
+        return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
+    }
+
     async createBugReport(userId: number, name: string, description: string, files: Express.Multer.File[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "BugReport erfolgreich erstellt" };
 
         const databaseBugReport = await BugReport.create({ userId: userId, name: name, description: description, status: BugReportStatusType.NEW });
+        const fileNames: string[] = [];
 
-        files.forEach(async (file, fileIndex) => {
-            await this.s3Service.uploadFile("users", `${userId}/bugReports/${databaseBugReport.id}/${fileIndex}`, file.buffer, file.mimetype);
+        await Promise.all(
+            files.map(async (file) => {
+                if (file.mimetype.startsWith("image/")) {
+                    const webpImageBuffer = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
+                    await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, webpImageBuffer, "image/webp");
+                    fileNames.push(path.parse(file.originalname).name);
+                } else {
+                    await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
+                    fileNames.push(path.parse(file.originalname).name);
+                }
+            })
+        );
+
+        databaseBugReport.fileNames = fileNames;
+        await databaseBugReport.save();
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    generateJSONResponse(databaseBugReports: BugReport[]): Record<string, any> {
+        return databaseBugReports.map((databaseBugReport) => {
+            return {
+                id: databaseBugReport.id,
+                userId: databaseBugReport.userId,
+                status: databaseBugReport.status,
+                name: databaseBugReport.name,
+                description: databaseBugReport.description,
+                createdAt: databaseBugReport.createdAt,
+                hasFiles: databaseBugReport.fileNames.length === 0 ? false : true,
+                fileCount: databaseBugReport.fileNames.length
+            };
         });
-
-        return { type: "json", jsonResponse: jsonResponse, logResponse: false };
     }
 }
