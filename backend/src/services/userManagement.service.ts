@@ -46,7 +46,7 @@ export class UserManagementService {
         let stream, contentType;
 
         try {
-            ({ stream, contentType } = await this.s3Service.getFile("users", `${userId}/avatar`));
+            ({ stream, contentType } = await this.s3Service.getFile("users", `${userId}/avatar.webp`));
         } catch (error) {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
@@ -57,7 +57,7 @@ export class UserManagementService {
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Profilbild erfolgreich entfernt" };
 
-        await this.s3Service.deleteFile("users", `${userId}/avatar`);
+        await this.s3Service.deleteFile("users", `${userId}/avatar.webp`);
 
         SocketService.getInstance().emitToRoom(`listen:user:${userId}`, "user:update", { avatar: null });
 

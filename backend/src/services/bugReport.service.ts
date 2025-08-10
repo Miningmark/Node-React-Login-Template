@@ -59,11 +59,11 @@ export class BugReportService {
             files.map(async (file) => {
                 if (file.mimetype.startsWith("image/")) {
                     const webpImageBuffer = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
-                    await this.s3Service.uploadFile("bug-reports", `${databaseBugReport.id}/${file.originalname}`, webpImageBuffer, "image/webp");
-                    fileNames.push(path.parse(file.originalname).name);
+                    await this.s3Service.uploadFile("bug-reports", `${databaseBugReport.id}/${path.parse(file.originalname).name}.webp`, webpImageBuffer, "image/webp");
+                    fileNames.push(`${path.parse(file.originalname).name}.webp`);
                 } else {
                     await this.s3Service.uploadFile("bug-reports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
-                    fileNames.push(path.parse(file.originalname).name);
+                    fileNames.push(file.originalname);
                 }
             })
         );
