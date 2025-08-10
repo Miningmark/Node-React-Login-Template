@@ -43,9 +43,8 @@ export class BugReportService {
         if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
 
         try {
-            ({ stream, contentType } = await this.s3Service.getFile("bug-reports", `${databaseBugReport.id}/${databaseBugReport.fileNames[fileIndex]}`));
+            ({ stream, contentType } = await this.s3Service.getFile("bug-reports", `${databaseBugReport.id}/${databaseBugReport.fileNames[fileIndex - 1]}`));
         } catch (error) {
-            console.log(error);
             return { type: "json", jsonResponse: { message: "Es ist keine Datei mit diesen Index vorhanden" }, statusCode: 204 };
         }
 
