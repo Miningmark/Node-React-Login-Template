@@ -18,6 +18,7 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown
             error = new InternalServerError("Fehler mit Dateiannahme");
         }
     } else if (!(error instanceof AppError)) {
+        console.log(error);
         error = new InternalServerError();
     }
 
