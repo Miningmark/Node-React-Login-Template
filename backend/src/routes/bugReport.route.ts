@@ -18,8 +18,9 @@ export default async () => {
 
     smartRouter.get("/getBugReports{/:limit-:offset}", BugReportRouteGroups.BUG_REPORT_READ, verifyAuth(), validateRequest(getBugReportsSchema), bugReportController.getBugReports);
 
-    router.get("/getBugReports{/:limit-:offset}", verifyAuth(), validateRequest(getOwnBugReportsSchema), bugReportController.getOwnBugReports);
-    router.get("/getBugReportFile", verifyAuth(), validateRequest(getBugReportFileSchema), bugReportController.getBugReportFile);
+    router.get("/getOwnBugReports{/:limit-:offset}", verifyAuth(), validateRequest(getOwnBugReportsSchema), bugReportController.getOwnBugReports);
+    router.get("/getBugReportFile", verifyAuth(), validateRequest(getBugReportFileSchema), bugReportController.getBugReportFile); //TODO: Permission
+
     router.post("/createBugReport", multerInstance.array("files"), verifyAuth(), validateRequest(createBugReportSchema), bugReportController.createBugReport);
 
     return smartRouter.getExpressRouter();
