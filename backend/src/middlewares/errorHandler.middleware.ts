@@ -5,13 +5,19 @@ import { ApiResponse } from "@/utils/apiResponse.util.js";
 import { getIpv4Address } from "@/utils/misc.util.js";
 import { formatZodError } from "@/utils/zod.util.js";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import { MulterError } from "multer";
 import { ZodError } from "zod/v4";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown, req: Request, res: Response, next: NextFunction): Promise<void> => {
     if (error instanceof ZodError) {
         error = new ValidationError(formatZodError(error));
+    } else if (error instanceof MulterError) {
+        if (error.code === "LIMIT_UNEXPECTED_FILE" || error.code === "LIMIT_FILE_COUNT" || error.code === "LIMIT_FIELD_COUNT") {
+            error = new ValidationError("Mehr Dateien erhalten als zulässig");
+        } else {
+            error = new InternalServerError("Fehler mit Dateiannahme");
+        }
     } else if (!(error instanceof AppError)) {
-        console.error(error);
         error = new InternalServerError();
     }
 

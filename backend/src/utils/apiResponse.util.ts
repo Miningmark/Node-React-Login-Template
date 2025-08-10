@@ -34,7 +34,7 @@ export class ApiResponse {
             userAgent: req.headers["user-agent"],
             requestBody: req.body,
             requestHeaders: req.headers,
-            response: logResponse ? jsonResponse : { response: "*removed*" },
+            response: logResponse ? jsonResponse : { response: "[REDACTED]" },
             source: "ApiResponse"
         };
     }

@@ -1,5 +1,6 @@
 import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "@/utils/misc.util.js";
 import { z } from "zod/v4";
+import mime from "mime-types";
 
 export const usernameValidation = z
     .string()
@@ -42,22 +43,23 @@ export const onlyAuthorizationSchema = z.object({
     headers: authorizationHeader
 });
 
-export const singleImageFileValidation = (maxFileSizeInMB: number): z.ZodType<Express.Multer.File> => {
-    return singleFileValidation(maxFileSizeInMB).refine((file) => file.mimetype?.startsWith("image/jpeg") || file.mimetype?.startsWith("image/png") || file.mimetype?.startsWith("image/webp"), {
-        message: "Nur Bilddateien sind erlaubt (.png, .jpeg, .jpg, .jpe, .webp)"
-    });
-};
+export const singleFileValidation = (maxFileSizeInMB: number, allowedMimeTypes: string[]): z.ZodType<Express.Multer.File> => {
+    const allowedExts = Array.from(new Set(allowedMimeTypes.flatMap((t) => mime.extensions[t] ?? (mime.extension(t) ? [mime.extension(t)!] : []))))
+        .map((e) => `.${e}`)
+        .sort();
 
-export const singleFileValidation = (maxFileSizeInMB: number): z.ZodType<Express.Multer.File> => {
     return z
         .custom<Express.Multer.File>((file): file is Express.Multer.File => !!file && typeof file === "object", {
             message: "Datei fehlt oder ungültig"
         })
         .refine((file) => file.size <= maxFileSizeInMB * 1024 * 1024, {
             message: `Bild zu groß (max. ${maxFileSizeInMB}MB)`
+        })
+        .refine((file) => !!file.mimetype && allowedMimeTypes.includes(file.mimetype), {
+            message: `Ungültiger Dateityp. Erlaubt: ${allowedExts.join(", ")}`
         });
 };
 
-export const multipleFilesValidation = (maxFileSizeInMB: number, maxFileCount: number): z.ZodType<Express.Multer.File[]> => {
-    return z.array(singleFileValidation(maxFileSizeInMB)).max(maxFileCount, { message: `Maximal ${maxFileCount} Dateien erlaubt` });
+export const multipleFilesValidation = (maxFileSizeInMB: number, maxFileCount: number, allowedMimeTypes: string[]): z.ZodType<Express.Multer.File[]> => {
+    return z.array(singleFileValidation(maxFileSizeInMB, allowedMimeTypes)).max(maxFileCount, { message: `Maximal ${maxFileCount} Dateien erlaubt` });
 };
