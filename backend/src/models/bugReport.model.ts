@@ -27,7 +27,6 @@ class BugReport extends Model<InferAttributes<BugReport>, InferCreationAttribute
     declare userId: number;
 
     @Attribute(DataTypes.ENUM(...Object.values(BugReportStatusType)))
-    @PrimaryKey
     @NotNull
     declare status: BugReportStatusType;
 
