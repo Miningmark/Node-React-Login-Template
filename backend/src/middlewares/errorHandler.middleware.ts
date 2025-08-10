@@ -9,6 +9,7 @@ import { MulterError } from "multer";
 import { ZodError } from "zod/v4";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown, req: Request, res: Response, next: NextFunction): Promise<void> => {
+    console.log(error);
     if (error instanceof ZodError) {
         error = new ValidationError(formatZodError(error));
     } else if (error instanceof MulterError) {
@@ -18,7 +19,6 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown
             error = new InternalServerError("Fehler mit Dateiannahme");
         }
     } else if (!(error instanceof AppError)) {
-        console.log(error);
         error = new InternalServerError();
     }
 
