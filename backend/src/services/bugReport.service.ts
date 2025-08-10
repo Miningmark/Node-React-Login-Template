@@ -87,6 +87,7 @@ export class BugReportService {
         if (routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false && databaseBugReport.status !== BugReportStatusType.NEW && status !== BugReportStatusType.CLOSED)
             throw new ForbiddenError('Du kannst deine eigenen BugReports nur auf geschlossen setzen wenn der Status noch auf "NEU" ist');
 
+        console.log(status);
         databaseBugReport.status = status;
         await databaseBugReport.save();
 
