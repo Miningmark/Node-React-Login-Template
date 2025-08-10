@@ -26,22 +26,15 @@ export class S3Service {
         return S3Service.instance;
     }
 
-    async ensureBucketExists(bucket: string): Promise<void> {
+    private async ensureBucketExists(bucket: string): Promise<void> {
         try {
             const headCommand = new HeadBucketCommand({ Bucket: bucket });
-            console.log("BUCKET2");
             await this.s3Client.send(headCommand);
-            console.log("BUCKET3");
         } catch (error: any) {
-            console.log("BUCKET4");
             if (error.$metadata?.httpStatusCode === 404) {
-                console.log("BUCKET5");
                 const createCommand = new CreateBucketCommand({ Bucket: bucket });
-                console.log("BUCKET6");
                 await this.s3Client.send(createCommand);
-                console.log("BUCKET7");
             } else {
-                console.log("BUCKET8");
                 throw error;
             }
         }
@@ -55,8 +48,7 @@ export class S3Service {
             ContentType: contentType
         });
 
-        console.log("BUCKET1");
-        //await this.ensureBucketExists(bucket);
+        await this.ensureBucketExists(bucket);
         await this.s3Client.send(command);
     }
 

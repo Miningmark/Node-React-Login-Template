@@ -55,26 +55,21 @@ export class BugReportService {
         const databaseBugReport = await BugReport.create({ userId: userId, name: name, description: description, status: BugReportStatusType.NEW });
         const fileNames: string[] = [];
 
-        await this.s3Service.ensureBucketExists("123456");
-        await this.s3Service.ensureBucketExists("bugReports");
-
-        /*await Promise.all(
+        await Promise.all(
             files.map(async (file) => {
-                /*if (file.mimetype.startsWith("image/")) {
+                if (file.mimetype.startsWith("image/")) {
                     const webpImageBuffer = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
-                    await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, webpImageBuffer, "image/webp");
+                    await this.s3Service.uploadFile("bug-reports", `${databaseBugReport.id}/${file.originalname}`, webpImageBuffer, "image/webp");
                     fileNames.push(path.parse(file.originalname).name);
                 } else {
-                    await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
+                    await this.s3Service.uploadFile("bug-reports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
                     fileNames.push(path.parse(file.originalname).name);
-                }*/
-        /*await this.s3Service.uploadFile("bugReports", `${databaseBugReport.id}/${file.originalname}`, file.buffer, file.mimetype);
-                fileNames.push(path.parse(file.originalname).name);
+                }
             })
-        );*/
+        );
 
-        //databaseBugReport.fileNames = fileNames;
-        //await databaseBugReport.save();
+        databaseBugReport.fileNames = fileNames;
+        await databaseBugReport.save();
 
         return { type: "json", jsonResponse: jsonResponse };
     }
