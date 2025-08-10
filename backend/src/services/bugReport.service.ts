@@ -45,6 +45,7 @@ export class BugReportService {
         try {
             ({ stream, contentType } = await this.s3Service.getFile("bug-reports", `${databaseBugReport.id}/${databaseBugReport.fileNames[fileIndex]}`));
         } catch (error) {
+            console.log(error);
             return { type: "json", jsonResponse: { message: "Es ist keine Datei mit diesen Index vorhanden" }, statusCode: 204 };
         }
 
