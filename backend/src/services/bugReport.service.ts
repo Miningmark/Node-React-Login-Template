@@ -35,7 +35,7 @@ export class BugReportService {
         let jsonResponse: Record<string, any> = { message: "Datei für BugReport erfolgreich zurückgegeben" };
         let stream, contentType;
 
-        const databaseBugReport = await BugReport.findOne({ where: { userId: id } });
+        const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
         if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
