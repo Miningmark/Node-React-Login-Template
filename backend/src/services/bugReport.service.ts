@@ -55,6 +55,8 @@ export class BugReportService {
         const databaseBugReport = await BugReport.create({ userId: userId, name: name, description: description, status: BugReportStatusType.NEW });
         const fileNames: string[] = [];
 
+        await this.s3Service.ensureBucketExists("bugReports");
+
         await Promise.all(
             files.map(async (file) => {
                 if (file.mimetype.startsWith("image/")) {
