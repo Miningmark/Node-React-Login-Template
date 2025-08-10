@@ -84,8 +84,8 @@ export class BugReportService {
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
         if (databaseBugReport.userId !== userId && routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false)
             throw new ForbiddenError("Du kannst nur den Status von deinen eigenen BugReports bearbeiten");
-        if (routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false && databaseBugReport.status !== BugReportStatusType.NEW && status !== BugReportStatusType.CLOSED)
-            throw new ForbiddenError('Du kannst deine eigenen BugReports nur auf geschlossen setzen wenn der Status noch auf "NEU" ist');
+        if (routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false && (databaseBugReport.status !== BugReportStatusType.NEW || status !== BugReportStatusType.CLOSED))
+            throw new ForbiddenError('Du kannst deine eigenen BugReports nur auf "GESCHLOSSEN" setzen wenn der Status noch auf "NEU" ist');
 
         databaseBugReport.status = status;
         await databaseBugReport.save();
