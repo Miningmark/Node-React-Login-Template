@@ -51,7 +51,7 @@ export class UserManagementService {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
 
-        return { type: "stream", stream: stream, contentType: contentType, jsonResponse: jsonResponse };
+        return { type: "stream", stream: stream, contentType: contentType, filename: "avatar.webp", jsonResponse: jsonResponse };
     }
 
     async deleteAvatar(userId: number): Promise<ControllerResponse> {
