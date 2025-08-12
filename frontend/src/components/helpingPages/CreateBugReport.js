@@ -36,8 +36,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [touched, setTouched] = useState({});
   const [isEditing, setIsEditing] = useState(!bugReport);
 
-  const [loadingFiles, setLoadingFiles] = useState([true, true]);
-  //Array(bugReport?.fileCount).fill(true) || []
+  const [loadingFiles, setLoadingFiles] = useState(Array(bugReport?.fileCount).fill(true) || []);
   const [files, setFiles] = useState([]);
 
   const axiosProtected = useAxiosProtected();
@@ -57,7 +56,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
               "/bugReport/getBugReportFile",
               {
                 id: bugReport.id,
-                fileIndex: i,
+                fileIndex: i + 1, // 1-based index for the API
               },
               { responseType: "blob" }
             );
@@ -381,28 +380,24 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
           ) : null}
         </Modal.Body>
         <Modal.Footer>
-          {checkAccess(["adminPageNotificationsWrite"]) && !isEditing && (
-            <Button variant="primary" onClick={() => setIsEditing(true)}>
-              Bearbeiten
+          {bugReport ? null : (
+            <Button
+              variant="success"
+              onClick={handleSave}
+              disabled={isSaving}
+              style={{ width: "100px" }}
+            >
+              {isSaving ? (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                <span>Speichern</span>
+              )}
             </Button>
           )}
-
-          <Button
-            variant="success"
-            onClick={handleSave}
-            disabled={isSaving}
-            style={{ width: "100px" }}
-          >
-            {isSaving ? (
-              <span
-                className="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-              ></span>
-            ) : (
-              <span>Speichern</span>
-            )}
-          </Button>
 
           <Button
             variant="secondary"
@@ -411,7 +406,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
             }}
             disabled={isSaving}
           >
-            Abbrechen
+            {bugReport ? "Schließen" : "Abbrechen"}
           </Button>
         </Modal.Footer>
       </Modal>
