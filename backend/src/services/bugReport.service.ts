@@ -3,6 +3,7 @@ import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
 import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
 import { S3Service } from "@/services/s3.service.js";
+import { SocketService } from "@/socketIO/socket.service";
 import { Op } from "@sequelize/core";
 import path from "path";
 import sharp from "sharp";
@@ -18,7 +19,7 @@ export class BugReportService {
         const databaseBugReports = await BugReport.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.bugReportCount = await BugReport.count();
-        jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
+        jsonResponse.bugReports = this.generateMultipleJSONResponseWithModel(databaseBugReports);
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -32,7 +33,7 @@ export class BugReportService {
         });
 
         jsonResponse.bugReportCount = await BugReport.count({ where: { status: { [Op.or]: [BugReportStatusType.CONFIRMED, BugReportStatusType.IN_PROGRESS] } } });
-        jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
+        jsonResponse.bugReports = this.generateMultipleJSONResponseWithModel(databaseBugReports);
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -42,7 +43,7 @@ export class BugReportService {
         const databaseBugReports = await BugReport.findAll({ where: { userId: userId }, ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.bugReportCount = await BugReport.count({ where: { userId: userId } });
-        jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
+        jsonResponse.bugReports = this.generateMultipleJSONResponseWithModel(databaseBugReports);
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -88,6 +89,9 @@ export class BugReportService {
         databaseBugReport.fileNames = fileNames;
         await databaseBugReport.save();
 
+        SocketService.getInstance().emitToRoom("listen:protected:bugReports:watchList", "bugReports:create", this.generateSingleJSONResponseWithModel(databaseBugReport));
+        SocketService.getInstance().emitToRoom(`listen:user:${userId}`, "bugReports:create", this.generateSingleJSONResponseWithModel(databaseBugReport));
+
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -97,6 +101,7 @@ export class BugReportService {
         const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
+        if (status === BugReportStatusType.NEW) throw new ValidationError("Status kann nicht auf NEU gesetzt werden");
         if (databaseBugReport.userId !== userId && routeGroups.includes(BUG_REPORT_WRITE.groupName) === false) throw new ForbiddenError("Du kannst nur den Status von deinen eigenen BugReports bearbeiten");
         if (routeGroups.includes(BUG_REPORT_WRITE.groupName) === false && (databaseBugReport.status !== BugReportStatusType.NEW || status !== BugReportStatusType.CLOSED))
             throw new ForbiddenError('Du kannst deine eigenen BugReports nur auf "GESCHLOSSEN" setzen wenn der Status noch auf "NEU" ist');
@@ -104,21 +109,28 @@ export class BugReportService {
         databaseBugReport.status = status;
         await databaseBugReport.save();
 
+        SocketService.getInstance().emitToRoom("listen:protected:bugReports:watchList", "bugReports:update", { id: databaseBugReport.id, status: status });
+        SocketService.getInstance().emitToRoom("listen:public:bugReports:watchList", "bugReports:update", { id: databaseBugReport.id, status: status });
+
         return { type: "json", jsonResponse: jsonResponse };
     }
 
-    generateJSONResponse(databaseBugReports: BugReport[]): Record<string, any> {
+    generateMultipleJSONResponseWithModel(databaseBugReports: BugReport[]): Record<string, any> {
         return databaseBugReports.map((databaseBugReport) => {
-            return {
-                id: databaseBugReport.id,
-                userId: databaseBugReport.userId,
-                status: databaseBugReport.status,
-                name: databaseBugReport.name,
-                description: databaseBugReport.description,
-                createdAt: databaseBugReport.createdAt,
-                hasFiles: databaseBugReport.fileNames.length === 0 ? false : true,
-                fileCount: databaseBugReport.fileNames.length
-            };
+            return this.generateSingleJSONResponseWithModel(databaseBugReport);
         });
+    }
+
+    generateSingleJSONResponseWithModel(databaseBugReport: BugReport): Record<string, any> {
+        return {
+            id: databaseBugReport.id,
+            userId: databaseBugReport.userId,
+            status: databaseBugReport.status,
+            name: databaseBugReport.name,
+            description: databaseBugReport.description,
+            createdAt: databaseBugReport.createdAt,
+            hasFiles: databaseBugReport.fileNames.length === 0 ? false : true,
+            fileCount: databaseBugReport.fileNames.length
+        };
     }
 }

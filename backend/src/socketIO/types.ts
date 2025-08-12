@@ -21,6 +21,9 @@ export interface ServerToClientEvents {
 
     "global:notifications:create": (data: Record<string, any>) => void;
     "global:notifications:update": (data: Record<string, any>) => void;
+
+    "bugReports:create": (data: Record<string, any>) => void;
+    "bugReports:update": (data: Record<string, any>) => void;
 }
 
 export interface ClientToServerEvents {
@@ -31,4 +34,6 @@ export interface ClientToServerEvents {
     "subscribe:adminPage:permissions:watchList": (data: Record<string, any>) => void;
     "subscribe:adminPage:notifications:watchList": (data: Record<string, any>) => void;
     "subscribe:adminPage:maintenanceMode:watchList": (data: Record<string, any>) => void;
+
+    "subscribe:bugReports:watchList": (data: Record<string, any>) => void;
 }
