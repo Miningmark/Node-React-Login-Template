@@ -85,6 +85,11 @@ function BugReportPage() {
                   maxHeight: `calc(100dvh - ${heightOffset + 160}px)`,
                   overflowY: "auto",
                   border: "1px solid #dee2e6",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  gap: "10px",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
                 {reportetBugs.map((bug, index) => (

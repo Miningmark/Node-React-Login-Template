@@ -43,6 +43,10 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
 
+  console.log("bugReport", bugReport);
+  console.log("files", files);
+  console.log("loadingFiles", loadingFiles);
+
   useEffect(() => {
     if (checkAccess(["adminPagePermissionsWrite"]) && bugReport && bugReport?.fileCount > 0) {
       const loadFiles = async () => {
