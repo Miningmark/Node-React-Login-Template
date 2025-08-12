@@ -163,9 +163,13 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
       addToast("Status erfolgreich geändert", "success");
     } catch (error) {
       addToast(error.response?.data?.message || "Status Änderung fehlgeschlagen", "danger");
-    } finally {
     }
   }
+
+  const getStatusName = (statusValue) => {
+    const status = STATUS_TYPES.find((s) => s.value === statusValue);
+    return status ? status.name : statusValue;
+  };
 
   return (
     <>
@@ -310,7 +314,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
                       key={index}
                       style={{
                         flex: "1 1 0",
-                        maxWidth:
+                        width:
                           file && file.name.toLowerCase().endsWith(".pdf")
                             ? "100%"
                             : `${100 / loadingFiles.length}%`,
@@ -404,7 +408,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
               ) : (
                 <>
                   <br />
-                  <span>Status: {bugReport.status}</span>
+                  <span>Status: {getStatusName(bugReport.status)}</span>
                   <br />
                 </>
               )}
