@@ -1,20 +1,32 @@
-import { useState, useContext } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { useState, useContext, useEffect } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import TextEditor from "components/util/TextEditor";
-import { convertToInputDateTime } from "util/timeConverting";
+import { convertToInputDateTime, convertToLocalTimeStamp } from "util/timeConverting";
 import DOMPurify from "dompurify";
 
 const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_FILE_TYPES =
   ".conf, .def, .doc, .docx, .dot, .in, .ini, .jpe, .jpeg, .jpg, .list, .log, .odp, .ods, .odt, .pdf, .png, .pot, .pps, .ppt, .pptx, .text, .txt, .webp, .xla, .xlc, .xlm, .xls, .xlsx, .xlt, .xlw";
+const ACCEPTED_IMAGE_EXTENSIONS = [".jpe", ".jpeg", ".jpg", ".png", ".webp"];
+
+const STATUS_TYPES = [
+  { name: "Offen", value: "NEW" },
+  { name: "In Bearbeitung", value: "IN_PROGRESS" },
+  { name: "Abgeschlossen", value: "CLOSED" },
+  { name: "Abgelehnt", value: "REJECTED" },
+  { name: "Angenommen", value: "CONFIRMED" },
+];
+const isImageFile = (fileName) =>
+  ACCEPTED_IMAGE_EXTENSIONS.some((ext) => fileName.toLowerCase().endsWith(ext));
 
 const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
   const [description, setDescription] = useState(bugReport ? bugReport.description : "");
+  const [status, setStatus] = useState(bugReport ? bugReport.status : STATUS_TYPES[0].value);
 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
@@ -24,9 +36,55 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [touched, setTouched] = useState({});
   const [isEditing, setIsEditing] = useState(!bugReport);
 
+  const [loadingFiles, setLoadingFiles] = useState([true, true]);
+  //Array(bugReport?.fileCount).fill(true) || []
+  const [files, setFiles] = useState([]);
+
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (checkAccess(["adminPagePermissionsWrite"]) && bugReport && bugReport?.fileCount > 0) {
+      const loadFiles = async () => {
+        setLoadingFiles(Array(bugReport.fileCount).fill(true));
+
+        try {
+          const fetchedFiles = [];
+
+          for (let i = 0; i < bugReport.fileCount; i++) {
+            const res = await axiosProtected.post(
+              "/bugReport/getBugReportFile",
+              {
+                id: bugReport.id,
+                fileIndex: i,
+              },
+              { responseType: "blob" }
+            );
+
+            const fileBlob = res.data;
+            const contentType = res.headers["content-type"];
+            const fileName =
+              res.headers["content-disposition"]?.split("filename=")[1] || `file-${i}`;
+
+            fetchedFiles.push({
+              name: fileName,
+              url: URL.createObjectURL(fileBlob),
+              type: contentType.startsWith("image/") ? "image" : "file",
+            });
+          }
+
+          setFiles(fetchedFiles);
+        } catch (error) {
+          addToast(error.response?.data?.message || "Datei laden fehlgeschlagen", "danger");
+        } finally {
+          setLoadingFiles(Array(bugReport.fileCount).fill(false));
+        }
+      };
+
+      loadFiles();
+    }
+  }, [bugReport]);
 
   const closeModal = () => {
     setName("");
@@ -95,30 +153,49 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
     setPreviews(updatedPreviews);
   };
 
+  async function handleStatusChange(e) {
+    const updatedBugReport = { ...bugReport, status: e.target.value };
+    setStatus(updatedBugReport.status);
+
+    try {
+      await axiosProtected.post(`/bugReport/updateBugReportStatus`, {
+        id: bugReport.id,
+        status: updatedBugReport.status,
+      });
+
+      addToast("Status erfolgreich geändert", "success");
+    } catch (error) {
+      addToast(error.response?.data?.message || "Status Änderung fehlgeschlagen", "danger");
+    } finally {
+    }
+  }
+
   return (
     <>
       <Modal show={show} onHide={closeModal} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
-            {bugReport ? "Bug/Verbesserung Bearbeiten" : "Neuer Bug/Verbesserung erstellen"}
+            {bugReport ? bugReport.name : "Neuer Bug/Verbesserung erstellen"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="form-floating mb-3">
-            <input
-              type="text"
-              className={`form-control ${touched.title && !name ? "is-invalid" : ""}`}
-              id="floatingTitle"
-              placeholder="Title"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onBlur={() => setTouched((prev) => ({ ...prev, title: true }))}
-              name="title"
-              disabled={!isEditing}
-              maxLength={25}
-            />
-            <label htmlFor="floatingTitle">Titel</label>
-          </div>
+          {!bugReport ? (
+            <div className="form-floating mb-3">
+              <input
+                type="text"
+                className={`form-control ${touched.title && !name ? "is-invalid" : ""}`}
+                id="floatingTitle"
+                placeholder="Title"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => setTouched((prev) => ({ ...prev, title: true }))}
+                name="title"
+                disabled={!isEditing}
+                maxLength={25}
+              />
+              <label htmlFor="floatingTitle">Titel</label>
+            </div>
+          ) : null}
 
           <div className="form-floating mb-3">
             {isEditing ? (
@@ -130,9 +207,6 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
               />
             ) : (
               <>
-                <p>
-                  <strong>Nachricht</strong>
-                </p>
                 <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} />
               </>
             )}
@@ -229,14 +303,81 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
               </div>
             </div>
           ) : (
-            <div>{checkAccess(["adminPagePermissionsWrite"]) ? <>Hallo</> : null}</div>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {checkAccess(["adminPagePermissionsWrite"]) &&
+                loadingFiles.map((item, index) => {
+                  const file = files[index];
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        flex: "1 1 0",
+                        maxWidth: `${100 / loadingFiles.length}%`,
+                        aspectRatio: item ? "1 / 1" : "auto",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        backgroundColor: "#f9f9f9",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {item ? (
+                        <span
+                          className="spinner-border spinner-border-xxl"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : file && isImageFile(file.name) ? (
+                        <img
+                          src={file.url}
+                          alt={file.name}
+                          style={{
+                            width: "100%",
+                            height: "auto",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <div style={{ textAlign: "center", fontSize: "0.9rem", padding: "5px" }}>
+                          📄 {file ? file.name : "Datei"}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
           )}
 
           {bugReport ? (
-            <>
-              <p>{bugReport.status}</p>
-              <p>{convertToInputDateTime(bugReport.createdAt)}</p>
-            </>
+            <div className="text-muted mt-3 mb-0">
+              {checkAccess(["adminPageNotificationsWrite"]) && !isEditing ? (
+                <>
+                  <Form className="mb-3 mt-5">
+                    <Form.Group className="mb-0">
+                      <Form.Label>Status</Form.Label>
+                      <Form.Select name="types" value={status} onChange={handleStatusChange}>
+                        {STATUS_TYPES.map((type, index) => (
+                          <option key={index} value={type.value}>
+                            {type.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </Form>
+                </>
+              ) : (
+                <>
+                  <br />
+                  <span>Status: {bugReport.status}</span>
+                  <br />
+                </>
+              )}
+
+              <span>{convertToLocalTimeStamp(bugReport.createdAt)}</span>
+            </div>
           ) : null}
         </Modal.Body>
         <Modal.Footer>
