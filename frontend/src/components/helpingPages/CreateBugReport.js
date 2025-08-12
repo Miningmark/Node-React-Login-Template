@@ -347,10 +347,8 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                           src={file.url}
                           type="application/pdf"
                           width="100%"
-                          maxWidth="300px"
-                          height="150px"
+                          height="300px"
                           style={{ borderRadius: "8px", cursor: "pointer" }}
-                          onClick={() => setSelectedFile(file)}
                         />
                       ) : (
                         <div
