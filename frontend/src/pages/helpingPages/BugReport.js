@@ -5,14 +5,16 @@ import { Container } from "react-bootstrap";
 import { Card } from "react-bootstrap";
 import TableLoadingAnimation from "components/TableLoadingAnimation";
 import { convertToLocalTimeStamp } from "util/timeConverting";
-import ResizableTable from "components/util/ResizableTable";
 import { SocketContext } from "contexts/SocketProvider";
 import { AuthContext } from "contexts/AuthContext";
 import DOMPurify from "dompurify";
 import CreateBugReport from "components/helpingPages/CreateBugReport";
 
+import "./bugReport.css";
+
 function BugReportPage() {
   const [reportetBugs, setReportedBugs] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loadingReportetBugs, setLoadingReportetBugs] = useState(false);
   const [showCreateBugModal, setShowCreateBugModal] = useState(false);
   const [showEditBugModal, setShowEditBugModal] = useState(false);
@@ -41,6 +43,8 @@ function BugReportPage() {
       setLoadingReportetBugs(true);
 
       try {
+        //const responseUsers = await axiosProtected.get("/user/getAllUsers");
+        //setAllUsers(responseUsers.data.users);
         if (checkAccess(["adminPagePermissionsWrite"])) {
           const responseBugs = await axiosProtected.get("/bugReport/getBugReports/500-0");
           console.log("All Bugs:", responseBugs.data.bugReports);
@@ -110,7 +114,14 @@ function BugReportPage() {
                 }}
               >
                 {reportetBugs.map((bug, index) => (
-                  <Card key={index}>
+                  <Card
+                    key={index}
+                    onClick={() => {
+                      setSelectedBug(bug.id);
+                      setShowEditBugModal(true);
+                    }}
+                    className="card-hover"
+                  >
                     <Card.Header>{bug.name}</Card.Header>
                     <Card.Body>
                       <div
@@ -118,17 +129,6 @@ function BugReportPage() {
                           __html: DOMPurify.sanitize(bug.description),
                         }}
                       />
-                      <div className="d-flex justify-content-between">
-                        <button
-                          className="btn btn-secondary"
-                          onClick={() => {
-                            setSelectedBug(bug.id);
-                            setShowEditBugModal(true);
-                          }}
-                        >
-                          Bearbeiten
-                        </button>
-                      </div>
                     </Card.Body>
                     <Card.Footer>
                       <div className="d-flex justify-content-between">
