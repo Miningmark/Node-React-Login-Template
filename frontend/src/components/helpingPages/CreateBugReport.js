@@ -19,10 +19,6 @@ const STATUS_TYPES = [
   { name: "Abgelehnt", value: "REJECTED" },
   { name: "Angenommen", value: "CONFIRMED" },
 ];
-const isImageFile = (fileName) => {
-  console.log("NAME: ", fileName);
-  return fileName?.toLowerCase().endsWith(".webp");
-};
 
 const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
@@ -45,10 +41,6 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
   const { checkAccess } = useContext(AuthContext);
-
-  console.log("bugReport", bugReport);
-  console.log("files", files);
-  console.log("loadingFiles", loadingFiles);
 
   useEffect(() => {
     if (checkAccess(["adminPagePermissionsWrite"]) && bugReport && bugReport?.fileCount > 0) {
@@ -315,8 +307,6 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
               {checkAccess(["adminPagePermissionsWrite"]) &&
                 loadingFiles.map((item, index) => {
                   const file = files[index];
-                  console.log("Filename:", file ? file.name : "Loading...");
-                  console.log("Is image:", file ? isImageFile(file.name) : "Loading...");
 
                   return (
                     <div
@@ -340,7 +330,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                           role="status"
                           aria-hidden="true"
                         />
-                      ) : file && isImageFile(file.name) ? (
+                      ) : file && file.name.toLowerCase().endsWith(".webp") ? (
                         <img
                           src={file.url}
                           alt={file.name}
@@ -348,12 +338,26 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                             width: "100%",
                             height: "auto",
                             objectFit: "cover",
+                            cursor: "pointer",
                           }}
                           onClick={() => setSelectedFile(file)}
                         />
+                      ) : file && file.name.toLowerCase().endsWith(".pdf") ? (
+                        <embed
+                          src={file.url}
+                          type="application/pdf"
+                          width="100%"
+                          height="300px"
+                          style={{ borderRadius: "8px", cursor: "pointer" }}
+                        />
                       ) : (
                         <div
-                          style={{ textAlign: "center", fontSize: "0.9rem", padding: "5px" }}
+                          style={{
+                            textAlign: "center",
+                            fontSize: "0.9rem",
+                            padding: "5px",
+                            cursor: "pointer",
+                          }}
                           onClick={() => setSelectedFile(file)}
                         >
                           📄 {file ? file.name : "Datei"}
