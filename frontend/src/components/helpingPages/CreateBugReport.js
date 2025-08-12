@@ -37,7 +37,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
 
   useEffect(() => {
     if (
-      (checkAccess(["adminPagePermissionsWrite"]) || bugReport.userId === userId) &&
+      (checkAccess(["bugReportWrite", "bugReportRead"]) || bugReport.userId === userId) &&
       bugReport &&
       bugReport?.fileCount > 0
     ) {
@@ -301,7 +301,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
             </div>
           ) : (
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {(checkAccess(["adminPagePermissionsWrite"]) || bugReport.userId === userId) &&
+              {(checkAccess(["bugReportWrite", "bugReportRead"]) || bugReport.userId === userId) &&
                 loadingFiles.map((item, index) => {
                   const file = files[index];
 
@@ -371,7 +371,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
 
           {bugReport ? (
             <div className="text-muted mt-3 mb-0">
-              {checkAccess(["adminPageNotificationsWrite"]) && !isEditing ? (
+              {checkAccess(["bugReportWrite"]) && !isEditing ? (
                 <>
                   <Form className="mb-3 mt-5">
                     <Form.Group className="mb-0">

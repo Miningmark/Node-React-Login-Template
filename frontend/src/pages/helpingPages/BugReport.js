@@ -79,7 +79,7 @@ function BugReportPage() {
       setLoadingReportetBugs(true);
 
       try {
-        if (checkAccess(["adminPagePermissionsWrite"])) {
+        if (checkAccess(["bugReportWrite", "bugReportRead"])) {
           const responseBugs = await axiosProtected.get("/bugReport/getBugReports/500-0");
           console.log("All Bugs:", responseBugs.data.bugReports);
           setReportedBugs(responseBugs.data.bugReports);
