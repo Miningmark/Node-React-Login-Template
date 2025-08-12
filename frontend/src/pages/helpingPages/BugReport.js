@@ -8,6 +8,7 @@ import { convertToLocalTimeStamp } from "util/timeConverting";
 import ResizableTable from "components/util/ResizableTable";
 import { SocketContext } from "contexts/SocketProvider";
 import { AuthContext } from "contexts/AuthContext";
+import DOMPurify from "dompurify";
 import CreateBugReport from "components/helpingPages/CreateBugReport";
 
 function BugReportPage() {
@@ -38,7 +39,30 @@ function BugReportPage() {
   useEffect(() => {
     async function fetchReportedBugs() {
       setLoadingReportetBugs(true);
+
       try {
+        if (checkAccess(["adminPagePermissionsWrite"])) {
+          const responseBugs = await axiosProtected.get("/bugReport/getBugReports/500-0");
+          console.log("All Bugs:", responseBugs.data.bugReports);
+          setReportedBugs(responseBugs.data.bugReports);
+        } else {
+          const responseActiveBugs = await axiosProtected.get(
+            "/bugReport/getActiveBugReports/500-0"
+          );
+          const responseOwnBugs = await axiosProtected.get("/bugReport/getOwnBugReports/500-0");
+
+          console.log("Active Bugs:", responseActiveBugs.data.bugReports);
+          console.log("My Bugs:", responseOwnBugs.data.bugReports);
+          const allBugs = [
+            ...responseOwnBugs.data.bugReports,
+            ...responseActiveBugs.data.bugReports,
+          ];
+          const uniqueBugs = allBugs.filter(
+            (bug, index, self) => index === self.findIndex((b) => b.id === bug.id)
+          );
+
+          setReportedBugs(uniqueBugs);
+        }
       } catch (error) {
         addToast(
           error.response?.data?.message || "Laden von Eingereichten Bug's fehlgeschlagen",
@@ -78,20 +102,23 @@ function BugReportPage() {
                   maxHeight: `calc(100dvh - ${heightOffset + 160}px)`,
                   overflowY: "auto",
                   border: "1px solid #dee2e6",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  gap: "10px",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
                 {reportetBugs.map((bug, index) => (
-                  <Card key={index} className="mb-3">
-                    <Card.Header>
-                      <div className="d-flex justify-content-between align-items-center">
-                        <span>{bug.title}</span>
-                        <span className="text-muted">{convertToLocalTimeStamp(bug.createdAt)}</span>
-                      </div>
-                    </Card.Header>
+                  <Card key={index}>
+                    <Card.Header>{bug.name}</Card.Header>
                     <Card.Body>
-                      <p>{bug.description}</p>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(bug.description),
+                        }}
+                      />
                       <div className="d-flex justify-content-between">
-                        <span className="text-muted">Status: {bug.status}</span>
                         <button
                           className="btn btn-secondary"
                           onClick={() => {
@@ -103,6 +130,12 @@ function BugReportPage() {
                         </button>
                       </div>
                     </Card.Body>
+                    <Card.Footer>
+                      <div className="d-flex justify-content-between">
+                        <span className="text-muted">Status: {bug.status}</span>
+                        <span className="text-muted">{convertToLocalTimeStamp(bug.createdAt)}</span>
+                      </div>
+                    </Card.Footer>
                   </Card>
                 ))}
               </div>
@@ -118,6 +151,14 @@ function BugReportPage() {
           show={true}
           handleClose={() => setShowCreateBugModal(false)}
           bugReport={null}
+        />
+      )}
+
+      {showEditBugModal && (
+        <CreateBugReport
+          show={true}
+          handleClose={() => setShowEditBugModal(false)}
+          bugReport={reportetBugs.find((bug) => bug.id === selectedBug)}
         />
       )}
     </>
