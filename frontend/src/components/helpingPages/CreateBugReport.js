@@ -36,7 +36,11 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
   const { checkAccess, userId } = useContext(AuthContext);
 
   useEffect(() => {
-    if (checkAccess(["adminPagePermissionsWrite"]) && bugReport && bugReport?.fileCount > 0) {
+    if (
+      (checkAccess(["adminPagePermissionsWrite"]) || bugReport.userId === userId) &&
+      bugReport &&
+      bugReport?.fileCount > 0
+    ) {
       const loadFiles = async () => {
         setLoadingFiles(Array(bugReport.fileCount).fill(true));
 
@@ -297,7 +301,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
             </div>
           ) : (
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {checkAccess(["adminPagePermissionsWrite"]) &&
+              {(checkAccess(["adminPagePermissionsWrite"]) || bugReport.userId === userId) &&
                 loadingFiles.map((item, index) => {
                   const file = files[index];
 
