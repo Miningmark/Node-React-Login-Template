@@ -20,6 +20,11 @@ const STATUS_TYPES = [
   { name: "Angenommen", value: "CONFIRMED" },
 ];
 
+const getStatusName = (statusValue) => {
+  const status = STATUS_TYPES.find((s) => s.value === statusValue);
+  return status ? status.name : statusValue;
+};
+
 function BugReportPage() {
   const [reportetBugs, setReportedBugs] = useState([]);
   const [loadingReportetBugs, setLoadingReportetBugs] = useState(false);
@@ -161,7 +166,7 @@ function BugReportPage() {
                     </Card.Body>
                     <Card.Footer>
                       <div className="d-flex justify-content-between">
-                        <span className="text-muted">Status: {bug.status}</span>
+                        <span className="text-muted">Status: {getStatusName(bug.status)}</span>
                         <span className="text-muted">{convertToLocalTimeStamp(bug.createdAt)}</span>
                       </div>
                     </Card.Footer>
