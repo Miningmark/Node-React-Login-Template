@@ -39,13 +39,30 @@ function BugReportPage() {
   useEffect(() => {
     async function fetchReportedBugs() {
       setLoadingReportetBugs(true);
-      try {
-        //const responseActiveBugs = await axiosProtected.get("/bugReport/getReportedBugs");
-        const responseOwnBugs = await axiosProtected.get("/bugReport/getOwnBugReports/500-0");
 
-        //console.log("Active Bugs:", responseActiveBugs.data);
-        console.log("My Bugs:", responseOwnBugs.data.bugReports);
-        setReportedBugs(responseOwnBugs.data.bugReports);
+      try {
+        if (checkAccess(["adminPagePermissionsWrite"])) {
+          const responseBugs = await axiosProtected.get("/bugReport/getBugReports/500-0");
+          console.log("All Bugs:", responseBugs.data.bugReports);
+          setReportedBugs(responseBugs.data.bugReports);
+        } else {
+          const responseActiveBugs = await axiosProtected.get(
+            "/bugReport/getActiveBugReports/500-0"
+          );
+          const responseOwnBugs = await axiosProtected.get("/bugReport/getOwnBugReports/500-0");
+
+          console.log("Active Bugs:", responseActiveBugs.data.bugReports);
+          console.log("My Bugs:", responseOwnBugs.data.bugReports);
+          const allBugs = [
+            ...responseOwnBugs.data.bugReports,
+            ...responseActiveBugs.data.bugReports,
+          ];
+          const uniqueBugs = allBugs.filter(
+            (bug, index, self) => index === self.findIndex((b) => b.id === bug.id)
+          );
+
+          setReportedBugs(uniqueBugs);
+        }
       } catch (error) {
         addToast(
           error.response?.data?.message || "Laden von Eingereichten Bug's fehlgeschlagen",

@@ -70,10 +70,10 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
 
             const fileBlob = res.data;
             const contentType = res.headers["content-type"];
-            const fileName = (
-              res.headers["content-disposition"]?.split("filename=")[1] || `file-${i}`
-            ).replace(/^"|"$/g, "");
-            console.log("File Name:", fileName);
+            let fileName = res.headers["content-disposition"]?.split("filename=")[1] || `file-${i}`;
+            if (fileName.startsWith('"') && fileName.endsWith('"')) {
+              fileName = fileName.slice(1, -1);
+            }
 
             fetchedFiles.push({
               name: fileName,
