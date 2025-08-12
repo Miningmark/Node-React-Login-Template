@@ -4,9 +4,11 @@ import { UserManagementService } from "@/services/userManagement.service.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator";
 import { CreateUserValidation, DeleteAvatarValidation, GetAvatarValidation, GetUsersValidation, UpdateUserValidation } from "@/validators/userManagement.validator.js";
 import { NextFunction, Request, Response } from "express";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class UserManagementController extends BaseController {
-    constructor(private userManagementService: UserManagementService) {
+    constructor(@inject(UserManagementService) private readonly userManagementService: UserManagementService) {
         super();
     }
 

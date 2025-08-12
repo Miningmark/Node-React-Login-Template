@@ -1,4 +1,4 @@
-import { ValidatedRequest } from "@/@types/validation";
+import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { AdminPageService } from "@/services/adminPage.service.js";
 import {
@@ -15,9 +15,11 @@ import {
 } from "@/validators/adminPage.validator.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator.js";
 import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class AdminPageController extends BaseController {
-    constructor(private adminPageService: AdminPageService) {
+    constructor(@inject(AdminPageService) private readonly adminPageService: AdminPageService) {
         super();
     }
 

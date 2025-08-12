@@ -1,6 +1,8 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import ServerSettings from "@/models/serverSettings.model.js";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class ServerService {
     constructor() {}
 

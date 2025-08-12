@@ -4,15 +4,13 @@ import { checkMaintenanceMode } from "@/middlewares/checkMaintenanceMode.middlew
 import { publicRateLimiter } from "@/middlewares/rateLimiter.middleware.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
-import { AuthService } from "@/services/auth.service.js";
 import { accountActivationSchema, handlePasswordRecoverySchema, loginSchema, refreshTokenSchema, registerSchema, requestPasswordResetSchema } from "@/validators/auth.validator.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
 import { Router } from "express";
+import { container } from "tsyringe";
 
 const router = Router();
-
-const authService = new AuthService();
-const authController = new AuthController(authService);
+const authController = container.resolve(AuthController);
 
 if (ENV.ENABLE_REGISTER === true) {
     router.post("/register", checkMaintenanceMode(), publicRateLimiter, validateRequest(registerSchema), authController.register);

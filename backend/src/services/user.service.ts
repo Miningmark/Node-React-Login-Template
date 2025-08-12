@@ -8,27 +8,25 @@ import UserNotification from "@/models/userNotifications.model.js";
 import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { S3Service } from "@/services/s3.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserNotificationService } from "@/services/userNotification.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
 import bcrypt from "bcrypt";
 import { Response } from "express";
 import sharp from "sharp";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class UserService {
-    private tokenService: TokenService;
-    private routeGroupService: RouteGroupService;
-    private userNotificationService: UserNotificationService;
-    private s3Service: S3Service;
-
-    constructor() {
-        this.tokenService = new TokenService();
-        this.routeGroupService = new RouteGroupService();
-        this.userNotificationService = new UserNotificationService();
-        this.s3Service = S3Service.getInstance();
-    }
+    constructor(
+        @inject(TokenService) private readonly tokenService: TokenService,
+        @inject(RouteGroupService) private readonly routeGroupService: RouteGroupService,
+        @inject(UserNotificationService) private readonly userNotificationService: UserNotificationService,
+        @inject(S3Service) private readonly s3Service: S3Service,
+        @inject(SocketService) private readonly socketService: SocketService
+    ) {}
 
     async updateUsername(userId: number, newUsername: string, res: Response): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert" };
@@ -46,7 +44,7 @@ export class UserService {
         databaseUser.username = newUsername;
         await databaseUser.save();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, databaseUser.username));
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, databaseUser.username));
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -66,7 +64,7 @@ export class UserService {
         databaseUser.email = newEmail;
         await databaseUser.save();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, undefined, databaseUser.email));
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.generateJSONResponse(databaseUser.id, undefined, databaseUser.email));
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -134,7 +132,7 @@ export class UserService {
         const webpImageBuffer = await sharp(file.buffer).resize({ width: 512 }).webp({ quality: 80 }).toBuffer();
         await this.s3Service.uploadFile("users", `${userId}/avatar.webp`, webpImageBuffer, "image/webp");
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: "changed" });
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: "changed" });
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -259,7 +257,7 @@ export class UserService {
 
         await this.s3Service.deleteFile("users", `${userId}/avatar.webp`);
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: null });
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", { id: userId, avatar: null });
         return { type: "json", jsonResponse: jsonResponse };
     }
 

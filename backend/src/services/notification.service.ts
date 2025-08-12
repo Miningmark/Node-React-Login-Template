@@ -1,5 +1,7 @@
 import Notification from "@/models/notification.model.js";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class NotificationService {
     constructor() {}
 

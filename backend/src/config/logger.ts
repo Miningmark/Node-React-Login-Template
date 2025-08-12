@@ -1,7 +1,8 @@
 import { ENV } from "@/config/env.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
+import { SocketService } from "@/services/socket.service.js";
+import { container } from "tsyringe";
 import winston from "winston";
 
 const REDACT_KEYS = [/authorization/i, /cookie/i, /password/i, /newPassword/i, /currentPassword/i, /email/i, /newEmail/i, /usernameOrEmail/i, /token/i, /secret/i];
@@ -68,7 +69,7 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
         });
 
         try {
-            SocketService.getInstance().emitToRoom("listen:adminPage:serverLogs:watchList", "adminPage:serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
+            container.resolve(SocketService).emitToRoom("listen:adminPage:serverLogs:watchList", "adminPage:serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
         } catch (error) {}
     } catch (error) {
         consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", {

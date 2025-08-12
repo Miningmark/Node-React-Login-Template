@@ -1,13 +1,11 @@
 import { InternalServerError } from "@/errors/errorClasses.js";
 import UserNotification from "@/models/userNotifications.model.js";
 import { NotificationService } from "@/services/notification.service.js";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class UserNotificationService {
-    private notificationService: NotificationService;
-
-    constructor() {
-        this.notificationService = new NotificationService();
-    }
+    constructor(@inject(NotificationService) private readonly notificationService: NotificationService) {}
 
     generateMultipleJSONResponseWithModel(databaseUserNotifications: UserNotification[], sendConfirmed: boolean = false): Record<string, any> {
         return databaseUserNotifications.map((databaseUserNotification) => {

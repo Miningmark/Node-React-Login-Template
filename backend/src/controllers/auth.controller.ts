@@ -4,9 +4,11 @@ import { AuthService } from "@/services/auth.service.js";
 import { AccountActivationValidation, HandlePasswordRecoveryValidation, LoginValidation, RefreshTokenValidation, RegisterValidation, RequestPasswordResetValidation } from "@/validators/auth.validator.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator";
 import { NextFunction, Request, Response } from "express";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class AuthController extends BaseController {
-    constructor(private authService: AuthService) {
+    constructor(@inject(AuthService) private readonly authService: AuthService) {
         super();
     }
 

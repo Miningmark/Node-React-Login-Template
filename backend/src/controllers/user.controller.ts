@@ -3,10 +3,12 @@ import { BaseController } from "@/controllers/base.controller.js";
 import { UserService } from "@/services/user.service.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator";
 import { ConfirmPendingNotificationValidation, UpdateAvatarValidation, UpdateEmailValidation, UpdatePasswordValidation, UpdateSettingsValidation, UpdateUsernameValidation } from "@/validators/user.validator.js";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class UserController extends BaseController {
-    constructor(private userService: UserService) {
+    constructor(@inject(UserService) private readonly userService: UserService) {
         super();
     }
 

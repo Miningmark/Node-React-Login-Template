@@ -3,16 +3,15 @@ import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
 import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
 import { S3Service } from "@/services/s3.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { Op } from "@sequelize/core";
 import path from "path";
 import sharp from "sharp";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class BugReportService {
-    private s3Service: S3Service;
-    constructor() {
-        this.s3Service = S3Service.getInstance();
-    }
+    constructor(@inject(S3Service) private readonly s3Service: S3Service, @inject(SocketService) private readonly socketService: SocketService) {}
 
     async getBugReports(limit?: number, offset?: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "BugReports erfolgreich zurückgegeben" };
@@ -89,8 +88,8 @@ export class BugReportService {
         databaseBugReport.fileNames = fileNames;
         await databaseBugReport.save();
 
-        SocketService.getInstance().emitToRoom("listen:protected:bugReports:watchList", "bugReports:create", this.generateSingleJSONResponseWithModel(databaseBugReport));
-        SocketService.getInstance().emitToRoom(`listen:user:${userId}`, "bugReports:create", this.generateSingleJSONResponseWithModel(databaseBugReport));
+        this.socketService.emitToRoom("listen:protected:bugReports:watchList", "bugReports:create", this.generateSingleJSONResponseWithModel(databaseBugReport));
+        this.socketService.emitToRoom(`listen:user:${userId}`, "bugReports:create", this.generateSingleJSONResponseWithModel(databaseBugReport));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -109,8 +108,8 @@ export class BugReportService {
         databaseBugReport.status = status;
         await databaseBugReport.save();
 
-        SocketService.getInstance().emitToRoom("listen:protected:bugReports:watchList", "bugReports:update", { id: databaseBugReport.id, status: status });
-        SocketService.getInstance().emitToRoom("listen:public:bugReports:watchList", "bugReports:update", { id: databaseBugReport.id, status: status });
+        this.socketService.emitToRoom("listen:protected:bugReports:watchList", "bugReports:update", { id: databaseBugReport.id, status: status });
+        this.socketService.emitToRoom("listen:public:bugReports:watchList", "bugReports:update", { id: databaseBugReport.id, status: status });
 
         return { type: "json", jsonResponse: jsonResponse };
     }

@@ -7,10 +7,10 @@ import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { ADMIN_PAGE_MAINTENANCE_MODE_WRITE } from "@/routeGroups/adminPage.routeGroup.js";
 import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserService } from "@/services/user.service.js";
 import { UserActivityService } from "@/services/userActivity.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
 import { getCompleteUserRegistrationEmailTemplate, getPasswordResetEmailTemplate } from "@/templates/email/auth.template.email.js";
 import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
@@ -18,21 +18,18 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jsonwebtoken from "jsonwebtoken";
 import ms from "ms";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class AuthService {
-    private emailService: EmailService;
-    private tokenService: TokenService;
-    private userService: UserService;
-    private userActivityService: UserActivityService;
-    private routeGroupService: RouteGroupService;
-
-    constructor() {
-        this.emailService = EmailService.getInstance();
-        this.tokenService = new TokenService();
-        this.userService = new UserService();
-        this.userActivityService = new UserActivityService();
-        this.routeGroupService = new RouteGroupService();
-    }
+    constructor(
+        @inject(EmailService) private readonly emailService: EmailService,
+        @inject(TokenService) private readonly tokenService: TokenService,
+        @inject(UserService) private readonly userService: UserService,
+        @inject(UserActivityService) private readonly userActivityService: UserActivityService,
+        @inject(RouteGroupService) private readonly routeGroupService: RouteGroupService,
+        @inject(SocketService) private readonly socketService: SocketService
+    ) {}
 
     async register(username: string, email: string, password: string): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Benutzer wurde erfolgreich registriert" };
@@ -50,7 +47,7 @@ export class AuthService {
             getCompleteUserRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}account-activation?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_USER_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponseWithModel(databaseUser));
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponseWithModel(databaseUser));
         return { type: "json", jsonResponse: jsonResponse, statusCode: 201 };
     }
 
@@ -129,7 +126,7 @@ export class AuthService {
         await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUserToken.user.id, undefined, undefined, true));
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUserToken.user.id, undefined, undefined, true));
         return { type: "json", jsonResponse: jsonResponse };
     }
 
@@ -162,13 +159,11 @@ export class AuthService {
 
         jsonResponse.accessToken = accessToken;
 
-        SocketService.getInstance()
-            .getIO()
-            .sockets.sockets.forEach((socket) => {
-                if (socket.userId === refreshUserToken.user!.id) {
-                    socket.routeGroups = routeGroupsArray;
-                }
-            });
+        this.socketService.getIO().sockets.sockets.forEach((socket) => {
+            if (socket.userId === refreshUserToken.user!.id) {
+                socket.routeGroups = routeGroupsArray;
+            }
+        });
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -225,7 +220,7 @@ export class AuthService {
         await databaseUserToken.user.save();
         await databaseUserToken.destroy();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUserToken.user.id, undefined, undefined, true));
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUserToken.user.id, undefined, undefined, true));
         return { type: "json", jsonResponse: jsonResponse };
     }
 }

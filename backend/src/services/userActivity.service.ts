@@ -5,22 +5,21 @@ import { UserTokenType } from "@/models/userToken.model.js";
 import { EmailService } from "@/services/email.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserService } from "@/services/user.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { getAccountLockedEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
 import { formatDate, getIpv4Address, IPV4_REGEX } from "@/utils/misc.util.js";
 import { CreationAttributes } from "@sequelize/core";
 import { Request } from "express";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class UserActivityService {
-    private emailService: EmailService;
-    private tokenService: TokenService;
-    private userService: UserService;
-
-    constructor() {
-        this.emailService = EmailService.getInstance();
-        this.tokenService = new TokenService();
-        this.userService = new UserService();
-    }
+    constructor(
+        @inject(EmailService) private readonly emailService: EmailService,
+        @inject(TokenService) private readonly tokenService: TokenService,
+        @inject(UserService) private readonly userService: UserService,
+        @inject(SocketService) private readonly socketService: SocketService
+    ) {}
 
     async checkHasLocationChanged(databaseUser: User) {
         const userLastLogins = await databaseUser.getLastLogins({ limit: 2, order: [["loginTime", "DESC"]] });
@@ -59,7 +58,7 @@ export class UserActivityService {
             databaseUser.isActive = false;
             await databaseUser.save();
 
-            SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUser.id, undefined, undefined, false));
+            this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUser.id, undefined, undefined, false));
 
             const token = await this.tokenService.generateHexUserToken(databaseUser.id, UserTokenType.ACCOUNT_REACTIVATION_TOKEN, null);
 
