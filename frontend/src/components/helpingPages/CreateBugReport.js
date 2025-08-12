@@ -308,7 +308,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                 loadingFiles.map((item, index) => {
                   const file = files[index];
                   console.log("Filename:", file ? file.name : "Loading...");
-                  console.log("Filename:", files ? files[index]?.name : "Loading...");
+                  console.log("Is image:", file ? isImageFile(file.name) : "Loading...");
 
                   return (
                     <div
@@ -331,7 +331,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                           className="spinner-border spinner-border-xxl"
                           role="status"
                           aria-hidden="true"
-                        ></span>
+                        />
                       ) : file && isImageFile(file.name) ? (
                         <img
                           src={file.url}
