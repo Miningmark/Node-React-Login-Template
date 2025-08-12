@@ -6,6 +6,7 @@ import { AuthContext } from "contexts/AuthContext";
 import TextEditor from "components/util/TextEditor";
 import { convertToLocalTimeStamp } from "util/timeConverting";
 import DOMPurify from "dompurify";
+import FileViewer from "components/util/FileViewer";
 
 const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
@@ -18,7 +19,10 @@ const STATUS_TYPES = [
   { name: "Abgelehnt", value: "REJECTED" },
   { name: "Angenommen", value: "CONFIRMED" },
 ];
-const isImageFile = (fileName) => fileName?.toLowerCase().endsWith(".webp");
+const isImageFile = (fileName) => {
+  console.log("NAME: ", fileName);
+  return fileName?.toLowerCase().endsWith(".webp");
+};
 
 const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
@@ -35,6 +39,8 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
 
   const [loadingFiles, setLoadingFiles] = useState(Array(bugReport?.fileCount).fill(true) || []);
   const [files, setFiles] = useState([]);
+
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
@@ -341,9 +347,13 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                             height: "auto",
                             objectFit: "cover",
                           }}
+                          onClick={() => setSelectedFile(file)}
                         />
                       ) : (
-                        <div style={{ textAlign: "center", fontSize: "0.9rem", padding: "5px" }}>
+                        <div
+                          style={{ textAlign: "center", fontSize: "0.9rem", padding: "5px" }}
+                          onClick={() => setSelectedFile(file)}
+                        >
                           📄 {file ? file.name : "Datei"}
                         </div>
                       )}
@@ -413,6 +423,10 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {selectedFile && (
+        <FileViewer show={true} handleClose={() => setSelectedFile(null)} file={selectedFile} />
+      )}
     </>
   );
 };
