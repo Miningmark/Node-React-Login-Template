@@ -48,7 +48,7 @@ function Login({ maintenanceMode, registration }) {
         }
       );
 
-      login(res.data.accessToken, res.data.username, res.data.routeGroups);
+      login(res.data.accessToken, res.data.username, res.data.routeGroups, res.data.userId);
 
       addToast("Login erfolgreich", "success");
 

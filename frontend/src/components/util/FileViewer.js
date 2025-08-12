@@ -61,11 +61,19 @@ const FileViewer = ({ show, handleClose, file }) => {
   const ext = getFileExtension(file.name);
 
   return (
-    <Modal show={show} onHide={closeModal} size="lg" centered>
+    <Modal show={show} onHide={closeModal} size="xl" centered>
       <Modal.Header closeButton>
         <Modal.Title>Datei anzeigen: {file.name}</Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ minHeight: "300px", overflowY: "auto" }}>
+      <Modal.Body
+        style={{
+          minHeight: "300px",
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         {error && <div className="text-danger mb-2">{error}</div>}
 
         {IMAGE_EXTENSIONS.includes(ext) && (

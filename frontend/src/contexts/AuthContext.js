@@ -7,17 +7,21 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsername] = useState(null);
   const [routeGroups, setRouteGroups] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [userId, setUserId] = useState(null);
 
-  function login(newAccessToken, username, routeGroups) {
+  function login(newAccessToken, username, routeGroups, userId) {
     setAccessToken(newAccessToken);
     setUsername(username);
     setRouteGroups(routeGroups);
+    setUserId(userId);
   }
 
   async function logout() {
     setAccessToken(null);
     setUsername(null);
     setRouteGroups(null);
+    setAvatar(null);
+    setUserId(null);
   }
 
   function checkAccess(allowedGroupNames) {
@@ -40,10 +44,12 @@ export const AuthProvider = ({ children }) => {
         username,
         routeGroups,
         avatar,
+        userId,
         setAccessToken,
         setUsername,
         setRouteGroups,
         setAvatar,
+        setUserId,
         login,
         logout,
         checkAccess,

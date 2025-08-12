@@ -12,15 +12,8 @@ const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_FILE_TYPES =
   ".conf, .def, .doc, .docx, .dot, .in, .ini, .jpe, .jpeg, .jpg, .list, .log, .odp, .ods, .odt, .pdf, .png, .pot, .pps, .ppt, .pptx, .text, .txt, .webp, .xla, .xlc, .xlm, .xls, .xlsx, .xlt, .xlw";
-const STATUS_TYPES = [
-  { name: "Offen", value: "NEW" },
-  { name: "In Bearbeitung", value: "IN_PROGRESS" },
-  { name: "Abgeschlossen", value: "CLOSED" },
-  { name: "Abgelehnt", value: "REJECTED" },
-  { name: "Angenommen", value: "CONFIRMED" },
-];
 
-const CreateBugReport = ({ show, handleClose, bugReport }) => {
+const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
   const [description, setDescription] = useState(bugReport ? bugReport.description : "");
   const [status, setStatus] = useState(bugReport ? bugReport.status : STATUS_TYPES[0].value);
@@ -40,7 +33,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { checkAccess } = useContext(AuthContext);
+  const { checkAccess, userId } = useContext(AuthContext);
 
   useEffect(() => {
     if (checkAccess(["adminPagePermissionsWrite"]) && bugReport && bugReport?.fileCount > 0) {
@@ -379,6 +372,21 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                       <Form.Select name="types" value={status} onChange={handleStatusChange}>
                         {STATUS_TYPES.map((type, index) => (
                           <option key={index} value={type.value}>
+                            {type.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </Form>
+                </>
+              ) : bugReport.userId === userId ? (
+                <>
+                  <Form className="mb-3 mt-5">
+                    <Form.Group className="mb-0">
+                      <Form.Label>Status</Form.Label>
+                      <Form.Select name="types" value={status} onChange={handleStatusChange}>
+                        {STATUS_TYPES.map((type, index) => (
+                          <option key={index} value={type.value} disabled={type.value !== "CLOSED"}>
                             {type.name}
                           </option>
                         ))}
