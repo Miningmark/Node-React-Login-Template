@@ -15,30 +15,30 @@ const userManagementController = new UserManagementController(userManagementServ
 
 router.get(
     "/getUsers{/:limit-:offset}",
-    verifyPermission([USER_MANAGEMENT_READ.groupName, USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     verifyAuth(),
+    verifyPermission([USER_MANAGEMENT_READ.groupName, USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     validateRequest(getUsersSchema),
     userManagementController.getUsers
 );
 router.get(
     "/getAvatar{/:id}",
-    verifyPermission([USER_MANAGEMENT_READ.groupName, USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     verifyAuth(),
+    verifyPermission([USER_MANAGEMENT_READ.groupName, USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     validateRequest(getAvatarSchema),
     userManagementController.getAvatar
 );
 
 router.get(
     "/getPermissions",
-    verifyPermission([USER_MANAGEMENT_READ.groupName, USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     verifyAuth(),
+    verifyPermission([USER_MANAGEMENT_READ.groupName, USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     validateRequest(onlyAuthorizationSchema),
     userManagementController.getPermissions
 );
 
-router.post("/updateUser", verifyPermission([USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]), verifyAuth(), validateRequest(updateUserSchema), userManagementController.updateUser);
-router.post("/createUser", verifyPermission([USER_MANAGEMENT_CREATE.groupName]), verifyAuth(), validateRequest(createUserSchema), userManagementController.createUser);
+router.post("/updateUser", verifyAuth(), verifyPermission([USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]), validateRequest(updateUserSchema), userManagementController.updateUser);
+router.post("/createUser", verifyAuth(), verifyPermission([USER_MANAGEMENT_CREATE.groupName]), validateRequest(createUserSchema), userManagementController.createUser);
 
-router.post("/deleteAvatar", verifyPermission([USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]), verifyAuth(), validateRequest(deleteAvatarSchema), userManagementController.deleteAvatar);
+router.post("/deleteAvatar", verifyAuth(), verifyPermission([USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]), validateRequest(deleteAvatarSchema), userManagementController.deleteAvatar);
 
 export default router;

@@ -14,7 +14,7 @@ const multerInstance = multer();
 const bugReportService = new BugReportService();
 const bugReportController = new BugReportController(bugReportService);
 
-router.get("/getBugReports{/:limit-:offset}", verifyPermission([BUG_REPORT_READ.groupName, BUG_REPORT_WRITE.groupName]), verifyAuth(), validateRequest(getBugReportsSchema), bugReportController.getBugReports);
+router.get("/getBugReports{/:limit-:offset}", verifyAuth(), verifyPermission([BUG_REPORT_READ.groupName, BUG_REPORT_WRITE.groupName]), validateRequest(getBugReportsSchema), bugReportController.getBugReports);
 
 router.get("/getActiveBugReports{/:limit-:offset}", verifyAuth(), validateRequest(getActiveBugReportsSchema), bugReportController.getActiveBugReports);
 router.get("/getOwnBugReports{/:limit-:offset}", verifyAuth(), validateRequest(getOwnBugReportsSchema), bugReportController.getOwnBugReports);
