@@ -4,15 +4,13 @@ import { useToast } from "components/ToastContext";
 import useAxiosProtected from "hook/useAxiosProtected";
 import { AuthContext } from "contexts/AuthContext";
 import TextEditor from "components/util/TextEditor";
-import { convertToInputDateTime, convertToLocalTimeStamp } from "util/timeConverting";
+import { convertToLocalTimeStamp } from "util/timeConverting";
 import DOMPurify from "dompurify";
 
 const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_FILE_TYPES =
   ".conf, .def, .doc, .docx, .dot, .in, .ini, .jpe, .jpeg, .jpg, .list, .log, .odp, .ods, .odt, .pdf, .png, .pot, .pps, .ppt, .pptx, .text, .txt, .webp, .xla, .xlc, .xlm, .xls, .xlsx, .xlt, .xlw";
-const ACCEPTED_IMAGE_EXTENSIONS = [".jpe", ".jpeg", ".jpg", ".png", ".webp"];
-
 const STATUS_TYPES = [
   { name: "Offen", value: "NEW" },
   { name: "In Bearbeitung", value: "IN_PROGRESS" },
@@ -20,8 +18,7 @@ const STATUS_TYPES = [
   { name: "Abgelehnt", value: "REJECTED" },
   { name: "Angenommen", value: "CONFIRMED" },
 ];
-const isImageFile = (fileName) =>
-  ACCEPTED_IMAGE_EXTENSIONS.some((ext) => fileName.toLowerCase().endsWith(ext));
+const isImageFile = (fileName) => fileName?.toLowerCase().endsWith(".webp");
 
 const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
@@ -310,6 +307,8 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
               {checkAccess(["adminPagePermissionsWrite"]) &&
                 loadingFiles.map((item, index) => {
                   const file = files[index];
+                  console.log("Filename:", file ? file.name : "Loading...");
+                  console.log("Filename:", files ? files[index]?.name : "Loading...");
 
                   return (
                     <div
