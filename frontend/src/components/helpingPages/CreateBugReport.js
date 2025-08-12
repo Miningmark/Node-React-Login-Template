@@ -313,11 +313,10 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
                     <div
                       key={index}
                       style={{
-                        flex: "1 1 0",
-                        width:
+                        flex:
                           file && file.name.toLowerCase().endsWith(".pdf")
-                            ? "100%"
-                            : `${100 / loadingFiles.length}%`,
+                            ? "0 0 100%"
+                            : `1 1 ${100 / loadingFiles.length}%`,
                         aspectRatio: item ? "1 / 1" : "auto",
                         display: "flex",
                         alignItems: "center",

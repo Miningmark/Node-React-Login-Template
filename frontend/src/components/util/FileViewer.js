@@ -99,7 +99,6 @@ const FileViewer = ({ show, handleClose, file }) => {
                   wordBreak: "break-word",
                   maxHeight: "70vh",
                   overflowY: "auto",
-                  backgroundColor: "#f8f9fa",
                   padding: "10px",
                   borderRadius: "6px",
                   border: "1px solid #ddd",
