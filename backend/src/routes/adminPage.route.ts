@@ -1,8 +1,15 @@
 import { AdminPageController } from "@/controllers/adminPage.controller.js";
-import { SmartRouter } from "@/lib/smartRouter.lib.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
-import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
+import { verifyPermission } from "@/middlewares/verifyPermission.middleware.js";
+import {
+    ADMIN_PAGE_MAINTENANCE_MODE_WRITE,
+    ADMIN_PAGE_NOTIFICATIONS_READ,
+    ADMIN_PAGE_NOTIFICATIONS_WRITE,
+    ADMIN_PAGE_PERMISSIONS_READ,
+    ADMIN_PAGE_PERMISSIONS_WRITE,
+    ADMIN_PAGE_SERVER_LOG_READ
+} from "@/routeGroups/adminPage.routeGroup.js";
 import { AdminPageService } from "@/services/adminPage.service.js";
 import {
     createNotificationSchema,
@@ -17,32 +24,42 @@ import {
     updatePermissionSchema
 } from "@/validators/adminPage.validator.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
+import { Router } from "express";
 
-export default async () => {
-    const smartRouter = new SmartRouter();
+const router = Router();
+const adminPageService = new AdminPageService();
+const adminPageController = new AdminPageController(adminPageService);
 
-    const adminPageService = new AdminPageService();
-    const adminPageController = new AdminPageController(adminPageService);
+router.get("/getServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
+router.get("/getFilterOptionsServerLog", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(onlyAuthorizationSchema), adminPageController.getFilterOptionsServerLog);
 
-    smartRouter.get("/getServerLogs{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PAGE_SERVER_LOG_READ, verifyAuth(), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
-    smartRouter.get("/getFilterOptionsServerLog", AdminPageRouteGroups.ADMIN_PAGE_SERVER_LOG_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), adminPageController.getFilterOptionsServerLog);
+router.post("/getFilteredServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
 
-    smartRouter.post("/getFilteredServerLogs{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PAGE_SERVER_LOG_READ, verifyAuth(), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
+router.get(
+    "/getPermissionsWithRouteGroups",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_PERMISSIONS_READ.groupName, ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
+    validateRequest(onlyAuthorizationSchema),
+    adminPageController.getPermissionsWithRouteGroups
+);
+router.get("/getRouteGroups", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_READ.groupName, ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(onlyAuthorizationSchema), adminPageController.getRouteGroups);
 
-    smartRouter.get("/getPermissionsWithRouteGroups", AdminPageRouteGroups.ADMIN_PAGE_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), adminPageController.getPermissionsWithRouteGroups);
-    smartRouter.get("/getRouteGroups", AdminPageRouteGroups.ADMIN_PAGE_PERMISSIONS_READ, verifyAuth(), validateRequest(onlyAuthorizationSchema), adminPageController.getRouteGroups);
+router.post("/createPermission", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(createPermissionSchema), adminPageController.createPermission);
+router.post("/updatePermission", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(updatePermissionSchema), adminPageController.updatePermission);
+router.post("/deletePermission", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(deletePermissionSchema), adminPageController.deletePermission);
 
-    smartRouter.post("/createPermission", AdminPageRouteGroups.ADMIN_PAGE_PERMISSIONS_WRITE, verifyAuth(), validateRequest(createPermissionSchema), adminPageController.createPermission);
-    smartRouter.post("/updatePermission", AdminPageRouteGroups.ADMIN_PAGE_PERMISSIONS_WRITE, verifyAuth(), validateRequest(updatePermissionSchema), adminPageController.updatePermission);
-    smartRouter.post("/deletePermission", AdminPageRouteGroups.ADMIN_PAGE_PERMISSIONS_WRITE, verifyAuth(), validateRequest(deletePermissionSchema), adminPageController.deletePermission);
+router.get(
+    "/getNotifications{/:limit-:offset}",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_NOTIFICATIONS_READ.groupName, ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
+    validateRequest(getNotificationsSchema),
+    adminPageController.getNotifications
+);
 
-    smartRouter.get("/getNotifications{/:limit-:offset}", AdminPageRouteGroups.ADMIN_PAGE_NOTIFICATIONS_READ, verifyAuth(), validateRequest(getNotificationsSchema), adminPageController.getNotifications);
+router.post("/createNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(createNotificationSchema), adminPageController.createNotification);
+router.post("/updateNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(updateNotificationSchema), adminPageController.updateNotification);
+router.post("/deleteNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(deleteNotificationSchema), adminPageController.deleteNotification);
 
-    smartRouter.post("/createNotification", AdminPageRouteGroups.ADMIN_PAGE_NOTIFICATIONS_WRITE, verifyAuth(), validateRequest(createNotificationSchema), adminPageController.createNotification);
-    smartRouter.post("/updateNotification", AdminPageRouteGroups.ADMIN_PAGE_NOTIFICATIONS_WRITE, verifyAuth(), validateRequest(updateNotificationSchema), adminPageController.updateNotification);
-    smartRouter.post("/deleteNotification", AdminPageRouteGroups.ADMIN_PAGE_NOTIFICATIONS_WRITE, verifyAuth(), validateRequest(deleteNotificationSchema), adminPageController.deleteNotification);
+router.post("/updateMaintenanceMode", verifyAuth(), verifyPermission([ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName]), validateRequest(updateMaintenanceModeSchema), adminPageController.updateMaintenanceMode);
 
-    smartRouter.post("/updateMaintenanceMode", AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE, verifyAuth(), validateRequest(updateMaintenanceModeSchema), adminPageController.updateMaintenanceMode);
-
-    return smartRouter.getExpressRouter();
-};
+export default router;

@@ -1,6 +1,9 @@
 import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
-import { GroupEntry } from "@/routeGroups";
+import { isGroupEntry } from "@/routeGroups/index.js";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 
 export class RouteGroupService {
     async generateUserRouteGroupArray(databaseUser: User): Promise<string[]> {
@@ -42,19 +45,36 @@ export class RouteGroupService {
         };
     }
 
-    static async registerRouteGroup(groupEntry: GroupEntry) {
-        const [routeGroup, isRouteGroupCreated] = await RouteGroup.findOrCreate({
-            where: { name: groupEntry.groupName },
-            defaults: { name: groupEntry.groupName, description: groupEntry.groupDescription }
-        });
+    static async createRouteGroups() {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const routeGroupsDir = path.join(__dirname, "..", "routeGroups");
 
-        if (isRouteGroupCreated === false) {
-            if (routeGroup.description !== groupEntry.groupDescription) {
-                routeGroup.description = groupEntry.groupDescription;
+        const files = await fs.readdir(routeGroupsDir);
+
+        for (const file of files) {
+            if (!(file.endsWith(".routeGroup.ts") || file.endsWith(".routeGroup.js"))) continue;
+
+            const fullPath = path.join(routeGroupsDir, file);
+            const moduleUrl = pathToFileURL(fullPath).toString();
+
+            for (const [exportName, routeGroup] of Object.entries(await import(moduleUrl))) {
+                if (isGroupEntry(routeGroup)) {
+                    const [databaseRouteGroup, isDatabaseRouteGroupCreated] = await RouteGroup.findOrCreate({
+                        where: { name: routeGroup.groupName },
+                        defaults: { name: routeGroup.groupName, description: routeGroup.groupDescription }
+                    });
+
+                    if (isDatabaseRouteGroupCreated === false) {
+                        if (databaseRouteGroup.description !== routeGroup.groupDescription) {
+                            databaseRouteGroup.description = routeGroup.groupDescription;
+                        }
+
+                        databaseRouteGroup.updatedAt = new Date(Date.now());
+                        await databaseRouteGroup.save();
+                    }
+                }
             }
-
-            routeGroup.updatedAt = new Date(Date.now());
-            await routeGroup.save();
         }
     }
 

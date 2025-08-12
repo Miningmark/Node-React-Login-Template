@@ -8,7 +8,7 @@ import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.
 import User from "@/models/user.model.js";
 import UserNotification from "@/models/userNotifications.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
-import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
+import { ADMIN_PAGE_MAINTENANCE_MODE_WRITE } from "@/routeGroups/adminPage.routeGroup.js";
 import { NotificationService } from "@/services/notification.service.js";
 import { PermissionService } from "@/services/permission.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
@@ -274,7 +274,7 @@ export class AdminPageService {
                 let shouldLoggout = true;
                 databaseUser.permissions?.map((databaseUserPermissions) => {
                     databaseUserPermissions.routeGroups?.map((databaseUserRouteGroups) => {
-                        if (databaseUserRouteGroups.name === AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName) {
+                        if (databaseUserRouteGroups.name === ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName) {
                             shouldLoggout = false;
                         }
                     });
