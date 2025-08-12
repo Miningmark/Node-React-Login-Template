@@ -9,6 +9,8 @@ import DOMPurify from "dompurify";
 
 const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
+const ACCEPTED_FILE_TYPES =
+  ".conf, .def, .doc, .docx, .dot, .in, .ini, .jpe, .jpeg, .jpg, .list, .log, .odp, .ods, .odt, .pdf, .png, .pot, .pps, .ppt, .pptx, .text, .txt, .webp, .xla, .xlc, .xlm, .xls, .xlsx, .xlt, .xlw";
 
 const CreateBugReport = ({ show, handleClose, bugReport }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
@@ -157,7 +159,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                 <input
                   id="multiUpload"
                   type="file"
-                  accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.txt"
+                  accept={ACCEPTED_FILE_TYPES}
                   multiple
                   style={{ display: "none" }}
                   onChange={handleFileChange}

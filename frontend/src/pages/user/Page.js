@@ -616,7 +616,7 @@ const UserPage = ({ usernameChange }) => {
                     <input
                       id="profileImage"
                       type="file"
-                      accept="image/*"
+                      accept=".jpe, .jpeg, .jpg, .png, .webp"
                       onChange={handleUpdateProfileImage}
                       style={{
                         display: "none",
