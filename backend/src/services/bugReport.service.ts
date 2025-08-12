@@ -3,6 +3,7 @@ import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
 import { BugReportRouteGroups } from "@/routeGroups/bugReport.routeGroup.js";
 import { S3Service } from "@/services/s3.service.js";
+import { Op } from "@sequelize/core";
 import path from "path";
 import sharp from "sharp";
 
@@ -17,6 +18,20 @@ export class BugReportService {
         const databaseBugReports = await BugReport.findAll({ ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}), order: [["id", "DESC"]] });
 
         jsonResponse.bugReportCount = await BugReport.count();
+        jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
+    async getActiveBugReports(limit?: number, offset?: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Alle aktiven BugReports erfolgreich zurückgegeben" };
+        const databaseBugReports = await BugReport.findAll({
+            where: { status: { [Op.or]: [BugReportStatusType.CONFIRMED, BugReportStatusType.IN_PROGRESS] } },
+            ...(limit !== undefined && offset !== undefined ? { limit: limit, offset: offset } : {}),
+            order: [["id", "DESC"]]
+        });
+
+        jsonResponse.bugReportCount = await BugReport.count({ where: { status: { [Op.or]: [BugReportStatusType.CONFIRMED, BugReportStatusType.IN_PROGRESS] } } });
         jsonResponse.bugReports = this.generateJSONResponse(databaseBugReports);
 
         return { type: "json", jsonResponse: jsonResponse };
