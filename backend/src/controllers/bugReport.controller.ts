@@ -1,7 +1,7 @@
 import { ValidatedRequest } from "@/@types/validation";
 import { BaseController } from "@/controllers/base.controller.js";
 import { BugReportService } from "@/services/bugReport.service.js";
-import { CreateBugReportValidation, GetBugReportFileValidation, GetBugReportsValidation, GetOwnBugReportsValidation, UpdateBugReportStatusValidation } from "@/validators/bugReport.validator.js";
+import { CreateBugReportValidation, GetActiveBugReportsValidation, GetBugReportFileValidation, GetBugReportsValidation, GetOwnBugReportsValidation, UpdateBugReportStatusValidation } from "@/validators/bugReport.validator.js";
 import { NextFunction, Response } from "express";
 
 export class BugReportController extends BaseController {
@@ -14,6 +14,14 @@ export class BugReportController extends BaseController {
             const { limit, offset } = req.validated.params;
 
             return await this.bugReportService.getBugReports(limit, offset);
+        });
+    };
+
+    getActiveBugReports = (req: ValidatedRequest<GetActiveBugReportsValidation>, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { limit, offset } = req.validated.params;
+
+            return await this.bugReportService.getActiveBugReports(limit, offset);
         });
     };
 

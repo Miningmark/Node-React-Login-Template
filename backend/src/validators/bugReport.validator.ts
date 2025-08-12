@@ -8,6 +8,12 @@ export const getBugReportsSchema = z.object({
     params: limitAndOffsetParams
 });
 
+export type GetActiveBugReportsValidation = z.infer<typeof getActiveBugReportsSchema>;
+export const getActiveBugReportsSchema = z.object({
+    headers: authorizationHeader,
+    params: limitAndOffsetParams
+});
+
 export type GetOwnBugReportsValidation = z.infer<typeof getOwnBugReportsSchema>;
 export const getOwnBugReportsSchema = z.object({
     headers: authorizationHeader,
