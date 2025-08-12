@@ -91,6 +91,7 @@ export class AuthService {
         this.tokenService.setRefreshTokenCookie(res, resultJWTs.refreshToken);
 
         jsonResponse.accessToken = resultJWTs.accessToken;
+        jsonResponse.userId = databaseUser.id;
         jsonResponse.username = capitalizeFirst(databaseUser.username);
         jsonResponse.routeGroups = routeGroupsArray;
 

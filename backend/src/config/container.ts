@@ -1,5 +1,7 @@
+import "reflect-metadata";
+
 import { container } from "tsyringe";
-import { ServerLogService } from "@/services/serverLog.service.js";
+/*import { ServerLogService } from "@/services/serverLog.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { PermissionService } from "@/services/permission.service.js";
 import { NotificationService } from "@/services/notification.service.js";
@@ -14,6 +16,6 @@ container.registerSingleton(AdminPageService, AdminPageService);
 
 container.register<SocketService>("SocketService", {
     useValue: SocketService.getInstance()
-});
+});*/
 
 export { container };
