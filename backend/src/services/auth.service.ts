@@ -4,7 +4,7 @@ import { ForbiddenError, InternalServerError, UnauthorizedError, ValidationError
 import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.js";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
-import { AdminPageRouteGroups } from "@/routeGroups/adminPage.routeGroup.js";
+import { ADMIN_PAGE_MAINTENANCE_MODE_WRITE } from "@/routeGroups/adminPage.routeGroup.js";
 import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { TokenService } from "@/services/token.service.js";
@@ -66,7 +66,7 @@ export class AuthService {
 
         if (databaseServerSetting.value === true) {
             console.log(routeGroupsArray);
-            if (!routeGroupsArray.includes(AdminPageRouteGroups.ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName)) {
+            if (!routeGroupsArray.includes(ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName)) {
                 throw new ForbiddenError("Server befindet sich momentan im Wartungsmodus bitte später nochmal versuchen.");
             }
         }

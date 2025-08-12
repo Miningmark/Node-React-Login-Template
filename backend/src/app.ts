@@ -34,9 +34,9 @@ export async function initApp() {
     app.use("/api/" + ENV.API_VERSION + "/auth", authRoutes);
     app.use("/api/" + ENV.API_VERSION + "/user", userRoutes);
 
-    app.use("/api/" + ENV.API_VERSION + "/userManagement", await userManagementRoutes());
-    app.use("/api/" + ENV.API_VERSION + "/adminPage", await adminPageRoutes());
-    app.use("/api/" + ENV.API_VERSION + "/bugReport", await bugReportRoutes());
+    app.use("/api/" + ENV.API_VERSION + "/userManagement", userManagementRoutes);
+    app.use("/api/" + ENV.API_VERSION + "/adminPage", adminPageRoutes);
+    app.use("/api/" + ENV.API_VERSION + "/bugReport", bugReportRoutes);
 
     app.use(notFoundMiddleware);
     app.use(errorHandlerMiddleware);

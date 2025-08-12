@@ -1,7 +1,7 @@
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
-import { BugReportRouteGroups } from "@/routeGroups/bugReport.routeGroup.js";
+import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
 import { S3Service } from "@/services/s3.service.js";
 import { Op } from "@sequelize/core";
 import path from "path";
@@ -54,7 +54,7 @@ export class BugReportService {
         const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
-        if (databaseBugReport.userId !== userId && routeGroups.includes(BugReportRouteGroups.BUG_REPORT_READ.groupName) === false) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports ansehen");
+        if (databaseBugReport.userId !== userId && routeGroups.includes(BUG_REPORT_READ.groupName) === false) throw new ForbiddenError("Du kannst nur Dateien von deinen eigenen BugReports ansehen");
         if (databaseBugReport.fileNames.length === 0 || databaseBugReport.fileNames.length < fileIndex) throw new ValidationError("Es ist keine Datei mit diesen Index vorhanden");
 
         try {
@@ -97,9 +97,8 @@ export class BugReportService {
         const databaseBugReport = await BugReport.findOne({ where: { id: id } });
 
         if (databaseBugReport === null) throw new ValidationError("Keinen BugReport mit dieser ID gefunden");
-        if (databaseBugReport.userId !== userId && routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false)
-            throw new ForbiddenError("Du kannst nur den Status von deinen eigenen BugReports bearbeiten");
-        if (routeGroups.includes(BugReportRouteGroups.BUG_REPORT_WRITE.groupName) === false && (databaseBugReport.status !== BugReportStatusType.NEW || status !== BugReportStatusType.CLOSED))
+        if (databaseBugReport.userId !== userId && routeGroups.includes(BUG_REPORT_WRITE.groupName) === false) throw new ForbiddenError("Du kannst nur den Status von deinen eigenen BugReports bearbeiten");
+        if (routeGroups.includes(BUG_REPORT_WRITE.groupName) === false && (databaseBugReport.status !== BugReportStatusType.NEW || status !== BugReportStatusType.CLOSED))
             throw new ForbiddenError('Du kannst deine eigenen BugReports nur auf "GESCHLOSSEN" setzen wenn der Status noch auf "NEU" ist');
 
         databaseBugReport.status = status;
