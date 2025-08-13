@@ -6,8 +6,6 @@ import { useToast } from "components/ToastContext";
 import menuItems from "./menuStruckture";
 import useAxiosProtected from "hook/useAxiosProtected";
 
-import "./sideMenuDesktop.css";
-
 //Icons
 import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
 import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
@@ -33,7 +31,6 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
 
   const setMenuBookmarks = useSettingsStore((state) => state.setMenuBookmarks);
   const menuBookmarks = useSettingsStore((state) => state.menuBookmarks);
-  console.log("Bookmarks:", menuBookmarks);
 
   // Submenus automatisch öffnen, wenn aktives SubItem vorhanden
   useEffect(() => {
@@ -117,7 +114,7 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
       ) : null}
 
       {/* Bookmarks anzeigen */}
-      {menuBookmarks.length > 0 && (
+      {(isHovered || menuFixed) && menuBookmarks.length > 0 && (
         <ul className="bookmarks-list">
           {menuBookmarks.map((bm, idx) => (
             <li key={idx}>
@@ -175,20 +172,26 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
                     {accessibleSubItems.map((subItem, subIdx) => {
                       const isActive = subItem.path === currentPath;
                       return (
-                        <li key={subIdx} className="submenu-item">
+                        <li
+                          key={subIdx}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span style={{ marginRight: "8px" }}>•</span>
                           <Link
                             to={subItem.path}
                             className={`submenu-link ${isActive ? "active" : ""}`}
                           >
                             {subItem.name}
                           </Link>
+
                           <span
                             className="bookmark-icon"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              toggleBookmark(subItem.name, subItem.path);
-                            }}
+                            style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                            onClick={() => toggleBookmark(subItem.name, subItem.path)}
                             title={
                               isBookmarked(subItem.path)
                                 ? "Bookmark entfernen"
@@ -196,9 +199,9 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
                             }
                           >
                             {isBookmarked(subItem.path) ? (
-                              <BookmarkCheckIcon className="keep-icon" />
+                              <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
                             ) : (
-                              <BookmarkIcon className="keep-icon" />
+                              <BookmarkIcon style={{ width: 20, height: 20 }} />
                             )}
                           </span>
                         </li>
@@ -221,17 +224,7 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
                   alignItems: "center",
                 }}
               >
-                <Link
-                  to={item.path}
-                  className={`menu-link ${isActiveMain ? "active" : ""}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexGrow: 1,
-                    textDecoration: "none",
-                    color: "inherit",
-                  }}
-                >
+                <Link to={item.path} className={`menu-link ${isActiveMain ? "active" : ""}`}>
                   {item.icon && (
                     <span
                       className="icon-wrapper"

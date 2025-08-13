@@ -117,6 +117,7 @@
   color: var(--bs-body-color);
   text-decoration: none;
   transition: background 0.2s ease;
+  width: 260px;
 }
 
 .menu-parent.active,
@@ -177,14 +178,15 @@
 
 /* Submenu */
 .submenu {
-  padding-left: 24px;
+  padding-left: 14px;
 }
 
 .submenu-link {
   display: block;
-  padding: 4px 0;
+  padding: 0;
   color: var(--bs-body-color);
   text-decoration: none;
+  width: 200px;
 }
 
 /* Sidebar header */
