@@ -27,6 +27,16 @@ class UserSettings extends Model<InferAttributes<UserSettings>, InferCreationAtt
     @NotNull
     declare isSideMenuFixed: CreationOptional<boolean>;
 
+    @Attribute(DataTypes.JSON)
+    @Default([])
+    @NotNull
+    declare menuBookmarks: CreationOptional<
+        {
+            linkName: string;
+            link: string;
+        }[]
+    >;
+
     declare user?: NonAttribute<User>;
 
     declare getUser: BelongsToGetAssociationMixin<User>;

@@ -33,7 +33,12 @@ export const updateSettingsSchema = z.object({
     body: z
         .object({
             theme: z.enum(Object.values(UserSettingsTheme)).optional(),
-            isSideMenuFixed: z.boolean().optional()
+            isSideMenuFixed: z.boolean().optional(),
+            menuBookmarks: z
+                .array(z.object({ linkName: z.string(), link: z.string() }))
+                .min(0)
+                .max(5)
+                .optional()
         })
         .refine((data) => {
             return data.theme !== undefined || data.isSideMenuFixed !== undefined;
