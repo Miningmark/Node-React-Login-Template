@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const socketDir = path.join(__dirname, "sockets");
+const socketDir = path.join(__dirname, "..", "socketIO", "sockets");
 
 @singleton()
 export class SocketService {
