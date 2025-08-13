@@ -2,12 +2,13 @@ import { ENV } from "@/config/env.js";
 import { BadRequestError } from "@/errors/badRequestError.js";
 import { CreateBucketCommand, DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
+import { singleton } from "tsyringe";
 
+@singleton()
 export class S3Service {
-    private static instance: S3Service;
     private s3Client: S3Client;
 
-    private constructor() {
+    constructor() {
         this.s3Client = new S3Client({
             region: "us-east-1",
             endpoint: ENV.S3_BASE_URL,
@@ -17,13 +18,6 @@ export class S3Service {
                 secretAccessKey: ENV.S3_PASSWORD
             }
         });
-    }
-
-    public static getInstance(): S3Service {
-        if (!S3Service.instance) {
-            S3Service.instance = new S3Service();
-        }
-        return S3Service.instance;
     }
 
     private async ensureBucketExists(bucket: string): Promise<void> {

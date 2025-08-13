@@ -1,7 +1,11 @@
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { Op, WhereOptions } from "@sequelize/core";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class ServerLogService {
+    constructor() {}
+
     generateJSONResponse(databaseServerLogs: ServerLog[]): Record<string, any> {
         return databaseServerLogs.map((databaseServerLog) => {
             return {

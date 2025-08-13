@@ -9,25 +9,22 @@ import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { S3Service } from "@/services/s3.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserService } from "@/services/user.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
 import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
 import { Op } from "@sequelize/core";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class UserManagementService {
-    private emailService: EmailService;
-    private routeGroupService: RouteGroupService;
-    private tokenService: TokenService;
-    private userService: UserService;
-    private s3Service: S3Service;
-
-    constructor() {
-        this.emailService = EmailService.getInstance();
-        this.routeGroupService = new RouteGroupService();
-        this.tokenService = new TokenService();
-        this.userService = new UserService();
-        this.s3Service = S3Service.getInstance();
-    }
+    constructor(
+        @inject(EmailService) private readonly emailService: EmailService,
+        @inject(RouteGroupService) private readonly routeGroupService: RouteGroupService,
+        @inject(TokenService) private readonly tokenService: TokenService,
+        @inject(UserService) private readonly userService: UserService,
+        @inject(S3Service) private readonly s3Service: S3Service,
+        @inject(SocketService) private readonly socketService: SocketService
+    ) {}
 
     async getUsers(limit?: number, offset?: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten Benutzer zurück gegeben" };
@@ -59,7 +56,7 @@ export class UserManagementService {
 
         await this.s3Service.deleteFile("users", `${userId}/avatar.webp`);
 
-        SocketService.getInstance().emitToRoom(`listen:user:${userId}`, "user:update", { avatar: null });
+        this.socketService.emitToRoom(`listen:user:${userId}`, "user:update", { avatar: null });
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -115,24 +112,24 @@ export class UserManagementService {
 
         if (username !== undefined) {
             databaseUser.username = username;
-            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { username: databaseUser.username });
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { username: databaseUser.username });
         }
 
         if (email !== undefined) {
             databaseUser.email = email;
-            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { email: databaseUser.email });
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { email: databaseUser.email });
         }
 
         if (isActive !== undefined) {
             this.tokenService.removeJWTs(databaseUser);
             databaseUser.isActive = isActive;
-            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { isActive: databaseUser.isActive });
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { isActive: databaseUser.isActive });
         }
 
         if (isDisabled !== undefined) {
             this.tokenService.removeJWTs(databaseUser);
             databaseUser.isDisabled = isDisabled;
-            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { isDisabled: databaseUser.isDisabled });
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { isDisabled: databaseUser.isDisabled });
         }
 
         if (permissionIds !== undefined) {
@@ -142,11 +139,11 @@ export class UserManagementService {
 
             databaseUser.permissions = await databaseUser.getPermissions();
 
-            SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: await this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: await this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
         }
 
         await databaseUser.save();
-        SocketService.getInstance().emitToRoom(
+        this.socketService.emitToRoom(
             "listen:userManagement:users:watchList",
             "userManagement:users:update",
             this.userService.generateJSONResponse(databaseUser.id, username, email, isActive, isDisabled, databaseUser.permissions)
@@ -179,7 +176,7 @@ export class UserManagementService {
             getCompleteAdminRegistrationEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`, formatDate(parseTimeOffsetToDate(ENV.ACCOUNT_ACTIVATION_ADMIN_EXPIRY)))
         );
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:users:watchList", "userManagement:users:create", this.userService.generateJSONResponseWithModel(databaseUser));
+        this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:create", this.userService.generateJSONResponseWithModel(databaseUser));
         return { type: "json", jsonResponse: jsonResponse };
     }
 }

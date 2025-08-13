@@ -1,4 +1,5 @@
-import "@/config/container.js";
+import "reflect-metadata";
+import { container } from "tsyringe";
 
 import app, { initApp } from "@/app.js";
 import { ENV } from "@/config/env.js";
@@ -6,16 +7,15 @@ import { consoleLogger, databaseLogger } from "@/config/logger.js";
 import { sequelize } from "@/config/sequelize.js";
 import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
-import { BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { generateDevUser, generateSuperAdmin } from "@/utils/superAdmin.util.js";
 import http from "http";
 import { Server } from "socket.io";
 
 const httpServer = http.createServer(app);
 
-const socketService = SocketService.getInstance();
+const socketService = container.resolve(SocketService);
 const io = new Server(httpServer, {
     cors: {
         origin: ENV.CORS_ALLOWED_ORIGINS,
@@ -56,7 +56,8 @@ const init = async () => {
 const shutdown = async () => {
     await databaseLogger(ServerLogTypes.WARN, "Server fährt runter", { source: "shutdown" });
 
-    SocketService.getInstance()
+    container
+        .resolve(SocketService)
         .getIO()
         .sockets.sockets.forEach((socket) => {
             socket.disconnect(true);

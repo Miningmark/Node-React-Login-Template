@@ -7,8 +7,12 @@ import crypto from "crypto";
 import { Response } from "express";
 import jsonwebtoken from "jsonwebtoken";
 import ms from "ms";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class TokenService {
+    constructor() {}
+
     clearRefreshTokenCookie(res: Response) {
         res.clearCookie("refreshToken", {
             httpOnly: true,

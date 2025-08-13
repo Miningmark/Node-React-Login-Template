@@ -2,9 +2,10 @@ import { ENV } from "@/config/env.js";
 import { databaseLogger } from "@/config/logger.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import nodemailer from "nodemailer";
+import { singleton } from "tsyringe";
 
+@singleton()
 export class EmailService {
-    private static instance: EmailService;
     private transporter!: nodemailer.Transporter;
     private readonly fromAddress: string;
 
@@ -22,13 +23,6 @@ export class EmailService {
         this.fromAddress = ENV.SMTP_USER;
 
         this.verifyConnection();
-    }
-
-    public static getInstance(): EmailService {
-        if (!EmailService.instance) {
-            EmailService.instance = new EmailService();
-        }
-        return EmailService.instance;
     }
 
     private async verifyConnection() {

@@ -1,13 +1,11 @@
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class PermissionService {
-    private routeGroupService: RouteGroupService;
-
-    constructor() {
-        this.routeGroupService = new RouteGroupService();
-    }
+    constructor(@inject(RouteGroupService) private readonly routeGroupService: RouteGroupService) {}
 
     generateMultipleJSONResponseWithModel(databasePermissions: Permission[]): Record<string, any> {
         return databasePermissions.map((databasePermission) => {

@@ -7,12 +7,11 @@ import { BugReportService } from "@/services/bugReport.service.js";
 import { createBugReportSchema, getActiveBugReportsSchema, getBugReportFileSchema, getBugReportsSchema, getOwnBugReportsSchema, updateBugReportStatusSchema } from "@/validators/bugReport.validator.js";
 import { Router } from "express";
 import multer from "multer";
+import { container } from "tsyringe";
 
 const router = Router();
+const bugReportController = container.resolve(BugReportController);
 const multerInstance = multer();
-
-const bugReportService = new BugReportService();
-const bugReportController = new BugReportController(bugReportService);
 
 router.get("/getBugReports{/:limit-:offset}", verifyAuth(), verifyPermission([BUG_REPORT_READ.groupName, BUG_REPORT_WRITE.groupName]), validateRequest(getBugReportsSchema), bugReportController.getBugReports);
 

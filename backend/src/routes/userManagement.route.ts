@@ -3,15 +3,13 @@ import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { verifyPermission } from "@/middlewares/verifyPermission.middleware.js";
 import { USER_MANAGEMENT_CREATE, USER_MANAGEMENT_READ, USER_MANAGEMENT_WRITE } from "@/routeGroups/userManagement.routeGroup.js";
-import { UserManagementService } from "@/services/userManagement.service.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
 import { createUserSchema, deleteAvatarSchema, getAvatarSchema, getUsersSchema, updateUserSchema } from "@/validators/userManagement.validator.js";
 import { Router } from "express";
+import { container } from "tsyringe";
 
 const router = Router();
-
-const userManagementService = new UserManagementService();
-const userManagementController = new UserManagementController(userManagementService);
+const userManagementController = container.resolve(UserManagementController);
 
 router.get(
     "/getUsers{/:limit-:offset}",

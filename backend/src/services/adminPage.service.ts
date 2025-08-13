@@ -13,21 +13,19 @@ import { NotificationService } from "@/services/notification.service.js";
 import { PermissionService } from "@/services/permission.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
-import { SocketService } from "@/socketIO/socket.service.js";
+import { SocketService } from "@/services/socket.service.js";
 import { Op } from "@sequelize/core";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class AdminPageService {
-    private serverLogService: ServerLogService;
-    private routeGroupService: RouteGroupService;
-    private permissionService: PermissionService;
-    private notificationService: NotificationService;
-
-    constructor() {
-        this.serverLogService = new ServerLogService();
-        this.routeGroupService = new RouteGroupService();
-        this.permissionService = new PermissionService();
-        this.notificationService = new NotificationService();
-    }
+    constructor(
+        @inject(ServerLogService) private readonly serverLogService: ServerLogService,
+        @inject(RouteGroupService) private readonly routeGroupService: RouteGroupService,
+        @inject(PermissionService) private readonly permissionService: PermissionService,
+        @inject(NotificationService) private readonly notificationService: NotificationService,
+        @inject(SocketService) private readonly socketService: SocketService
+    ) {}
 
     async getServerLogs(limit?: number, offset?: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Alle angeforderten ServerLogs zurück gegeben" };
@@ -116,8 +114,8 @@ export class AdminPageService {
         await databasePermission.setRouteGroups(databaseRouteGroups);
         databasePermission.routeGroups = await databasePermission.getRouteGroups();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:create", { id: databasePermission.id, name: name, description: description });
-        SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:create", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
+        this.socketService.emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:create", { id: databasePermission.id, name: name, description: description });
+        this.socketService.emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:create", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -125,7 +123,7 @@ export class AdminPageService {
     async updatePermission(id: number, name?: string, description?: string, routeGroupIds?: number[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Berechtigung erfolgreich bearbeitet" };
 
-        const databasePermission = await Permission.findOne({ where: { id: id } });
+        const databasePermission = await Permission.findOne({ where: { id: id }, include: { model: User } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser Id");
         if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht bearbeitet werden");
 
@@ -147,8 +145,12 @@ export class AdminPageService {
 
         await databasePermission.save();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:update", { id: id, name: name, description: description });
-        SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:update", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
+        databasePermission.users?.map(async (databaseUser) => {
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: await this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
+        });
+
+        this.socketService.emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:update", { id: id, name: name, description: description });
+        this.socketService.emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:update", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -164,8 +166,8 @@ export class AdminPageService {
 
         await databasePermission.destroy();
 
-        SocketService.getInstance().emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:delete", { id: id });
-        SocketService.getInstance().emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:delete", { id: id });
+        this.socketService.emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:delete", { id: id });
+        this.socketService.emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:delete", { id: id });
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -186,8 +188,8 @@ export class AdminPageService {
 
         const databaseNotification = await Notification.create({ name: name, description: description, notifyFrom: notifyFrom, notifyTo: notifyTo });
 
-        SocketService.getInstance().emitToRoom("listen:global:notifications:watchList", "global:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
-        SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
+        this.socketService.emitToRoom("listen:global:notifications:watchList", "global:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
+        this.socketService.emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:create", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -228,12 +230,12 @@ export class AdminPageService {
 
         if (resendNotification) {
             await UserNotification.update({ confirmed: false }, { where: { notificationId: id } });
-            SocketService.getInstance().emitToRoom("listen:global:notifications:watchList", "global:notifications:update", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
+            this.socketService.emitToRoom("listen:global:notifications:watchList", "global:notifications:update", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
         }
 
         await databaseNotification.save();
 
-        SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:update", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
+        this.socketService.emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:update", this.notificationService.generateSingleJSONResponseWithModel(databaseNotification));
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -246,7 +248,7 @@ export class AdminPageService {
 
         await databaseNotification.destroy();
 
-        SocketService.getInstance().emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:delete", { id: id });
+        this.socketService.emitToRoom("listen:adminPage:notifications:watchList", "adminPage:notifications:delete", { id: id });
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -260,7 +262,7 @@ export class AdminPageService {
         databaseServerSetting.value = active;
         databaseServerSetting.save();
 
-        SocketService.getInstance().emitToRoom("listen:adminPage:maintenanceMode:watchList", "adminPage:maintenanceMode:update", { active: active });
+        this.socketService.emitToRoom("listen:adminPage:maintenanceMode:watchList", "adminPage:maintenanceMode:update", { active: active });
 
         if (active === true) {
             const databaseUsers = await User.findAll({
@@ -281,7 +283,7 @@ export class AdminPageService {
                 });
 
                 if (shouldLoggout === true) {
-                    SocketService.getInstance().emitToRoom(`listen:user:${databaseUser.id}`, "user:logout", {});
+                    this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:logout", {});
 
                     databaseUser.userTokens?.map((databaseUserToken) => {
                         databaseUserToken.destroy();

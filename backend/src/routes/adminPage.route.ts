@@ -10,7 +10,6 @@ import {
     ADMIN_PAGE_PERMISSIONS_WRITE,
     ADMIN_PAGE_SERVER_LOG_READ
 } from "@/routeGroups/adminPage.routeGroup.js";
-import { AdminPageService } from "@/services/adminPage.service.js";
 import {
     createNotificationSchema,
     createPermissionSchema,
@@ -25,10 +24,10 @@ import {
 } from "@/validators/adminPage.validator.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
 import { Router } from "express";
+import { container } from "tsyringe";
 
 const router = Router();
-const adminPageService = new AdminPageService();
-const adminPageController = new AdminPageController(adminPageService);
+const adminPageController = container.resolve(AdminPageController);
 
 router.get("/getServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
 router.get("/getFilterOptionsServerLog", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(onlyAuthorizationSchema), adminPageController.getFilterOptionsServerLog);

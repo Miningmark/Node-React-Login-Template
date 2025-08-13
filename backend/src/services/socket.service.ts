@@ -9,24 +9,18 @@ import fs from "fs/promises";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import path from "path";
 import { Server, Socket } from "socket.io";
+import { singleton } from "tsyringe";
 import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const socketDir = path.join(__dirname, "sockets");
+const socketDir = path.join(__dirname, "..", "socketIO", "sockets");
 
+@singleton()
 export class SocketService {
-    private static instance: SocketService;
     private io?: Server<ClientToServerEvents, ServerToClientEvents>;
 
-    private constructor() {}
-
-    public static getInstance(): SocketService {
-        if (!SocketService.instance) {
-            SocketService.instance = new SocketService();
-        }
-        return SocketService.instance;
-    }
+    constructor() {}
 
     public init(io: Server<ClientToServerEvents, ServerToClientEvents>) {
         this.io = io;

@@ -2,17 +2,15 @@ import { ENV } from "@/config/env.js";
 import { UserController } from "@/controllers/user.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
-import { UserService } from "@/services/user.service.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
 import { confirmPendingNotificationSchema, updateAvatarSchema, updateEmailSchema, updatePasswordSchema, updateSettingsSchema, updateUsernameSchema } from "@/validators/user.validator.js";
 import { Router } from "express";
 import multer from "multer";
+import { container } from "tsyringe";
 
 const router = Router();
+const userController = container.resolve(UserController);
 const multerInstance = multer();
-
-const userService = new UserService();
-const userController = new UserController(userService);
 
 if (ENV.ENABLE_USERNAME_CHANGE === true) {
     router.post("/updateUsername", validateRequest(updateUsernameSchema), verifyAuth(), userController.updateUsername);
@@ -30,6 +28,7 @@ router.get("/getUsername", validateRequest(onlyAuthorizationSchema), verifyAuth(
 router.get("/getRouteGroups", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getRouteGroups);
 router.get("/getLastLogins", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getLastLogins);
 router.get("/getSettings", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getSettings);
+router.get("/getUserId", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getUserId);
 
 router.get("/getPendingNotifications", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getPendingNotifications);
 router.get("/getActiveNotifications", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getActiveNotifications);

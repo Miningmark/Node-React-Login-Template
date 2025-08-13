@@ -3,9 +3,13 @@ import User from "@/models/user.model.js";
 import { isGroupEntry } from "@/routeGroups/index.js";
 import fs from "fs/promises";
 import path from "path";
+import { injectable } from "tsyringe";
 import { fileURLToPath, pathToFileURL } from "url";
 
+@injectable()
 export class RouteGroupService {
+    constructor() {}
+
     async generateUserRouteGroupArray(databaseUser: User): Promise<string[]> {
         let routeGroupsArray: string[] = [];
 

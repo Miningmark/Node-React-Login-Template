@@ -3,9 +3,11 @@ import { BaseController } from "@/controllers/base.controller.js";
 import { BugReportService } from "@/services/bugReport.service.js";
 import { CreateBugReportValidation, GetActiveBugReportsValidation, GetBugReportFileValidation, GetBugReportsValidation, GetOwnBugReportsValidation, UpdateBugReportStatusValidation } from "@/validators/bugReport.validator.js";
 import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 export class BugReportController extends BaseController {
-    constructor(private bugReportService: BugReportService) {
+    constructor(@inject(BugReportService) private readonly bugReportService: BugReportService) {
         super();
     }
 
