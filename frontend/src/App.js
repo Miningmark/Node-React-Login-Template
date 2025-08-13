@@ -21,12 +21,6 @@ import RequireAuth from "components/RequireAuth";
 import PublicRoute from "components/PublicRoute";
 import { useContext, useEffect, useState } from "react";
 import { closeSocket } from "util/socket";
-
-import useAxiosProtected from "hook/useAxiosProtected";
-import { SocketProvider, SocketContext } from "contexts/SocketProvider";
-
-//Zustand Store
-import { useSettingsStore } from "hook/store/settingsStore";
 import UserNotificationModal from "components/util/UserNotificationModal";
 import { axiosPublic } from "util/axios";
 import StartLoading from "pages/StartLoading";
@@ -37,6 +31,12 @@ import BugReportPage from "pages/helpingPages/BugReport";
 import Impressum from "pages/helpingPages/Impressum";
 import Datenschutz from "pages/helpingPages/Datenschutz";
 import MaintenancePage from "pages/admin/MaintenancePage";
+
+import useAxiosProtected from "hook/useAxiosProtected";
+import { SocketProvider, SocketContext } from "contexts/SocketProvider";
+
+//Zustand Store
+import { useSettingsStore } from "hook/store/settingsStore";
 
 function AppWrapper() {
   return (
@@ -76,6 +76,7 @@ function App() {
   const axiosProtected = useAxiosProtected();
 
   const setMenuFixed = useSettingsStore((state) => state.setMenuFixed);
+  const setMenuBookmarks = useSettingsStore((state) => state.setMenuBookmarks);
 
   useState(() => {
     async function fetchServerSettings() {
@@ -210,6 +211,7 @@ function App() {
         const responseSettings = await axiosProtected.get("/user/getSettings");
         setTheme(responseSettings.data.settings.theme === "dark_theme" ? "dark" : "light");
         setMenuFixed(responseSettings.data.settings.isSideMenuFixed || false);
+        setMenuBookmarks(responseSettings.data.settings.menuBookmarks || []);
       } catch (error) {
         console.warn("Fehler beim Laden der Einstellungen:", error);
       }
@@ -235,6 +237,7 @@ function App() {
     setAvatar,
     setMenuFixed,
     setUserId,
+    setMenuBookmarks,
   ]);
 
   function notificationRead(notificationId) {
