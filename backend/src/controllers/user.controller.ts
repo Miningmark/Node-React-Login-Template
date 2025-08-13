@@ -42,9 +42,9 @@ export class UserController extends BaseController {
     updateSettings = (req: ValidatedRequest<UpdateSettingsValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
-            const { theme, isSideMenuFixed } = req.validated.body;
+            const { theme, isSideMenuFixed, menuBookmarks } = req.validated.body;
 
-            return await this.userService.updateSettings(userId, theme, isSideMenuFixed);
+            return await this.userService.updateSettings(userId, theme, isSideMenuFixed, menuBookmarks);
         });
     };
 

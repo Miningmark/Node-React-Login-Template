@@ -17,6 +17,7 @@ import bcrypt from "bcrypt";
 import { Response } from "express";
 import sharp from "sharp";
 import { inject, injectable } from "tsyringe";
+import { StringFormatParams } from "zod/v4/core";
 
 @injectable()
 export class UserService {
@@ -90,7 +91,7 @@ export class UserService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateSettings(userId: number, theme?: UserSettingsTheme, isSideMenuFixed?: boolean): Promise<ControllerResponse> {
+    async updateSettings(userId: number, theme?: UserSettingsTheme, isSideMenuFixed?: boolean, menuBookmarks?: { linkName: string; link: string }[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
@@ -106,6 +107,10 @@ export class UserService {
 
             if (isSideMenuFixed !== undefined) {
                 databaseUser.userSettings.isSideMenuFixed = isSideMenuFixed;
+            }
+
+            if (menuBookmarks !== undefined) {
+                databaseUser.userSettings.menuBookmarks = menuBookmarks;
             }
 
             await databaseUser.userSettings.save();
@@ -180,17 +185,16 @@ export class UserService {
     async getSettings(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich zurückgegeben" };
 
-        const databaseUser = await User.findOne({ where: { id: userId }, include: { model: UserSettings } });
-        if (databaseUser === null) throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
-        if (databaseUser.userSettings === undefined) throw new InternalServerError("Einstellungen nicht geladen");
+        let databaseUserSettings = await UserSettings.findOne({ where: { userId: userId } });
 
-        if (databaseUser.userSettings === null) {
-            databaseUser.userSettings = await databaseUser.createUserSettings();
+        if (databaseUserSettings === null) {
+            databaseUserSettings = await UserSettings.create({ userId: userId });
         }
 
         jsonResponse.settings = {
-            theme: databaseUser.userSettings.theme,
-            isSideMenuFixed: databaseUser.userSettings.isSideMenuFixed
+            theme: databaseUserSettings.theme,
+            isSideMenuFixed: databaseUserSettings.isSideMenuFixed,
+            menuBookmarks: databaseUserSettings.menuBookmarks
         };
 
         return { type: "json", jsonResponse: jsonResponse };
