@@ -67,7 +67,7 @@ function App() {
   const [serverSettings, setServerSettings] = useState(null);
   const [serverSettingsLoaded, setServerSettingsLoaded] = useState(0);
 
-  const { setUsername, setRouteGroups, username, accessToken, logout, setAvatar } =
+  const { setUsername, setRouteGroups, setUserId, username, accessToken, logout, setAvatar } =
     useContext(AuthContext);
   const { setTheme } = useContext(ThemeContext);
 
@@ -180,11 +180,12 @@ function App() {
 
     async function fetchUser() {
       try {
-        const [userRes, routesRes, avatarRes, settingsRes] = await Promise.all([
+        const [userRes, routesRes, avatarRes, settingsRes, userIdRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
           axiosProtected.get("/user/getRouteGroups", { signal }),
           axiosProtected.get("/user/getAvatar", { signal, responseType: "blob" }),
           axiosProtected.get("/user/getSettings", { signal }),
+          axiosProtected.get("/user/getUserId", { signal }),
         ]);
 
         if (isMounted) {
@@ -196,6 +197,7 @@ function App() {
             setAvatar(avatarUrl);
           }
           if (settingsRes.data) setMenuFixed(settingsRes.data.settings.isSideMenuFixed || false);
+          if (userIdRes.data?.userId) setUserId(userIdRes.data.userId);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
