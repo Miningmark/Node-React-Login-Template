@@ -81,7 +81,7 @@ const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
 
       loadFiles();
     }
-  }, [bugReport]);
+  }, [bugReport, axiosProtected, addToast, userId, checkAccess]);
 
   const closeModal = () => {
     setName("");
