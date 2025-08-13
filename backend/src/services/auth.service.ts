@@ -62,7 +62,6 @@ export class AuthService {
         if (databaseServerSetting === null) throw new InternalServerError("Server Setting nicht vorhanden");
 
         if (databaseServerSetting.value === true) {
-            console.log(routeGroupsArray);
             if (!routeGroupsArray.includes(ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName)) {
                 throw new ForbiddenError("Server befindet sich momentan im Wartungsmodus bitte später nochmal versuchen.");
             }

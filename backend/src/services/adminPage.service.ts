@@ -123,7 +123,7 @@ export class AdminPageService {
     async updatePermission(id: number, name?: string, description?: string, routeGroupIds?: number[]): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Berechtigung erfolgreich bearbeitet" };
 
-        const databasePermission = await Permission.findOne({ where: { id: id } });
+        const databasePermission = await Permission.findOne({ where: { id: id }, include: { model: User } });
         if (databasePermission === null) throw new ValidationError("Es gibt keine Permission mit dieser Id");
         if (databasePermission.name.toLowerCase() === "SuperAdmin Berechtigung".toLowerCase()) throw new ForbiddenError("Die SuperAdmin Berechtigung kann nicht bearbeitet werden");
 
@@ -144,6 +144,10 @@ export class AdminPageService {
         }
 
         await databasePermission.save();
+
+        databasePermission.users?.map(async (databaseUser) => {
+            this.socketService.emitToRoom(`listen:user:${databaseUser.id}`, "user:update", { routeGroups: await this.routeGroupService.generateUserRouteGroupArray(databaseUser) });
+        });
 
         this.socketService.emitToRoom("listen:userManagement:permissions:watchList", "userManagement:permissions:update", { id: id, name: name, description: description });
         this.socketService.emitToRoom("listen:adminPage:permissions:watchList", "adminPage:permissions:update", this.permissionService.generateSingleJSONResponseWithModel(databasePermission));
