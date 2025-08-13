@@ -41,7 +41,7 @@ export const updateSettingsSchema = z.object({
                 .optional()
         })
         .refine((data) => {
-            return data.theme !== undefined || data.isSideMenuFixed !== undefined;
+            return data.theme !== undefined || data.isSideMenuFixed !== undefined || data.menuBookmarks !== undefined;
         }, "Es muss mindestens ein Wert geändert werden")
 });
 
