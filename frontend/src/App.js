@@ -180,11 +180,10 @@ function App() {
 
     async function fetchUser() {
       try {
-        const [userRes, routesRes, avatarRes, settingsRes, userIdRes] = await Promise.all([
+        const [userRes, routesRes, avatarRes, userIdRes] = await Promise.all([
           axiosProtected.get("/user/getUsername", { signal }),
           axiosProtected.get("/user/getRouteGroups", { signal }),
           axiosProtected.get("/user/getAvatar", { signal, responseType: "blob" }),
-          axiosProtected.get("/user/getSettings", { signal }),
           axiosProtected.get("/user/getUserId", { signal }),
         ]);
 
@@ -196,7 +195,6 @@ function App() {
             const avatarUrl = URL.createObjectURL(avatarRes.data);
             setAvatar(avatarUrl);
           }
-          if (settingsRes.data) setMenuFixed(settingsRes.data.settings.isSideMenuFixed || false);
           if (userIdRes.data?.userId) setUserId(userIdRes.data.userId);
         }
       } catch (err) {
@@ -211,6 +209,7 @@ function App() {
       try {
         const responseSettings = await axiosProtected.get("/user/getSettings");
         setTheme(responseSettings.data.settings.theme === "dark_theme" ? "dark" : "light");
+        setMenuFixed(responseSettings.data.settings.isSideMenuFixed || false);
       } catch (error) {
         console.warn("Fehler beim Laden der Einstellungen:", error);
       }
@@ -235,6 +234,7 @@ function App() {
     setTheme,
     setAvatar,
     setMenuFixed,
+    setUserId,
   ]);
 
   function notificationRead(notificationId) {
