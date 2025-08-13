@@ -12,9 +12,21 @@ import CreateBugReport from "components/helpingPages/CreateBugReport";
 
 import "./bugReport.css";
 
+const STATUS_TYPES = [
+  { name: "Offen", value: "NEW" },
+  { name: "In Bearbeitung", value: "IN_PROGRESS" },
+  { name: "Abgeschlossen", value: "CLOSED" },
+  { name: "Abgelehnt", value: "REJECTED" },
+  { name: "Angenommen", value: "CONFIRMED" },
+];
+
+const getStatusName = (statusValue) => {
+  const status = STATUS_TYPES.find((s) => s.value === statusValue);
+  return status ? status.name : statusValue;
+};
+
 function BugReportPage() {
   const [reportetBugs, setReportedBugs] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
   const [loadingReportetBugs, setLoadingReportetBugs] = useState(false);
   const [showCreateBugModal, setShowCreateBugModal] = useState(false);
   const [showEditBugModal, setShowEditBugModal] = useState(false);
@@ -39,13 +51,35 @@ function BugReportPage() {
   }, []);
 
   useEffect(() => {
+    if (socket) {
+      function handleBugReportCreated(data) {
+        setReportedBugs((prev) => [data, ...prev]);
+      }
+
+      function handleBugReportUpdate(data) {
+        setReportedBugs((prev) =>
+          prev.map((bug) => (bug.id === data.id ? { ...bug, status: data.status } : bug))
+        );
+      }
+
+      socket.emit("subscribe:bugReports:watchList");
+
+      socket.on("bugReports:create", handleBugReportCreated);
+      socket.on("bugReports:update", handleBugReportUpdate);
+
+      return () => {
+        socket.off("bugReports:create", handleBugReportCreated);
+        socket.off("bugReports:update", handleBugReportUpdate);
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     async function fetchReportedBugs() {
       setLoadingReportetBugs(true);
 
       try {
-        //const responseUsers = await axiosProtected.get("/user/getAllUsers");
-        //setAllUsers(responseUsers.data.users);
-        if (checkAccess(["adminPagePermissionsWrite"])) {
+        if (checkAccess(["bugReportWrite", "bugReportRead"])) {
           const responseBugs = await axiosProtected.get("/bugReport/getBugReports/500-0");
           console.log("All Bugs:", responseBugs.data.bugReports);
           setReportedBugs(responseBugs.data.bugReports);
@@ -132,7 +166,7 @@ function BugReportPage() {
                     </Card.Body>
                     <Card.Footer>
                       <div className="d-flex justify-content-between">
-                        <span className="text-muted">Status: {bug.status}</span>
+                        <span className="text-muted">Status: {getStatusName(bug.status)}</span>
                         <span className="text-muted">{convertToLocalTimeStamp(bug.createdAt)}</span>
                       </div>
                     </Card.Footer>
@@ -151,6 +185,7 @@ function BugReportPage() {
           show={true}
           handleClose={() => setShowCreateBugModal(false)}
           bugReport={null}
+          STATUS_TYPES={STATUS_TYPES}
         />
       )}
 
@@ -159,6 +194,7 @@ function BugReportPage() {
           show={true}
           handleClose={() => setShowEditBugModal(false)}
           bugReport={reportetBugs.find((bug) => bug.id === selectedBug)}
+          STATUS_TYPES={STATUS_TYPES}
         />
       )}
     </>

@@ -12,15 +12,8 @@ const MAX_FILES = 3;
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_FILE_TYPES =
   ".conf, .def, .doc, .docx, .dot, .in, .ini, .jpe, .jpeg, .jpg, .list, .log, .odp, .ods, .odt, .pdf, .png, .pot, .pps, .ppt, .pptx, .text, .txt, .webp, .xla, .xlc, .xlm, .xls, .xlsx, .xlt, .xlw";
-const STATUS_TYPES = [
-  { name: "Offen", value: "NEW" },
-  { name: "In Bearbeitung", value: "IN_PROGRESS" },
-  { name: "Abgeschlossen", value: "CLOSED" },
-  { name: "Abgelehnt", value: "REJECTED" },
-  { name: "Angenommen", value: "CONFIRMED" },
-];
 
-const CreateBugReport = ({ show, handleClose, bugReport }) => {
+const CreateBugReport = ({ show, handleClose, bugReport, STATUS_TYPES }) => {
   const [name, setName] = useState(bugReport ? bugReport.name : "");
   const [description, setDescription] = useState(bugReport ? bugReport.description : "");
   const [status, setStatus] = useState(bugReport ? bugReport.status : STATUS_TYPES[0].value);
@@ -40,10 +33,14 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
 
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
-  const { checkAccess } = useContext(AuthContext);
+  const { checkAccess, userId } = useContext(AuthContext);
 
   useEffect(() => {
-    if (checkAccess(["adminPagePermissionsWrite"]) && bugReport && bugReport?.fileCount > 0) {
+    if (
+      (checkAccess(["bugReportWrite", "bugReportRead"]) || bugReport.userId === userId) &&
+      bugReport &&
+      bugReport?.fileCount > 0
+    ) {
       const loadFiles = async () => {
         setLoadingFiles(Array(bugReport.fileCount).fill(true));
 
@@ -166,9 +163,13 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
       addToast("Status erfolgreich geändert", "success");
     } catch (error) {
       addToast(error.response?.data?.message || "Status Änderung fehlgeschlagen", "danger");
-    } finally {
     }
   }
+
+  const getStatusName = (statusValue) => {
+    const status = STATUS_TYPES.find((s) => s.value === statusValue);
+    return status ? status.name : statusValue;
+  };
 
   return (
     <>
@@ -304,7 +305,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
             </div>
           ) : (
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {checkAccess(["adminPagePermissionsWrite"]) &&
+              {(checkAccess(["bugReportWrite", "bugReportRead"]) || bugReport.userId === userId) &&
                 loadingFiles.map((item, index) => {
                   const file = files[index];
 
@@ -312,8 +313,10 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                     <div
                       key={index}
                       style={{
-                        flex: "1 1 0",
-                        maxWidth: `${100 / loadingFiles.length}%`,
+                        flex:
+                          file && file.name.toLowerCase().endsWith(".pdf")
+                            ? "0 0 100%"
+                            : `1 1 ${100 / loadingFiles.length}%`,
                         aspectRatio: item ? "1 / 1" : "auto",
                         display: "flex",
                         alignItems: "center",
@@ -371,7 +374,7 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
 
           {bugReport ? (
             <div className="text-muted mt-3 mb-0">
-              {checkAccess(["adminPageNotificationsWrite"]) && !isEditing ? (
+              {checkAccess(["bugReportWrite"]) && !isEditing ? (
                 <>
                   <Form className="mb-3 mt-5">
                     <Form.Group className="mb-0">
@@ -386,10 +389,25 @@ const CreateBugReport = ({ show, handleClose, bugReport }) => {
                     </Form.Group>
                   </Form>
                 </>
+              ) : bugReport.userId === userId ? (
+                <>
+                  <Form className="mb-3 mt-5">
+                    <Form.Group className="mb-0">
+                      <Form.Label>Status</Form.Label>
+                      <Form.Select name="types" value={status} onChange={handleStatusChange}>
+                        {STATUS_TYPES.map((type, index) => (
+                          <option key={index} value={type.value} disabled={type.value !== "CLOSED"}>
+                            {type.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </Form>
+                </>
               ) : (
                 <>
                   <br />
-                  <span>Status: {bugReport.status}</span>
+                  <span>Status: {getStatusName(bugReport.status)}</span>
                   <br />
                 </>
               )}
