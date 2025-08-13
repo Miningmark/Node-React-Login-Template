@@ -29,7 +29,7 @@ import { container } from "tsyringe";
 const router = Router();
 const adminPageController = container.resolve(AdminPageController);
 
-/*router.get("/getServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
+router.get("/getServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
 router.get("/getFilterOptionsServerLog", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(onlyAuthorizationSchema), adminPageController.getFilterOptionsServerLog);
 
 router.post("/getFilteredServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
@@ -59,6 +59,6 @@ router.post("/createNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NO
 router.post("/updateNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(updateNotificationSchema), adminPageController.updateNotification);
 router.post("/deleteNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(deleteNotificationSchema), adminPageController.deleteNotification);
 
-router.post("/updateMaintenanceMode", verifyAuth(), verifyPermission([ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName]), validateRequest(updateMaintenanceModeSchema), adminPageController.updateMaintenanceMode);*/
+router.post("/updateMaintenanceMode", verifyAuth(), verifyPermission([ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName]), validateRequest(updateMaintenanceModeSchema), adminPageController.updateMaintenanceMode);
 
 export default router;
