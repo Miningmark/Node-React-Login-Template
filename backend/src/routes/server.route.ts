@@ -1,6 +1,5 @@
 import { ServerController } from "@/controllers/server.controller.js";
 import { publicRateLimiter } from "@/middlewares/rateLimiter.middleware.js";
-import { ServerService } from "@/services/server.service.js";
 import { Router } from "express";
 import { container } from "tsyringe";
 

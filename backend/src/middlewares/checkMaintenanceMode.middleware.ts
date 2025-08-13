@@ -8,7 +8,7 @@ export const checkMaintenanceMode = () => {
             const databaseServerSetting = await ServerSettings.findOne({ where: { key: ServerSettingKey.MAINTENANCE_MODE } });
             if (databaseServerSetting === null) throw new InternalServerError("Server Setting nicht vorhanden");
 
-            if (databaseServerSetting.value === false) next();
+            if (databaseServerSetting.value === false) return next();
 
             next(new ForbiddenError("Server befindet sich momentan im Wartungsmodus bitte später nochmal versuchen."));
         } catch (error) {
