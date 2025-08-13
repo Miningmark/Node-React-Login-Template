@@ -25,7 +25,7 @@ const menuItems = [
       {
         name: "Benutzer Benachrichtigungen",
         path: "/admin/user-notifications",
-        allowedRouteGroups: [],
+        allowedRouteGroups: ["adminPageNotificationsRead", "adminPageNotificationsWrite"],
       },
       {
         name: "Wartung",
