@@ -98,6 +98,14 @@ export class UserController extends BaseController {
         });
     };
 
+    getUserId = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
+        this.handleRequest(req, res, next, async () => {
+            const { userId } = req as { userId: number };
+
+            return await this.userService.getUserId(userId);
+        });
+    };
+
     getPendingNotifications = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };

@@ -196,6 +196,14 @@ export class UserService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
+    async getUserId(userId: number): Promise<ControllerResponse> {
+        let jsonResponse: Record<string, any> = { message: "Benutzer ID erfolgreich zurückgegeben" };
+
+        jsonResponse.userId = userId;
+
+        return { type: "json", jsonResponse: jsonResponse };
+    }
+
     async getPendingNotifications(userId: number): Promise<ControllerResponse> {
         let jsonResponse: Record<string, any> = { message: "Events erfolgreich zurückgegeben" };
 

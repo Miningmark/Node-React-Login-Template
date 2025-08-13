@@ -28,6 +28,7 @@ router.get("/getUsername", validateRequest(onlyAuthorizationSchema), verifyAuth(
 router.get("/getRouteGroups", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getRouteGroups);
 router.get("/getLastLogins", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getLastLogins);
 router.get("/getSettings", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getSettings);
+router.get("/getUserId", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getUserId);
 
 router.get("/getPendingNotifications", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getPendingNotifications);
 router.get("/getActiveNotifications", validateRequest(onlyAuthorizationSchema), verifyAuth(), userController.getActiveNotifications);
