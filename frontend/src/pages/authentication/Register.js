@@ -41,8 +41,10 @@ function Register() {
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const passwordsMatch = password === repeatPassword;
 
-  const PASSWORD_REGEX =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/;
+  const isPasswordValid =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/.test(
+      password.trim()
+    );
 
   const handleSubmitRegister = async (e) => {
     e.preventDefault();
@@ -59,7 +61,7 @@ function Register() {
       return;
     }
 
-    if (!PASSWORD_REGEX.test(password)) {
+    if (!isPasswordValid) {
       addToast("Passwort erfüllt nicht die Anforderungen", "danger");
       passwordRef.current?.focus();
       return;
@@ -166,7 +168,11 @@ function Register() {
             <input
               type={showPassword ? "text" : "password"}
               className={`form-control ${
-                touched.password && !isLengthValid ? "is-invalid" : isLengthValid ? "is-valid" : ""
+                touched.password && !isPasswordValid
+                  ? "is-invalid"
+                  : isPasswordValid
+                  ? "is-valid"
+                  : ""
               }`}
               id="floatingPassword"
               placeholder="Passwort"

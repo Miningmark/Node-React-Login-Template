@@ -55,9 +55,6 @@ function ServerLogPage() {
   const serverLogQueueRef = useRef([]);
   const intervalRef = useRef(null);
 
-  console.log("Filtered Server Log:", filteredServerLog);
-  console.log("selectedServerLog:", selectedServerLog);
-
   useEffect(() => {
     const updateOffset = () => {
       setHeightOffset(window.innerWidth > 768 ? 80 : 0);

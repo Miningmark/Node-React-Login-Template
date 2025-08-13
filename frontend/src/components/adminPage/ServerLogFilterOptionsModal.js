@@ -33,8 +33,6 @@ const ServerLogFilterOptionsModal = ({
   }
 
   function handleSearch() {
-    console.log("formData", formData);
-
     handleFilterOptions(formData);
     handleClose();
   }
