@@ -54,11 +54,11 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
   }, [currentPath, checkAccess, menuFixed, menuFixedChanged, routeGroups]);
 
   useEffect(() => {
-    if (!menuFixedChanged && menuFixed) {
+    if (!menuFixedChanged && menuFixed && routeGroups) {
       setMenuFixedChanged(true);
       console.log("Menu wurde fixiert");
     }
-  }, [menuFixedChanged, menuFixed]);
+  }, [menuFixedChanged, menuFixed, routeGroups]);
   console.log("Menu Fixed Changed:", menuFixedChanged);
 
   const toggleSubMenu = (name) => {
