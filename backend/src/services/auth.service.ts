@@ -28,6 +28,7 @@ import {
     getPasswordResetEmailTemplate
 } from "@/templates/email/auth.template.email.js";
 import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
+import { ServerLogService } from "@/services/serverLog.service.js";
 
 @injectable()
 export class AuthService {
@@ -37,7 +38,8 @@ export class AuthService {
         @inject(UserService) private readonly userService: UserService,
         @inject(UserActivityService) private readonly userActivityService: UserActivityService,
         @inject(RouteGroupService) private readonly routeGroupService: RouteGroupService,
-        @inject(SocketService) private readonly socketService: SocketService
+        @inject(SocketService) private readonly socketService: SocketService,
+        @inject(ServerLogService) private readonly serverLogService: ServerLogService
     ) {}
 
     async register(username: string, email: string, password: string): Promise<ControllerResponse> {
@@ -79,6 +81,12 @@ export class AuthService {
             "userManagement:users:update",
             this.userService.generateJSONResponseWithModel(databaseUser)
         );
+        this.socketService.emitToRoom(
+            "listen:adminPage:serverLogs:watchList",
+            "adminPage:serverLogOptions:update",
+            await this.serverLogService.generateJSONOptionsResponse()
+        );
+
         return { type: "json", jsonResponse: jsonResponse, statusCode: 201 };
     }
 
@@ -93,8 +101,9 @@ export class AuthService {
         const databaseUser = await User.findOne({ where: { username: username } });
         if (databaseUser === null) throw new ValidationError("Benutzername nicht vorhanden");
 
-        const routeGroupsArray =
-            await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
+        const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(
+            databaseUser
+        );
         const databaseServerSetting = await ServerSettings.findOne({
             where: { key: ServerSettingKey.MAINTENANCE_MODE }
         });
@@ -118,8 +127,9 @@ export class AuthService {
         if (isPasswordMatching === false) {
             await this.userActivityService.addUserLastLogin(databaseUser.id, req, false);
 
-            const isAccountLocked =
-                await this.userActivityService.checkUserLastLogins(databaseUser);
+            const isAccountLocked = await this.userActivityService.checkUserLastLogins(
+                databaseUser
+            );
             if (isAccountLocked)
                 throw new ForbiddenError(
                     "Benutzer wurde wegen zuvieler fehlerhafter Login Versuchen vorübergehen deaktiviert"

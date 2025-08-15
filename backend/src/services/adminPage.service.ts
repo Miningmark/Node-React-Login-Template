@@ -90,17 +90,9 @@ export class AdminPageService {
             message: "Alle Filter Optionen zurück gegeben"
         };
 
-        const databaseUsers = await User.findAll({});
-
-        jsonResponse.filterOptions = {};
-        jsonResponse.filterOptions.users = databaseUsers.map((databaseUser) => {
-            return {
-                id: databaseUser.id,
-                username: databaseUser.username
-            };
-        });
-
-        jsonResponse.filterOptions.types = Object.values(ServerLogTypes);
+        jsonResponse.filterOptions = (
+            await this.serverLogService.generateJSONOptionsResponse()
+        ).filterOptions;
 
         return { type: "json", jsonResponse: jsonResponse };
     }
