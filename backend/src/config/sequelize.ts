@@ -1,9 +1,11 @@
-import { ENV } from "@/config/env.js";
-import Sequelize from "@sequelize/core";
-import { MariaDbDialect } from "@sequelize/mariadb";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
+
+import { MariaDbDialect } from "@sequelize/mariadb";
+import Sequelize from "@sequelize/core";
+
+import { ENV } from "@/config/env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,6 +46,7 @@ export const sequelize = new Sequelize({
         acquire: 10000,
         idle: 10000
     },
+    // eslint-disable-next-line no-console
     ...(ENV.CONSOLE_LOG_DATABASE_QUERRIES ? { logging: console.log } : { logging: false }),
     models: models
 });

@@ -1,13 +1,16 @@
+import { injectable } from "tsyringe";
+
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import ServerSettings from "@/models/serverSettings.model.js";
-import { injectable } from "tsyringe";
 
 @injectable()
 export class ServerService {
     constructor() {}
 
     async getSettings(): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich zurückgegeben" };
+        const jsonResponse: Record<string, any> = {
+            message: "Einstellungen erfolgreich zurückgegeben"
+        };
 
         const databaseServerSettings = await ServerSettings.findAll();
 

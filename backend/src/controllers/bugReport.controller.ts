@@ -1,9 +1,17 @@
+import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ValidatedRequest } from "@/@types/validation";
 import { BaseController } from "@/controllers/base.controller.js";
 import { BugReportService } from "@/services/bugReport.service.js";
-import { CreateBugReportValidation, GetActiveBugReportsValidation, GetBugReportFileValidation, GetBugReportsValidation, GetOwnBugReportsValidation, UpdateBugReportStatusValidation } from "@/validators/bugReport.validator.js";
-import { NextFunction, Response } from "express";
-import { inject, injectable } from "tsyringe";
+import {
+    CreateBugReportValidation,
+    GetActiveBugReportsValidation,
+    GetBugReportFileValidation,
+    GetBugReportsValidation,
+    GetOwnBugReportsValidation,
+    UpdateBugReportStatusValidation
+} from "@/validators/bugReport.validator.js";
 
 @injectable()
 export class BugReportController extends BaseController {
@@ -11,7 +19,11 @@ export class BugReportController extends BaseController {
         super();
     }
 
-    getBugReports = (req: ValidatedRequest<GetBugReportsValidation>, res: Response, next: NextFunction): void => {
+    getBugReports = (
+        req: ValidatedRequest<GetBugReportsValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
@@ -19,7 +31,11 @@ export class BugReportController extends BaseController {
         });
     };
 
-    getActiveBugReports = (req: ValidatedRequest<GetActiveBugReportsValidation>, res: Response, next: NextFunction): void => {
+    getActiveBugReports = (
+        req: ValidatedRequest<GetActiveBugReportsValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
@@ -27,7 +43,11 @@ export class BugReportController extends BaseController {
         });
     };
 
-    getOwnBugReports = (req: ValidatedRequest<GetOwnBugReportsValidation>, res: Response, next: NextFunction): void => {
+    getOwnBugReports = (
+        req: ValidatedRequest<GetOwnBugReportsValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
             const { limit, offset } = req.validated.params;
@@ -36,7 +56,11 @@ export class BugReportController extends BaseController {
         });
     };
 
-    getBugReportFile = (req: ValidatedRequest<GetBugReportFileValidation>, res: Response, next: NextFunction): void => {
+    getBugReportFile = (
+        req: ValidatedRequest<GetBugReportFileValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId, routeGroups } = req as { userId: number; routeGroups: string[] };
             const { id, fileIndex } = req.validated.body;
@@ -45,7 +69,11 @@ export class BugReportController extends BaseController {
         });
     };
 
-    createBugReport = (req: ValidatedRequest<CreateBugReportValidation>, res: Response, next: NextFunction): void => {
+    createBugReport = (
+        req: ValidatedRequest<CreateBugReportValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
             const { name, description } = req.validated.body;
@@ -55,12 +83,21 @@ export class BugReportController extends BaseController {
         });
     };
 
-    updateBugReportStatus = (req: ValidatedRequest<UpdateBugReportStatusValidation>, res: Response, next: NextFunction): void => {
+    updateBugReportStatus = (
+        req: ValidatedRequest<UpdateBugReportStatusValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId, routeGroups } = req as { userId: number; routeGroups: string[] };
             const { id, status } = req.validated.body;
 
-            return await this.bugReportService.updateBugReportStatus(userId, routeGroups, id, status);
+            return await this.bugReportService.updateBugReportStatus(
+                userId,
+                routeGroups,
+                id,
+                status
+            );
         });
     };
 }

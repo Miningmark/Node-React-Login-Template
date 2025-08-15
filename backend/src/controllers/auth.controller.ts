@@ -1,10 +1,18 @@
+import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { AuthService } from "@/services/auth.service.js";
-import { AccountActivationValidation, HandlePasswordRecoveryValidation, LoginValidation, RefreshTokenValidation, RegisterValidation, RequestPasswordResetValidation } from "@/validators/auth.validator.js";
+import {
+    AccountActivationValidation,
+    HandlePasswordRecoveryValidation,
+    LoginValidation,
+    RefreshTokenValidation,
+    RegisterValidation,
+    RequestPasswordResetValidation
+} from "@/validators/auth.validator.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator";
-import { NextFunction, Request, Response } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class AuthController extends BaseController {
@@ -12,7 +20,11 @@ export class AuthController extends BaseController {
         super();
     }
 
-    register = (req: ValidatedRequest<RegisterValidation>, res: Response, next: NextFunction): void => {
+    register = (
+        req: ValidatedRequest<RegisterValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { username, email, password } = req.validated.body;
 
@@ -28,7 +40,11 @@ export class AuthController extends BaseController {
         });
     };
 
-    logout = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
+    logout = (
+        req: ValidatedRequest<OnlyAuthorizationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -36,7 +52,11 @@ export class AuthController extends BaseController {
         });
     };
 
-    accountActivation = (req: ValidatedRequest<AccountActivationValidation>, res: Response, next: NextFunction): void => {
+    accountActivation = (
+        req: ValidatedRequest<AccountActivationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { token } = req.validated.body;
 
@@ -44,7 +64,11 @@ export class AuthController extends BaseController {
         });
     };
 
-    refreshAccessToken = (req: ValidatedRequest<RefreshTokenValidation>, res: Response, next: NextFunction): void => {
+    refreshAccessToken = (
+        req: ValidatedRequest<RefreshTokenValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { refreshToken } = req.validated.cookies;
 
@@ -52,7 +76,11 @@ export class AuthController extends BaseController {
         });
     };
 
-    requestPasswordReset = (req: ValidatedRequest<RequestPasswordResetValidation>, res: Response, next: NextFunction): void => {
+    requestPasswordReset = (
+        req: ValidatedRequest<RequestPasswordResetValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { usernameOrEmail } = req.validated.body;
 
@@ -60,7 +88,11 @@ export class AuthController extends BaseController {
         });
     };
 
-    handlePasswordRecovery = (req: ValidatedRequest<HandlePasswordRecoveryValidation>, res: Response, next: NextFunction): void => {
+    handlePasswordRecovery = (
+        req: ValidatedRequest<HandlePasswordRecoveryValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { token, password } = req.validated.body;
 

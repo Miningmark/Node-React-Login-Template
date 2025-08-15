@@ -1,4 +1,9 @@
-export const getCompleteAdminRegistrationEmailTemplate = (websiteName: string, username: string, url: string, expiryDate: string) => `
+export const getCompleteAdminRegistrationEmailTemplate = (
+    websiteName: string,
+    username: string,
+    url: string,
+    expiryDate: string
+) => `
 <!DOCTYPE html>
 <html lang="de">
   <head>

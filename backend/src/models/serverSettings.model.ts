@@ -1,7 +1,22 @@
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model
+} from "@sequelize/core";
+import {
+    AfterSync,
+    Attribute,
+    AutoIncrement,
+    NotNull,
+    PrimaryKey,
+    Table,
+    Unique
+} from "@sequelize/core/decorators-legacy";
+
 import { ENV } from "@/config/env.js";
 import { InternalServerError } from "@/errors/errorClasses.js";
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
-import { AfterSync, Attribute, AutoIncrement, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
 
 export enum ServerSettingKey {
     MAINTENANCE_MODE = "maintenance_mode",
@@ -13,7 +28,10 @@ export enum ServerSettingKey {
     tableName: "server_settings",
     timestamps: false
 })
-class ServerSettings extends Model<InferAttributes<ServerSettings>, InferCreationAttributes<ServerSettings>> {
+class ServerSettings extends Model<
+    InferAttributes<ServerSettings>,
+    InferCreationAttributes<ServerSettings>
+> {
     @Attribute(DataTypes.INTEGER)
     @AutoIncrement
     @PrimaryKey
@@ -51,7 +69,8 @@ class ServerSettings extends Model<InferAttributes<ServerSettings>, InferCreatio
             where: { key: "enable_register" }
         });
 
-        if (databaseServerSettingRegister === null) throw new InternalServerError("Fehler bei den Server Settings");
+        if (databaseServerSettingRegister === null)
+            throw new InternalServerError("Fehler bei den Server Settings");
 
         if (databaseServerSettingRegister.value !== ENV.ENABLE_REGISTER) {
             databaseServerSettingRegister.value = ENV.ENABLE_REGISTER;
@@ -62,7 +81,8 @@ class ServerSettings extends Model<InferAttributes<ServerSettings>, InferCreatio
             where: { key: "enable_username_change" }
         });
 
-        if (databaseServerSettingUsername === null) throw new InternalServerError("Fehler bei den Server Settings");
+        if (databaseServerSettingUsername === null)
+            throw new InternalServerError("Fehler bei den Server Settings");
 
         if (databaseServerSettingUsername.value !== ENV.ENABLE_USERNAME_CHANGE) {
             databaseServerSettingUsername.value = ENV.ENABLE_USERNAME_CHANGE;

@@ -1,8 +1,18 @@
+import { Readable } from "stream";
+
+import {
+    CreateBucketCommand,
+    DeleteObjectCommand,
+    HeadBucketCommand,
+    PutObjectCommand,
+    GetObjectCommand,
+    S3Client
+} from "@aws-sdk/client-s3";
+import { singleton } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { BadRequestError } from "@/errors/badRequestError.js";
-import { CreateBucketCommand, DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
-import { singleton } from "tsyringe";
+
 
 @singleton()
 export class S3Service {
@@ -34,7 +44,12 @@ export class S3Service {
         }
     }
 
-    async uploadFile(bucket: string, key: string, body: Buffer, contentType: string): Promise<void> {
+    async uploadFile(
+        bucket: string,
+        key: string,
+        body: Buffer,
+        contentType: string
+    ): Promise<void> {
         const command = new PutObjectCommand({
             Bucket: bucket,
             Key: key,
@@ -53,7 +68,11 @@ export class S3Service {
         });
 
         const response = await this.s3Client.send(command);
-        if (response.Body === undefined || response.ContentType === undefined || !(response.Body instanceof Readable)) {
+        if (
+            response.Body === undefined ||
+            response.ContentType === undefined ||
+            !(response.Body instanceof Readable)
+        ) {
             throw new BadRequestError("Fehler beim Laden der Datei vom S3 Speicher");
         }
 

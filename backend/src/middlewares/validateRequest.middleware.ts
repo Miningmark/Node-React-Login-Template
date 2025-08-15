@@ -1,8 +1,9 @@
-import { ValidatedRequest } from "@/@types/validation.js";
 import { NextFunction, Response } from "express";
 import { z, ZodObject } from "zod/v4";
 
-export const validateRequest = <T extends ZodObject<any>>(schema: T) => {
+import { ValidatedRequest } from "@/@types/validation.js";
+
+export const validateRequest = <T extends ZodObject>(schema: T) => {
     return (req: ValidatedRequest<z.infer<T>>, res: Response, next: NextFunction): void => {
         try {
             const validatedData = schema.parse({

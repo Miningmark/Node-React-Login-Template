@@ -1,6 +1,11 @@
-import { BugReportStatusType } from "@/models/bugReport.model.js";
-import { authorizationHeader, limitAndOffsetParams, multipleFilesValidation } from "@/validators/base.validator.js";
 import { z } from "zod/v4";
+
+import { BugReportStatusType } from "@/models/bugReport.model.js";
+import {
+    authorizationHeader,
+    limitAndOffsetParams,
+    multipleFilesValidation
+} from "@/validators/base.validator.js";
 
 export type GetBugReportsValidation = z.infer<typeof getBugReportsSchema>;
 export const getBugReportsSchema = z.object({

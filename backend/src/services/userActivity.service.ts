@@ -1,3 +1,7 @@
+import { CreationAttributes } from "@sequelize/core";
+import { Request } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import LastLogin from "@/models/lastLogin.model.js";
 import User from "@/models/user.model.js";
@@ -6,11 +10,11 @@ import { EmailService } from "@/services/email.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserService } from "@/services/user.service.js";
 import { SocketService } from "@/services/socket.service.js";
-import { getAccountLockedEmailTemplate, getSuspiciousLoginEmailTemplate } from "@/templates/email/auth.template.email.js";
+import {
+    getAccountLockedEmailTemplate,
+    getSuspiciousLoginEmailTemplate
+} from "@/templates/email/auth.template.email.js";
 import { formatDate, getIpv4Address, IPV4_REGEX } from "@/utils/misc.util.js";
-import { CreationAttributes } from "@sequelize/core";
-import { Request } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class UserActivityService {
@@ -22,14 +26,20 @@ export class UserActivityService {
     ) {}
 
     async checkHasLocationChanged(databaseUser: User) {
-        const userLastLogins = await databaseUser.getLastLogins({ limit: 2, order: [["loginTime", "DESC"]] });
+        const userLastLogins = await databaseUser.getLastLogins({
+            limit: 2,
+            order: [["loginTime", "DESC"]]
+        });
 
         if (userLastLogins.length < 2) return;
 
         const recentLogin = userLastLogins[0];
         const lastLogin = userLastLogins[1];
 
-        if (recentLogin.country !== lastLogin.country || recentLogin.regionName !== lastLogin.regionName) {
+        if (
+            recentLogin.country !== lastLogin.country ||
+            recentLogin.regionName !== lastLogin.regionName
+        ) {
             await this.emailService.sendHTMLTemplateEmail(
                 databaseUser.email,
                 "Verdächtiger Login-Versuch",
@@ -48,7 +58,10 @@ export class UserActivityService {
 
     async checkUserLastLogins(databaseUser: User) {
         let unsuccefullyLogins = 0;
-        const userLastLogins = await databaseUser.getLastLogins({ limit: 5, order: [["id", "DESC"]] });
+        const userLastLogins = await databaseUser.getLastLogins({
+            limit: 5,
+            order: [["id", "DESC"]]
+        });
 
         userLastLogins.forEach((userLastLogin) => {
             if (!userLastLogin.successfully) unsuccefullyLogins++;
@@ -58,14 +71,26 @@ export class UserActivityService {
             databaseUser.isActive = false;
             await databaseUser.save();
 
-            this.socketService.emitToRoom("listen:userManagement:users:watchList", "userManagement:users:update", this.userService.generateJSONResponse(databaseUser.id, undefined, undefined, false));
+            this.socketService.emitToRoom(
+                "listen:userManagement:users:watchList",
+                "userManagement:users:update",
+                this.userService.generateJSONResponse(databaseUser.id, undefined, undefined, false)
+            );
 
-            const token = await this.tokenService.generateHexUserToken(databaseUser.id, UserTokenType.ACCOUNT_REACTIVATION_TOKEN, null);
+            const token = await this.tokenService.generateHexUserToken(
+                databaseUser.id,
+                UserTokenType.ACCOUNT_REACTIVATION_TOKEN,
+                null
+            );
 
             await this.emailService.sendHTMLTemplateEmail(
                 databaseUser.email,
                 "Konto vorübergehend deaktiviert",
-                getAccountLockedEmailTemplate(ENV.FRONTEND_NAME, databaseUser.username, `${ENV.FRONTEND_URL}password-reset?token=${token}`)
+                getAccountLockedEmailTemplate(
+                    ENV.FRONTEND_NAME,
+                    databaseUser.username,
+                    `${ENV.FRONTEND_URL}password-reset?token=${token}`
+                )
             );
 
             return true;
@@ -78,7 +103,7 @@ export class UserActivityService {
         const ipv4Address = getIpv4Address(req);
         const userAgent = req.headers["user-agent"] || "Ungültiger UserAgent";
 
-        let userLastLogin: CreationAttributes<LastLogin> = {
+        const userLastLogin: CreationAttributes<LastLogin> = {
             userId: userId,
             userAgent: userAgent,
             loginTime: new Date(Date.now()),

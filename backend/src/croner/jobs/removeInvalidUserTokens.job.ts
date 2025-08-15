@@ -1,8 +1,9 @@
+import { Op } from "@sequelize/core";
+
 import { databaseLogger } from "@/config/logger.js";
 import { CronJobDefinition } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
-import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
     name: "removeInvalidUserTokens",
@@ -10,7 +11,13 @@ const job: CronJobDefinition = {
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
             where: {
-                type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN, UserTokenType.PASSWORD_RESET_TOKEN] },
+                type: {
+                    [Op.or]: [
+                        UserTokenType.ACCESS_TOKEN,
+                        UserTokenType.REFRESH_TOKEN,
+                        UserTokenType.PASSWORD_RESET_TOKEN
+                    ]
+                },
                 expiresAt: { [Op.lte]: new Date(Date.now()) }
             }
         });
@@ -22,9 +29,13 @@ const job: CronJobDefinition = {
             })
         );
 
-        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} User Token gelöscht`, {
-            source: job.name
-        });
+        await databaseLogger(
+            ServerLogTypes.INFO,
+            `Es wurden ${destroyedCount} User Token gelöscht`,
+            {
+                source: job.name
+            }
+        );
     }
 };
 

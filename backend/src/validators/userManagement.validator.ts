@@ -1,5 +1,11 @@
 import { z } from "zod/v4";
-import { authorizationHeader, emailValidation, limitAndOffsetParams, usernameValidation } from "@/validators/base.validator.js";
+
+import {
+    authorizationHeader,
+    emailValidation,
+    limitAndOffsetParams,
+    usernameValidation
+} from "@/validators/base.validator.js";
 
 export type GetUsersValidation = z.infer<typeof getUsersSchema>;
 export const getUsersSchema = z.object({
@@ -39,7 +45,13 @@ export const updateUserSchema = z.object({
             permissionIds: z.array(z.int().positive()).optional()
         })
         .refine((data) => {
-            return data.username !== undefined || data.email !== undefined || data.isActive !== undefined || data.isDisabled !== undefined || data.permissionIds !== undefined;
+            return (
+                data.username !== undefined ||
+                data.email !== undefined ||
+                data.isActive !== undefined ||
+                data.isDisabled !== undefined ||
+                data.permissionIds !== undefined
+            );
         }, "Es muss mindestens ein Wert geändert werden")
 });
 

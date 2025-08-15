@@ -1,11 +1,25 @@
+import { container } from "tsyringe";
+import winston from "winston";
+
 import { ENV } from "@/config/env.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/services/socket.service.js";
-import { container } from "tsyringe";
-import winston from "winston";
 
-const REDACT_KEYS = [/authorization/i, /cookie/i, /password/i, /newPassword/i, /currentPassword/i, /email/i, /newEmail/i, /usernameOrEmail/i, /token/i, /secret/i];
+const REDACT_KEYS = [
+    /x-real-ip/i,
+    /x-forwarded-for/i,
+    /authorization/i,
+    /cookie/i,
+    /password/i,
+    /newPassword/i,
+    /currentPassword/i,
+    /email/i,
+    /newEmail/i,
+    /usernameOrEmail/i,
+    /token/i,
+    /secret/i
+];
 const MAX_LENGTH = 2000;
 
 const serverLogService = new ServerLogService();
@@ -38,9 +52,25 @@ export const consoleLogger = winston.createLogger({
     transports: [new winston.transports.Console()]
 });
 
-export async function databaseLogger(type: ServerLogTypes, message: string, options: DatabaseLoggerOptions) {
+export async function databaseLogger(
+    type: ServerLogTypes,
+    message: string,
+    options: DatabaseLoggerOptions
+) {
     try {
-        const { userId, url, method, status, ipv4Address, userAgent, requestBody, requestHeaders, response, source, error } = options;
+        const {
+            userId,
+            url,
+            method,
+            status,
+            ipv4Address,
+            userAgent,
+            requestBody,
+            requestHeaders,
+            response,
+            source,
+            error
+        } = options;
 
         if (ENV.CONSOLE_LOG_ERRORS) {
             if (type === ServerLogTypes.INFO) {
@@ -68,9 +98,13 @@ export async function databaseLogger(type: ServerLogTypes, message: string, opti
             errorStack: error?.stack?.split("\n").slice(1).join("\n")
         });
 
-        try {
-            container.resolve(SocketService).emitToRoom("listen:adminPage:serverLogs:watchList", "adminPage:serverLogs:create", serverLogService.generateJSONResponse([databaseServerLog])[0]);
-        } catch (error) {}
+        container
+            .resolve(SocketService)
+            .emitToRoom(
+                "listen:adminPage:serverLogs:watchList",
+                "adminPage:serverLogs:create",
+                serverLogService.generateJSONResponse([databaseServerLog])[0]
+            );
     } catch (error) {
         consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", {
             error: error instanceof Error ? error.stack : ""

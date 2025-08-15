@@ -1,5 +1,3 @@
-import User from "@/models/user.model.js";
-import UserNotification from "@/models/userNotifications.model.js";
 import {
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
@@ -18,13 +16,26 @@ import {
     Model,
     NonAttribute
 } from "@sequelize/core";
-import { AfterCreate, Attribute, AutoIncrement, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
+import {
+    AfterCreate,
+    Attribute,
+    AutoIncrement,
+    NotNull,
+    PrimaryKey,
+    Table
+} from "@sequelize/core/decorators-legacy";
+
+import User from "@/models/user.model.js";
+import UserNotification from "@/models/userNotifications.model.js";
 
 @Table({
     tableName: "notifications",
     timestamps: false
 })
-class Notification extends Model<InferAttributes<Notification>, InferCreationAttributes<Notification>> {
+class Notification extends Model<
+    InferAttributes<Notification>,
+    InferCreationAttributes<Notification>
+> {
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     @AutoIncrement

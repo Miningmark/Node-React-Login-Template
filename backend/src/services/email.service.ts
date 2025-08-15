@@ -1,8 +1,9 @@
+import nodemailer from "nodemailer";
+import { singleton } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { databaseLogger } from "@/config/logger.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
-import nodemailer from "nodemailer";
-import { singleton } from "tsyringe";
 
 @singleton()
 export class EmailService {
@@ -28,11 +29,17 @@ export class EmailService {
     private async verifyConnection() {
         try {
             await this.transporter.verify();
-            await databaseLogger(ServerLogTypes.INFO, "EmailService verbunden", { source: "EmailService" });
-        } catch (error) {
-            await databaseLogger(ServerLogTypes.ERROR, "EmailService konnte sich nicht mit dem Email Server verbinden", {
-                error: error instanceof Error ? error : undefined
+            await databaseLogger(ServerLogTypes.INFO, "EmailService verbunden", {
+                source: "EmailService"
             });
+        } catch (error) {
+            await databaseLogger(
+                ServerLogTypes.ERROR,
+                "EmailService konnte sich nicht mit dem Email Server verbinden",
+                {
+                    error: error instanceof Error ? error : undefined
+                }
+            );
         }
     }
 
@@ -45,10 +52,16 @@ export class EmailService {
                     subject: subject,
                     html: htmlTemplate
                 });
-                await databaseLogger(ServerLogTypes.INFO, `Email erfolgreich versendet ID: ${info.messageId}`, { source: "EmailService" });
+                await databaseLogger(
+                    ServerLogTypes.INFO,
+                    `Email erfolgreich versendet ID: ${info.messageId}`,
+                    { source: "EmailService" }
+                );
             }
         } catch (error) {
-            await databaseLogger(ServerLogTypes.ERROR, "Error", { error: error instanceof Error ? error : undefined });
+            await databaseLogger(ServerLogTypes.ERROR, "Error", {
+                error: error instanceof Error ? error : undefined
+            });
         }
     }
 }

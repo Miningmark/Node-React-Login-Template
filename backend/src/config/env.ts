@@ -17,7 +17,11 @@ const envSchema = z.object({
     BACKEND_VERSION: z.string(),
     API_VERSION: z.string(),
 
-    SUPER_ADMIN_PASSWORD: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/),
+    SUPER_ADMIN_PASSWORD: z
+        .string()
+        .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,24}$/
+        ),
 
     FRONTEND_NAME: z.string(),
     FRONTEND_URL: z.string().url(),
@@ -70,7 +74,10 @@ try {
     });
 } catch (err) {
     if (err instanceof z.ZodError) {
-        const msg = "\n❌ Invalid environment configuration:\n" + prettyZodError(err) + "\n\nFix your .env or deployment secrets and restart.\n";
+        const msg =
+            "\n❌ Invalid environment configuration:\n" +
+            prettyZodError(err) +
+            "\n\nFix your .env or deployment secrets and restart.\n";
         console.error(msg);
         process.exit(1);
     }

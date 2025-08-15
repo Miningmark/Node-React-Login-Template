@@ -1,9 +1,11 @@
-import { databaseLogger } from "@/config/logger.js";
-import { ServerLogTypes } from "@/models/serverLog.model.js";
-import { Cron } from "croner";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
+
+import { Cron } from "croner";
+
+import { ServerLogTypes } from "@/models/serverLog.model.js";
+import { databaseLogger } from "@/config/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,16 +33,19 @@ export async function scheduleAllCronJobs() {
                 await job.job();
             });
 
-            await databaseLogger(ServerLogTypes.INFO, `Job "${job.name}" erfolgreich erstellt mit dem Zeitplan "${job.schedule}"`, {
-                source: "scheduler"
-            });
+            await databaseLogger(
+                ServerLogTypes.INFO,
+                `Job "${job.name}" erfolgreich erstellt mit dem Zeitplan "${job.schedule}"`,
+                {
+                    source: "scheduler"
+                }
+            );
         }
 
         await databaseLogger(ServerLogTypes.INFO, "Sämtliche CronJobs erfolgreich erstellt", {
             source: "scheduler"
         });
-    } catch (err) {
-        console.log(err);
+    } catch {
         await databaseLogger(ServerLogTypes.ERROR, "Fehler beim erstellen der CronJobs", {
             source: "scheduler"
         });

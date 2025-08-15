@@ -1,3 +1,7 @@
+import cookieParser from "cookie-parser";
+import express from "express";
+import z from "zod/v4";
+
 import { ENV } from "@/config/env.js";
 import { compressionMiddleware } from "@/middlewares/compression.middleware.js";
 import { errorHandlerMiddleware } from "@/middlewares/errorHandler.middleware.js";
@@ -10,9 +14,6 @@ import serverRoutes from "@/routes/server.route.js";
 import userRoutes from "@/routes/user.route.js";
 import userManagementRoutes from "@/routes/userManagement.route.js";
 import { ErrorMonitoringService } from "@/services/errorMonitoring.service.js";
-import cookieParser from "cookie-parser";
-import express from "express";
-import z from "zod/v4";
 
 const app = express();
 export default app;

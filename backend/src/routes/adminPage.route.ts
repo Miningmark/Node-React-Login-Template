@@ -1,3 +1,6 @@
+import { Router } from "express";
+import { container } from "tsyringe";
+
 import { AdminPageController } from "@/controllers/adminPage.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
@@ -23,42 +26,115 @@ import {
     updatePermissionSchema
 } from "@/validators/adminPage.validator.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
-import { Router } from "express";
-import { container } from "tsyringe";
 
 const router = Router();
 const adminPageController = container.resolve(AdminPageController);
 
-router.get("/getServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getServerLogSchema), adminPageController.getServerLogs);
-router.get("/getFilterOptionsServerLog", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(onlyAuthorizationSchema), adminPageController.getFilterOptionsServerLog);
+router.get(
+    "/getServerLogs{/:limit-:offset}",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
+    validateRequest(getServerLogSchema),
+    adminPageController.getServerLogs
+);
+router.get(
+    "/getFilterOptionsServerLog",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
+    validateRequest(onlyAuthorizationSchema),
+    adminPageController.getFilterOptionsServerLog
+);
 
-router.post("/getFilteredServerLogs{/:limit-:offset}", verifyAuth(), verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]), validateRequest(getFilteredServerLogSchema), adminPageController.getFilteredServerLogs);
+router.post(
+    "/getFilteredServerLogs{/:limit-:offset}",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
+    validateRequest(getFilteredServerLogSchema),
+    adminPageController.getFilteredServerLogs
+);
 
 router.get(
     "/getPermissionsWithRouteGroups",
     verifyAuth(),
-    verifyPermission([ADMIN_PAGE_PERMISSIONS_READ.groupName, ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
+    verifyPermission([
+        ADMIN_PAGE_PERMISSIONS_READ.groupName,
+        ADMIN_PAGE_PERMISSIONS_WRITE.groupName
+    ]),
     validateRequest(onlyAuthorizationSchema),
     adminPageController.getPermissionsWithRouteGroups
 );
-router.get("/getRouteGroups", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_READ.groupName, ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(onlyAuthorizationSchema), adminPageController.getRouteGroups);
+router.get(
+    "/getRouteGroups",
+    verifyAuth(),
+    verifyPermission([
+        ADMIN_PAGE_PERMISSIONS_READ.groupName,
+        ADMIN_PAGE_PERMISSIONS_WRITE.groupName
+    ]),
+    validateRequest(onlyAuthorizationSchema),
+    adminPageController.getRouteGroups
+);
 
-router.post("/createPermission", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(createPermissionSchema), adminPageController.createPermission);
-router.post("/updatePermission", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(updatePermissionSchema), adminPageController.updatePermission);
-router.post("/deletePermission", verifyAuth(), verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]), validateRequest(deletePermissionSchema), adminPageController.deletePermission);
+router.post(
+    "/createPermission",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
+    validateRequest(createPermissionSchema),
+    adminPageController.createPermission
+);
+router.post(
+    "/updatePermission",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
+    validateRequest(updatePermissionSchema),
+    adminPageController.updatePermission
+);
+router.post(
+    "/deletePermission",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
+    validateRequest(deletePermissionSchema),
+    adminPageController.deletePermission
+);
 
 router.get(
     "/getNotifications{/:limit-:offset}",
     verifyAuth(),
-    verifyPermission([ADMIN_PAGE_NOTIFICATIONS_READ.groupName, ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
+    verifyPermission([
+        ADMIN_PAGE_NOTIFICATIONS_READ.groupName,
+        ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName
+    ]),
     validateRequest(getNotificationsSchema),
     adminPageController.getNotifications
 );
 
-router.post("/createNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(createNotificationSchema), adminPageController.createNotification);
-router.post("/updateNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(updateNotificationSchema), adminPageController.updateNotification);
-router.post("/deleteNotification", verifyAuth(), verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]), validateRequest(deleteNotificationSchema), adminPageController.deleteNotification);
+router.post(
+    "/createNotification",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
+    validateRequest(createNotificationSchema),
+    adminPageController.createNotification
+);
+router.post(
+    "/updateNotification",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
+    validateRequest(updateNotificationSchema),
+    adminPageController.updateNotification
+);
+router.post(
+    "/deleteNotification",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
+    validateRequest(deleteNotificationSchema),
+    adminPageController.deleteNotification
+);
 
-router.post("/updateMaintenanceMode", verifyAuth(), verifyPermission([ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName]), validateRequest(updateMaintenanceModeSchema), adminPageController.updateMaintenanceMode);
+router.post(
+    "/updateMaintenanceMode",
+    verifyAuth(),
+    verifyPermission([ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName]),
+    validateRequest(updateMaintenanceModeSchema),
+    adminPageController.updateMaintenanceMode
+);
 
 export default router;

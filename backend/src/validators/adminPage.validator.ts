@@ -1,6 +1,11 @@
-import { ServerLogTypes } from "@/models/serverLog.model.js";
-import { authorizationHeader, isoDateTimeValidation, limitAndOffsetParams } from "@/validators/base.validator.js";
 import { z } from "zod/v4";
+
+import { ServerLogTypes } from "@/models/serverLog.model.js";
+import {
+    authorizationHeader,
+    isoDateTimeValidation,
+    limitAndOffsetParams
+} from "@/validators/base.validator.js";
 
 export type GetServerLogValidation = z.infer<typeof getServerLogSchema>;
 export const getServerLogSchema = z.object({
@@ -43,7 +48,11 @@ export const updatePermissionSchema = z.object({
             routeGroupIds: z.array(z.int().positive()).optional()
         })
         .refine((data) => {
-            return data.name !== undefined || data.description !== undefined || data.routeGroupIds !== undefined;
+            return (
+                data.name !== undefined ||
+                data.description !== undefined ||
+                data.routeGroupIds !== undefined
+            );
         }, "Es muss mindestens ein Wert geändert werden")
 });
 
@@ -72,7 +81,11 @@ export const createNotificationSchema = z.object({
             notifyTo: isoDateTimeValidation
         })
         .refine((data) => {
-            return data.notifyFrom !== undefined || data.notifyTo !== undefined || data.notifyFrom < data.notifyTo;
+            return (
+                data.notifyFrom !== undefined ||
+                data.notifyTo !== undefined ||
+                data.notifyFrom < data.notifyTo
+            );
         }, "Startdatum muss vor dem Enddatum liegen")
 });
 
@@ -89,7 +102,12 @@ export const updateNotificationSchema = z.object({
             notifyTo: isoDateTimeValidation.optional()
         })
         .refine((data) => {
-            return data.name !== undefined || data.description !== undefined || data.notifyFrom !== undefined || data.notifyTo !== undefined;
+            return (
+                data.name !== undefined ||
+                data.description !== undefined ||
+                data.notifyFrom !== undefined ||
+                data.notifyTo !== undefined
+            );
         }, "Es muss mindestens ein Wert geändert werden")
 });
 

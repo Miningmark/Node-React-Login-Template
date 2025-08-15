@@ -1,4 +1,9 @@
-export const getCompleteUserRegistrationEmailTemplate = (websiteName: string, username: string, url: string, expiryDate: string) => `
+export const getCompleteUserRegistrationEmailTemplate = (
+    websiteName: string,
+    username: string,
+    url: string,
+    expiryDate: string
+) => `
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -60,7 +65,11 @@ export const getCompleteUserRegistrationEmailTemplate = (websiteName: string, us
 </html>
 `;
 
-export const getAccountLockedEmailTemplate = (websiteName: string, username: string, url: string) => `
+export const getAccountLockedEmailTemplate = (
+    websiteName: string,
+    username: string,
+    url: string
+) => `
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -115,7 +124,15 @@ export const getAccountLockedEmailTemplate = (websiteName: string, username: str
 </html>
 `;
 
-export const getSuspiciousLoginEmailTemplate = (websiteName: string, username: string, loginTime: string, ipAddress: string, country: string, region: string, url: string) => `
+export const getSuspiciousLoginEmailTemplate = (
+    websiteName: string,
+    username: string,
+    loginTime: string,
+    ipAddress: string,
+    country: string,
+    region: string,
+    url: string
+) => `
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -210,7 +227,12 @@ export const getSuspiciousLoginEmailTemplate = (websiteName: string, username: s
 </html>
 `;
 
-export const getPasswordResetEmailTemplate = (websiteName: string, username: string, url: string, expiryDate: string) => `
+export const getPasswordResetEmailTemplate = (
+    websiteName: string,
+    username: string,
+    url: string,
+    expiryDate: string
+) => `
 <!DOCTYPE html>
 <html lang="de">
   <head>

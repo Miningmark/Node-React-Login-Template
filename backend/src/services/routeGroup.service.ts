@@ -1,29 +1,33 @@
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
+
+import { injectable } from "tsyringe";
+
 import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
 import { isGroupEntry } from "@/routeGroups/index.js";
-import fs from "fs/promises";
-import path from "path";
-import { injectable } from "tsyringe";
-import { fileURLToPath, pathToFileURL } from "url";
 
 @injectable()
 export class RouteGroupService {
     constructor() {}
 
     async generateUserRouteGroupArray(databaseUser: User): Promise<string[]> {
-        let routeGroupsArray: string[] = [];
+        const routeGroupsArray: string[] = [];
 
-        const userPermissions = await databaseUser.getPermissions({ include: { model: RouteGroup } });
+        const userPermissions = await databaseUser.getPermissions({
+            include: { model: RouteGroup }
+        });
         if (userPermissions === null) return routeGroupsArray;
 
         userPermissions.map((userPermission) => {
-            userPermission.routeGroups
-                ? userPermission.routeGroups.map((routeGroup) => {
-                      if (!routeGroupsArray.includes(routeGroup.name)) {
-                          routeGroupsArray.push(routeGroup.name);
-                      }
-                  })
-                : [];
+            if (userPermission.routeGroups) {
+                userPermission.routeGroups.map((routeGroup) => {
+                    if (!routeGroupsArray.includes(routeGroup.name)) {
+                        routeGroupsArray.push(routeGroup.name);
+                    }
+                });
+            }
         });
 
         return routeGroupsArray;
@@ -38,10 +42,18 @@ export class RouteGroupService {
     }
 
     generateSingleJSONResponseWithModel(databaseRouteGroup: RouteGroup): Record<string, any> {
-        return this.generateSingleJSONResponse(databaseRouteGroup.id, databaseRouteGroup.name, databaseRouteGroup.description === null ? undefined : databaseRouteGroup.description);
+        return this.generateSingleJSONResponse(
+            databaseRouteGroup.id,
+            databaseRouteGroup.name,
+            databaseRouteGroup.description === null ? undefined : databaseRouteGroup.description
+        );
     }
 
-    generateSingleJSONResponse(id: number, name: string, description?: string): Record<string, any> {
+    generateSingleJSONResponse(
+        id: number,
+        name: string,
+        description?: string
+    ): Record<string, any> {
         return {
             id: id,
             name: name,
@@ -62,12 +74,16 @@ export class RouteGroupService {
             const fullPath = path.join(routeGroupsDir, file);
             const moduleUrl = pathToFileURL(fullPath).toString();
 
-            for (const [exportName, routeGroup] of Object.entries(await import(moduleUrl))) {
+            for (const [, routeGroup] of Object.entries(await import(moduleUrl))) {
                 if (isGroupEntry(routeGroup)) {
-                    const [databaseRouteGroup, isDatabaseRouteGroupCreated] = await RouteGroup.findOrCreate({
-                        where: { name: routeGroup.groupName },
-                        defaults: { name: routeGroup.groupName, description: routeGroup.groupDescription }
-                    });
+                    const [databaseRouteGroup, isDatabaseRouteGroupCreated] =
+                        await RouteGroup.findOrCreate({
+                            where: { name: routeGroup.groupName },
+                            defaults: {
+                                name: routeGroup.groupName,
+                                description: routeGroup.groupDescription
+                            }
+                        });
 
                     if (isDatabaseRouteGroupCreated === false) {
                         if (databaseRouteGroup.description !== routeGroup.groupDescription) {
@@ -95,7 +111,10 @@ export class RouteGroupService {
 
         await Promise.all(
             databaseRouteGroups.map(async (databaseRouteGroup) => {
-                if (Math.abs(databaseRouteGroup.updatedAt.getTime() - lastUpdatedAt.getTime()) > 1000) {
+                if (
+                    Math.abs(databaseRouteGroup.updatedAt.getTime() - lastUpdatedAt.getTime()) >
+                    1000
+                ) {
                     await databaseRouteGroup.destroy();
                 }
             })
