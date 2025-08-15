@@ -85,7 +85,6 @@ function App() {
         setServerSettings(response.data);
         setServerSettingsLoaded(1);
       } catch (error) {
-        console.error("Fehler beim Laden der Servereinstellungen:", error);
         setServerSettingsLoaded(-1);
       }
     }
