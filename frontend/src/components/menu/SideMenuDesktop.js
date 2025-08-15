@@ -95,6 +95,8 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
     return menuBookmarks.some((b) => b.link === link);
   };
 
+  console.log("Menu Bookmarks:", menuBookmarks);
+
   return (
     <div
       className={`desktop-sidebar ${isHovered || menuFixed ? "expanded" : ""}`}
@@ -114,17 +116,35 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
       ) : null}
 
       {/* Bookmarks anzeigen */}
-      {(isHovered || menuFixed) && menuBookmarks.length > 0 && (
-        <ul className="bookmarks-list">
-          {menuBookmarks.map((bm, idx) => (
-            <li key={idx}>
-              <Link to={bm.link} className="bookmark-link">
-                {bm.linkName}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div style={{ height: `${menuBookmarks.length * 24}px` }}>
+        {(isHovered || menuFixed) && menuBookmarks.length > 0 && (
+          <ul className="bookmarks-list">
+            {menuBookmarks.map((bm, idx) => (
+              <li key={idx} style={{ position: "relative" }}>
+                <Link to={bm.link} className="bookmark-link">
+                  {bm.linkName}
+                </Link>
+                <span
+                  className="bookmark-icon"
+                  style={{
+                    cursor: "pointer",
+                    position: "absolute",
+                    right: "16px",
+                  }}
+                  onClick={() => toggleBookmark(bm.linkName, bm.link)}
+                  title={isBookmarked(bm.link) ? "Bookmark entfernen" : "Bookmark hinzufügen"}
+                >
+                  {isBookmarked(bm.link) ? (
+                    <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
+                  ) : (
+                    <BookmarkIcon style={{ width: 20, height: 20 }} />
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <ul className="menu-items">
         {menuItems.map((item, idx) => {
