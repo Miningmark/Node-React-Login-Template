@@ -17,42 +17,40 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (
     // eslint-disable-next-line no-console
     console.log(error);
 
-    let normalized: AppError;
-
     if (error instanceof ZodError) {
-        normalized = new ValidationError(formatZodError(error));
+        error = new ValidationError(formatZodError(error));
     } else if (error instanceof MulterError) {
         if (
             error.code === "LIMIT_UNEXPECTED_FILE" ||
             error.code === "LIMIT_FILE_COUNT" ||
             error.code === "LIMIT_FIELD_COUNT"
         ) {
-            normalized = new ValidationError("Mehr Dateien erhalten als zulässig");
+            error = new ValidationError("Mehr Dateien erhalten als zulässig");
         } else {
-            normalized = new InternalServerError("Fehler mit Dateiannahme");
+            error = new InternalServerError("Fehler mit Dateiannahme");
         }
-    } else if (error instanceof AppError) {
-        normalized = error;
-    } else {
-        normalized = new InternalServerError();
+    } else if (!(error instanceof AppError)) {
+        error = new InternalServerError();
     }
-
-    const jsonResponse: Record<string, any> = { message: normalized.message };
 
     const loggerOptions: DatabaseLoggerOptions = {
         userId: req.userId,
         url: req.originalUrl,
         method: req.method,
-        status: normalized.statusCode,
+        status: error instanceof AppError ? error.statusCode : 500,
         ipv4Address: getIpv4Address(req),
         userAgent: req.headers["user-agent"],
         requestBody: req.body,
         requestHeaders: req.headers,
-        response: jsonResponse,
+        response: { message: (error as AppError).message },
         source: "errorHandlerMiddleware",
-        error: normalized
+        error: error as Error
     };
 
+    const jsonResponse: Record<string, any> = {};
+    jsonResponse.message =
+        error instanceof ZodError ? formatZodError(error) : (error as AppError).message;
+
     await databaseLogger(ServerLogTypes.ERROR, jsonResponse.message, loggerOptions);
-    ApiResponse.sendError(res, jsonResponse, normalized.statusCode);
+    ApiResponse.sendError(res, jsonResponse, error instanceof AppError ? error.statusCode : 500);
 };
