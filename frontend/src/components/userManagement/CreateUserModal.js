@@ -46,7 +46,6 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
       setTouched((prev) => ({ ...prev, username: true }));
       return;
     }
-    console.log("test", isEmailValid);
     if (!newUser.email || !isEmailValid) {
       addToast("Bitte eine gültige E-Mail-Adresse eingeben", "danger");
       setTouched((prev) => ({ ...prev, email: true }));

@@ -14,6 +14,11 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
 
+  const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(editedUser.username.trim());
+  const isEmailValid = /^[a-zA-Z0-9.%_+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(
+    editedUser.email.trim()
+  );
+
   if (!user) return null;
 
   const handleChange = (e) => {
@@ -49,6 +54,19 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
   };
 
   const handleSave = async () => {
+    if (!editedUser.username || !isUsernameValid) {
+      addToast(
+        "Benutzername muss zwischen 5 und 15 Zeichen lang sein und darf keine Sonderzeichen enthalten",
+        "danger"
+      );
+      setTouched((prev) => ({ ...prev, username: true }));
+      return;
+    }
+    if (!editedUser.email || !isEmailValid) {
+      addToast("Bitte eine gültige E-Mail-Adresse eingeben", "danger");
+      setTouched((prev) => ({ ...prev, email: true }));
+      return;
+    }
     setIsSaving(true);
     const changedFields = getChangedFields(user, editedUser);
     const permissionsChanged = havePermissionsChanged();
@@ -104,7 +122,9 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
             <div className="form-floating mb-3">
               <input
                 type="text"
-                className={`form-control ${touched.username ? "is-valid" : ""}`}
+                className={`form-control ${
+                  touched.username && !isUsernameValid ? "is-invalid" : ""
+                }`}
                 id="floatingUsername"
                 placeholder="Benutzername"
                 value={editedUser.username}
@@ -119,7 +139,7 @@ const UserDetailsModal = ({ show, handleClose, user, allPermissions }) => {
             <div className="form-floating mb-3">
               <input
                 type="email"
-                className={`form-control ${touched.email ? "is-valid" : ""}`}
+                className={`form-control ${touched.email && !isEmailValid ? "is-invalid" : ""}`}
                 id="floatingEmail"
                 placeholder="E-Mail"
                 value={editedUser.email}
