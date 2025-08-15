@@ -49,17 +49,14 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
     });
     if (!menuFixed || !menuFixedChanged) {
       setOpenMenus(initialOpenMenus);
-      console.log("Initial Open Menus:", initialOpenMenus);
     }
   }, [currentPath, checkAccess, menuFixed, menuFixedChanged, routeGroups]);
 
   useEffect(() => {
     if (!menuFixedChanged && menuFixed && routeGroups) {
       setMenuFixedChanged(true);
-      console.log("Menu wurde fixiert");
     }
   }, [menuFixedChanged, menuFixed, routeGroups]);
-  console.log("Menu Fixed Changed:", menuFixedChanged);
 
   const toggleSubMenu = (name) => {
     setOpenMenus((prev) => ({
