@@ -87,7 +87,12 @@ export class AuthService {
             await this.serverLogService.generateJSONOptionsResponse()
         );
 
-        return { type: "json", jsonResponse: jsonResponse, statusCode: 201 };
+        return {
+            type: "json",
+            jsonResponse: jsonResponse,
+            userId: databaseUser.id,
+            statusCode: 201
+        };
     }
 
     async login(
@@ -204,7 +209,7 @@ export class AuthService {
                 true
             )
         );
-        return { type: "json", jsonResponse: jsonResponse };
+        return { type: "json", jsonResponse: jsonResponse, userId: databaseUserToken.user.id };
     }
 
     async refreshAccessToken(token: string, res: Response): Promise<ControllerResponse> {
@@ -259,7 +264,7 @@ export class AuthService {
             }
         });
 
-        return { type: "json", jsonResponse: jsonResponse };
+        return { type: "json", jsonResponse: jsonResponse, userId: refreshUserToken.user.id };
     }
 
     async requestPasswordReset(usernameOrEmail: string): Promise<ControllerResponse> {
@@ -301,7 +306,7 @@ export class AuthService {
             )
         );
 
-        return { type: "json", jsonResponse: jsonResponse };
+        return { type: "json", jsonResponse: jsonResponse, userId: databaseUser.id };
     }
 
     async handlePasswordRecovery(token: string, password: string): Promise<ControllerResponse> {
@@ -365,6 +370,6 @@ export class AuthService {
                 true
             )
         );
-        return { type: "json", jsonResponse: jsonResponse };
+        return { type: "json", jsonResponse: jsonResponse, userId: databaseUserToken.user.id };
     }
 }
