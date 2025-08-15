@@ -122,18 +122,10 @@ const PermissionsPage = () => {
               ]}
               tableHeight={`calc(100dvh - ${heightOffset + 62}px)`}
               handleSort={handleSort}
-            >
-              <tbody>
-                {filteredPermissions
-                  .filter((permission) => permission.name !== "SuperAdmin Berechtigung")
-                  .map((permission) => (
-                    <tr key={permission.id}>
-                      <td>{permission.name}</td>
-                      <td>{permission.description}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </ResizableTable>
+              rows={filteredPermissions.filter(
+                (permission) => permission.name !== "SuperAdmin Berechtigung"
+              )}
+            />
           ) : (
             <TableLoadingAnimation />
           )}

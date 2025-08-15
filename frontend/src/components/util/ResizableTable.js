@@ -7,10 +7,12 @@ import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
 import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
 import { ReactComponent as ArrowForwardIcon } from "assets/icons/arrow_forward.svg";
 
-const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, children }) => {
+const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, rows, onRowClick }) => {
   const tableRef = useRef();
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
+
+  const [columnOrder, setColumnOrder] = useState(columns);
 
   const resizeIntervalRef = useRef(null);
 
@@ -198,7 +200,7 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
           }}
         >
           <tr>
-            {columns.map((col, index) => (
+            {columnOrder.map((col, index) => (
               <th
                 className="text-center "
                 key={index}
@@ -207,6 +209,19 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
                   cursor: `${handleSort ? "pointer" : "default"}`,
                 }}
                 onClick={(e) => handleHeaderClick(e, col.id || null)}
+                draggable
+                onDragStart={(e) => e.dataTransfer.setData("colIndex", index)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  const from = parseInt(e.dataTransfer.getData("colIndex"), 10);
+                  const to = index;
+                  if (from !== to) {
+                    const newOrder = [...columnOrder];
+                    const [moved] = newOrder.splice(from, 1);
+                    newOrder.splice(to, 0, moved);
+                    setColumnOrder(newOrder);
+                  }
+                }}
               >
                 <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
                   {col.title}
@@ -234,7 +249,19 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, childre
             ))}
           </tr>
         </thead>
-        {children}
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr
+              key={row.id || rowIndex}
+              onClick={() => onRowClick && onRowClick(row)}
+              style={{ cursor: `${onRowClick ? "pointer" : ""}` }}
+            >
+              {columnOrder.map((col) => (
+                <td key={col.id}>{col.render ? col.render(row) : row[col.id]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
       </Table>
     </div>
   );

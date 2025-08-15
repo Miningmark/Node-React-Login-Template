@@ -259,54 +259,58 @@ const UsersPage = () => {
               >
                 <ResizableTable
                   columns={[
-                    { title: "Username", id: "username" },
-                    { title: "Email", id: "email" },
-                    { title: "Active", id: "isActive" },
-                    { title: "Blocked", id: "isDisabled" },
+                    {
+                      title: "Username",
+                      id: "username",
+                      render: (row) => (
+                        <div
+                          style={{ cursor: "pointer", fontWeight: "bold" }}
+                          onClick={() => handleUserClick(row.id)}
+                        >
+                          <div className="d-flex align-items-center gap-2">
+                            {row.avatar ? (
+                              <img
+                                src={row.avatar}
+                                alt="Avatar"
+                                className="rounded-circle"
+                                style={{ width: "32px", height: "32px" }}
+                              />
+                            ) : (
+                              <UserDefaultIcon
+                                fill={theme === "light" ? "black" : "var(--bs-body-color)"}
+                                width={32}
+                                height={32}
+                              />
+                            )}
+                            <span>{row.username}</span>
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      title: "Email",
+                      id: "email",
+                      render: (row) => <span>{row.email}</span>,
+                    },
+                    {
+                      title: "Active",
+                      id: "isActive",
+                      render: (row) => (
+                        <span className="text-center">{row.isActive ? "✅" : "❌"}</span>
+                      ),
+                    },
+                    {
+                      title: "Blocked",
+                      id: "isDisabled",
+                      render: (row) => (
+                        <span className="text-center">{row.isDisabled ? "✅" : "❌"}</span>
+                      ),
+                    },
                   ]}
+                  rows={filteredUsers.filter((user) => user.username !== "SuperAdmin")}
                   tableHeight={`calc(100dvh - ${heightOffset + 142}px)`}
                   handleSort={handleSort}
-                >
-                  <tbody>
-                    {filteredUsers
-                      .filter((user) => user.username !== "SuperAdmin")
-                      .map((user) => (
-                        <tr key={user.id}>
-                          <td
-                            style={{
-                              cursor: "pointer",
-                              fontWeight: "bold",
-                            }}
-                            onClick={() => {
-                              handleUserClick(user.id);
-                            }}
-                          >
-                            <div className="d-flex align-items-center gap-2">
-                              {user.avatar ? (
-                                <img
-                                  src={user.avatar}
-                                  alt="Avatar"
-                                  className="rounded-circle"
-                                  style={{ width: "32px", height: "32px", borderRadius: "50%" }}
-                                />
-                              ) : (
-                                <UserDefaultIcon
-                                  fill={theme === "light" ? "black" : "var(--bs-body-color)"}
-                                  width={32}
-                                  height={32}
-                                  style={{ borderRadius: "50%" }}
-                                />
-                              )}
-                              <span>{user.username}</span>
-                            </div>
-                          </td>
-                          <td>{user.email}</td>
-                          <td className="text-center">{user.isActive ? "✅" : "❌"}</td>
-                          <td className="text-center">{user.isDisabled ? "✅" : "❌"}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </ResizableTable>
+                />
               </div>
             </>
           ) : (

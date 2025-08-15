@@ -119,35 +119,26 @@ const UserNotificationsPage = () => {
               >
                 <ResizableTable
                   columns={[
-                    { title: "ID", width: 50 },
-                    { title: "Name" },
-                    { title: "Von" },
-                    { title: "Bis" },
+                    { id: "id", title: "ID", width: 50 },
+                    { id: "name", title: "Name" },
+                    {
+                      id: "notifyFrom",
+                      title: "Von",
+                      render: (value) => convertToLocalTimeStamp(value),
+                    },
+                    {
+                      id: "notifyTo",
+                      title: "Bis",
+                      render: (value) => convertToLocalTimeStamp(value),
+                    },
                   ]}
                   tableHeight={`calc(100dvh - ${heightOffset + 162}px)`}
-                >
-                  <tbody>
-                    {userNotifications.map((notification) => (
-                      <tr
-                        key={notification.id}
-                        onClick={() => {
-                          setSelectedNotification(notification.id);
-                          setShowEditNotificationModal(true);
-                        }}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <td>{notification.id}</td>
-                        <td className="text-center">{notification.name}</td>
-                        <td className="text-center">
-                          {convertToLocalTimeStamp(notification.notifyFrom)}
-                        </td>
-                        <td className="text-center">
-                          {convertToLocalTimeStamp(notification.notifyTo)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </ResizableTable>
+                  rows={userNotifications}
+                  onRowClick={(notification) => {
+                    setSelectedNotification(notification.id);
+                    setShowEditNotificationModal(true);
+                  }}
+                />
               </div>
               <div className="text-center my-3">
                 <button

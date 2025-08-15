@@ -253,28 +253,20 @@ function ServerLogPage() {
               >
                 <ResizableTable
                   columns={[
-                    { title: "ID", width: 50 },
-                    { title: "Zeitstempel", width: 180 },
-                    { title: "Type", width: 60 },
-                    { title: "Nachricht" },
+                    { id: "id", title: "ID", width: 50 },
+                    {
+                      id: "createdAt",
+                      title: "Zeitstempel",
+                      width: 180,
+                      render: (value) => convertToLocalTimeStamp(value),
+                    },
+                    { id: "type", title: "Type", width: 60 },
+                    { id: "message", title: "Nachricht" },
                   ]}
+                  rows={sortedServerLog}
                   tableHeight={`calc(100dvh - ${heightOffset + 162}px)`}
-                >
-                  <tbody>
-                    {sortedServerLog.map((log) => (
-                      <tr
-                        key={log.id}
-                        onClick={() => setSelectedServerLog(log.id)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <td>{log.id}</td>
-                        <td className="text-center">{convertToLocalTimeStamp(log.createdAt)}</td>
-                        <td className="text-center">{log.type}</td>
-                        <td className="text-center">{log.message}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </ResizableTable>
+                  onRowClick={(row) => setSelectedServerLog(row.id)}
+                />
               </div>
               <div className="text-center my-3">
                 <button
