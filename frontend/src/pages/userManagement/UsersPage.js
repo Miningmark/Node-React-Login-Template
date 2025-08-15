@@ -262,7 +262,7 @@ const UsersPage = () => {
                     {
                       title: "Username",
                       id: "username",
-                      render: (row) => (
+                      render: (row, value) => (
                         <div
                           style={{ cursor: "pointer", fontWeight: "bold" }}
                           onClick={() => handleUserClick(row.id)}
@@ -282,7 +282,7 @@ const UsersPage = () => {
                                 height={32}
                               />
                             )}
-                            <span>{row.username}</span>
+                            <span>{value}</span>
                           </div>
                         </div>
                       ),

@@ -256,8 +256,14 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, rows, o
               onClick={() => onRowClick && onRowClick(row)}
               style={{ cursor: `${onRowClick ? "pointer" : ""}` }}
             >
+              {columnOrder.map((col) => {
+                console.log("Column", col);
+                console.log("Row", row);
+
+                console.log("Value", row[col.id]);
+              })}
               {columnOrder.map((col) => (
-                <td key={col.id}> {col.render ? col.render(row[col.id], row) : row[col.id]}</td>
+                <td key={col.id}> {col.render ? col.render(row, row[col.id]) : row[col.id]}</td>
               ))}
             </tr>
           ))}

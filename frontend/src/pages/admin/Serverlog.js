@@ -258,7 +258,7 @@ function ServerLogPage() {
                       id: "createdAt",
                       title: "Zeitstempel",
                       width: 180,
-                      render: (value) => convertToLocalTimeStamp(value),
+                      render: (row, value) => convertToLocalTimeStamp(value),
                     },
                     { id: "type", title: "Type", width: 60 },
                     { id: "message", title: "Nachricht" },

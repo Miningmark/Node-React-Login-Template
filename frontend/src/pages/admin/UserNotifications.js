@@ -124,12 +124,12 @@ const UserNotificationsPage = () => {
                     {
                       id: "notifyFrom",
                       title: "Von",
-                      render: (value) => convertToLocalTimeStamp(value),
+                      render: (row, value) => convertToLocalTimeStamp(value),
                     },
                     {
                       id: "notifyTo",
                       title: "Bis",
-                      render: (value) => convertToLocalTimeStamp(value),
+                      render: (row, value) => convertToLocalTimeStamp(value),
                     },
                   ]}
                   tableHeight={`calc(100dvh - ${heightOffset + 162}px)`}
