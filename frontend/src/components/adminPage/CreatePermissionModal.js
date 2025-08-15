@@ -31,6 +31,21 @@ const CreatePermissionModal = ({
       addToast("Berechtigung mit dem selben Namen existiert bereits!", "danger");
       return;
     }
+    if (!name || name.trim() === "" || name.length < 5 || name.length > 50) {
+      addToast("Name mit min. 5 Stellen ist erforderlich", "danger");
+      setTouched((prev) => ({ ...prev, name: true }));
+      return;
+    }
+    if (
+      !description ||
+      description.trim() === "" ||
+      description.length < 5 ||
+      description.length > 100
+    ) {
+      addToast("Beschreibung mit min. 5 Stellen ist erforderlich", "danger");
+      setTouched((prev) => ({ ...prev, description: true }));
+      return;
+    }
     setIsSaving(true);
     const routeGroupIds = selectedRouteGroups.map((rg) => rg.id);
 
