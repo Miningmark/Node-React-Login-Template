@@ -29,7 +29,7 @@ export class UserController extends BaseController {
             const { userId } = req as { userId: number };
             const { newUsername } = req.validated.body;
 
-            return await this.userService.updateUsername(userId, newUsername, res);
+            return await this.userService.updateUsername(userId, newUsername);
         });
     };
 
@@ -42,7 +42,7 @@ export class UserController extends BaseController {
             const { userId } = req as { userId: number };
             const { newEmail } = req.validated.body;
 
-            return await this.userService.updateEmail(userId, newEmail, res);
+            return await this.userService.updateEmail(userId, newEmail);
         });
     };
 

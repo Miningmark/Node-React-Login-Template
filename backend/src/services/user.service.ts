@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import { Response } from "express";
 import sharp from "sharp";
 import { inject, injectable } from "tsyringe";
-import { StringFormatParams } from "zod/v4/core";
 
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
@@ -31,11 +30,7 @@ export class UserService {
         @inject(SocketService) private readonly socketService: SocketService
     ) {}
 
-    async updateUsername(
-        userId: number,
-        newUsername: string,
-        res: Response
-    ): Promise<ControllerResponse> {
+    async updateUsername(userId: number, newUsername: string): Promise<ControllerResponse> {
         const jsonResponse: Record<string, any> = { message: "Benutzername erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -63,11 +58,7 @@ export class UserService {
         return { type: "json", jsonResponse: jsonResponse };
     }
 
-    async updateEmail(
-        userId: number,
-        newEmail: string,
-        res: Response
-    ): Promise<ControllerResponse> {
+    async updateEmail(userId: number, newEmail: string): Promise<ControllerResponse> {
         const jsonResponse: Record<string, any> = { message: "Email erfolgreich geändert" };
 
         const databaseUser = await User.findOne({ where: { id: userId } });
@@ -238,8 +229,9 @@ export class UserService {
         if (databaseUser === null)
             throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        jsonResponse.routeGroups =
-            await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
+        jsonResponse.routeGroups = await this.routeGroupService.generateUserRouteGroupArray(
+            databaseUser
+        );
 
         return { type: "json", jsonResponse: jsonResponse };
     }
@@ -361,7 +353,7 @@ export class UserService {
                 "users",
                 `${userId}/avatar.webp`
             ));
-        } catch (error) {
+        } catch {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
 

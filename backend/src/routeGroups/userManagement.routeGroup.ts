@@ -1,4 +1,4 @@
-import { defineGroup, GroupEntry } from "@/routeGroups/index.js";
+import { defineGroup } from "@/routeGroups/index.js";
 
 export const USER_MANAGEMENT_READ = defineGroup(
     "userManagementRead",

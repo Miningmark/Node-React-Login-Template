@@ -45,8 +45,7 @@ export async function scheduleAllCronJobs() {
         await databaseLogger(ServerLogTypes.INFO, "Sämtliche CronJobs erfolgreich erstellt", {
             source: "scheduler"
         });
-    } catch (err) {
-        console.log(err);
+    } catch {
         await databaseLogger(ServerLogTypes.ERROR, "Fehler beim erstellen der CronJobs", {
             source: "scheduler"
         });

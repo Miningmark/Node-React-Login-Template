@@ -1,15 +1,8 @@
-import {
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model
-} from "@sequelize/core";
-import { Attribute, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
+import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "@sequelize/core";
+import { Attribute, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
 
-import Notification from "@/models/notification.model.js";
-import User from "@/models/user.model.js";
 import Permission from "@/models/permission.model";
+import User from "@/models/user.model.js";
 
 @Table({
     tableName: "user_permissions",

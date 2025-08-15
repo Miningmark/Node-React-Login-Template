@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
 import { ValidatedRequest } from "@/@types/validation.js";

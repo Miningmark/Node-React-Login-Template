@@ -27,6 +27,8 @@ const io = new Server(httpServer, {
 
 const init = async () => {
     try {
+        socketService.init(io);
+
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
 
@@ -50,7 +52,6 @@ const init = async () => {
 
         httpServer.listen(ENV.BACKEND_PORT);
 
-        socketService.init(io);
         await socketService.setup();
     } catch (error) {
         consoleLogger.error(error instanceof Error ? error.message : "", {

@@ -7,7 +7,6 @@ import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
 import { verifyPermission } from "@/middlewares/verifyPermission.middleware.js";
 import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
-import { BugReportService } from "@/services/bugReport.service.js";
 import {
     createBugReportSchema,
     getActiveBugReportsSchema,

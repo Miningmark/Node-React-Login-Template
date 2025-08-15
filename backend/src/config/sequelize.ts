@@ -46,6 +46,7 @@ export const sequelize = new Sequelize({
         acquire: 10000,
         idle: 10000
     },
+    // eslint-disable-next-line no-console
     ...(ENV.CONSOLE_LOG_DATABASE_QUERRIES ? { logging: console.log } : { logging: false }),
     models: models
 });

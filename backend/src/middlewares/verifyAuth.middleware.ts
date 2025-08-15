@@ -28,7 +28,7 @@ export const verifyAuth = () => {
                 req.routeGroups = decodedPayload.routeGroups;
 
                 next();
-            } catch (error) {
+            } catch {
                 throw new ForbiddenError("AccessToken konnte nicht verifiziert werden");
             }
         } catch (error) {

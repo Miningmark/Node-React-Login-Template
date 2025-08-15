@@ -1,7 +1,6 @@
 import { z } from "zod/v4";
 
 import {
-    authorizationHeader,
     emailValidation,
     passwordValidation,
     usernameValidation

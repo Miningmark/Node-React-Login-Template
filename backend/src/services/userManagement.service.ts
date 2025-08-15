@@ -58,7 +58,7 @@ export class UserManagementService {
                 "users",
                 `${userId}/avatar.webp`
             ));
-        } catch (error) {
+        } catch {
             return { type: "json", jsonResponse: jsonResponse, statusCode: 204 };
         }
 

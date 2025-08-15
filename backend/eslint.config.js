@@ -1,11 +1,12 @@
-import js from "@eslint/js";
+import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-config-prettier";
 import pluginImport from "eslint-plugin-import";
 
 export default [
-    { ignores: ["dist", "node_modules"] },
-    js.configs.recommended,
+    { ignores: ["dist", "node_modules", "eslint.config.js"] },
+
+    eslint.configs.recommended,
     ...tseslint.configs.recommended,
     pluginImport.flatConfigs.recommended,
     eslintConfigPrettier,
@@ -30,7 +31,8 @@ export default [
                     "newlines-between": "always"
                 }
             ],
-            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }]
+            "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+            "@typescript-eslint/no-explicit-any": "off"
         }
     }
 ];

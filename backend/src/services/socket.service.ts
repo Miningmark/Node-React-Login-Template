@@ -14,10 +14,6 @@ import { ServerLogTypes } from "@/models/serverLog.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
 import { ClientToServerEvents, ServerToClientEvents } from "@/socketIO/types.js";
 
-
-
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const socketDir = path.join(__dirname, "..", "socketIO", "sockets");
@@ -69,7 +65,7 @@ export class SocketService {
                 socket.routeGroups = decodedPayload.routeGroups;
 
                 next();
-            } catch (error) {
+            } catch {
                 await databaseLogger(
                     ServerLogTypes.WARN,
                     "Socket abgelehnt wegen ungültigen AccessToken",
@@ -84,7 +80,7 @@ export class SocketService {
         this.getIO().on("connection", async (socket) => {
             await databaseLogger(
                 ServerLogTypes.INFO,
-                `Socket verbunden: \"${socket.id}\" für Benutzer ID: \"${socket.userId}\"`,
+                `Socket verbunden: "${socket.id}" für Benutzer ID: "${socket.userId}"`,
                 {
                     userId: socket.userId,
                     source: "socket.io"
@@ -94,7 +90,7 @@ export class SocketService {
             socket.on("disconnecting", async (reason) => {
                 await databaseLogger(
                     ServerLogTypes.INFO,
-                    `Socket getrennt \"${socket.id}\ mit der Begründung: \"${reason}\" für Benutzer ID: \"${socket.userId}\"`,
+                    `Socket getrennt "${socket.id}" mit der Begründung: "${reason}" für Benutzer ID: "${socket.userId}"`,
                     {
                         userId: socket.userId,
                         source: "socket.io"

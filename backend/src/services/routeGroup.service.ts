@@ -8,8 +8,6 @@ import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
 import { isGroupEntry } from "@/routeGroups/index.js";
 
-
-
 @injectable()
 export class RouteGroupService {
     constructor() {}
@@ -23,13 +21,13 @@ export class RouteGroupService {
         if (userPermissions === null) return routeGroupsArray;
 
         userPermissions.map((userPermission) => {
-            userPermission.routeGroups
-                ? userPermission.routeGroups.map((routeGroup) => {
-                      if (!routeGroupsArray.includes(routeGroup.name)) {
-                          routeGroupsArray.push(routeGroup.name);
-                      }
-                  })
-                : [];
+            if (userPermission.routeGroups) {
+                userPermission.routeGroups.map((routeGroup) => {
+                    if (!routeGroupsArray.includes(routeGroup.name)) {
+                        routeGroupsArray.push(routeGroup.name);
+                    }
+                });
+            }
         });
 
         return routeGroupsArray;
@@ -76,7 +74,7 @@ export class RouteGroupService {
             const fullPath = path.join(routeGroupsDir, file);
             const moduleUrl = pathToFileURL(fullPath).toString();
 
-            for (const [exportName, routeGroup] of Object.entries(await import(moduleUrl))) {
+            for (const [, routeGroup] of Object.entries(await import(moduleUrl))) {
                 if (isGroupEntry(routeGroup)) {
                     const [databaseRouteGroup, isDatabaseRouteGroupCreated] =
                         await RouteGroup.findOrCreate({

@@ -11,7 +11,6 @@ import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.route
 import { S3Service } from "@/services/s3.service.js";
 import { SocketService } from "@/services/socket.service.js";
 
-
 @injectable()
 export class BugReportService {
     constructor(
@@ -117,7 +116,7 @@ export class BugReportService {
                 "bug-reports",
                 `${databaseBugReport.id}/${databaseBugReport.fileNames[fileIndex - 1]}`
             ));
-        } catch (error) {
+        } catch {
             return {
                 type: "json",
                 jsonResponse: { message: "Es ist keine Datei mit diesen Index vorhanden" },

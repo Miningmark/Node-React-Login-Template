@@ -98,15 +98,13 @@ export async function databaseLogger(
             errorStack: error?.stack?.split("\n").slice(1).join("\n")
         });
 
-        try {
-            container
-                .resolve(SocketService)
-                .emitToRoom(
-                    "listen:adminPage:serverLogs:watchList",
-                    "adminPage:serverLogs:create",
-                    serverLogService.generateJSONResponse([databaseServerLog])[0]
-                );
-        } catch (error) {}
+        container
+            .resolve(SocketService)
+            .emitToRoom(
+                "listen:adminPage:serverLogs:watchList",
+                "adminPage:serverLogs:create",
+                serverLogService.generateJSONResponse([databaseServerLog])[0]
+            );
     } catch (error) {
         consoleLogger.error("Error bei erstellen eines ServerLog in der Datenbank", {
             error: error instanceof Error ? error.stack : ""

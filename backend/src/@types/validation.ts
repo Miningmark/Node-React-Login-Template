@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { z, ZodObject } from "zod/v4";
 
-export interface ValidatedRequest<T = any> extends Request {
+export interface ValidatedRequest<T = ZodObject> extends Request {
     validated: T;
 }
 
