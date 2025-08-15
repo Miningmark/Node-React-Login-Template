@@ -2,12 +2,13 @@ import { Op, WhereOptions } from "@sequelize/core";
 import { injectable } from "tsyringe";
 
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
+import User from "@/models/user.model.js";
 
 @injectable()
 export class ServerLogService {
     constructor() {}
 
-    generateJSONResponse(databaseServerLogs: ServerLog[]): Record<string, any> {
+    public generateJSONResponse(databaseServerLogs: ServerLog[]): Record<string, any> {
         return databaseServerLogs.map((databaseServerLog) => {
             return {
                 id: databaseServerLog.id,
@@ -29,7 +30,24 @@ export class ServerLogService {
         });
     }
 
-    buildServerLogQueryConditions(
+    public async generateJSONOptionsResponse(): Promise<Record<string, any>> {
+        const jsonResponse: Record<string, any> = {};
+        const databaseUsers = await User.findAll({});
+
+        jsonResponse.filterOptions = {};
+        jsonResponse.filterOptions.users = databaseUsers.map((databaseUser) => {
+            return {
+                id: databaseUser.id,
+                username: databaseUser.username
+            };
+        });
+
+        jsonResponse.filterOptions.types = Object.values(ServerLogTypes);
+
+        return jsonResponse;
+    }
+
+    public buildServerLogQueryConditions(
         userIds?: number[],
         types?: ServerLogTypes[],
         ipv4Address?: string,
