@@ -37,6 +37,33 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
   };
 
   async function handleSave() {
+    if (!name || name.trim() === "" || name.length < 5 || name.length > 50) {
+      addToast("Name mit min. 5 Zeichen ist erforderlich", "danger");
+      setTouched((prev) => ({ ...prev, name: true }));
+      return;
+    }
+
+    if (!notifyFrom || !notifyTo) {
+      addToast("Bitte geben Sie Startdatum an", "danger");
+      setTouched((prev) => ({ ...prev, startDate: true }));
+      return;
+    }
+    if (!notifyTo) {
+      addToast("Bitte geben Sie Enddatum an", "danger");
+      setTouched((prev) => ({ ...prev, endDate: true }));
+      return;
+    }
+    if (
+      !description ||
+      description.trim() === "" ||
+      description.length < 5 ||
+      description.length > 100
+    ) {
+      addToast("Nachricht mit min. 5 Zeichen ist erforderlich", "danger");
+      setTouched((prev) => ({ ...prev, description: true }));
+      return;
+    }
+
     setIsSaving(true);
     try {
       await axiosProtected.post("/adminPage/createNotification", {
@@ -48,6 +75,7 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
       addToast("Benachrichtigung erfolgreich erstellt", "success");
       closeModal();
     } catch (error) {
+      console.error("Error creating notification:", error);
       addToast(error.response?.data?.message || "Erstellung fehlgeschlagen", "danger");
     } finally {
       setIsSaving(false);
@@ -193,7 +221,12 @@ const CreateUserNotification = ({ show, handleClose, notification }) => {
               onClick={() => {
                 notification ? handleEdit() : handleSave();
               }}
-              disabled={isSaving || !name}
+              disabled={isSaving}
+              title={
+                !name || !description || !notifyFrom || !notifyTo
+                  ? "Bitte füllen Sie alle erforderlichen Felder aus"
+                  : ""
+              }
               style={{ width: "100px" }}
             >
               {isSaving ? (

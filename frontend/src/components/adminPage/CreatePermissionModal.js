@@ -32,7 +32,7 @@ const CreatePermissionModal = ({
       return;
     }
     if (!name || name.trim() === "" || name.length < 5 || name.length > 50) {
-      addToast("Name mit min. 5 Stellen ist erforderlich", "danger");
+      addToast("Name mit min. 5 Zeichen ist erforderlich", "danger");
       setTouched((prev) => ({ ...prev, name: true }));
       return;
     }
@@ -42,7 +42,7 @@ const CreatePermissionModal = ({
       description.length < 5 ||
       description.length > 100
     ) {
-      addToast("Beschreibung mit min. 5 Stellen ist erforderlich", "danger");
+      addToast("Beschreibung mit min. 5 Zeichen ist erforderlich", "danger");
       setTouched((prev) => ({ ...prev, description: true }));
       return;
     }
