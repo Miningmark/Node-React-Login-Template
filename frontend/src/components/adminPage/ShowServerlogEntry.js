@@ -1,6 +1,6 @@
 import { Modal, Button } from "react-bootstrap";
 
-const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
+const ShowServerlogEntry = ({ show, handleClose, serverLogEntry, users }) => {
   if (!serverLogEntry) return null;
 
   const renderJsonIfPossible = (value) => {
@@ -28,7 +28,10 @@ const ShowServerlogEntry = ({ show, handleClose, serverLogEntry }) => {
           <strong>Level:</strong> {serverLogEntry.type}
         </p>
         <p>
-          <strong>User:</strong> {serverLogEntry.userId || "—"}
+          <strong>User:</strong>{" "}
+          {serverLogEntry?.userId
+            ? users.find((user) => user.id === serverLogEntry.userId)?.username || "—"
+            : "—"}
         </p>
         <p>
           <strong>Source:</strong> {serverLogEntry.source}
