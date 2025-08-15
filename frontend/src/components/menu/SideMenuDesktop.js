@@ -119,7 +119,6 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
           <ul style={{ listStyle: "none", padding: "0 16px", margin: 0 }}>
             {menuBookmarks.map((bm, idx) => {
               const isActiveMain = bm.link === currentPath;
-              console.log("Bookmark:", bm.linkName, bm.link, isActiveMain);
               return (
                 <li key={idx} className="menu-item" style={{}}>
                   <div
@@ -233,9 +232,15 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
                             }
                           >
                             {isBookmarked(subItem.path) ? (
-                              <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
+                              <BookmarkCheckIcon
+                                className="keep-icon"
+                                style={{ width: 20, height: 20 }}
+                              />
                             ) : (
-                              <BookmarkIcon style={{ width: 20, height: 20 }} />
+                              <BookmarkIcon
+                                className="keep-icon"
+                                style={{ width: 20, height: 20 }}
+                              />
                             )}
                           </span>
                         </li>

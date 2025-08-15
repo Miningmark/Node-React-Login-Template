@@ -99,30 +99,49 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
 
         {/* Bookmarks anzeigen */}
         {menuBookmarks.length > 0 && (
-          <ul className="bookmarks-list">
-            {menuBookmarks.map((bm, idx) => (
-              <li key={idx} style={{ position: "relative" }}>
-                <Link to={bm.link} className="bookmark-link">
-                  {bm.linkName}
-                </Link>
-                <span
-                  className="bookmark-icon"
-                  style={{
-                    cursor: "pointer",
-                    position: "absolute",
-                    right: "16px",
-                  }}
-                  onClick={() => toggleBookmark(bm.linkName, bm.link)}
-                  title={isBookmarked(bm.link) ? "Bookmark entfernen" : "Bookmark hinzufügen"}
-                >
-                  {isBookmarked(bm.link) ? (
-                    <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
-                  ) : (
-                    <BookmarkIcon style={{ width: 20, height: 20 }} />
-                  )}
-                </span>
-              </li>
-            ))}
+          <ul style={{ listStyle: "none", padding: "0 16px", margin: 0 }}>
+            {menuBookmarks.map((bm, idx) => {
+              const isActiveMain = bm.link === currentPath;
+              return (
+                <li key={idx} className="menu-item" style={{}}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span
+                      className="icon-wrapper"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginRight: 8,
+                        cursor: "pointer",
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleBookmark(bm.linkName, bm.link);
+                      }}
+                      title={isBookmarked(bm.link) ? "Bookmark entfernen" : "Bookmark hinzufügen"}
+                    >
+                      <BookmarkCheckIcon
+                        fill={isActiveMain ? "green" : theme === "light" ? "black" : "white"}
+                        style={{ width: 24, height: 24 }}
+                      />
+                    </span>
+                    <Link
+                      to={bm.link}
+                      className={`menu-link ${isActiveMain ? "active" : ""}`}
+                      onClick={handleMobileSideMenuClose}
+                    >
+                      {bm.linkName}
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
 
@@ -206,9 +225,15 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
                               }
                             >
                               {isBookmarked(subItem.path) ? (
-                                <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
+                                <BookmarkCheckIcon
+                                  className="keep-icon"
+                                  style={{ width: 20, height: 20 }}
+                                />
                               ) : (
-                                <BookmarkIcon style={{ width: 20, height: 20 }} />
+                                <BookmarkIcon
+                                  className="keep-icon"
+                                  style={{ width: 20, height: 20 }}
+                                />
                               )}
                             </span>
                           </div>
