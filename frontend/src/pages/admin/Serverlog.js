@@ -55,8 +55,6 @@ function ServerLogPage() {
   const serverLogQueueRef = useRef([]);
   const intervalRef = useRef(null);
 
-  console.log("filterOptions", filterOptions);
-
   useEffect(() => {
     const updateOffset = () => {
       setHeightOffset(window.innerWidth > 768 ? 80 : 0);

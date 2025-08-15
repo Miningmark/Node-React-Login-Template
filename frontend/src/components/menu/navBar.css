@@ -183,7 +183,7 @@
 
 .submenu-link {
   display: block;
-  padding: 0;
+  padding: 2px 0;
   color: var(--bs-body-color);
   text-decoration: none;
   width: 200px;
