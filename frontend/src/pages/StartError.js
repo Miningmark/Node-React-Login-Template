@@ -1,4 +1,14 @@
+import { useEffect } from "react";
+
 function StartError() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      window.location.reload();
+    }, 60000); // 60 Sekunden
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div
       className="vh-100 d-flex justify-content-center align-items-center"
