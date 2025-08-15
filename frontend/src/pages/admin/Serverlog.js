@@ -283,7 +283,6 @@ function ServerLogPage() {
                     if (activeFilters) {
                       fetchFilteredLogs(activeFilters, filteredServerlogOffset);
                     } else {
-                      console.log("Lade mehr Server-Logs", serverlogOffset);
                       fetchServerLogs(serverlogOffset);
                     }
                   }}
