@@ -11,12 +11,14 @@ export class ApiResponse {
         res: Response,
         req: Request,
         jsonResponse: Record<string, any>,
+        userId: number | undefined = undefined,
         logResponse: boolean = true,
         statusCode: number = 200
     ) {
         const loggerOptions = this.generateLoggerOptions(
             req,
             jsonResponse,
+            userId,
             logResponse,
             statusCode
         );
@@ -52,11 +54,12 @@ export class ApiResponse {
     private static generateLoggerOptions(
         req: Request,
         jsonResponse: Record<string, any>,
+        userId: number | undefined = undefined,
         logResponse: boolean = true,
         statusCode: number = 200
     ): DatabaseLoggerOptions {
         return {
-            userId: req.userId,
+            userId: req.userId || userId,
             url: req.originalUrl,
             method: req.method,
             status: statusCode,

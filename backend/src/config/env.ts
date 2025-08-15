@@ -70,7 +70,7 @@ let parsed;
 try {
     parsed = envSchema.parse({
         ...process.env,
-        BACKEND_VERSION: "pre-0.1.0_ts"
+        BACKEND_VERSION: "0.1.0_ts"
     });
 } catch (err) {
     if (err instanceof z.ZodError) {

@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, Request, Response } from "express";
+import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { MulterError } from "multer";
 import { ZodError } from "zod/v4";
 
@@ -12,7 +12,8 @@ import { formatZodError } from "@/utils/zod.util.js";
 export const errorHandlerMiddleware: ErrorRequestHandler = async (
     error: unknown,
     req: Request,
-    res: Response
+    res: Response,
+    _next: NextFunction
 ): Promise<void> => {
     // eslint-disable-next-line no-console
     console.log(error);

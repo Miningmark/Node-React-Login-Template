@@ -9,6 +9,7 @@ export type ControllerResponse =
     | {
           type: "json";
           jsonResponse: Record<string, any>;
+          userId?: number;
           statusCode?: number;
           logResponse?: boolean;
       }
@@ -36,6 +37,7 @@ export abstract class BaseController {
                         res,
                         req,
                         controllerResponse.jsonResponse,
+                        controllerResponse.userId,
                         controllerResponse.logResponse,
                         controllerResponse.statusCode
                     );
