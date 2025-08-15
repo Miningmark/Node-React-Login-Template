@@ -2,11 +2,10 @@ import { Router } from "express";
 import { container } from "tsyringe";
 
 import { ServerController } from "@/controllers/server.controller.js";
-import { publicRateLimiter } from "@/middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 const serverController = container.resolve(ServerController);
 
-router.get("/getSettings", publicRateLimiter, serverController.getSettings);
+router.get("/getSettings", serverController.getSettings);
 
 export default router;
