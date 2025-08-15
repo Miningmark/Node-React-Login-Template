@@ -158,7 +158,7 @@ export class AuthService {
         await this.userActivityService.addUserLastLogin(databaseUser.id, req, true);
         await this.userActivityService.checkHasLocationChanged(databaseUser);
 
-        return { type: "json", jsonResponse: jsonResponse };
+        return { type: "json", jsonResponse: jsonResponse, userId: databaseUser.id };
     }
 
     async logout(userId: number, res: Response): Promise<ControllerResponse> {
