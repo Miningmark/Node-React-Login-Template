@@ -4,6 +4,7 @@ import { Response } from "express";
 import sharp from "sharp";
 import { inject, injectable } from "tsyringe";
 
+import { ENV } from "@/config/env.js";
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import LastLogin from "@/models/lastLogin.model.js";
@@ -12,15 +13,17 @@ import Permission from "@/models/permission.model.js";
 import User from "@/models/user.model.js";
 import UserNotification from "@/models/userNotifications.model.js";
 import UserSettings, { UserSettingsTheme } from "@/models/userSettings.model.js";
+import { EmailService } from "@/services/email.service.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { S3Service } from "@/services/s3.service.js";
 import { SocketService } from "@/services/socket.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserNotificationService } from "@/services/userNotification.service.js";
+import {
+    getEmailChangedInfoEmailTemplate,
+    getUsernameChangedInfoEmailTemplate
+} from "@/templates/email/user.template.email.js";
 import { capitalizeFirst, formatDate } from "@/utils/misc.util.js";
-import { EmailService } from "@/services/email.service";
-import { getEmailChangedInfoEmailTemplate } from "@/templates/email/user.template.email";
-import { ENV } from "@/config/env";
 
 @injectable()
 export class UserService {
@@ -50,6 +53,17 @@ export class UserService {
         const databaseUserNewUsername = await User.findOne({ where: { username: newUsername } });
         if (databaseUserNewUsername !== null)
             throw new ConflictError("Benutzername bereits vergeben");
+
+        await this.emailService.sendHTMLTemplateEmail(
+            databaseUser.email,
+            "Änderung deines Benutzernamens",
+            getUsernameChangedInfoEmailTemplate(
+                ENV.FRONTEND_NAME,
+                databaseUser.username,
+                newUsername,
+                formatDate(new Date(Date.now()))
+            )
+        );
 
         databaseUser.username = newUsername;
         await databaseUser.save();
