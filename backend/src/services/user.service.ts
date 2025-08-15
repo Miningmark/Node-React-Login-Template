@@ -17,11 +17,15 @@ import { S3Service } from "@/services/s3.service.js";
 import { SocketService } from "@/services/socket.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserNotificationService } from "@/services/userNotification.service.js";
-import { capitalizeFirst } from "@/utils/misc.util.js";
+import { capitalizeFirst, formatDate } from "@/utils/misc.util.js";
+import { EmailService } from "@/services/email.service";
+import { getEmailChangedInfoEmailTemplate } from "@/templates/email/user.template.email";
+import { ENV } from "@/config/env";
 
 @injectable()
 export class UserService {
     constructor(
+        @inject(EmailService) private readonly emailService: EmailService,
         @inject(TokenService) private readonly tokenService: TokenService,
         @inject(RouteGroupService) private readonly routeGroupService: RouteGroupService,
         @inject(UserNotificationService)
@@ -73,6 +77,18 @@ export class UserService {
 
         const databaseUserNewEmail = await User.findOne({ where: { email: newEmail } });
         if (databaseUserNewEmail !== null) throw new ConflictError("Email bereits vergeben");
+
+        await this.emailService.sendHTMLTemplateEmail(
+            databaseUser.email,
+            "Änderung deiner E-Mail-Adresse",
+            getEmailChangedInfoEmailTemplate(
+                ENV.FRONTEND_NAME,
+                databaseUser.username,
+                databaseUser.email,
+                newEmail,
+                formatDate(new Date(Date.now()))
+            )
+        );
 
         databaseUser.email = newEmail;
         await databaseUser.save();
@@ -229,8 +245,9 @@ export class UserService {
         if (databaseUser === null)
             throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        jsonResponse.routeGroups =
-            await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
+        jsonResponse.routeGroups = await this.routeGroupService.generateUserRouteGroupArray(
+            databaseUser
+        );
 
         return { type: "json", jsonResponse: jsonResponse };
     }
