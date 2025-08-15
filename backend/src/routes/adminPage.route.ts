@@ -19,36 +19,35 @@ import {
     deleteNotificationSchema,
     deletePermissionSchema,
     getFilteredServerLogSchema,
-    getNotificationsSchema,
-    getServerLogSchema,
     updateMaintenanceModeSchema,
     updateNotificationSchema,
     updatePermissionSchema
 } from "@/validators/adminPage.validator.js";
-import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
+import { onlyAuthorizationSchema, onlyLimitAndOffsetSchema } from "@/validators/base.validator.js";
 
 const router = Router();
 const adminPageController = container.resolve(AdminPageController);
 
 router.get(
     "/getServerLogs{/:limit-:offset}",
-
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
-    validateRequest(getServerLogSchema),
+    validateRequest(onlyLimitAndOffsetSchema),
     adminPageController.getServerLogs
 );
 
 router.get(
     "/getFilterOptionsServerLog",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
-    validateRequest(onlyAuthorizationSchema),
     adminPageController.getFilterOptionsServerLog
 );
 
 router.post(
     "/getFilteredServerLogs{/:limit-:offset}",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
     validateRequest(getFilteredServerLogSchema),
@@ -57,27 +56,28 @@ router.post(
 
 router.get(
     "/getPermissionsWithRouteGroups",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([
         ADMIN_PAGE_PERMISSIONS_READ.groupName,
         ADMIN_PAGE_PERMISSIONS_WRITE.groupName
     ]),
-    validateRequest(onlyAuthorizationSchema),
     adminPageController.getPermissionsWithRouteGroups
 );
 router.get(
     "/getRouteGroups",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([
         ADMIN_PAGE_PERMISSIONS_READ.groupName,
         ADMIN_PAGE_PERMISSIONS_WRITE.groupName
     ]),
-    validateRequest(onlyAuthorizationSchema),
     adminPageController.getRouteGroups
 );
 
 router.post(
     "/createPermission",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
     validateRequest(createPermissionSchema),
@@ -85,6 +85,7 @@ router.post(
 );
 router.post(
     "/updatePermission",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
     validateRequest(updatePermissionSchema),
@@ -92,6 +93,7 @@ router.post(
 );
 router.post(
     "/deletePermission",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_PERMISSIONS_WRITE.groupName]),
     validateRequest(deletePermissionSchema),
@@ -100,17 +102,19 @@ router.post(
 
 router.get(
     "/getNotifications{/:limit-:offset}",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([
         ADMIN_PAGE_NOTIFICATIONS_READ.groupName,
         ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName
     ]),
-    validateRequest(getNotificationsSchema),
+    validateRequest(onlyLimitAndOffsetSchema),
     adminPageController.getNotifications
 );
 
 router.post(
     "/createNotification",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
     validateRequest(createNotificationSchema),
@@ -118,6 +122,7 @@ router.post(
 );
 router.post(
     "/updateNotification",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
     validateRequest(updateNotificationSchema),
@@ -125,6 +130,7 @@ router.post(
 );
 router.post(
     "/deleteNotification",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_NOTIFICATIONS_WRITE.groupName]),
     validateRequest(deleteNotificationSchema),
@@ -133,6 +139,7 @@ router.post(
 
 router.post(
     "/updateMaintenanceMode",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_MAINTENANCE_MODE_WRITE.groupName]),
     validateRequest(updateMaintenanceModeSchema),

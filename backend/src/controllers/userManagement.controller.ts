@@ -4,12 +4,14 @@ import { inject, injectable } from "tsyringe";
 import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { UserManagementService } from "@/services/userManagement.service.js";
-import { OnlyAuthorizationValidation } from "@/validators/base.validator";
+import {
+    OnlyAuthorizationValidation,
+    OnlyLimitAndOffsetValidation
+} from "@/validators/base.validator";
 import {
     CreateUserValidation,
     DeleteAvatarValidation,
     GetAvatarValidation,
-    GetUsersValidation,
     UpdateUserValidation
 } from "@/validators/userManagement.validator.js";
 
@@ -23,7 +25,7 @@ export class UserManagementController extends BaseController {
     }
 
     getUsers = (
-        req: ValidatedRequest<GetUsersValidation>,
+        req: ValidatedRequest<OnlyLimitAndOffsetValidation>,
         res: Response,
         next: NextFunction
     ): void => {

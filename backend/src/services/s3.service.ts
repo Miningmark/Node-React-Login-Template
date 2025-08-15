@@ -13,7 +13,6 @@ import { singleton } from "tsyringe";
 import { ENV } from "@/config/env.js";
 import { BadRequestError } from "@/errors/badRequestError.js";
 
-
 @singleton()
 export class S3Service {
     private s3Client: S3Client;

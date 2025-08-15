@@ -1,10 +1,9 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
 import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { UserService } from "@/services/user.service.js";
-import { OnlyAuthorizationValidation } from "@/validators/base.validator";
 import {
     ConfirmPendingNotificationValidation,
     UpdateAvatarValidation,
@@ -103,11 +102,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getUsername = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getUsername = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -115,11 +110,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getRouteGroups = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -127,11 +118,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getLastLogins = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getLastLogins = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -139,11 +126,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getSettings = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getSettings = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -151,11 +134,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getUserId = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getUserId = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -163,11 +142,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getPendingNotifications = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getPendingNotifications = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -175,11 +150,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getActiveNotifications = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getActiveNotifications = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -187,11 +158,7 @@ export class UserController extends BaseController {
         });
     };
 
-    getAvatar = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 
@@ -199,11 +166,7 @@ export class UserController extends BaseController {
         });
     };
 
-    deleteAvatar = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    deleteAvatar = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             const { userId } = req as { userId: number };
 

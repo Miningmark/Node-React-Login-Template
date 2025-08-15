@@ -2,7 +2,6 @@ import { z } from "zod/v4";
 
 import { UserSettingsTheme } from "@/models/userSettings.model.js";
 import {
-    authorizationHeader,
     emailValidation,
     passwordValidation,
     singleFileValidation,
@@ -11,7 +10,6 @@ import {
 
 export type UpdateUsernameValidation = z.infer<typeof updateUsernameSchema>;
 export const updateUsernameSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         newUsername: usernameValidation
     })
@@ -19,7 +17,6 @@ export const updateUsernameSchema = z.object({
 
 export type UpdateEmailValidation = z.infer<typeof updateEmailSchema>;
 export const updateEmailSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         newEmail: emailValidation
     })
@@ -27,7 +24,6 @@ export const updateEmailSchema = z.object({
 
 export type UpdatePasswordValidation = z.infer<typeof updatePasswordSchema>;
 export const updatePasswordSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         currentPassword: z.string(),
         newPassword: passwordValidation
@@ -36,7 +32,6 @@ export const updatePasswordSchema = z.object({
 
 export type UpdateSettingsValidation = z.infer<typeof updateSettingsSchema>;
 export const updateSettingsSchema = z.object({
-    headers: authorizationHeader,
     body: z
         .object({
             theme: z.enum(Object.values(UserSettingsTheme)).optional(),
@@ -58,7 +53,6 @@ export const updateSettingsSchema = z.object({
 
 export type ConfirmPendingNotificationValidation = z.infer<typeof confirmPendingNotificationSchema>;
 export const confirmPendingNotificationSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         id: z.int().positive()
     })
@@ -66,6 +60,5 @@ export const confirmPendingNotificationSchema = z.object({
 
 export type UpdateAvatarValidation = z.infer<typeof updateAvatarSchema>;
 export const updateAvatarSchema = z.object({
-    headers: authorizationHeader,
     file: singleFileValidation(5, ["image/jpeg", "image/png", "image/webp"])
 });

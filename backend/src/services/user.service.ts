@@ -229,9 +229,8 @@ export class UserService {
         if (databaseUser === null)
             throw new ValidationError("Kein Benutzer mit diesem Benutzernamen gefunden");
 
-        jsonResponse.routeGroups = await this.routeGroupService.generateUserRouteGroupArray(
-            databaseUser
-        );
+        jsonResponse.routeGroups =
+            await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
 
         return { type: "json", jsonResponse: jsonResponse };
     }

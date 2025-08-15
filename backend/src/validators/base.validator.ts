@@ -36,6 +36,11 @@ export const authorizationHeader = z.object({
         .regex(/^Bearer\s[\w-]+\.[\w-]+\.[\w-]+$/, "Kein AccessToken vorhanden")
 });
 
+export type OnlyAuthorizationValidation = z.infer<typeof onlyAuthorizationSchema>;
+export const onlyAuthorizationSchema = z.object({
+    headers: authorizationHeader
+});
+
 export const limitAndOffsetParams = z.object({
     limit: z
         .string()
@@ -55,9 +60,9 @@ export const limitAndOffsetParams = z.object({
         )
 });
 
-export type OnlyAuthorizationValidation = z.infer<typeof onlyAuthorizationSchema>;
-export const onlyAuthorizationSchema = z.object({
-    headers: authorizationHeader
+export type OnlyLimitAndOffsetValidation = z.infer<typeof onlyLimitAndOffsetSchema>;
+export const onlyLimitAndOffsetSchema = z.object({
+    params: limitAndOffsetParams
 });
 
 export const singleFileValidation = (
