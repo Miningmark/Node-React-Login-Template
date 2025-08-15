@@ -1,7 +1,9 @@
+import { Readable } from "stream";
+
+import { NextFunction, Request, Response } from "express";
+
 import { InternalServerError } from "@/errors/errorClasses.js";
 import { ApiResponse } from "@/utils/apiResponse.util.js";
-import { NextFunction, Request, Response } from "express";
-import { Readable } from "stream";
 
 export type ControllerResponse =
     | {

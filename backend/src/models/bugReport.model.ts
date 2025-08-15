@@ -1,4 +1,3 @@
-import User from "@/models/user.model.js";
 import {
     BelongsToGetAssociationMixin,
     BelongsToSetAssociationMixin,
@@ -17,6 +16,8 @@ import {
     PrimaryKey,
     Table
 } from "@sequelize/core/decorators-legacy";
+
+import User from "@/models/user.model.js";
 
 export enum BugReportStatusType {
     NEW = "NEW",

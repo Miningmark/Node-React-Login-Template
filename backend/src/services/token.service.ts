@@ -1,13 +1,15 @@
-import { ENV } from "@/config/env.js";
-import User from "@/models/user.model.js";
-import UserToken, { UserTokenType } from "@/models/userToken.model.js";
-import { parseTimeOffsetToDate } from "@/utils/misc.util.js";
-import { Op } from "@sequelize/core";
 import crypto from "crypto";
+
+import { Op } from "@sequelize/core";
 import { Response } from "express";
 import jsonwebtoken from "jsonwebtoken";
 import ms from "ms";
 import { injectable } from "tsyringe";
+
+import { parseTimeOffsetToDate } from "@/utils/misc.util.js";
+import UserToken, { UserTokenType } from "@/models/userToken.model.js";
+import User from "@/models/user.model.js";
+import { ENV } from "@/config/env.js";
 
 @injectable()
 export class TokenService {

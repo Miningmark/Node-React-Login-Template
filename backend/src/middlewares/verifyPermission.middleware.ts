@@ -1,5 +1,6 @@
-import { UnauthorizedError } from "@/errors/errorClasses.js";
 import { NextFunction, Request, Response } from "express";
+
+import { UnauthorizedError } from "@/errors/errorClasses.js";
 
 export const verifyPermission = (requiredRouteGroup: string[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {

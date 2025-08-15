@@ -1,3 +1,10 @@
+import { Op } from "@sequelize/core";
+import bcrypt from "bcrypt";
+import { Response } from "express";
+import sharp from "sharp";
+import { inject, injectable } from "tsyringe";
+import { StringFormatParams } from "zod/v4/core";
+
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ConflictError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import LastLogin from "@/models/lastLogin.model.js";
@@ -12,12 +19,6 @@ import { SocketService } from "@/services/socket.service.js";
 import { TokenService } from "@/services/token.service.js";
 import { UserNotificationService } from "@/services/userNotification.service.js";
 import { capitalizeFirst } from "@/utils/misc.util.js";
-import { Op } from "@sequelize/core";
-import bcrypt from "bcrypt";
-import { Response } from "express";
-import sharp from "sharp";
-import { inject, injectable } from "tsyringe";
-import { StringFormatParams } from "zod/v4/core";
 
 @injectable()
 export class UserService {

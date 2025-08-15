@@ -1,7 +1,8 @@
+import { inject, injectable } from "tsyringe";
+
 import { InternalServerError } from "@/errors/errorClasses.js";
 import UserNotification from "@/models/userNotifications.model.js";
 import { NotificationService } from "@/services/notification.service.js";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class UserNotificationService {

@@ -1,10 +1,11 @@
+import bcrypt from "bcrypt";
+
 import { ENV } from "@/config/env.js";
 import { databaseLogger } from "@/config/logger.js";
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import User from "@/models/user.model.js";
-import bcrypt from "bcrypt";
 
 export async function generateSuperAdmin() {
     try {

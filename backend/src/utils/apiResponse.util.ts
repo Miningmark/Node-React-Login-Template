@@ -1,8 +1,10 @@
+import { Readable } from "stream";
+
+import { Request, Response } from "express";
+
 import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { getIpv4Address } from "@/utils/misc.util.js";
-import { Request, Response } from "express";
-import { Readable } from "stream";
 
 export class ApiResponse {
     static async sendJSONSuccess(

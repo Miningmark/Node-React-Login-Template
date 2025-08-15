@@ -1,5 +1,6 @@
-import { ValidationError } from "@/errors/validationError.js";
 import { Request } from "express";
+
+import { ValidationError } from "@/errors/validationError.js";
 
 export const USERNAME_REGEX = /^[a-zA-Z0-9-]{5,15}$/;
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -16,10 +17,11 @@ export const getIpv4Address = (req: Request): string | undefined => {
     if (typeof remoteAddr === "string") return remoteAddr;
 
     const forwardedFor = req.headers["x-forwarded-for"];
-    if (typeof forwardedFor === "string") return forwardedFor;
-
-    const ip = req.ip;
-    if (typeof ip === "string") return ip;
+    if (typeof forwardedFor === "string") {
+        return forwardedFor;
+    } else if (Array.isArray(forwardedFor)) {
+        return forwardedFor[0];
+    }
 
     return undefined;
 };

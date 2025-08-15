@@ -1,10 +1,11 @@
+import { z } from "zod/v4";
+
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import {
     authorizationHeader,
     isoDateTimeValidation,
     limitAndOffsetParams
 } from "@/validators/base.validator.js";
-import { z } from "zod/v4";
 
 export type GetServerLogValidation = z.infer<typeof getServerLogSchema>;
 export const getServerLogSchema = z.object({

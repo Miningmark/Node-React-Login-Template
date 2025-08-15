@@ -1,6 +1,7 @@
+import { NextFunction, Request, Response } from "express";
+
 import { ForbiddenError, InternalServerError } from "@/errors/errorClasses.js";
 import ServerSettings, { ServerSettingKey } from "@/models/serverSettings.model.js";
-import { NextFunction, Request, Response } from "express";
 
 export const checkMaintenanceMode = () => {
     return async (req: Request, res: Response, next: NextFunction) => {

@@ -1,3 +1,6 @@
+import { NextFunction, Request, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { AuthService } from "@/services/auth.service.js";
@@ -10,8 +13,6 @@ import {
     RequestPasswordResetValidation
 } from "@/validators/auth.validator.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator";
-import { NextFunction, Request, Response } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class AuthController extends BaseController {

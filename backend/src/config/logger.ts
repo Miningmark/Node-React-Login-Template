@@ -1,11 +1,14 @@
+import { container } from "tsyringe";
+import winston from "winston";
+
 import { ENV } from "@/config/env.js";
 import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ServerLogService } from "@/services/serverLog.service.js";
 import { SocketService } from "@/services/socket.service.js";
-import { container } from "tsyringe";
-import winston from "winston";
 
 const REDACT_KEYS = [
+    /x-real-ip/i,
+    /x-forwarded-for/i,
     /authorization/i,
     /cookie/i,
     /password/i,

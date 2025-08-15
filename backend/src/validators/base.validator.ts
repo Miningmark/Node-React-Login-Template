@@ -1,6 +1,7 @@
-import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "@/utils/misc.util.js";
 import { z } from "zod/v4";
 import mime from "mime-types";
+
+import { EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "@/utils/misc.util.js";
 
 export const usernameValidation = z
     .string()

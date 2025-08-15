@@ -1,6 +1,7 @@
-import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 import { Op, WhereOptions } from "@sequelize/core";
 import { injectable } from "tsyringe";
+
+import ServerLog, { ServerLogTypes } from "@/models/serverLog.model.js";
 
 @injectable()
 export class ServerLogService {

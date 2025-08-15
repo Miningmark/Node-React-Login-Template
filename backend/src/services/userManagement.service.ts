@@ -1,3 +1,6 @@
+import { Op } from "@sequelize/core";
+import { inject, injectable } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
@@ -12,8 +15,6 @@ import { UserService } from "@/services/user.service.js";
 import { SocketService } from "@/services/socket.service.js";
 import { getCompleteAdminRegistrationEmailTemplate } from "@/templates/email/userManagement.template.email.js";
 import { formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
-import { Op } from "@sequelize/core";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class UserManagementService {

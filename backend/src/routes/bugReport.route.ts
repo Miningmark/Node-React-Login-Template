@@ -1,3 +1,7 @@
+import { Router } from "express";
+import multer from "multer";
+import { container } from "tsyringe";
+
 import { BugReportController } from "@/controllers/bugReport.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
@@ -12,9 +16,6 @@ import {
     getOwnBugReportsSchema,
     updateBugReportStatusSchema
 } from "@/validators/bugReport.validator.js";
-import { Router } from "express";
-import multer from "multer";
-import { container } from "tsyringe";
 
 const router = Router();
 const bugReportController = container.resolve(BugReportController);

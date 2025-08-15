@@ -1,3 +1,7 @@
+import { Router } from "express";
+import multer from "multer";
+import { container } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { UserController } from "@/controllers/user.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
@@ -11,9 +15,6 @@ import {
     updateSettingsSchema,
     updateUsernameSchema
 } from "@/validators/user.validator.js";
-import { Router } from "express";
-import multer from "multer";
-import { container } from "tsyringe";
 
 const router = Router();
 const userController = container.resolve(UserController);

@@ -1,3 +1,7 @@
+import { CreationAttributes } from "@sequelize/core";
+import { Request } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import LastLogin from "@/models/lastLogin.model.js";
 import User from "@/models/user.model.js";
@@ -11,9 +15,6 @@ import {
     getSuspiciousLoginEmailTemplate
 } from "@/templates/email/auth.template.email.js";
 import { formatDate, getIpv4Address, IPV4_REGEX } from "@/utils/misc.util.js";
-import { CreationAttributes } from "@sequelize/core";
-import { Request } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class UserActivityService {

@@ -1,5 +1,8 @@
 import "reflect-metadata";
+import http from "http";
+
 import { container } from "tsyringe";
+import { Server } from "socket.io";
 
 import app, { initApp } from "@/app.js";
 import { ENV } from "@/config/env.js";
@@ -10,8 +13,6 @@ import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { SocketService } from "@/services/socket.service.js";
 import { generateDevUser, generateSuperAdmin } from "@/utils/superAdmin.util.js";
-import http from "http";
-import { Server } from "socket.io";
 
 const httpServer = http.createServer(app);
 

@@ -1,7 +1,8 @@
+import { inject, injectable } from "tsyringe";
+
 import Permission from "@/models/permission.model.js";
 import RouteGroup from "@/models/routeGroup.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class PermissionService {

@@ -1,8 +1,9 @@
+import nodemailer from "nodemailer";
+import { singleton } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { databaseLogger } from "@/config/logger.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
-import nodemailer from "nodemailer";
-import { singleton } from "tsyringe";
 
 @singleton()
 export class EmailService {

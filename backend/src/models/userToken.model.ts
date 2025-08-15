@@ -1,4 +1,3 @@
-import User from "@/models/user.model.js";
 import {
     BelongsToGetAssociationMixin,
     BelongsToSetAssociationMixin,
@@ -10,6 +9,8 @@ import {
     NonAttribute
 } from "@sequelize/core";
 import { Attribute, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
+
+import User from "@/models/user.model.js";
 
 export enum UserTokenType {
     REFRESH_TOKEN = "refreshToken",

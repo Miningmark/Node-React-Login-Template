@@ -1,3 +1,6 @@
+import { Router } from "express";
+import { container } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { AuthController } from "@/controllers/auth.controller.js";
 import { checkMaintenanceMode } from "@/middlewares/checkMaintenanceMode.middleware.js";
@@ -13,8 +16,6 @@ import {
     requestPasswordResetSchema
 } from "@/validators/auth.validator.js";
 import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
-import { Router } from "express";
-import { container } from "tsyringe";
 
 const router = Router();
 const authController = container.resolve(AuthController);

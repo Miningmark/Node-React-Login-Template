@@ -1,5 +1,6 @@
-import Notification from "@/models/notification.model.js";
 import { injectable } from "tsyringe";
+
+import Notification from "@/models/notification.model.js";
 
 @injectable()
 export class NotificationService {

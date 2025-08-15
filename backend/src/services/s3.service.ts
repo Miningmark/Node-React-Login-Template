@@ -1,5 +1,5 @@
-import { ENV } from "@/config/env.js";
-import { BadRequestError } from "@/errors/badRequestError.js";
+import { Readable } from "stream";
+
 import {
     CreateBucketCommand,
     DeleteObjectCommand,
@@ -8,8 +8,11 @@ import {
     GetObjectCommand,
     S3Client
 } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
 import { singleton } from "tsyringe";
+
+import { ENV } from "@/config/env.js";
+import { BadRequestError } from "@/errors/badRequestError.js";
+
 
 @singleton()
 export class S3Service {

@@ -1,6 +1,7 @@
+import { Socket } from "socket.io";
+
 import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
 import { ClientToServerEvents, ServerToClientEvents } from "@/socketIO/types.js";
-import { Socket } from "socket.io";
 
 export default (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>) => {
     socket.on("subscribe:bugReports:watchList", () => {

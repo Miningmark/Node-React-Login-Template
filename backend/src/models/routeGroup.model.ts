@@ -1,4 +1,3 @@
-import Permission from "@/models/permission.model.js";
 import {
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
@@ -26,6 +25,8 @@ import {
     Table,
     Unique
 } from "@sequelize/core/decorators-legacy";
+
+import Permission from "@/models/permission.model.js";
 
 @Table({
     tableName: "route_groups",

@@ -1,3 +1,6 @@
+import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { AdminPageService } from "@/services/adminPage.service.js";
@@ -14,8 +17,6 @@ import {
     UpdatePermissionValidation
 } from "@/validators/adminPage.validator.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator.js";
-import { NextFunction, Response } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class AdminPageController extends BaseController {

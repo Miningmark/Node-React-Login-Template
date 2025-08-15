@@ -1,3 +1,5 @@
+import { Socket } from "socket.io";
+
 import {
     ADMIN_PAGE_MAINTENANCE_MODE_WRITE,
     ADMIN_PAGE_NOTIFICATIONS_READ,
@@ -7,7 +9,6 @@ import {
     ADMIN_PAGE_SERVER_LOG_READ
 } from "@/routeGroups/adminPage.routeGroup.js";
 import { ClientToServerEvents, ServerToClientEvents } from "@/socketIO/types.js";
-import { Socket } from "socket.io";
 
 export default (socket: Socket<ClientToServerEvents, ServerToClientEvents, any>) => {
     socket.on("subscribe:adminPage:serverLogs:watchList", () => {

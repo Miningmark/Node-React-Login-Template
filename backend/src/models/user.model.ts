@@ -1,15 +1,3 @@
-import BugReport from "@/models/bugReport.model.js";
-import LastLogin from "@/models/lastLogin.model.js";
-import Notification from "@/models/notification.model.js";
-import Permission from "@/models/permission.model.js";
-import ServerLog from "@/models/serverLog.model.js";
-import {
-    default as UserNotification,
-    default as UserNotifications
-} from "@/models/userNotifications.model.js";
-import UserPermission from "@/models/userPermission.model.js";
-import UserSettings from "@/models/userSettings.model.js";
-import UserToken from "@/models/userToken.model.js";
 import {
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
@@ -54,6 +42,19 @@ import {
     Table,
     Unique
 } from "@sequelize/core/decorators-legacy";
+
+import BugReport from "@/models/bugReport.model.js";
+import LastLogin from "@/models/lastLogin.model.js";
+import Notification from "@/models/notification.model.js";
+import Permission from "@/models/permission.model.js";
+import ServerLog from "@/models/serverLog.model.js";
+import {
+    default as UserNotification,
+    default as UserNotifications
+} from "@/models/userNotifications.model.js";
+import UserPermission from "@/models/userPermission.model.js";
+import UserSettings from "@/models/userSettings.model.js";
+import UserToken from "@/models/userToken.model.js";
 
 @Table({
     tableName: "users",

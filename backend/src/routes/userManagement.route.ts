@@ -1,3 +1,6 @@
+import { Router } from "express";
+import { container } from "tsyringe";
+
 import { UserManagementController } from "@/controllers/userManagement.controller.js";
 import { validateRequest } from "@/middlewares/validateRequest.middleware.js";
 import { verifyAuth } from "@/middlewares/verifyAuth.middleware.js";
@@ -15,8 +18,6 @@ import {
     getUsersSchema,
     updateUserSchema
 } from "@/validators/userManagement.validator.js";
-import { Router } from "express";
-import { container } from "tsyringe";
 
 const router = Router();
 const userManagementController = container.resolve(UserManagementController);

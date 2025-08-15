@@ -1,10 +1,14 @@
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
+
+import { injectable } from "tsyringe";
+
 import RouteGroup from "@/models/routeGroup.model.js";
 import User from "@/models/user.model.js";
 import { isGroupEntry } from "@/routeGroups/index.js";
-import fs from "fs/promises";
-import path from "path";
-import { injectable } from "tsyringe";
-import { fileURLToPath, pathToFileURL } from "url";
+
+
 
 @injectable()
 export class RouteGroupService {

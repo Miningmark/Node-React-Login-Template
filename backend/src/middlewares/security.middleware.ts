@@ -1,7 +1,8 @@
-import { ENV } from "@/config/env.js";
 import cors from "cors";
 import { Express } from "express";
 import helmet from "helmet";
+
+import { ENV } from "@/config/env.js";
 
 export const setupSecurityMiddleware = (app: Express) => {
     app.disable("x-powered-by");

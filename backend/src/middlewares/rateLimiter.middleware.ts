@@ -1,7 +1,8 @@
-import { TooManyRequestsError } from "@/errors/errorClasses.js";
-import { getIpv4Address } from "@/utils/misc.util.js";
 import { NextFunction, Request, Response } from "express";
 import { RateLimiterMemory, RateLimiterRes } from "rate-limiter-flexible";
+
+import { TooManyRequestsError } from "@/errors/errorClasses.js";
+import { getIpv4Address } from "@/utils/misc.util.js";
 
 function setHeaders(res: Response, rateLimiterResponse?: RateLimiterRes) {
     if (rateLimiterResponse === undefined) return;

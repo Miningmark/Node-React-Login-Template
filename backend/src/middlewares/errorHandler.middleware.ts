@@ -1,12 +1,13 @@
+import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import { MulterError } from "multer";
+import { ZodError } from "zod/v4";
+
 import { databaseLogger, DatabaseLoggerOptions } from "@/config/logger.js";
 import { AppError, InternalServerError, ValidationError } from "@/errors/errorClasses.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { ApiResponse } from "@/utils/apiResponse.util.js";
 import { getIpv4Address } from "@/utils/misc.util.js";
 import { formatZodError } from "@/utils/zod.util.js";
-import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
-import { MulterError } from "multer";
-import { ZodError } from "zod/v4";
 
 export const errorHandlerMiddleware: ErrorRequestHandler = async (
     error: unknown,

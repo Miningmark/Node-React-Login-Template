@@ -1,3 +1,6 @@
+import { NextFunction, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ValidatedRequest } from "@/@types/validation";
 import { BaseController } from "@/controllers/base.controller.js";
 import { BugReportService } from "@/services/bugReport.service.js";
@@ -9,8 +12,6 @@ import {
     GetOwnBugReportsValidation,
     UpdateBugReportStatusValidation
 } from "@/validators/bugReport.validator.js";
-import { NextFunction, Response } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class BugReportController extends BaseController {

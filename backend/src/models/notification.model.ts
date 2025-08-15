@@ -1,5 +1,3 @@
-import User from "@/models/user.model.js";
-import UserNotification from "@/models/userNotifications.model.js";
 import {
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
@@ -26,6 +24,9 @@ import {
     PrimaryKey,
     Table
 } from "@sequelize/core/decorators-legacy";
+
+import User from "@/models/user.model.js";
+import UserNotification from "@/models/userNotifications.model.js";
 
 @Table({
     tableName: "notifications",

@@ -1,3 +1,6 @@
+import { NextFunction, Request, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
 import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { UserManagementService } from "@/services/userManagement.service.js";
@@ -9,8 +12,6 @@ import {
     GetUsersValidation,
     UpdateUserValidation
 } from "@/validators/userManagement.validator.js";
-import { NextFunction, Request, Response } from "express";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class UserManagementController extends BaseController {

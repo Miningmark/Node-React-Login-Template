@@ -1,3 +1,10 @@
+import { Op } from "@sequelize/core";
+import bcrypt from "bcrypt";
+import { Request, Response } from "express";
+import jsonwebtoken from "jsonwebtoken";
+import ms from "ms";
+import { inject, injectable } from "tsyringe";
+
 import { ENV } from "@/config/env.js";
 import { ControllerResponse } from "@/controllers/base.controller";
 import {
@@ -21,12 +28,6 @@ import {
     getPasswordResetEmailTemplate
 } from "@/templates/email/auth.template.email.js";
 import { capitalizeFirst, formatDate, parseTimeOffsetToDate } from "@/utils/misc.util.js";
-import { Op } from "@sequelize/core";
-import bcrypt from "bcrypt";
-import { Request, Response } from "express";
-import jsonwebtoken from "jsonwebtoken";
-import ms from "ms";
-import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class AuthService {

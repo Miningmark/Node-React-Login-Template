@@ -1,9 +1,10 @@
+import { Op } from "@sequelize/core";
+
 import { databaseLogger } from "@/config/logger.js";
 import { CronJobDefinition } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import User from "@/models/user.model.js";
 import UserToken, { UserTokenType } from "@/models/userToken.model.js";
-import { Op } from "@sequelize/core";
 
 const job: CronJobDefinition = {
     name: "removeInactiveRegistrations",

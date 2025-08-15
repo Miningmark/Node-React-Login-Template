@@ -1,3 +1,5 @@
+import { z } from "zod/v4";
+
 import { UserSettingsTheme } from "@/models/userSettings.model.js";
 import {
     authorizationHeader,
@@ -6,7 +8,6 @@ import {
     singleFileValidation,
     usernameValidation
 } from "@/validators/base.validator.js";
-import { z } from "zod/v4";
 
 export type UpdateUsernameValidation = z.infer<typeof updateUsernameSchema>;
 export const updateUsernameSchema = z.object({

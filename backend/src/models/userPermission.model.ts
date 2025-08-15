@@ -1,5 +1,3 @@
-import Notification from "@/models/notification.model.js";
-import User from "@/models/user.model.js";
 import {
     CreationOptional,
     DataTypes,
@@ -8,6 +6,9 @@ import {
     Model
 } from "@sequelize/core";
 import { Attribute, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
+
+import Notification from "@/models/notification.model.js";
+import User from "@/models/user.model.js";
 import Permission from "@/models/permission.model";
 
 @Table({

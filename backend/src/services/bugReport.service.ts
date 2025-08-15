@@ -1,13 +1,16 @@
+import path from "path";
+
+import { Op } from "@sequelize/core";
+import sharp from "sharp";
+import { inject, injectable } from "tsyringe";
+
 import { ControllerResponse } from "@/controllers/base.controller.js";
 import { ForbiddenError, ValidationError } from "@/errors/errorClasses.js";
 import BugReport, { BugReportStatusType } from "@/models/bugReport.model.js";
 import { BUG_REPORT_READ, BUG_REPORT_WRITE } from "@/routeGroups/bugReport.routeGroup.js";
 import { S3Service } from "@/services/s3.service.js";
 import { SocketService } from "@/services/socket.service.js";
-import { Op } from "@sequelize/core";
-import path from "path";
-import sharp from "sharp";
-import { inject, injectable } from "tsyringe";
+
 
 @injectable()
 export class BugReportService {

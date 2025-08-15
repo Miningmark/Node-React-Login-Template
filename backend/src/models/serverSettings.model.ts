@@ -1,5 +1,3 @@
-import { ENV } from "@/config/env.js";
-import { InternalServerError } from "@/errors/errorClasses.js";
 import {
     CreationOptional,
     DataTypes,
@@ -16,6 +14,9 @@ import {
     Table,
     Unique
 } from "@sequelize/core/decorators-legacy";
+
+import { ENV } from "@/config/env.js";
+import { InternalServerError } from "@/errors/errorClasses.js";
 
 export enum ServerSettingKey {
     MAINTENANCE_MODE = "maintenance_mode",
