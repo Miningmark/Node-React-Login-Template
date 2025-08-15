@@ -44,7 +44,7 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
-    restart: no
+    restart: "no"
     environment:
       PMA_HOST: mariadb
       PMA_ABSOLUTE_URI: https://${DOMAIN}/phpmyadmin/
