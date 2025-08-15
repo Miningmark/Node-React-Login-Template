@@ -53,5 +53,5 @@ function makeProtectedRateLimiter(opts: { points: number; durationSec: number })
     };
 }
 
-export const publicRateLimiter = makePublicRateLimiter({ points: 10, durationSec: 60 });
-export const protectedRateLimiter = makeProtectedRateLimiter({ points: 20, durationSec: 30 });
+export const publicRateLimiter = makePublicRateLimiter({ points: 15, durationSec: 60 });
+export const protectedRateLimiter = makeProtectedRateLimiter({ points: 60, durationSec: 60 });
