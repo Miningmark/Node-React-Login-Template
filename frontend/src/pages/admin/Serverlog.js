@@ -171,21 +171,22 @@ function ServerLogPage() {
     }
   };
 
-  const fetchInitialData = async () => {
-    try {
-      const { data } = await axiosProtected.get(`/adminPage/getFilterOptionsServerLog`);
-      setFilterOptions(data?.filterOptions || []);
-
-      fetchServerLogs();
-    } catch (error) {
-      addToast("Fehler beim Laden des Serverlogs", "danger");
-    } finally {
-      setLoadingServerLog(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const { data } = await axiosProtected.get(`/adminPage/getFilterOptionsServerLog`);
+        setFilterOptions(data?.filterOptions || []);
+
+        fetchServerLogs();
+      } catch (error) {
+        addToast("Fehler beim Laden des Serverlogs", "danger");
+      } finally {
+        setLoadingServerLog(false);
+      }
+    };
+
     fetchInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleServerLogSearch(filters) {

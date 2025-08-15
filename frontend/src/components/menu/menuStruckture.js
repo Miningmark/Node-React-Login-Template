@@ -50,9 +50,6 @@ const menuItems = [
       },
     ],
   },
-  { name: "Test1", path: "/", icon: <KanbanlIcon /> },
-  { name: "Test2", path: "/", icon: <NewspaperIcon /> },
-  { name: "Test3", path: "/", icon: <ContactsIcon /> },
 ];
 
 export default menuItems;

@@ -38,7 +38,7 @@ export default function ShowAllUserNotifications({ handleClose }) {
     }
 
     fetchNotifications();
-  }, []);
+  }, [addToast, axiosProtected]);
 
   function closeModal() {
     setShow(false);
