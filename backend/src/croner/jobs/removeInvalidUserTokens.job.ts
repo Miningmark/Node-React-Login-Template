@@ -10,7 +10,13 @@ const job: CronJobDefinition = {
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
             where: {
-                type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN, UserTokenType.PASSWORD_RESET_TOKEN] },
+                type: {
+                    [Op.or]: [
+                        UserTokenType.ACCESS_TOKEN,
+                        UserTokenType.REFRESH_TOKEN,
+                        UserTokenType.PASSWORD_RESET_TOKEN
+                    ]
+                },
                 expiresAt: { [Op.lte]: new Date(Date.now()) }
             }
         });
@@ -22,9 +28,13 @@ const job: CronJobDefinition = {
             })
         );
 
-        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} User Token gelöscht`, {
-            source: job.name
-        });
+        await databaseLogger(
+            ServerLogTypes.INFO,
+            `Es wurden ${destroyedCount} User Token gelöscht`,
+            {
+                source: job.name
+            }
+        );
     }
 };
 

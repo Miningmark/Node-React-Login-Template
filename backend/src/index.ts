@@ -29,9 +29,13 @@ const init = async () => {
         await sequelize.authenticate();
         await sequelize.sync(ENV.NODE_ENV === "development" ? { force: true } : {});
 
-        await databaseLogger(ServerLogTypes.INFO, `Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`, {
-            source: "startup"
-        });
+        await databaseLogger(
+            ServerLogTypes.INFO,
+            `Datenbank verbunden und Server läuft auf Port ${ENV.BACKEND_PORT} mit Version: ${ENV.BACKEND_VERSION}`,
+            {
+                source: "startup"
+            }
+        );
 
         await initApp();
 
@@ -48,7 +52,9 @@ const init = async () => {
         socketService.init(io);
         await socketService.setup();
     } catch (error) {
-        consoleLogger.error(error instanceof Error ? error.message : "", { error: error instanceof Error ? error.stack : "" });
+        consoleLogger.error(error instanceof Error ? error.message : "", {
+            error: error instanceof Error ? error.stack : ""
+        });
         process.exit(1);
     }
 };

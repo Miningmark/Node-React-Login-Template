@@ -17,7 +17,15 @@ import {
     Model,
     NonAttribute
 } from "@sequelize/core";
-import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
+import {
+    Attribute,
+    AutoIncrement,
+    Default,
+    NotNull,
+    PrimaryKey,
+    Table,
+    Unique
+} from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "route_groups",

@@ -3,7 +3,10 @@ import LastLogin from "@/models/lastLogin.model.js";
 import Notification from "@/models/notification.model.js";
 import Permission from "@/models/permission.model.js";
 import ServerLog from "@/models/serverLog.model.js";
-import { default as UserNotification, default as UserNotifications } from "@/models/userNotifications.model.js";
+import {
+    default as UserNotification,
+    default as UserNotifications
+} from "@/models/userNotifications.model.js";
 import UserPermission from "@/models/userPermission.model.js";
 import UserSettings from "@/models/userSettings.model.js";
 import UserToken from "@/models/userToken.model.js";
@@ -38,7 +41,19 @@ import {
     Model,
     NonAttribute
 } from "@sequelize/core";
-import { AfterCreate, Attribute, AutoIncrement, BelongsToMany, Default, HasMany, HasOne, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
+import {
+    AfterCreate,
+    Attribute,
+    AutoIncrement,
+    BelongsToMany,
+    Default,
+    HasMany,
+    HasOne,
+    NotNull,
+    PrimaryKey,
+    Table,
+    Unique
+} from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "users",
@@ -75,14 +90,20 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     @NotNull
     declare isDisabled: CreationOptional<boolean>;
 
-    @HasOne(() => UserSettings, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    @HasOne(() => UserSettings, {
+        foreignKey: { name: "userId", onDelete: "CASCADE" },
+        inverse: { as: "user" }
+    })
     declare userSettings?: NonAttribute<UserSettings>;
 
     declare getUserSettings: HasOneGetAssociationMixin<UserSettings>;
     declare setUserSettings: HasOneSetAssociationMixin<UserSettings, number>;
     declare createUserSettings: HasOneCreateAssociationMixin<UserSettings>;
 
-    @HasMany(() => UserToken, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    @HasMany(() => UserToken, {
+        foreignKey: { name: "userId", onDelete: "CASCADE" },
+        inverse: { as: "user" }
+    })
     declare userTokens?: NonAttribute<UserToken[]>;
 
     declare getUserTokens: HasManyGetAssociationsMixin<UserToken>;
@@ -96,7 +117,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasUserTokens: HasManyHasAssociationsMixin<UserToken, number>;
     declare countUserTokens: HasManyCountAssociationsMixin<UserToken>;
 
-    @HasMany(() => LastLogin, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    @HasMany(() => LastLogin, {
+        foreignKey: { name: "userId", onDelete: "CASCADE" },
+        inverse: { as: "user" }
+    })
     declare lastLogins?: NonAttribute<LastLogin[]>;
 
     declare getLastLogins: HasManyGetAssociationsMixin<LastLogin>;
@@ -110,7 +134,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasLastLogins: HasManyHasAssociationsMixin<LastLogin, number>;
     declare countLastLogins: HasManyCountAssociationsMixin<LastLogin>;
 
-    @HasMany(() => ServerLog, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    @HasMany(() => ServerLog, {
+        foreignKey: { name: "userId", onDelete: "CASCADE" },
+        inverse: { as: "user" }
+    })
     declare serverLogs?: NonAttribute<ServerLog[]>;
 
     declare getServerLogs: HasManyGetAssociationsMixin<ServerLog>;
@@ -124,7 +151,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasServerLogs: HasManyHasAssociationsMixin<ServerLog, number>;
     declare countServerLogs: HasManyCountAssociationsMixin<ServerLog>;
 
-    @HasMany(() => BugReport, { foreignKey: { name: "userId", onDelete: "CASCADE" }, inverse: { as: "user" } })
+    @HasMany(() => BugReport, {
+        foreignKey: { name: "userId", onDelete: "CASCADE" },
+        inverse: { as: "user" }
+    })
     declare bugReports?: NonAttribute<BugReport[]>;
 
     declare getBugReports: HasManyGetAssociationsMixin<BugReport>;
@@ -138,7 +168,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasBugReports: HasManyHasAssociationsMixin<BugReport, number>;
     declare countBugReports: HasManyCountAssociationsMixin<BugReport>;
 
-    @BelongsToMany(() => Permission, { through: { model: UserPermission }, foreignKey: "userId", otherKey: "permissionId", inverse: { as: "users" } })
+    @BelongsToMany(() => Permission, {
+        through: { model: UserPermission },
+        foreignKey: "userId",
+        otherKey: "permissionId",
+        inverse: { as: "users" }
+    })
     declare permissions?: NonAttribute<Permission[]>;
 
     declare getPermissions: BelongsToManyGetAssociationsMixin<Permission>;
@@ -152,7 +187,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare hasPermissions: BelongsToManyHasAssociationsMixin<Permission, number>;
     declare countPermissions: BelongsToManyCountAssociationsMixin<Permission>;
 
-    @BelongsToMany(() => Notification, { through: { model: UserNotifications }, foreignKey: "userId", otherKey: "notificationId", inverse: { as: "users" } })
+    @BelongsToMany(() => Notification, {
+        through: { model: UserNotifications },
+        foreignKey: "userId",
+        otherKey: "notificationId",
+        inverse: { as: "users" }
+    })
     declare notifications?: NonAttribute<[Notification]>;
 
     declare getNotifications: BelongsToManyGetAssociationsMixin<Notification>;

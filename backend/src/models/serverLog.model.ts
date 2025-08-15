@@ -1,6 +1,22 @@
 import User from "@/models/user.model.js";
-import { BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "@sequelize/core";
-import { Attribute, AutoIncrement, Default, NotNull, PrimaryKey, Table } from "@sequelize/core/decorators-legacy";
+import {
+    BelongsToGetAssociationMixin,
+    BelongsToSetAssociationMixin,
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "@sequelize/core";
+import {
+    Attribute,
+    AutoIncrement,
+    Default,
+    NotNull,
+    PrimaryKey,
+    Table
+} from "@sequelize/core/decorators-legacy";
 
 export enum ServerLogTypes {
     INFO = "INFO",

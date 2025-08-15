@@ -1,5 +1,10 @@
 import { z } from "zod/v4";
-import { authorizationHeader, emailValidation, passwordValidation, usernameValidation } from "@/validators/base.validator.js";
+import {
+    authorizationHeader,
+    emailValidation,
+    passwordValidation,
+    usernameValidation
+} from "@/validators/base.validator.js";
 
 export type RegisterValidation = z.infer<typeof registerSchema>;
 export const registerSchema = z.object({
@@ -35,7 +40,12 @@ export const refreshTokenSchema = z.object({
 export type RequestPasswordResetValidation = z.infer<typeof requestPasswordResetSchema>;
 export const requestPasswordResetSchema = z.object({
     body: z.object({
-        usernameOrEmail: z.string().refine((val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()), "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!")
+        usernameOrEmail: z
+            .string()
+            .refine(
+                (val) => !val.toLowerCase().includes("SuperAdmin".toLowerCase()),
+                "Passwortänderungen für den SuperAdmin sind nicht möglich. Bitte direkt am Server vornehmen!"
+            )
     })
 });
 

@@ -7,7 +7,10 @@ import { Attribute, PrimaryKey, Table } from "@sequelize/core/decorators-legacy"
     tableName: "permission_route_groups",
     timestamps: false
 })
-class PermissionRouteGroup extends Model<InferAttributes<PermissionRouteGroup>, InferCreationAttributes<PermissionRouteGroup>> {
+class PermissionRouteGroup extends Model<
+    InferAttributes<PermissionRouteGroup>,
+    InferCreationAttributes<PermissionRouteGroup>
+> {
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
     declare permissionId: number;

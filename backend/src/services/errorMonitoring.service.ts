@@ -16,11 +16,15 @@ export class ErrorMonitoringService {
     }
 
     private handleUncaughtException = (error: Error) => {
-        consoleLogger.error("Unbehandelte Exception, Server wird runtergefahren", { error: error.stack });
+        consoleLogger.error("Unbehandelte Exception, Server wird runtergefahren", {
+            error: error.stack
+        });
         process.exit(1);
     };
     private handleUnhandledRejection = (reason: any) => {
-        consoleLogger.error("Unbehandelte Rejection, Server wird runtergefahren", { error: reason instanceof Error ? reason.stack : new Error(String(reason)) });
+        consoleLogger.error("Unbehandelte Rejection, Server wird runtergefahren", {
+            error: reason instanceof Error ? reason.stack : new Error(String(reason))
+        });
         process.exit(1);
     };
 }

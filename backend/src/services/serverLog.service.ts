@@ -28,7 +28,14 @@ export class ServerLogService {
         });
     }
 
-    buildServerLogQueryConditions(userIds?: number[], types?: ServerLogTypes[], ipv4Address?: string, createdAtFrom?: Date, createdAtTo?: Date, searchString?: string) {
+    buildServerLogQueryConditions(
+        userIds?: number[],
+        types?: ServerLogTypes[],
+        ipv4Address?: string,
+        createdAtFrom?: Date,
+        createdAtTo?: Date,
+        searchString?: string
+    ) {
         const conditions: WhereOptions[] = [];
 
         if (userIds !== undefined && userIds.length > 0) {
@@ -69,7 +76,15 @@ export class ServerLogService {
 
         if (searchString) {
             const like = { [Op.like]: `%${searchString}%` };
-            conditions.push({ [Op.or]: [{ message: like }, { url: like }, { method: like }, !isNaN(Number(searchString)) ? { status: Number(searchString) } : {}, { userAgent: like }] });
+            conditions.push({
+                [Op.or]: [
+                    { message: like },
+                    { url: like },
+                    { method: like },
+                    !isNaN(Number(searchString)) ? { status: Number(searchString) } : {},
+                    { userAgent: like }
+                ]
+            });
         }
 
         return conditions.length > 0 ? { [Op.and]: conditions } : {};

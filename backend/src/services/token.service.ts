@@ -31,13 +31,31 @@ export class TokenService {
     }
 
     async generateJWTs(databaseUser: User, routeGroupsArray: string[]) {
-        const accessToken = await this.generateJWT(databaseUser, UserTokenType.ACCESS_TOKEN, routeGroupsArray, ENV.ACCESS_TOKEN_SECRET, ENV.ACCESS_TOKEN_EXPIRY as ms.StringValue);
-        const refreshToken = await this.generateJWT(databaseUser, UserTokenType.REFRESH_TOKEN, routeGroupsArray, ENV.REFRESH_TOKEN_SECRET, ENV.REFRESH_TOKEN_EXPIRY as ms.StringValue);
+        const accessToken = await this.generateJWT(
+            databaseUser,
+            UserTokenType.ACCESS_TOKEN,
+            routeGroupsArray,
+            ENV.ACCESS_TOKEN_SECRET,
+            ENV.ACCESS_TOKEN_EXPIRY as ms.StringValue
+        );
+        const refreshToken = await this.generateJWT(
+            databaseUser,
+            UserTokenType.REFRESH_TOKEN,
+            routeGroupsArray,
+            ENV.REFRESH_TOKEN_SECRET,
+            ENV.REFRESH_TOKEN_EXPIRY as ms.StringValue
+        );
 
         return { accessToken: accessToken, refreshToken: refreshToken };
     }
 
-    async generateJWT(databaseUser: User, tokenType: UserTokenType, routeGroupsArray: string[], secret: string, expiresIn: ms.StringValue) {
+    async generateJWT(
+        databaseUser: User,
+        tokenType: UserTokenType,
+        routeGroupsArray: string[],
+        secret: string,
+        expiresIn: ms.StringValue
+    ) {
         const token = jsonwebtoken.sign(
             {
                 userId: databaseUser.id,
@@ -47,13 +65,20 @@ export class TokenService {
             { expiresIn: expiresIn }
         );
 
-        await UserToken.create({ userId: databaseUser.id, token: token, type: tokenType, expiresAt: new Date(Date.now() + ms(expiresIn)) });
+        await UserToken.create({
+            userId: databaseUser.id,
+            token: token,
+            type: tokenType,
+            expiresAt: new Date(Date.now() + ms(expiresIn))
+        });
 
         return token;
     }
 
     async removeJWTs(databaseUser: User) {
-        const userTokens = await databaseUser.getUserTokens({ where: { type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN] } } });
+        const userTokens = await databaseUser.getUserTokens({
+            where: { type: { [Op.or]: [UserTokenType.ACCESS_TOKEN, UserTokenType.REFRESH_TOKEN] } }
+        });
 
         await Promise.all(
             userTokens.map(async (userToken) => {

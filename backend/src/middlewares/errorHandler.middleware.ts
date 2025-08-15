@@ -8,12 +8,21 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { MulterError } from "multer";
 import { ZodError } from "zod/v4";
 
-export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown, req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const errorHandlerMiddleware: ErrorRequestHandler = async (
+    error: unknown,
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
     console.log(error);
     if (error instanceof ZodError) {
         error = new ValidationError(formatZodError(error));
     } else if (error instanceof MulterError) {
-        if (error.code === "LIMIT_UNEXPECTED_FILE" || error.code === "LIMIT_FILE_COUNT" || error.code === "LIMIT_FIELD_COUNT") {
+        if (
+            error.code === "LIMIT_UNEXPECTED_FILE" ||
+            error.code === "LIMIT_FILE_COUNT" ||
+            error.code === "LIMIT_FIELD_COUNT"
+        ) {
             error = new ValidationError("Mehr Dateien erhalten als zulässig");
         } else {
             error = new InternalServerError("Fehler mit Dateiannahme");
@@ -36,8 +45,9 @@ export const errorHandlerMiddleware: ErrorRequestHandler = async (error: unknown
         error: error as Error
     };
 
-    let jsonResponse: Record<string, any> = {};
-    jsonResponse.message = error instanceof ZodError ? formatZodError(error) : (error as AppError).message;
+    const jsonResponse: Record<string, any> = {};
+    jsonResponse.message =
+        error instanceof ZodError ? formatZodError(error) : (error as AppError).message;
 
     await databaseLogger(ServerLogTypes.ERROR, jsonResponse.message, loggerOptions);
     ApiResponse.sendError(res, jsonResponse, error instanceof AppError ? error.statusCode : 500);

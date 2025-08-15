@@ -31,14 +31,20 @@ export class SocketService {
             const accessToken = socket.handshake.auth.accessToken;
 
             if (accessToken === undefined) {
-                await databaseLogger(ServerLogTypes.WARN, "Socket abgelehnt wegen keinem AccessToken", {
-                    source: "socket.io"
-                });
+                await databaseLogger(
+                    ServerLogTypes.WARN,
+                    "Socket abgelehnt wegen keinem AccessToken",
+                    {
+                        source: "socket.io"
+                    }
+                );
 
                 return next(new ValidationError("Keinen Token erhalten"));
             }
 
-            const foundAccessToken = await UserToken.findOne({ where: { token: accessToken, type: UserTokenType.ACCESS_TOKEN } });
+            const foundAccessToken = await UserToken.findOne({
+                where: { token: accessToken, type: UserTokenType.ACCESS_TOKEN }
+            });
             if (foundAccessToken === null) {
                 await databaseLogger(ServerLogTypes.WARN, "AccessToken nicht mehr gültig", {
                     source: "socket.io"
@@ -48,31 +54,46 @@ export class SocketService {
             }
 
             try {
-                const decodedPayload = jwt.verify(accessToken, ENV.ACCESS_TOKEN_SECRET) as JwtPayload;
+                const decodedPayload = jwt.verify(
+                    accessToken,
+                    ENV.ACCESS_TOKEN_SECRET
+                ) as JwtPayload;
 
                 socket.userId = decodedPayload.userId;
                 socket.routeGroups = decodedPayload.routeGroups;
 
                 next();
             } catch (error) {
-                await databaseLogger(ServerLogTypes.WARN, "Socket abgelehnt wegen ungültigen AccessToken", {
-                    source: "socket.io"
-                });
+                await databaseLogger(
+                    ServerLogTypes.WARN,
+                    "Socket abgelehnt wegen ungültigen AccessToken",
+                    {
+                        source: "socket.io"
+                    }
+                );
                 return next(new ValidationError("AccessToken konnte nicht verifiziert werden"));
             }
         });
 
         this.getIO().on("connection", async (socket) => {
-            await databaseLogger(ServerLogTypes.INFO, `Socket verbunden: \"${socket.id}\" für Benutzer ID: \"${socket.userId}\"`, {
-                userId: socket.userId,
-                source: "socket.io"
-            });
-
-            socket.on("disconnecting", async (reason) => {
-                await databaseLogger(ServerLogTypes.INFO, `Socket getrennt \"${socket.id}\ mit der Begründung: \"${reason}\" für Benutzer ID: \"${socket.userId}\"`, {
+            await databaseLogger(
+                ServerLogTypes.INFO,
+                `Socket verbunden: \"${socket.id}\" für Benutzer ID: \"${socket.userId}\"`,
+                {
                     userId: socket.userId,
                     source: "socket.io"
-                });
+                }
+            );
+
+            socket.on("disconnecting", async (reason) => {
+                await databaseLogger(
+                    ServerLogTypes.INFO,
+                    `Socket getrennt \"${socket.id}\ mit der Begründung: \"${reason}\" für Benutzer ID: \"${socket.userId}\"`,
+                    {
+                        userId: socket.userId,
+                        source: "socket.io"
+                    }
+                );
             });
 
             await this.loadSockets(socket);

@@ -19,7 +19,15 @@ import {
     Model,
     NonAttribute
 } from "@sequelize/core";
-import { Attribute, AutoIncrement, BelongsToMany, NotNull, PrimaryKey, Table, Unique } from "@sequelize/core/decorators-legacy";
+import {
+    Attribute,
+    AutoIncrement,
+    BelongsToMany,
+    NotNull,
+    PrimaryKey,
+    Table,
+    Unique
+} from "@sequelize/core/decorators-legacy";
 
 @Table({
     tableName: "permissions",

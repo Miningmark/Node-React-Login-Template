@@ -31,9 +31,13 @@ export async function scheduleAllCronJobs() {
                 await job.job();
             });
 
-            await databaseLogger(ServerLogTypes.INFO, `Job "${job.name}" erfolgreich erstellt mit dem Zeitplan "${job.schedule}"`, {
-                source: "scheduler"
-            });
+            await databaseLogger(
+                ServerLogTypes.INFO,
+                `Job "${job.name}" erfolgreich erstellt mit dem Zeitplan "${job.schedule}"`,
+                {
+                    source: "scheduler"
+                }
+            );
         }
 
         await databaseLogger(ServerLogTypes.INFO, "Sämtliche CronJobs erfolgreich erstellt", {

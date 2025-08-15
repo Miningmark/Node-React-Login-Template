@@ -10,7 +10,15 @@ const job: CronJobDefinition = {
     schedule: "? ? /2 * * *",
     job: async () => {
         const databaseUserTokens = await UserToken.findAll({
-            where: { type: { [Op.or]: [UserTokenType.USER_REGISTRATION_TOKEN, UserTokenType.ADMIN_REGISTRATION_TOKEN] }, expiresAt: { [Op.lte]: new Date(Date.now()) } },
+            where: {
+                type: {
+                    [Op.or]: [
+                        UserTokenType.USER_REGISTRATION_TOKEN,
+                        UserTokenType.ADMIN_REGISTRATION_TOKEN
+                    ]
+                },
+                expiresAt: { [Op.lte]: new Date(Date.now()) }
+            },
             include: { model: User }
         });
         const destroyedCount = databaseUserTokens.length;
@@ -21,9 +29,13 @@ const job: CronJobDefinition = {
             })
         );
 
-        await databaseLogger(ServerLogTypes.INFO, `Es wurden ${destroyedCount} Benutzer wegen abgelaufener aktivierung gelöscht`, {
-            source: job.name
-        });
+        await databaseLogger(
+            ServerLogTypes.INFO,
+            `Es wurden ${destroyedCount} Benutzer wegen abgelaufener aktivierung gelöscht`,
+            {
+                source: job.name
+            }
+        );
     }
 };
 

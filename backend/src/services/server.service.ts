@@ -7,7 +7,9 @@ export class ServerService {
     constructor() {}
 
     async getSettings(): Promise<ControllerResponse> {
-        let jsonResponse: Record<string, any> = { message: "Einstellungen erfolgreich zurückgegeben" };
+        const jsonResponse: Record<string, any> = {
+            message: "Einstellungen erfolgreich zurückgegeben"
+        };
 
         const databaseServerSettings = await ServerSettings.findAll();
 

@@ -23,7 +23,11 @@ export class AdminPageController extends BaseController {
         super();
     }
 
-    getServerLogs = (req: ValidatedRequest<GetServerLogValidation>, res: Response, next: NextFunction): void => {
+    getServerLogs = (
+        req: ValidatedRequest<GetServerLogValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
@@ -31,34 +35,64 @@ export class AdminPageController extends BaseController {
         });
     };
 
-    getFilteredServerLogs = (req: ValidatedRequest<GetFilteredServerLogValidation>, res: Response, next: NextFunction): void => {
+    getFilteredServerLogs = (
+        req: ValidatedRequest<GetFilteredServerLogValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
-            const { userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString } = req.validated.body;
+            const { userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString } =
+                req.validated.body;
 
-            return await this.adminPageService.getFilteredServerLogs(limit, offset, userIds, types, ipv4Address, createdAtFrom, createdAtTo, searchString);
+            return await this.adminPageService.getFilteredServerLogs(
+                limit,
+                offset,
+                userIds,
+                types,
+                ipv4Address,
+                createdAtFrom,
+                createdAtTo,
+                searchString
+            );
         });
     };
 
-    getFilterOptionsServerLog = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
+    getFilterOptionsServerLog = (
+        req: ValidatedRequest<OnlyAuthorizationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPageService.getFilterOptionsServerLog();
         });
     };
 
-    getPermissionsWithRouteGroups = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
+    getPermissionsWithRouteGroups = (
+        req: ValidatedRequest<OnlyAuthorizationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPageService.getPermissionsWithRouteGroups();
         });
     };
 
-    getRouteGroups = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
+    getRouteGroups = (
+        req: ValidatedRequest<OnlyAuthorizationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPageService.getRouteGroups();
         });
     };
 
-    createPermission = (req: ValidatedRequest<CreatePermissionValidation>, res: Response, next: NextFunction): void => {
+    createPermission = (
+        req: ValidatedRequest<CreatePermissionValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { name, routeGroupIds, description } = req.validated.body;
 
@@ -66,15 +100,28 @@ export class AdminPageController extends BaseController {
         });
     };
 
-    updatePermission = (req: ValidatedRequest<UpdatePermissionValidation>, res: Response, next: NextFunction): void => {
+    updatePermission = (
+        req: ValidatedRequest<UpdatePermissionValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { id, name, description, routeGroupIds } = req.validated.body;
 
-            return await this.adminPageService.updatePermission(id, name, description, routeGroupIds);
+            return await this.adminPageService.updatePermission(
+                id,
+                name,
+                description,
+                routeGroupIds
+            );
         });
     };
 
-    deletePermission = (req: ValidatedRequest<DeletePermissionValidation>, res: Response, next: NextFunction): void => {
+    deletePermission = (
+        req: ValidatedRequest<DeletePermissionValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { id } = req.validated.body;
 
@@ -82,7 +129,11 @@ export class AdminPageController extends BaseController {
         });
     };
 
-    getNotifications = (req: ValidatedRequest<GetNotificationsValidation>, res: Response, next: NextFunction): void => {
+    getNotifications = (
+        req: ValidatedRequest<GetNotificationsValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
@@ -90,23 +141,48 @@ export class AdminPageController extends BaseController {
         });
     };
 
-    createNotification = (req: ValidatedRequest<CreateNotificationsValidation>, res: Response, next: NextFunction): void => {
+    createNotification = (
+        req: ValidatedRequest<CreateNotificationsValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { name, description, notifyFrom, notifyTo } = req.validated.body;
 
-            return await this.adminPageService.createNotification(name, description, notifyFrom, notifyTo);
+            return await this.adminPageService.createNotification(
+                name,
+                description,
+                notifyFrom,
+                notifyTo
+            );
         });
     };
 
-    updateNotification = (req: ValidatedRequest<UpdateNotificationValidation>, res: Response, next: NextFunction): void => {
+    updateNotification = (
+        req: ValidatedRequest<UpdateNotificationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
-            const { id, resendNotification, name, description, notifyFrom, notifyTo } = req.validated.body;
+            const { id, resendNotification, name, description, notifyFrom, notifyTo } =
+                req.validated.body;
 
-            return await this.adminPageService.updateNotification(id, resendNotification, name, description, notifyFrom, notifyTo);
+            return await this.adminPageService.updateNotification(
+                id,
+                resendNotification,
+                name,
+                description,
+                notifyFrom,
+                notifyTo
+            );
         });
     };
 
-    deleteNotification = (req: ValidatedRequest<DeleteNotificationValidation>, res: Response, next: NextFunction): void => {
+    deleteNotification = (
+        req: ValidatedRequest<DeleteNotificationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { id } = req.validated.body;
 
@@ -114,7 +190,11 @@ export class AdminPageController extends BaseController {
         });
     };
 
-    updateMaintenanceMode = (req: ValidatedRequest<UpdateMaintenanceModeValidation>, res: Response, next: NextFunction): void => {
+    updateMaintenanceMode = (
+        req: ValidatedRequest<UpdateMaintenanceModeValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { active } = req.validated.body;
 

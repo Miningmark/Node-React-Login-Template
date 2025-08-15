@@ -10,10 +10,17 @@ export async function generateSuperAdmin() {
     try {
         const hashedPassword = await bcrypt.hash(ENV.SUPER_ADMIN_PASSWORD, 10);
         let databaseUser = await User.findOne({ where: { username: "SuperAdmin" } });
-        let databasePermission = await Permission.findOne({ where: { name: "SuperAdmin Berechtigung" } });
+        let databasePermission = await Permission.findOne({
+            where: { name: "SuperAdmin Berechtigung" }
+        });
 
         if (databaseUser === null) {
-            databaseUser = await User.create({ username: "SuperAdmin", email: "", password: hashedPassword, isActive: true });
+            databaseUser = await User.create({
+                username: "SuperAdmin",
+                email: "",
+                password: hashedPassword,
+                isActive: true
+            });
         } else {
             const isEqual = await bcrypt.compare(ENV.SUPER_ADMIN_PASSWORD, databaseUser.password);
             if (!isEqual) {
@@ -23,7 +30,10 @@ export async function generateSuperAdmin() {
         }
 
         if (databasePermission === null) {
-            databasePermission = await Permission.create({ name: "SuperAdmin Berechtigung", description: "Hat sämtlich Berechtigungen für den SuperAdmin" });
+            databasePermission = await Permission.create({
+                name: "SuperAdmin Berechtigung",
+                description: "Hat sämtlich Berechtigungen für den SuperAdmin"
+            });
         }
 
         const databaseRouteGroups = await RouteGroup.findAll();
@@ -31,9 +41,15 @@ export async function generateSuperAdmin() {
         await databaseUser.setPermissions([databasePermission]);
         await databasePermission.setRouteGroups(databaseRouteGroups);
 
-        await databaseLogger(ServerLogTypes.INFO, "SuperAdmin und Berechtigungen erfolgreich erstellt/geupdated", { source: "superAdmin.utils" });
+        await databaseLogger(
+            ServerLogTypes.INFO,
+            "SuperAdmin und Berechtigungen erfolgreich erstellt/geupdated",
+            { source: "superAdmin.utils" }
+        );
     } catch (error) {
-        await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", { error: error instanceof Error ? error : undefined });
+        await databaseLogger(ServerLogTypes.ERROR, error instanceof Error ? error.message : "", {
+            error: error instanceof Error ? error : undefined
+        });
     }
 }
 
@@ -43,7 +59,12 @@ export async function generateDevUser() {
     let databaseUser = await User.findOne({ where: { username: "devUser" } });
 
     if (databaseUser === null) {
-        databaseUser = await User.create({ username: "devUser", email: "devUser@devUser.com", password: hashedPassword, isActive: true });
+        databaseUser = await User.create({
+            username: "devUser",
+            email: "devUser@devUser.com",
+            password: hashedPassword,
+            isActive: true
+        });
     }
 
     let databasePermission = await Permission.findOne({ where: { name: "DevUser Berechtigung" } });
@@ -51,7 +72,10 @@ export async function generateDevUser() {
     if (databaseUser === null) return;
 
     if (databasePermission === null) {
-        databasePermission = await Permission.create({ name: "DevUser Berechtigung", description: "Hat sämtlich Berechtigungen für den DevUser" });
+        databasePermission = await Permission.create({
+            name: "DevUser Berechtigung",
+            description: "Hat sämtlich Berechtigungen für den DevUser"
+        });
     }
 
     const databaseRouteGroups = await RouteGroup.findAll();

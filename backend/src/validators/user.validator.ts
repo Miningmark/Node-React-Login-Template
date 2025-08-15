@@ -1,5 +1,11 @@
 import { UserSettingsTheme } from "@/models/userSettings.model.js";
-import { authorizationHeader, emailValidation, passwordValidation, singleFileValidation, usernameValidation } from "@/validators/base.validator.js";
+import {
+    authorizationHeader,
+    emailValidation,
+    passwordValidation,
+    singleFileValidation,
+    usernameValidation
+} from "@/validators/base.validator.js";
 import { z } from "zod/v4";
 
 export type UpdateUsernameValidation = z.infer<typeof updateUsernameSchema>;
@@ -41,7 +47,11 @@ export const updateSettingsSchema = z.object({
                 .optional()
         })
         .refine((data) => {
-            return data.theme !== undefined || data.isSideMenuFixed !== undefined || data.menuBookmarks !== undefined;
+            return (
+                data.theme !== undefined ||
+                data.isSideMenuFixed !== undefined ||
+                data.menuBookmarks !== undefined
+            );
         }, "Es muss mindestens ein Wert geändert werden")
 });
 

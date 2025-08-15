@@ -2,17 +2,30 @@ import { ValidatedRequest } from "@/@types/validation.js";
 import { BaseController } from "@/controllers/base.controller.js";
 import { UserManagementService } from "@/services/userManagement.service.js";
 import { OnlyAuthorizationValidation } from "@/validators/base.validator";
-import { CreateUserValidation, DeleteAvatarValidation, GetAvatarValidation, GetUsersValidation, UpdateUserValidation } from "@/validators/userManagement.validator.js";
+import {
+    CreateUserValidation,
+    DeleteAvatarValidation,
+    GetAvatarValidation,
+    GetUsersValidation,
+    UpdateUserValidation
+} from "@/validators/userManagement.validator.js";
 import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class UserManagementController extends BaseController {
-    constructor(@inject(UserManagementService) private readonly userManagementService: UserManagementService) {
+    constructor(
+        @inject(UserManagementService)
+        private readonly userManagementService: UserManagementService
+    ) {
         super();
     }
 
-    getUsers = (req: ValidatedRequest<GetUsersValidation>, res: Response, next: NextFunction): void => {
+    getUsers = (
+        req: ValidatedRequest<GetUsersValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { limit, offset } = req.validated.params;
 
@@ -20,7 +33,11 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    getAvatar = (req: ValidatedRequest<GetAvatarValidation>, res: Response, next: NextFunction): void => {
+    getAvatar = (
+        req: ValidatedRequest<GetAvatarValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { id } = req.validated.params;
 
@@ -28,7 +45,11 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    deleteAvatar = (req: ValidatedRequest<DeleteAvatarValidation>, res: Response, next: NextFunction): void => {
+    deleteAvatar = (
+        req: ValidatedRequest<DeleteAvatarValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { id } = req.validated.body;
 
@@ -36,21 +57,40 @@ export class UserManagementController extends BaseController {
         });
     };
 
-    getPermissions = (req: ValidatedRequest<OnlyAuthorizationValidation>, res: Response, next: NextFunction): void => {
+    getPermissions = (
+        req: ValidatedRequest<OnlyAuthorizationValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.userManagementService.getPermissions();
         });
     };
 
-    updateUser = (req: ValidatedRequest<UpdateUserValidation>, res: Response, next: NextFunction): void => {
+    updateUser = (
+        req: ValidatedRequest<UpdateUserValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { id, username, email, isActive, isDisabled, permissionIds } = req.validated.body;
 
-            return await this.userManagementService.updateUser(id, username, email, isActive, isDisabled, permissionIds);
+            return await this.userManagementService.updateUser(
+                id,
+                username,
+                email,
+                isActive,
+                isDisabled,
+                permissionIds
+            );
         });
     };
 
-    createUser = (req: ValidatedRequest<CreateUserValidation>, res: Response, next: NextFunction): void => {
+    createUser = (
+        req: ValidatedRequest<CreateUserValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             const { username, email, permissionIds } = req.validated.body;
 

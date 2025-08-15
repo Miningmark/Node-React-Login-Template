@@ -11,7 +11,11 @@ export class ServerController extends BaseController {
         super();
     }
 
-    getSettings = (req: ValidatedRequest<RegisterValidation>, res: Response, next: NextFunction): void => {
+    getSettings = (
+        req: ValidatedRequest<RegisterValidation>,
+        res: Response,
+        next: NextFunction
+    ): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.serverService.getSettings();
         });
