@@ -17,6 +17,9 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
   const axiosProtected = useAxiosProtected();
   const { addToast } = useToast();
 
+  const isUsernameValid = /^[a-zA-Z0-9]{5,15}$/.test(newUser.username.trim());
+  const isEmailValid = /^[a-zA-Z0-9.%_+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(newUser.email.trim());
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewUser((prev) => ({ ...prev, [name]: value }));
@@ -35,6 +38,20 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
   };
 
   const handleSave = async () => {
+    if (!newUser.username || !isUsernameValid) {
+      addToast(
+        "Benutzername muss zwischen 5 und 15 Zeichen lang sein und darf keine Sonderzeichen enthalten",
+        "danger"
+      );
+      setTouched((prev) => ({ ...prev, username: true }));
+      return;
+    }
+    console.log("test", isEmailValid);
+    if (!newUser.email || !isEmailValid) {
+      addToast("Bitte eine gültige E-Mail-Adresse eingeben", "danger");
+      setTouched((prev) => ({ ...prev, email: true }));
+      return;
+    }
     setIsSaving(true);
     try {
       const payload = {
@@ -127,7 +144,7 @@ const CreateUserModal = ({ show, handleClose, allPermissions }) => {
         <Button
           variant="success"
           onClick={handleSave}
-          disabled={isSaving || !newUser.username || !newUser.email}
+          disabled={isSaving}
           style={{ width: "100px" }}
         >
           {isSaving ? (
