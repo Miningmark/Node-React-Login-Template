@@ -225,9 +225,15 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
                               }
                             >
                               {isBookmarked(subItem.path) ? (
-                                <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
+                                <BookmarkCheckIcon
+                                  className="keep-icon"
+                                  style={{ width: 20, height: 20 }}
+                                />
                               ) : (
-                                <BookmarkIcon style={{ width: 20, height: 20 }} />
+                                <BookmarkIcon
+                                  className="keep-icon"
+                                  style={{ width: 20, height: 20 }}
+                                />
                               )}
                             </span>
                           </div>
