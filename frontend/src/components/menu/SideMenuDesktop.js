@@ -95,8 +95,6 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
     return menuBookmarks.some((b) => b.link === link);
   };
 
-  console.log("Menu Bookmarks:", menuBookmarks);
-
   return (
     <div
       className={`desktop-sidebar ${isHovered || menuFixed ? "expanded" : ""}`}

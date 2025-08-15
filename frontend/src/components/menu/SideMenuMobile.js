@@ -3,18 +3,31 @@ import { AuthContext } from "contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeContext } from "contexts/ThemeContext";
 import menuItems from "./menuStruckture";
+import { useToast } from "components/ToastContext";
+import useAxiosProtected from "hook/useAxiosProtected";
 
 import "./sideMenuMobile.css";
 
+//Icons
 import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
 import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
+import { ReactComponent as BookmarkIcon } from "assets/icons/bookmark.svg";
+import { ReactComponent as BookmarkCheckIcon } from "assets/icons/bookmark_check.svg";
+
+//Zustand Store
+import { useSettingsStore } from "hook/store/settingsStore";
 
 export default function SideMenuMobile({ handleMobileSideMenuClose }) {
   const [openMenus, setOpenMenus] = useState({});
   const { checkAccess } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
+  const { addToast } = useToast();
+  const axiosProtected = useAxiosProtected();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const setMenuBookmarks = useSettingsStore((state) => state.setMenuBookmarks);
+  const menuBookmarks = useSettingsStore((state) => state.menuBookmarks);
 
   // Öffne Submenus automatisch, wenn ein aktiver SubItem-Path erkannt wird
   useEffect(() => {
@@ -40,6 +53,37 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
     }));
   };
 
+  const toggleBookmark = async (linkName, link) => {
+    const exists = menuBookmarks.find((b) => b.link === link);
+    let updatedBookmarks;
+
+    if (exists) {
+      // Entfernen
+      updatedBookmarks = menuBookmarks.filter((b) => b.link !== link);
+    } else {
+      // Hinzufügen (max. 5)
+      if (menuBookmarks.length >= 5) {
+        addToast("Es sind maximal 5 Lesezeichen möglich!", "danger");
+        return;
+      }
+      updatedBookmarks = [...menuBookmarks, { linkName, link }];
+    }
+
+    setMenuBookmarks(updatedBookmarks);
+
+    try {
+      await axiosProtected.post("/user/updateSettings", {
+        menuBookmarks: updatedBookmarks,
+      });
+    } catch (error) {
+      addToast("Fehler beim Aktualisieren der Lesezeichen", "danger");
+    }
+  };
+
+  const isBookmarked = (link) => {
+    return menuBookmarks.some((b) => b.link === link);
+  };
+
   return (
     <div className="side-menu-background" onClick={handleMobileSideMenuClose}>
       <div className="side-menu-wrapper bg-body-tertiary" onClick={(e) => e.stopPropagation()}>
@@ -52,6 +96,35 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
             onClick={handleMobileSideMenuClose}
           ></button>
         </div>
+
+        {/* Bookmarks anzeigen */}
+        {menuBookmarks.length > 0 && (
+          <ul className="bookmarks-list">
+            {menuBookmarks.map((bm, idx) => (
+              <li key={idx} style={{ position: "relative" }}>
+                <Link to={bm.link} className="bookmark-link">
+                  {bm.linkName}
+                </Link>
+                <span
+                  className="bookmark-icon"
+                  style={{
+                    cursor: "pointer",
+                    position: "absolute",
+                    right: "16px",
+                  }}
+                  onClick={() => toggleBookmark(bm.linkName, bm.link)}
+                  title={isBookmarked(bm.link) ? "Bookmark entfernen" : "Bookmark hinzufügen"}
+                >
+                  {isBookmarked(bm.link) ? (
+                    <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
+                  ) : (
+                    <BookmarkIcon style={{ width: 20, height: 20 }} />
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="menu-items">
           {menuItems.map((item, idx) => {
@@ -100,14 +173,45 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
                       {accessibleSubItems.map((subItem, subIdx) => {
                         const isActive = subItem.path === currentPath;
                         return (
-                          <Link
+                          <div
                             key={subIdx}
-                            to={subItem.path}
-                            className={`submenu-item ${isActive ? "active" : ""}`}
-                            onClick={handleMobileSideMenuClose}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              position: "relative",
+                            }}
                           >
-                            {subItem.name}
-                          </Link>
+                            <span style={{ marginRight: "8px" }}>•</span>
+                            <Link
+                              to={subItem.path}
+                              className={`submenu-item ${isActive ? "active" : ""}`}
+                              onClick={handleMobileSideMenuClose}
+                            >
+                              {subItem.name}
+                            </Link>
+                            <span
+                              className="bookmark-icon"
+                              style={{
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                position: "absolute",
+                                right: "0px",
+                              }}
+                              onClick={() => toggleBookmark(subItem.name, subItem.path)}
+                              title={
+                                isBookmarked(subItem.path)
+                                  ? "Bookmark entfernen"
+                                  : "Bookmark hinzufügen"
+                              }
+                            >
+                              {isBookmarked(subItem.path) ? (
+                                <BookmarkCheckIcon style={{ width: 20, height: 20 }} />
+                              ) : (
+                                <BookmarkIcon style={{ width: 20, height: 20 }} />
+                              )}
+                            </span>
+                          </div>
                         );
                       })}
                     </div>
@@ -138,6 +242,29 @@ export default function SideMenuMobile({ handleMobileSideMenuClose }) {
                     )}
                     {item.name}
                   </Link>
+                  <span
+                    className="bookmark-icon"
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      position: "absolute",
+                      right: "0px",
+                      top: "0",
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleBookmark(item.name, item.path);
+                    }}
+                    title={isBookmarked(item.path) ? "Bookmark entfernen" : "Bookmark hinzufügen"}
+                  >
+                    {isBookmarked(item.path) ? (
+                      <BookmarkCheckIcon className="keep-icon" style={{ width: 20, height: 20 }} />
+                    ) : (
+                      <BookmarkIcon className="keep-icon" style={{ width: 20, height: 20 }} />
+                    )}
+                  </span>
                 </div>
               );
             }
