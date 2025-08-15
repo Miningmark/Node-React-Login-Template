@@ -277,6 +277,15 @@ function Register() {
               Registrieren
             </Button>
           </div>
+          <div className="mt-3 text-start">
+            <span
+              role="button"
+              className="text-primary text-decoration-underline"
+              onClick={() => navigate("/login")}
+            >
+              ← Zurück zum Login
+            </span>
+          </div>
         </Form>
       </div>
 
