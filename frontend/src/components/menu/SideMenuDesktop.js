@@ -18,7 +18,7 @@ import { ReactComponent as BookmarkCheckIcon } from "assets/icons/bookmark_check
 import { useSettingsStore } from "hook/store/settingsStore";
 
 export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
-  const { checkAccess } = useContext(AuthContext);
+  const { checkAccess, routeGroups } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const { addToast } = useToast();
   const axiosProtected = useAxiosProtected();
@@ -34,6 +34,7 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
 
   // Submenus automatisch öffnen, wenn aktives SubItem vorhanden
   useEffect(() => {
+    if (!routeGroups) return;
     const initialOpenMenus = {};
     menuItems.forEach((item) => {
       if (item.subItems) {
@@ -48,14 +49,17 @@ export default function SideMenuDesktop({ menuFixed, setMenuFixed }) {
     });
     if (!menuFixed || !menuFixedChanged) {
       setOpenMenus(initialOpenMenus);
+      console.log("Initial Open Menus:", initialOpenMenus);
     }
-  }, [currentPath, checkAccess, menuFixed, menuFixedChanged]);
+  }, [currentPath, checkAccess, menuFixed, menuFixedChanged, routeGroups]);
 
   useEffect(() => {
-    if (menuFixed) {
+    if (!menuFixedChanged && menuFixed) {
       setMenuFixedChanged(true);
+      console.log("Menu wurde fixiert");
     }
-  }, [menuFixed]);
+  }, [menuFixedChanged, menuFixed]);
+  console.log("Menu Fixed Changed:", menuFixedChanged);
 
   const toggleSubMenu = (name) => {
     setOpenMenus((prev) => ({
