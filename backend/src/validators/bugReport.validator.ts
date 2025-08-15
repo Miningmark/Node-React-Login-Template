@@ -1,33 +1,10 @@
 import { z } from "zod/v4";
 
 import { BugReportStatusType } from "@/models/bugReport.model.js";
-import {
-    authorizationHeader,
-    limitAndOffsetParams,
-    multipleFilesValidation
-} from "@/validators/base.validator.js";
-
-export type GetBugReportsValidation = z.infer<typeof getBugReportsSchema>;
-export const getBugReportsSchema = z.object({
-    headers: authorizationHeader,
-    params: limitAndOffsetParams
-});
-
-export type GetActiveBugReportsValidation = z.infer<typeof getActiveBugReportsSchema>;
-export const getActiveBugReportsSchema = z.object({
-    headers: authorizationHeader,
-    params: limitAndOffsetParams
-});
-
-export type GetOwnBugReportsValidation = z.infer<typeof getOwnBugReportsSchema>;
-export const getOwnBugReportsSchema = z.object({
-    headers: authorizationHeader,
-    params: limitAndOffsetParams
-});
+import { multipleFilesValidation } from "@/validators/base.validator.js";
 
 export type GetBugReportFileValidation = z.infer<typeof getBugReportFileSchema>;
 export const getBugReportFileSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         id: z.int().positive(),
         fileIndex: z.int().min(1).max(3)
@@ -36,7 +13,6 @@ export const getBugReportFileSchema = z.object({
 
 export type CreateBugReportValidation = z.infer<typeof createBugReportSchema>;
 export const createBugReportSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         name: z.string().min(5).max(25),
         description: z.string().min(5).max(16000)
@@ -61,7 +37,6 @@ export const createBugReportSchema = z.object({
 
 export type UpdateBugReportStatusValidation = z.infer<typeof updateBugReportStatusSchema>;
 export const updateBugReportStatusSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         id: z.int().positive(),
         status: z.enum(BugReportStatusType)

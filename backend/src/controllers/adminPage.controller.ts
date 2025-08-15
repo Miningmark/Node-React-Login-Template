@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
 import { ValidatedRequest } from "@/@types/validation.js";
@@ -10,13 +10,11 @@ import {
     DeleteNotificationValidation,
     DeletePermissionValidation,
     GetFilteredServerLogValidation,
-    GetNotificationsValidation,
-    GetServerLogValidation,
     UpdateMaintenanceModeValidation,
     UpdateNotificationValidation,
     UpdatePermissionValidation
 } from "@/validators/adminPage.validator.js";
-import { OnlyAuthorizationValidation } from "@/validators/base.validator.js";
+import { OnlyLimitAndOffsetValidation } from "@/validators/base.validator";
 
 @injectable()
 export class AdminPageController extends BaseController {
@@ -25,7 +23,7 @@ export class AdminPageController extends BaseController {
     }
 
     getServerLogs = (
-        req: ValidatedRequest<GetServerLogValidation>,
+        req: ValidatedRequest<OnlyLimitAndOffsetValidation>,
         res: Response,
         next: NextFunction
     ): void => {
@@ -59,31 +57,19 @@ export class AdminPageController extends BaseController {
         });
     };
 
-    getFilterOptionsServerLog = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getFilterOptionsServerLog = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPageService.getFilterOptionsServerLog();
         });
     };
 
-    getPermissionsWithRouteGroups = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getPermissionsWithRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPageService.getPermissionsWithRouteGroups();
         });
     };
 
-    getRouteGroups = (
-        req: ValidatedRequest<OnlyAuthorizationValidation>,
-        res: Response,
-        next: NextFunction
-    ): void => {
+    getRouteGroups = (req: Request, res: Response, next: NextFunction): void => {
         this.handleRequest(req, res, next, async () => {
             return await this.adminPageService.getRouteGroups();
         });
@@ -131,7 +117,7 @@ export class AdminPageController extends BaseController {
     };
 
     getNotifications = (
-        req: ValidatedRequest<GetNotificationsValidation>,
+        req: ValidatedRequest<OnlyLimitAndOffsetValidation>,
         res: Response,
         next: NextFunction
     ): void => {

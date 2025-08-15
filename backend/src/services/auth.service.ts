@@ -106,9 +106,8 @@ export class AuthService {
         const databaseUser = await User.findOne({ where: { username: username } });
         if (databaseUser === null) throw new ValidationError("Benutzername nicht vorhanden");
 
-        const routeGroupsArray = await this.routeGroupService.generateUserRouteGroupArray(
-            databaseUser
-        );
+        const routeGroupsArray =
+            await this.routeGroupService.generateUserRouteGroupArray(databaseUser);
         const databaseServerSetting = await ServerSettings.findOne({
             where: { key: ServerSettingKey.MAINTENANCE_MODE }
         });
@@ -132,9 +131,8 @@ export class AuthService {
         if (isPasswordMatching === false) {
             await this.userActivityService.addUserLastLogin(databaseUser.id, req, false);
 
-            const isAccountLocked = await this.userActivityService.checkUserLastLogins(
-                databaseUser
-            );
+            const isAccountLocked =
+                await this.userActivityService.checkUserLastLogins(databaseUser);
             if (isAccountLocked)
                 throw new ForbiddenError(
                     "Benutzer wurde wegen zuvieler fehlerhafter Login Versuchen vorübergehen deaktiviert"

@@ -23,42 +23,48 @@ const multerInstance = multer();
 if (ENV.ENABLE_USERNAME_CHANGE === true) {
     router.post(
         "/updateUsername",
-        validateRequest(updateUsernameSchema),
+        validateRequest(onlyAuthorizationSchema),
         verifyAuth(),
+        validateRequest(updateUsernameSchema),
         userController.updateUsername
     );
 }
 router.post(
     "/updateEmail",
-    validateRequest(updateEmailSchema),
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
+    validateRequest(updateEmailSchema),
     userController.updateEmail
 );
 router.post(
     "/updatePassword",
-    validateRequest(updatePasswordSchema),
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
+    validateRequest(updatePasswordSchema),
     userController.updatePassword
 );
 router.post(
     "/updateSettings",
-    validateRequest(updateSettingsSchema),
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
+    validateRequest(updateSettingsSchema),
     userController.updateSettings
 );
 
 router.post(
     "/confirmPendingNotification",
-    validateRequest(confirmPendingNotificationSchema),
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
+    validateRequest(confirmPendingNotificationSchema),
     userController.confirmPendingNotification
 );
 
 router.post(
     "/updateAvatar",
     multerInstance.single("file"),
-    validateRequest(updateAvatarSchema),
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
+    validateRequest(updateAvatarSchema),
     userController.updateAvatar
 );
 router.post(

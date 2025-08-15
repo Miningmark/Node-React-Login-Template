@@ -1,21 +1,9 @@
 import { z } from "zod/v4";
 
-import {
-    authorizationHeader,
-    emailValidation,
-    limitAndOffsetParams,
-    usernameValidation
-} from "@/validators/base.validator.js";
-
-export type GetUsersValidation = z.infer<typeof getUsersSchema>;
-export const getUsersSchema = z.object({
-    headers: authorizationHeader,
-    params: limitAndOffsetParams
-});
+import { emailValidation, usernameValidation } from "@/validators/base.validator.js";
 
 export type GetAvatarValidation = z.infer<typeof getAvatarSchema>;
 export const getAvatarSchema = z.object({
-    headers: authorizationHeader,
     params: z.object({
         id: z
             .string()
@@ -26,7 +14,6 @@ export const getAvatarSchema = z.object({
 
 export type DeleteAvatarValidation = z.infer<typeof deleteAvatarSchema>;
 export const deleteAvatarSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         id: z.int().positive()
     })
@@ -34,7 +21,6 @@ export const deleteAvatarSchema = z.object({
 
 export type UpdateUserValidation = z.infer<typeof updateUserSchema>;
 export const updateUserSchema = z.object({
-    headers: authorizationHeader,
     body: z
         .object({
             id: z.int().positive(),
@@ -57,7 +43,6 @@ export const updateUserSchema = z.object({
 
 export type CreateUserValidation = z.infer<typeof createUserSchema>;
 export const createUserSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         username: usernameValidation,
         email: emailValidation,

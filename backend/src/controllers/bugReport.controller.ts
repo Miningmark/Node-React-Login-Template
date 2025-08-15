@@ -4,12 +4,10 @@ import { inject, injectable } from "tsyringe";
 import { ValidatedRequest } from "@/@types/validation";
 import { BaseController } from "@/controllers/base.controller.js";
 import { BugReportService } from "@/services/bugReport.service.js";
+import { OnlyLimitAndOffsetValidation } from "@/validators/base.validator";
 import {
     CreateBugReportValidation,
-    GetActiveBugReportsValidation,
     GetBugReportFileValidation,
-    GetBugReportsValidation,
-    GetOwnBugReportsValidation,
     UpdateBugReportStatusValidation
 } from "@/validators/bugReport.validator.js";
 
@@ -20,7 +18,7 @@ export class BugReportController extends BaseController {
     }
 
     getBugReports = (
-        req: ValidatedRequest<GetBugReportsValidation>,
+        req: ValidatedRequest<OnlyLimitAndOffsetValidation>,
         res: Response,
         next: NextFunction
     ): void => {
@@ -32,7 +30,7 @@ export class BugReportController extends BaseController {
     };
 
     getActiveBugReports = (
-        req: ValidatedRequest<GetActiveBugReportsValidation>,
+        req: ValidatedRequest<OnlyLimitAndOffsetValidation>,
         res: Response,
         next: NextFunction
     ): void => {
@@ -44,7 +42,7 @@ export class BugReportController extends BaseController {
     };
 
     getOwnBugReports = (
-        req: ValidatedRequest<GetOwnBugReportsValidation>,
+        req: ValidatedRequest<OnlyLimitAndOffsetValidation>,
         res: Response,
         next: NextFunction
     ): void => {

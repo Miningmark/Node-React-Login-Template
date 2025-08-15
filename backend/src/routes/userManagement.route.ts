@@ -10,12 +10,11 @@ import {
     USER_MANAGEMENT_READ,
     USER_MANAGEMENT_WRITE
 } from "@/routeGroups/userManagement.routeGroup.js";
-import { onlyAuthorizationSchema } from "@/validators/base.validator.js";
+import { onlyAuthorizationSchema, onlyLimitAndOffsetSchema } from "@/validators/base.validator.js";
 import {
     createUserSchema,
     deleteAvatarSchema,
     getAvatarSchema,
-    getUsersSchema,
     updateUserSchema
 } from "@/validators/userManagement.validator.js";
 
@@ -24,17 +23,19 @@ const userManagementController = container.resolve(UserManagementController);
 
 router.get(
     "/getUsers{/:limit-:offset}",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([
         USER_MANAGEMENT_READ.groupName,
         USER_MANAGEMENT_WRITE.groupName,
         USER_MANAGEMENT_CREATE.groupName
     ]),
-    validateRequest(getUsersSchema),
+    validateRequest(onlyLimitAndOffsetSchema),
     userManagementController.getUsers
 );
 router.get(
     "/getAvatar{/:id}",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([
         USER_MANAGEMENT_READ.groupName,
@@ -47,18 +48,19 @@ router.get(
 
 router.get(
     "/getPermissions",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([
         USER_MANAGEMENT_READ.groupName,
         USER_MANAGEMENT_WRITE.groupName,
         USER_MANAGEMENT_CREATE.groupName
     ]),
-    validateRequest(onlyAuthorizationSchema),
     userManagementController.getPermissions
 );
 
 router.post(
     "/updateUser",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     validateRequest(updateUserSchema),
@@ -66,6 +68,7 @@ router.post(
 );
 router.post(
     "/createUser",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([USER_MANAGEMENT_CREATE.groupName]),
     validateRequest(createUserSchema),
@@ -74,6 +77,7 @@ router.post(
 
 router.post(
     "/deleteAvatar",
+    validateRequest(onlyAuthorizationSchema),
     verifyAuth(),
     verifyPermission([USER_MANAGEMENT_WRITE.groupName, USER_MANAGEMENT_CREATE.groupName]),
     validateRequest(deleteAvatarSchema),

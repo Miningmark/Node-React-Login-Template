@@ -1,21 +1,10 @@
 import { z } from "zod/v4";
 
 import { ServerLogTypes } from "@/models/serverLog.model.js";
-import {
-    authorizationHeader,
-    isoDateTimeValidation,
-    limitAndOffsetParams
-} from "@/validators/base.validator.js";
-
-export type GetServerLogValidation = z.infer<typeof getServerLogSchema>;
-export const getServerLogSchema = z.object({
-    headers: authorizationHeader,
-    params: limitAndOffsetParams
-});
+import { isoDateTimeValidation, limitAndOffsetParams } from "@/validators/base.validator.js";
 
 export type GetFilteredServerLogValidation = z.infer<typeof getFilteredServerLogSchema>;
 export const getFilteredServerLogSchema = z.object({
-    headers: authorizationHeader,
     params: limitAndOffsetParams,
     body: z.object({
         userIds: z.array(z.int()).optional(),
@@ -29,7 +18,6 @@ export const getFilteredServerLogSchema = z.object({
 
 export type CreatePermissionValidation = z.infer<typeof createPermissionSchema>;
 export const createPermissionSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         name: z.string().min(5).max(50),
         description: z.string().min(5).max(100).optional(),
@@ -39,7 +27,6 @@ export const createPermissionSchema = z.object({
 
 export type UpdatePermissionValidation = z.infer<typeof updatePermissionSchema>;
 export const updatePermissionSchema = z.object({
-    headers: authorizationHeader,
     body: z
         .object({
             id: z.int().positive(),
@@ -58,21 +45,13 @@ export const updatePermissionSchema = z.object({
 
 export type DeletePermissionValidation = z.infer<typeof deletePermissionSchema>;
 export const deletePermissionSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         id: z.int().positive()
     })
 });
 
-export type GetNotificationsValidation = z.infer<typeof getNotificationsSchema>;
-export const getNotificationsSchema = z.object({
-    headers: authorizationHeader,
-    params: limitAndOffsetParams
-});
-
 export type CreateNotificationsValidation = z.infer<typeof createNotificationSchema>;
 export const createNotificationSchema = z.object({
-    headers: authorizationHeader,
     body: z
         .object({
             name: z.string().min(5).max(25),
@@ -91,7 +70,6 @@ export const createNotificationSchema = z.object({
 
 export type UpdateNotificationValidation = z.infer<typeof updateNotificationSchema>;
 export const updateNotificationSchema = z.object({
-    headers: authorizationHeader,
     body: z
         .object({
             id: z.int().positive(),
@@ -113,7 +91,6 @@ export const updateNotificationSchema = z.object({
 
 export type DeleteNotificationValidation = z.infer<typeof deleteNotificationSchema>;
 export const deleteNotificationSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         id: z.int().positive()
     })
@@ -121,7 +98,6 @@ export const deleteNotificationSchema = z.object({
 
 export type UpdateMaintenanceModeValidation = z.infer<typeof updateMaintenanceModeSchema>;
 export const updateMaintenanceModeSchema = z.object({
-    headers: authorizationHeader,
     body: z.object({
         active: z.boolean()
     })
