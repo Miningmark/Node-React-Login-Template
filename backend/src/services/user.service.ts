@@ -21,6 +21,7 @@ import { TokenService } from "@/services/token.service.js";
 import { UserNotificationService } from "@/services/userNotification.service.js";
 import {
     getEmailChangedInfoEmailTemplate,
+    getPasswordChangedInfoEmailTemplate,
     getUsernameChangedInfoEmailTemplate
 } from "@/templates/email/user.template.email.js";
 import { capitalizeFirst, formatDate } from "@/utils/misc.util.js";
@@ -148,6 +149,16 @@ export class UserService {
 
         this.tokenService.removeJWTs(databaseUser);
         this.tokenService.clearRefreshTokenCookie(res);
+
+        await this.emailService.sendHTMLTemplateEmail(
+            databaseUser.email,
+            "Änderung deiner E-Mail-Adresse",
+            getPasswordChangedInfoEmailTemplate(
+                ENV.FRONTEND_NAME,
+                databaseUser.username,
+                formatDate(new Date(Date.now()))
+            )
+        );
 
         return { type: "json", jsonResponse: jsonResponse };
     }
