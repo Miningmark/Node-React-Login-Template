@@ -114,12 +114,18 @@ function ServerLogPage() {
         }
       }, 100); // alle 100ms prüfen
 
+      function handleUpdateFilterOptions(data) {
+        setFilterOptions(data.filterOptions);
+      }
+
       socket.emit("subscribe:adminPage:serverLogs:watchList");
 
       socket.on("adminPage:serverLogs:create", handleNewServerLog);
+      socket.on("adminPage:serverLogOptions:update", handleUpdateFilterOptions);
 
       return () => {
         socket.off("adminPage:serverLogs:create", handleNewServerLog);
+        socket.off("adminPage:serverLogOptions:update", handleUpdateFilterOptions);
 
         clearInterval(intervalRef.current);
       };
@@ -307,6 +313,7 @@ function ServerLogPage() {
               ? filteredServerLog.find((log) => log.id === selectedServerLog)
               : serverLog.find((log) => log.id === selectedServerLog)
           }
+          users={filterOptions?.users || []}
         />
       ) : null}
 
