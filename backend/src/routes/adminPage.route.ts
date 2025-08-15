@@ -32,11 +32,13 @@ const adminPageController = container.resolve(AdminPageController);
 
 router.get(
     "/getServerLogs{/:limit-:offset}",
+
     verifyAuth(),
     verifyPermission([ADMIN_PAGE_SERVER_LOG_READ.groupName]),
     validateRequest(getServerLogSchema),
     adminPageController.getServerLogs
 );
+
 router.get(
     "/getFilterOptionsServerLog",
     verifyAuth(),
