@@ -7,6 +7,8 @@ import { ReactComponent as ArrowUpIcon } from "assets/icons/arrow_up.svg";
 import { ReactComponent as ArrowDownIcon } from "assets/icons/arrow_down.svg";
 import { ReactComponent as ArrowForwardIcon } from "assets/icons/arrow_forward.svg";
 
+const MIN_WIDTH = 50;
+
 const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, rows, onRowClick }) => {
   const tableRef = useRef();
   const [sortedColumn, setSortedColumn] = useState(null);
@@ -20,8 +22,6 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, rows, o
     const table = tableRef.current;
     const headers = table.querySelectorAll("thead th");
     const totalTableWidth = table.parentElement.clientWidth - 36;
-
-    const MIN_WIDTH = 50;
 
     const fixedWidths = columns.map((col) => col.width || null);
     const totalFixedWidth = fixedWidths.reduce((sum, w) => (w ? sum + w : sum), 0);
@@ -256,12 +256,6 @@ const ResizableTable = ({ columns, tableHeight = 300, handleSort = null, rows, o
               onClick={() => onRowClick && onRowClick(row)}
               style={{ cursor: `${onRowClick ? "pointer" : ""}` }}
             >
-              {columnOrder.map((col) => {
-                console.log("Column", col);
-                console.log("Row", row);
-
-                console.log("Value", row[col.id]);
-              })}
               {columnOrder.map((col) => (
                 <td key={col.id}> {col.render ? col.render(row, row[col.id]) : row[col.id]}</td>
               ))}
