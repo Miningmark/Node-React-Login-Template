@@ -695,28 +695,37 @@ const UserPage = ({ usernameChange }) => {
                 ) : (
                   <ResizableTable
                     columns={[
-                      { title: "Zeitpunkt", width: 140 },
-                      { title: "IPv4-Adresse", width: 150 },
-                      { title: "Region / Land", width: 200 },
-                      { title: "Erfolgreich", width: 50 },
+                      {
+                        id: "loginTime",
+                        title: "Zeitpunkt",
+                        width: 140,
+                        render: (row, value) => convertToLocalDate(value),
+                      },
+                      { id: "ipv4Address", title: "IPv4-Adresse", width: 150 },
+                      {
+                        id: "regionName",
+                        title: "Region / Land",
+                        width: 200,
+                        render: (row, value) => (
+                          <span className="text-center">
+                            {row.regionName === "IP Lookup nicht erfolgreich"
+                              ? row.regionName
+                              : `${row.regionName} / ${row.country}`}
+                          </span>
+                        ),
+                      },
+                      {
+                        id: "successfully",
+                        title: "Erfolgreich",
+                        width: 50,
+                        render: (row, Value) => (
+                          <span className="text-center">{Value ? "✅" : "❌"}</span>
+                        ),
+                      },
                     ]}
                     tableHeight="auto"
-                  >
-                    <tbody>
-                      {logins.map((entry, idx) => (
-                        <tr key={idx}>
-                          <td>{convertToLocalDate(entry.loginTime)}</td>
-                          <td>{entry.ipv4Address}</td>
-                          <td>
-                            {entry.regionName === "IP Lookup nicht erfolgreich"
-                              ? entry.regionName
-                              : `${entry.regionName} / ${entry.country}`}
-                          </td>
-                          <td className="text-center">{entry.successfully ? "✅" : "❌"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </ResizableTable>
+                    rows={logins}
+                  />
                 )}
               </div>
             </div>
