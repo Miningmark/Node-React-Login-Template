@@ -12,7 +12,7 @@ import { scheduleAllCronJobs } from "@/croner/scheduler.js";
 import { ServerLogTypes } from "@/models/serverLog.model.js";
 import { RouteGroupService } from "@/services/routeGroup.service.js";
 import { SocketService } from "@/services/socket.service.js";
-import { generateDevUser, generateSuperAdmin } from "@/utils/superAdmin.util.js";
+import { generateSuperAdmin } from "@/utils/superAdmin.util.js";
 
 const httpServer = http.createServer(app);
 
@@ -46,7 +46,6 @@ const init = async () => {
         await RouteGroupService.removeUnusedRouteGroups();
 
         await generateSuperAdmin();
-        await generateDevUser();
 
         await scheduleAllCronJobs();
 

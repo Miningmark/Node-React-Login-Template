@@ -53,34 +53,3 @@ export async function generateSuperAdmin() {
         });
     }
 }
-
-//TODO: remove
-export async function generateDevUser() {
-    const hashedPassword = await bcrypt.hash("Test123!", 10);
-    let databaseUser = await User.findOne({ where: { username: "devUser" } });
-
-    if (databaseUser === null) {
-        databaseUser = await User.create({
-            username: "devUser",
-            email: "devUser@devUser.com",
-            password: hashedPassword,
-            isActive: true
-        });
-    }
-
-    let databasePermission = await Permission.findOne({ where: { name: "DevUser Berechtigung" } });
-
-    if (databaseUser === null) return;
-
-    if (databasePermission === null) {
-        databasePermission = await Permission.create({
-            name: "DevUser Berechtigung",
-            description: "Hat sämtlich Berechtigungen für den DevUser"
-        });
-    }
-
-    const databaseRouteGroups = await RouteGroup.findAll();
-
-    await databaseUser.setPermissions([databasePermission]);
-    await databasePermission.setRouteGroups(databaseRouteGroups);
-}
